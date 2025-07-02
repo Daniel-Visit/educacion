@@ -1,0 +1,512 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "blockquote",
+      "content": [
+        {
+          "type": "paragraph",
+          "content": [
+            {
+              "type": "text",
+              "marks": [{ "type": "bold" }],
+              "text": "OA N°2: "
+            },
+            {
+              "type": "text",
+              "marks": [
+                { "type": "bold" },
+                {
+                  "type": "highlight",
+                  "attrs": { "color": "var(--tt-color-highlight-purple)" }
+                }
+              ],
+              "text": "Leer y comprender textos narrativos y expositivos, identificando sus características y estructura."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "level": 2 },
+      "content": [
+        {
+          "type": "text",
+          "marks": [{ "type": "bold" }],
+          "text": "Propósito General de la Clase:"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "text": "Desarrollar habilidades de " },
+        {
+          "type": "text",
+          "marks": [
+            { "type": "bold" },
+            {
+              "type": "highlight",
+              "attrs": { "color": "var(--tt-color-highlight-green)" }
+            }
+          ],
+          "text": "comprensión lectora"
+        },
+        {
+          "type": "text",
+          "text": " en textos narrativos y expositivos, fomentando la identificación de elementos clave como personajes, trama, estructura, y mensaje principal."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "level": 3 },
+      "content": [
+        {
+          "type": "text",
+          "marks": [{ "type": "bold" }],
+          "text": "Objetivos Específicos:"
+        }
+      ]
+    },
+    {
+      "type": "orderedList",
+      "attrs": { "order": 1 },
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Leer y comprender un texto narrativo y un texto expositivo."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Identificar las características de los textos narrativos y expositivos (estructura, personajes, tema, etc.)."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Desarrollar la capacidad de extraer información clave de los textos."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                { "type": "text", "text": "Fomentar la " },
+                {
+                  "type": "text",
+                  "marks": [{ "type": "bold" }, { "type": "underline" }],
+                  "text": "expresión oral y escrita"
+                },
+                { "type": "text", "text": " a partir de la lectura." }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "level": 4 },
+      "content": [
+        {
+          "type": "text",
+          "marks": [{ "type": "bold" }],
+          "text": "Links de interés:"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "link",
+              "attrs": {
+                "href": "https://www.curriculumnacional.cl/curriculum/1o-6o-basico/lenguaje-comunicacion/2-basico",
+                "target": "_blank"
+              }
+            }
+          ],
+          "text": "https://www.curriculumnacional.cl/curriculum/1o-6o-basico/lenguaje-comunicacion/2-basico"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "level": 3 },
+      "content": [
+        {
+          "type": "text",
+          "marks": [{ "type": "bold" }],
+          "text": "Estructura de la Clase: Total: 60 minutos"
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": { "language": null },
+      "content": [
+        { "type": "text", "text": "Sección 1: Introducción (10 minutos)" }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "marks": [{ "type": "bold" }], "text": "Actividad:" },
+        {
+          "type": "text",
+          "text": " El docente plantea una situación problemática: ¿Como podemos ayudar a otros niños a comprender que son los cuentos y los textos informativos?"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "marks": [{ "type": "bold" }],
+          "text": "Descripción:"
+        },
+        {
+          "type": "text",
+          "text": " Se les pregunta a los estudiantes si alguna vez han leido textos narrativos o expositivos, y que diferencias conocen entre ellos."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "marks": [{ "type": "bold" }], "text": "Recursos:" },
+        { "type": "text", "text": " Pizarra, marcadores." }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "marks": [{ "type": "bold" }],
+          "text": "Observaciones:"
+        },
+        {
+          "type": "text",
+          "text": " Utilizar preguntas abiertas para generar interés y promover la participación de todos los estudiantes."
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": { "language": null },
+      "content": [
+        {
+          "type": "text",
+          "text": "Sección 2: Presentación del Texto Narrativo (15 minutos)"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "marks": [{ "type": "bold" }], "text": "Actividad:" },
+        {
+          "type": "text",
+          "text": " En equipos, los estudiantes leen y analizan un cuento para identificar sus elementos narrativos. corto, como un cuento."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "marks": [{ "type": "bold" }],
+          "text": "Descripción:"
+        },
+        {
+          "type": "text",
+          "text": " El docente lee en voz alta el texto, destacando los personajes principales, la trama y el lugar donde ocurre la historia. Durante la lectura, se realizan pausas para comentar ciertos fragmentos y explicar conceptos importantes (como personajes, dialogo, secuencia de eventos)."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "marks": [{ "type": "bold" }], "text": "Recursos:" },
+        {
+          "type": "text",
+          "text": " Texto narrativo impreso o digital, pizarra."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "marks": [{ "type": "bold" }],
+          "text": "Observaciones:"
+        },
+        {
+          "type": "text",
+          "text": " Hacer preguntas durante la lectura, como 'Que creen que pasara despues?' o 'Por que el personaje actua de esta manera?', para fomentar la reflexion."
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": { "language": null },
+      "content": [
+        {
+          "type": "text",
+          "text": "Sección 3: Actividad de Comprensión de Texto Narrativo (10 minutos)"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "marks": [{ "type": "bold" }], "text": "Actividad:" },
+        {
+          "type": "text",
+          "text": " Crear una infografía con los elementos del cuento para enseñar a otros."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "marks": [{ "type": "bold" }],
+          "text": "Descripción:"
+        },
+        {
+          "type": "text",
+          "text": " Se les entregan fichas con preguntas que permitan identificar los personajes, el lugar, los eventos importantes y la moraleja o mensaje del cuento."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "marks": [{ "type": "bold" }], "text": "Recursos:" },
+        { "type": "text", "text": " Fichas de comprensión, lápices." }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "marks": [{ "type": "bold" }],
+          "text": "Observaciones:"
+        },
+        {
+          "type": "text",
+          "text": " Asegurarse de que todos los estudiantes comprendan las preguntas antes de que comiencen a responder. En caso de que algunos estudiantes tengan dificultades, proporcionarles ejemplos."
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": { "language": null },
+      "content": [
+        {
+          "type": "text",
+          "text": "Sección 4: Presentación del Texto Expositivo (15 minutos)"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "marks": [{ "type": "bold" }], "text": "Actividad:" },
+        {
+          "type": "text",
+          "text": " En equipos, leen un texto expositivo y extraen información relevante para incluir en su infografía. corto, como una breve explicación sobre un tema (puede ser un texto sobre animales, plantas, la naturaleza, etc.)."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "marks": [{ "type": "bold" }],
+          "text": "Descripción:"
+        },
+        {
+          "type": "text",
+          "text": " El docente lee el texto en voz alta y se detiene para explicar términos importantes o ideas centrales. Se hace hincapié en cómo se estructura un texto expositivo (introducción, desarrollo, conclusión)."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "marks": [{ "type": "bold" }], "text": "Recursos:" },
+        {
+          "type": "text",
+          "text": " Texto expositivo impreso o digital, pizarra."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "marks": [{ "type": "bold" }],
+          "text": "Observaciones:"
+        },
+        {
+          "type": "text",
+          "text": " Asegurarse de que los estudiantes comprendan la diferencia entre texto narrativo y expositivo."
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": { "language": null },
+      "content": [
+        {
+          "type": "text",
+          "text": "Sección 5: Actividad de Comprensión de Texto Expositivo (10 minutos)"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "marks": [{ "type": "bold" }], "text": "Actividad:" },
+        {
+          "type": "text",
+          "text": " Complementan su infografía con datos del texto expositivo."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "marks": [{ "type": "bold" }],
+          "text": "Descripción:"
+        },
+        {
+          "type": "text",
+          "text": " Se entrega a los estudiantes una ficha de preguntas sobre el texto expositivo, donde deben identificar información clave, como los hechos, datos o conceptos principales."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "marks": [{ "type": "bold" }], "text": "Recursos:" },
+        { "type": "text", "text": " Fichas de comprensión, lápices." }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "marks": [{ "type": "bold" }],
+          "text": "Observaciones:"
+        },
+        {
+          "type": "text",
+          "text": " Las preguntas deben ser claras y enfocadas en los puntos principales del texto (por ejemplo, 'Que es lo mas importante que aprendiste en este texto?')."
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": { "language": null },
+      "content": [
+        {
+          "type": "text",
+          "text": "Sección 6. Cierre y Reflexión Final (5 minutos)"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "marks": [{ "type": "bold" }], "text": "Actividad:" },
+        {
+          "type": "text",
+          "text": " Presentan su infografía y reflexionan sobre el trabajo en equipo y el aprendizaje logrado. sobre lo aprendido en la clase."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "marks": [{ "type": "bold" }],
+          "text": "Descripción:"
+        },
+        {
+          "type": "text",
+          "text": " El docente guía una breve discusión en la que los estudiantes comparten lo que aprendieron sobre los textos narrativos y expositivos. También se les pide que comparen ambos tipos de texto y expliquen las diferencias que notaron."
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        { "type": "text", "marks": [{ "type": "bold" }], "text": "Recursos:" },
+        { "type": "text", "text": " Pizarra." }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "marks": [{ "type": "bold" }],
+          "text": "Observaciones:"
+        },
+        {
+          "type": "text",
+          "text": " Aprovechar este momento para aclarar cualquier duda y dar retroalimentación sobre las actividades realizadas."
+        }
+      ]
+    }
+  ]
+}

@@ -25,8 +25,8 @@ export default function Entrevista() {
   const isTypeS = steps[step]?.tipo === "S";
 
   return (
-    <div className="min-h-screen bg-[#f7f8fd] flex flex-row w-full">
-      <div className="flex w-full max-w-7xl min-h-screen mx-auto rounded-3xl my-6 bg-white/80 shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] overflow-hidden">
+    <div className="h-full bg-[#f7f8fd] flex flex-row w-full">
+      <div className="flex w-full max-w-7xl h-full max-h-[calc(100vh-48px)] mx-auto rounded-3xl my-6 bg-white/80 shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] overflow-hidden">
         {/* Sidebar glassmorphism */}
         <Sidebar
           steps={steps}

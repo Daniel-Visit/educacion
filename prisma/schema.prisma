@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model asignatura {
+  id     Int    @id @default(autoincrement())
+  nombre String @unique
+  @@map("asignatura")
+}
+
+model nivel {
+  id     Int    @id @default(autoincrement())
+  nombre String @unique
+  @@map("nivel")
+}
+
+model metodologia {
+  id                Int    @id @default(autoincrement())
+  nombre_metodologia String @unique
+  descripcion       String
+  nivel_recomendado String
+  fuentes_literatura String
+  @@map("metodologia")
+}
+
+model oa {
+  id                Int    @id @default(autoincrement())
+  nivel_id          Int
+  asignatura_id     Int
+  eje_id            Int
+  eje_descripcion   String
+  oas_id            String
+  descripcion_oas   String
+  basal             Boolean
+  minimo_clases     Int
+  @@map("oa")
+} 
