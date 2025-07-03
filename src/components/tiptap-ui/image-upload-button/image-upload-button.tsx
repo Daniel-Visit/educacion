@@ -1,129 +1,81 @@
 "use client"
 
 import * as React from "react"
-import { type Editor } from "@tiptap/react"
-
-// --- Hooks ---
-import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
-
-// --- Icons ---
+import { useCallback, useRef } from "react"
 import { ImagePlusIcon } from "@/components/tiptap-icons/image-plus-icon"
-
-// --- UI Primitives ---
-import type { ButtonProps } from "@/components/tiptap-ui-primitive/button"
 import { Button } from "@/components/tiptap-ui-primitive/button"
+import { Editor } from "@tiptap/react"
+import { useImageUpload } from "@/hooks/use-image-upload"
 
-export interface ImageUploadButtonProps extends ButtonProps {
-  editor?: Editor | null
+interface ImageUploadButtonProps {
+  editor: Editor | null
   text?: string
-  extensionName?: string
 }
 
-export function isImageActive(
-  editor: Editor | null,
-  extensionName: string
-): boolean {
-  if (!editor) return false
-  return editor.isActive(extensionName)
-}
+export default function ImageUploadButton({ editor, text = "Upload" }: ImageUploadButtonProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { uploadImage, isUploading, uploadProgress, uploadError } = useImageUpload()
 
-export function insertImage(
-  editor: Editor | null,
-  extensionName: string
-): boolean {
-  if (!editor) return false
+  const handleFileSelect = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0]
+      if (!file || !editor) return
 
-  return editor
-    .chain()
-    .focus()
-    .insertContent({
-      type: extensionName,
-    })
-    .run()
-}
+      try {
+        const url = await uploadImage(file)
 
-export function useImageUploadButton(
-  editor: Editor | null,
-  extensionName: string = "imageUpload",
-  disabled: boolean = false
-) {
-  const isActive = isImageActive(editor, extensionName)
-  const handleInsertImage = React.useCallback(() => {
-    if (disabled) return false
-    return insertImage(editor, extensionName)
-  }, [editor, extensionName, disabled])
-
-  return {
-    isActive,
-    handleInsertImage,
-  }
-}
-
-export const ImageUploadButton = React.forwardRef<
-  HTMLButtonElement,
-  ImageUploadButtonProps
->(
-  (
-    {
-      editor: providedEditor,
-      extensionName = "imageUpload",
-      text,
-      className = "",
-      disabled,
-      onClick,
-      children,
-      ...buttonProps
-    },
-    ref
-  ) => {
-    const editor = useTiptapEditor(providedEditor)
-    const { isActive, handleInsertImage } = useImageUploadButton(
-      editor,
-      extensionName,
-      disabled
-    )
-
-    const handleClick = React.useCallback(
-      (e: React.MouseEvent<HTMLButtonElement>) => {
-        onClick?.(e)
-
-        if (!e.defaultPrevented && !disabled) {
-          handleInsertImage()
+        editor
+          .chain()
+          .focus()
+          .setImage({ src: url })
+          .run()
+      } catch (error) {
+        console.error("Error uploading image:", error)
+        // El error ya se maneja en el hook
+      } finally {
+        // Reset file input
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ""
         }
-      },
-      [onClick, disabled, handleInsertImage]
-    )
+      }
+    },
+    [editor, uploadImage]
+  )
 
-    if (!editor || !editor.isEditable) {
-      return null
-    }
+  const handleClick = useCallback(() => {
+    fileInputRef.current?.click()
+  }, [])
 
-    return (
+  if (!editor) return null
+
+  return (
+    <>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileSelect}
+        style={{ display: "none" }}
+      />
       <Button
-        ref={ref}
-        type="button"
-        className={className.trim()}
         data-style="ghost"
-        data-active-state={isActive ? "on" : "off"}
-        role="button"
-        tabIndex={-1}
-        aria-label="Add image"
-        aria-pressed={isActive}
-        tooltip="Add image"
         onClick={handleClick}
-        {...buttonProps}
+        disabled={isUploading}
+        title="Upload image (max 5MB)"
       >
-        {children || (
-          <>
-            <ImagePlusIcon className="tiptap-button-icon" />
-            {text && <span className="tiptap-button-text">{text}</span>}
-          </>
+        <ImagePlusIcon className="tiptap-button-icon" />
+        {text}
+        {isUploading && (
+          <div className="ml-2 text-xs text-gray-500">
+            {uploadProgress}%
+          </div>
         )}
       </Button>
-    )
-  }
-)
-
-ImageUploadButton.displayName = "ImageUploadButton"
-
-export default ImageUploadButton
+      {uploadError && (
+        <div className="absolute top-full left-0 mt-1 p-2 bg-red-100 text-red-700 text-xs rounded border border-red-200 max-w-xs z-50">
+          {uploadError}
+        </div>
+      )}
+    </>
+  )
+}

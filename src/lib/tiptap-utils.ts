@@ -132,7 +132,7 @@ export function findNodePosition(props: {
  * @param file The file to upload
  * @param onProgress Optional callback for tracking upload progress
  * @param abortSignal Optional AbortSignal for cancelling the upload
- * @returns Promise resolving to the URL of the uploaded image
+ * @returns Promise resolving to the image URL that references the database
  */
 export const handleImageUpload = async (
   file: File,
@@ -150,19 +150,54 @@ export const handleImageUpload = async (
     )
   }
 
-  // For demo/testing: Simulate upload progress
-  for (let progress = 0; progress <= 100; progress += 10) {
-    if (abortSignal?.aborted) {
-      throw new Error("Upload cancelled")
-    }
-    await new Promise((resolve) => setTimeout(resolve, 500))
-    onProgress?.({ progress })
+  // Validate file type
+  if (!file.type.startsWith('image/')) {
+    throw new Error("File must be an image")
   }
 
-  return "/images/placeholder-image.png"
+  try {
+    // Simulate upload progress
+    for (let progress = 0; progress <= 90; progress += 10) {
+      if (abortSignal?.aborted) {
+        throw new Error("Upload cancelled")
+      }
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      onProgress?.({ progress })
+    }
 
-  // Uncomment for production use:
-  // return convertFileToBase64(file, abortSignal);
+    // Convert to base64
+    const base64 = await convertFileToBase64(file, abortSignal)
+    
+    // Save to database
+    const response = await fetch('/api/imagenes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        nombre: file.name,
+        tipo: file.type,
+        data: base64,
+        tamaño: file.size
+      })
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Error al guardar la imagen')
+    }
+
+    const imagen = await response.json()
+    
+    // Final progress update
+    onProgress?.({ progress: 100 })
+    
+    // Return a URL that references the image by ID
+    return `/api/imagenes/${imagen.id}`
+  } catch (error) {
+    console.error("Error uploading image:", error)
+    throw error
+  }
 }
 
 /**

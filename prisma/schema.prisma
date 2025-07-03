@@ -11,6 +11,7 @@ model asignatura {
   id     Int    @id @default(autoincrement())
   nombre String @unique
   oas    oa[]
+
   @@map("asignatura")
 }
 
@@ -18,53 +19,87 @@ model nivel {
   id     Int    @id @default(autoincrement())
   nombre String @unique
   oas    oa[]
+
   @@map("nivel")
 }
 
 model metodologia {
-  id                Int    @id @default(autoincrement())
+  id                 Int    @id @default(autoincrement())
   nombre_metodologia String @unique
-  descripcion       String
-  nivel_recomendado String
+  descripcion        String
+  nivel_recomendado  String
   fuentes_literatura String
+
   @@map("metodologia")
 }
 
 model oa {
-  id                Int    @id @default(autoincrement())
-  nivel_id          Int
-  asignatura_id     Int
-  eje_id            Int
-  eje_descripcion   String
-  oas_id            String
-  descripcion_oas   String
-  basal             Boolean
-  minimo_clases     Int
-  nivel             nivel     @relation(fields: [nivel_id], references: [id])
-  asignatura        asignatura @relation(fields: [asignatura_id], references: [id])
+  id              Int        @id @default(autoincrement())
+  nivel_id        Int
+  asignatura_id   Int
+  eje_id          Int
+  eje_descripcion String
+  oas_id          String
+  descripcion_oas String
+  basal           Boolean
+  minimo_clases   Int
+  asignatura      asignatura @relation(fields: [asignatura_id], references: [id])
+  nivel           nivel      @relation(fields: [nivel_id], references: [id])
+
   @@map("oa")
 }
 
 model MatrizEspecificacion {
-  id                Int           @id @default(autoincrement())
-  nombre            String
-  total_preguntas   Int
-  createdAt         DateTime      @default(now())
-  oas               MatrizOA[]
+  id              Int        @id @default(autoincrement())
+  nombre          String
+  total_preguntas Int
+  createdAt       DateTime   @default(now())
+  oas             MatrizOA[]
 }
 
 model MatrizOA {
-  id                Int           @id @default(autoincrement())
-  matrizId          Int
-  oaId              Int           // Relaciona con OA real
-  matriz            MatrizEspecificacion @relation(fields: [matrizId], references: [id])
-  indicadores       Indicador[]
+  id          Int                  @id @default(autoincrement())
+  matrizId    Int
+  oaId        Int
+  indicadores Indicador[]
+  matriz      MatrizEspecificacion @relation(fields: [matrizId], references: [id])
 }
 
 model Indicador {
-  id                Int           @id @default(autoincrement())
-  matrizOAId        Int
-  descripcion       String
-  preguntas         Int
-  matrizOA          MatrizOA      @relation(fields: [matrizOAId], references: [id])
-} 
+  id          Int      @id @default(autoincrement())
+  matrizOAId  Int
+  descripcion String
+  preguntas   Int
+  matrizOA    MatrizOA @relation(fields: [matrizOAId], references: [id])
+}
+
+model Archivo {
+  id        Int             @id @default(autoincrement())
+  titulo    String
+  tipo      String
+  contenido String
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  imagenes  ArchivoImagen[]
+}
+
+model Imagen {
+  id        Int             @id @default(autoincrement())
+  nombre    String
+  tipo      String
+  data      String
+  tamaño   Int
+  createdAt DateTime        @default(now())
+  archivos  ArchivoImagen[]
+}
+
+model ArchivoImagen {
+  id        Int      @id @default(autoincrement())
+  archivoId Int
+  imagenId  Int
+  createdAt DateTime @default(now())
+  imagen    Imagen   @relation(fields: [imagenId], references: [id], onDelete: Cascade)
+  archivo   Archivo  @relation(fields: [archivoId], references: [id], onDelete: Cascade)
+
+  @@unique([archivoId, imagenId])
+}

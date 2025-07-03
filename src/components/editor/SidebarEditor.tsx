@@ -1,4 +1,5 @@
 import { BookOpen, FileText, Check } from 'lucide-react';
+import { SavedContent } from '@/hooks/use-content-save';
 
 const options = [
   {
@@ -15,7 +16,13 @@ const options = [
   },
 ];
 
-export default function SidebarEditor({ selected, onSelect }: { selected: string; onSelect: (key: string) => void }) {
+interface SidebarEditorProps {
+  selected: string;
+  onSelect: (key: string) => void;
+  currentFile?: SavedContent | null;
+}
+
+export default function SidebarEditor({ selected, onSelect, currentFile }: SidebarEditorProps) {
   return (
     <aside className="w-80 h-full min-h-0 flex flex-col bg-white/70 backdrop-blur-md py-10 px-6 border-r border-[#f0f0fa] overflow-y-auto max-h-full shadow-[0_4px_24px_0_rgba(99,102,241,0.08)] transition-all">
       <div className="flex items-center gap-4 mb-10">
@@ -27,6 +34,20 @@ export default function SidebarEditor({ selected, onSelect }: { selected: string
           <div className="text-sm text-purple-500 font-medium">Contenido generativo</div>
         </div>
       </div>
+      
+      {/* Nombre del archivo actual */}
+      {currentFile && (
+        <div className="mb-6 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+          <div className="flex items-center gap-2 mb-2">
+            <FileText className="w-4 h-4 text-indigo-600" />
+            <span className="text-sm font-medium text-indigo-700">Archivo actual</span>
+          </div>
+          <div className="text-sm text-indigo-900 font-semibold truncate">
+            {currentFile.titulo}
+          </div>
+        </div>
+      )}
+      
       <nav className="flex-1 space-y-2 min-h-0">
         {options.map((opt, idx) => {
           const Icon = opt.icon;

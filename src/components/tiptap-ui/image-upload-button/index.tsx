@@ -1,1 +1,1 @@
-export * from "./image-upload-button"
+export { default } from "./image-upload-button"

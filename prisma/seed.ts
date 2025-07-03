@@ -1,11 +1,53 @@
-import { PrismaClient } from '@prisma/client';
-import fs from 'fs';
-import path from 'path';
-import { parse } from 'csv-parse/sync';
+const { PrismaClient } = require('@prisma/client');
+const fs = require('fs');
+const path = require('path');
+const { parse } = require('csv-parse/sync');
 
 const prisma = new PrismaClient();
 
 async function main() {
+  // 1. Poblar niveles
+  console.log('Poblando niveles desde Niveles.csv...');
+  const nivelesPath = path.join(__dirname, '../Niveles.csv');
+  const nivelesCSV = fs.readFileSync(nivelesPath, 'utf-8');
+  const niveles = parse(nivelesCSV, { columns: true, delimiter: ';', skip_empty_lines: true });
+  let nivelesProcesados = 0;
+  for (const row of niveles) {
+    if (!row['nombre']) continue;
+    try {
+      await prisma.nivel.upsert({
+        where: { nombre: row['nombre'] },
+        update: {},
+        create: { nombre: row['nombre'] },
+      });
+      nivelesProcesados++;
+    } catch (error) {
+      console.log('Error al crear nivel:', error, row);
+    }
+  }
+  console.log(`Niveles procesados: ${nivelesProcesados}`);
+
+  // 2. Poblar asignaturas
+  console.log('Poblando asignaturas desde Asignaturas.csv...');
+  const asignaturasPath = path.join(__dirname, '../Asignaturas.csv');
+  const asignaturasCSV = fs.readFileSync(asignaturasPath, 'utf-8');
+  const asignaturas = parse(asignaturasCSV, { columns: true, delimiter: ';', skip_empty_lines: true });
+  let asignaturasProcesadas = 0;
+  for (const row of asignaturas) {
+    if (!row['nombre']) continue;
+    try {
+      await prisma.asignatura.upsert({
+        where: { nombre: row['nombre'] },
+        update: {},
+        create: { nombre: row['nombre'] },
+      });
+      asignaturasProcesadas++;
+    } catch (error) {
+      console.log('Error al crear asignatura:', error, row);
+    }
+  }
+  console.log(`Asignaturas procesadas: ${asignaturasProcesadas}`);
+
   console.log('Poblando solo OA desde OAS.csv...');
   const oasPath = path.join(__dirname, '../OAS.csv');
   const oasCSV = fs.readFileSync(oasPath, 'utf-8');
@@ -116,6 +158,37 @@ async function main() {
   
   console.log(`Metodologías procesadas: ${metodologiasProcessed}, saltadas: ${metodologiasSkipped}`);
   console.log('Seed completado.');
+
+  const contentPath = path.join(__dirname, '../src/components/tiptap-templates/simple/data/content.json');
+  const contentJson = fs.readFileSync(contentPath, 'utf-8');
+
+  // Eliminar archivos previos de ejemplo para evitar duplicados
+  await prisma.archivo.deleteMany({
+    where: {
+      OR: [
+        { titulo: 'planificacion ejemplo' },
+        { titulo: 'material ejemplo' }
+      ]
+    }
+  });
+
+  await prisma.archivo.create({
+    data: {
+      titulo: 'planificacion ejemplo',
+      tipo: 'planificacion',
+      contenido: contentJson
+    }
+  });
+
+  await prisma.archivo.create({
+    data: {
+      titulo: 'material ejemplo',
+      tipo: 'material',
+      contenido: contentJson
+    }
+  });
+
+  console.log('Archivos de ejemplo insertados');
 }
 
 main()

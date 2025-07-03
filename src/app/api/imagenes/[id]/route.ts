@@ -1,0 +1,75 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    const idNum = parseInt(id)
+    
+    if (isNaN(idNum)) {
+      return NextResponse.json(
+        { error: 'ID inválido' },
+        { status: 400 }
+      )
+    }
+
+    const imagen = await prisma.imagen.findUnique({
+      where: { id: idNum }
+    })
+
+    if (!imagen) {
+      return NextResponse.json(
+        { error: 'Imagen no encontrada' },
+        { status: 404 }
+      )
+    }
+
+    // Devolver la imagen como respuesta de imagen
+    return new NextResponse(imagen.data, {
+      headers: {
+        'Content-Type': imagen.tipo,
+        'Cache-Control': 'public, max-age=31536000', // Cache por 1 año
+      },
+    })
+  } catch (error) {
+    console.error('Error al obtener imagen:', error)
+    return NextResponse.json(
+      { error: 'Error interno del servidor' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    const idNum = parseInt(id)
+    
+    if (isNaN(idNum)) {
+      return NextResponse.json(
+        { error: 'ID inválido' },
+        { status: 400 }
+      )
+    }
+
+    const imagen = await prisma.imagen.delete({
+      where: { id: idNum }
+    })
+
+    return NextResponse.json({ message: 'Imagen eliminada correctamente' })
+  } catch (error) {
+    console.error('Error al eliminar imagen:', error)
+    return NextResponse.json(
+      { error: 'Error interno del servidor' },
+      { status: 500 }
+    )
+  }
+} 

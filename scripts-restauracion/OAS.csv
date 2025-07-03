@@ -1,0 +1,38 @@
+﻿id;nivel_id;asignatura_id;eje_id;eje_descripcion;oas_id;descripcion_oas;basal;minimo_clases
+1;2;7;1;Lectura - Comprensión;OA 01;Leer textos significativos que incluyan palabras con hiatos y diptongos, con grupos consonánticos y con combinación ce-ci, que-qui, ge-gi, gue-gui, güe-güi.;true;10
+2;2;7;1;Lectura - Comprensión;OA 02;Leer en voz alta para adquirir fluidez;false;8
+3;2;7;1;Lectura - Comprensión;OA 03;Comprender textos aplicando estrategias de comprensión lectora;true;11
+4;2;7;1;Lectura - Comprensión;OA 04;Leer independientemente y ampliar repertorio de lecturas;true;11
+5;2;7;1;Lectura - Comprensión;OA 05;Demostrar comprensión de las narraciones leídas;true;11
+6;2;7;1;Lectura - Comprensión;OA 06;Leer habitualmente y disfrutar los mejores poemas de autor y de la tradición oral adecuados a su edad.;false;8
+7;2;7;1;Lectura - Comprensión;OA 07;Leer independientemente y comprender textos no literarios;false;8
+8;2;7;1;Lectura - Comprensión;OA 08;Desarrollar el gusto por la lectura, leyendo habitualmente diversos textos.;true;10
+9;2;7;1;Lectura - Comprensión;OA 09;Asistir habitualmente a la biblioteca para encontrar información y elegir libros, cuidando el material en favor del uso común.;true;10
+10;2;7;1;Lectura - Comprensión;OA 10;Buscar información sobre un tema en una fuente dada por el docente (página de internet, sección del diario, capítulo de un libro, etc.), para llevar a cabo una investigación.;true;10
+11;2;7;1;Lectura - Comprensión;OA 11;Desarrollar la curiosidad por las palabras o expresiones que desconocen y adquirir el hábito de averiguar su significado.;true;10
+12;2;7;1;Lectura - Comprensión;OA 12;Escribir frecuentemente, para desarrollar la creatividad y expresar sus ideas, textos como poemas, diarios de vida, anécdotas, cartas, recados, etc.;false;8
+13;2;7;2;Escritura - Producción;OA 13;Escribir creativamente narraciones (experiencias personales, relatos de hechos, cuentos, etc.) que tengan inicio, desarrollo y desenlace.;true;10
+14;2;7;2;Escritura - Producción;OA 14;Escribir artículos informativos para comunicar información sobre un tema.;false;8
+15;2;7;2;Escritura - Producción;OA 15;Escribir con letra clara, separando las palabras con un espacio para que puedan ser leídas por otros con facilidad.;false;8
+16;2;7;2;Escritura - Producción;OA 16;Planificar la escritura;false;8
+17;2;7;2;Escritura - Producción;OA 17;Revisión y edición de textos propios para transmitir ideas claramente;false;8
+18;2;7;2;Escritura - Producción;OA 18;Incorporar de manera pertinente en la escritura el vocabulario nuevo extraído de textos escuchados o leídos.;true;10
+19;2;7;2;Escritura - Producción;OA 19;Comprender la función de los artículos, sustantivos y adjetivos en textos orales y escritos, y reemplazarlos o combinarlos de diversas maneras para enriquecer o precisar sus producciones.;false;8
+20;2;7;2;Escritura - Producción;OA 20;Identificar el género y número de las palabras para asegurar la concordancia en sus escritos.;false;8
+21;2;7;2;Escritura - Producción;OA 21;Escribir correctamente para facilitar la comprensión al lector;true;10
+22;2;7;2;Escritura - Producción;OA 22;Comprender y disfrutar versiones completas de obras narradas por un adulto;false;8
+23;2;7;3;Comunicación oral;OA 23;Comprender textos orales para obtener información y desarrollar curiosidad;true;10
+24;2;7;3;Comunicación oral;OA 24;Disfrutar de la experiencia de asistir a obras de teatro infantiles o representaciones para ampliar sus posibilidades de expresión, desarrollar su creatividad y familiarizarse con el género.;false;8
+25;2;7;3;Comunicación oral;OA 25;Participar activamente en conversaciones grupales sobre textos;true;10
+26;2;7;3;Comunicación oral;OA 26;Interactuar según convenciones sociales en diferentes situaciones;false;8
+27;2;7;3;Comunicación oral;OA 27;Expresarse coherente y articuladamente sobre temas de interés;false;8
+28;2;7;3;Comunicación oral;OA 28;Incorporar de manera pertinente en sus intervenciones orales el vocabulario nuevo extraído de textos escuchados o leídos.;false;8
+29;2;7;3;Comunicación oral;OA 29;Desempeñar diferentes roles para desarrollar su lenguaje y autoestima, y aprender a trabajar en equipo.;false;8
+30;2;7;3;Comunicación oral;OA 30;Recitar con entonación y expresión poemas, rimas, canciones, trabalenguas y adivinanzas para fortalecer la confianza en sí mismos, aumentar el vocabulario y desarrollar su capacidad expresiva.;false;8
+31;2;7;4;Actitud;OAA A;Demostrar interés y una actitud activa frente a la lectura, orientada al disfrute de la misma y a la valoración del conocimiento que se puede obtener a partir de ella.;false;5
+32;2;7;4;Actitud;OAA B;Demostrar disposición e interés por compartir ideas, experiencias y opiniones con otros.;false;5
+33;2;7;4;Actitud;OAA C;Demostrar disposición e interés por expresarse de manera creativa por medio de la comunicación oral y escrita.;false;5
+34;2;7;4;Actitud;OAA D;Realizar tareas y trabajos de forma rigurosa y perseverante, con el fin de desarrollarlos de manera adecuada a los propósitos de la asignatura.;false;5
+35;2;7;4;Actitud;OAA E;Reflexionar sobre sí mismo, sus ideas y sus intereses para comprenderse y valorarse.;false;5
+36;2;7;4;Actitud;OAA F;Demostrar empatía hacia los demás, comprendiendo el contexto en el que se sitúan.;false;5
+37;2;7;4;Actitud;OAA G;Demostrar respeto por las diversas opiniones y puntos de vista, reconociendo el diálogo como una herramienta de enriquecimiento personal y social.;false;5

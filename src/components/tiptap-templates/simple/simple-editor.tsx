@@ -30,7 +30,6 @@ import {
 } from "@/components/tiptap-ui-primitive/toolbar"
 
 // --- Tiptap Node ---
-import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/image-upload-node-extension"
 import "@/components/tiptap-node/code-block-node/code-block-node.scss"
 import "@/components/tiptap-node/list-node/list-node.scss"
 import "@/components/tiptap-node/image-node/image-node.scss"
@@ -38,7 +37,7 @@ import "@/components/tiptap-node/paragraph-node/paragraph-node.scss"
 
 // --- Tiptap UI ---
 import { HeadingDropdownMenu } from "@/components/tiptap-ui/heading-dropdown-menu"
-import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button"
+import ImageUploadButton from "@/components/tiptap-ui/image-upload-button"
 import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu"
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button"
 import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button"
@@ -75,13 +74,18 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
-import content from "@/components/tiptap-templates/simple/data/content.json"
+interface SimpleEditorProps {
+  initialContent?: any
+  onEditorReady?: (editor: any) => void
+}
 
 const MainToolbarContent = ({
+  editor,
   onHighlighterClick,
   onLinkClick,
   isMobile,
 }: {
+  editor: any
   onHighlighterClick: () => void
   onLinkClick: () => void
   isMobile: boolean
@@ -139,7 +143,7 @@ const MainToolbarContent = ({
       <ToolbarSeparator />
 
       <ToolbarGroup>
-        <ImageUploadButton text="Add" />
+        <ImageUploadButton editor={editor} text="Add" />
       </ToolbarGroup>
 
       <Spacer />
@@ -180,7 +184,7 @@ const MobileToolbarContent = ({
   </>
 )
 
-export function SimpleEditor() {
+export function SimpleEditor({ initialContent, onEditorReady }: SimpleEditorProps) {
   const isMobile = useMobile()
   const windowSize = useWindowSize()
   const [mobileView, setMobileView] = React.useState<
@@ -211,18 +215,25 @@ export function SimpleEditor() {
       Subscript,
 
       Selection,
-      ImageUploadNode.configure({
-        accept: "image/*",
-        maxSize: MAX_FILE_SIZE,
-        limit: 3,
-        upload: handleImageUpload,
-        onError: (error) => console.error("Upload failed:", error),
-      }),
       TrailingNode,
       Link.configure({ openOnClick: false }),
     ],
-    content: content,
+    content: initialContent || '<p></p>',
   })
+
+  // Notificar cuando el editor esté listo
+  React.useEffect(() => {
+    if (editor && onEditorReady) {
+      onEditorReady(editor)
+    }
+  }, [editor, onEditorReady])
+
+  // Cargar contenido inicial cuando cambie
+  React.useEffect(() => {
+    if (editor && initialContent) {
+      editor.commands.setContent(initialContent)
+    }
+  }, [editor, initialContent])
 
   const bodyRect = useCursorVisibility({
     editor,
@@ -249,6 +260,7 @@ export function SimpleEditor() {
       >
         {mobileView === "main" ? (
           <MainToolbarContent
+            editor={editor}
             onHighlighterClick={() => setMobileView("highlighter")}
             onLinkClick={() => setMobileView("link")}
             isMobile={isMobile}

@@ -1,0 +1,177 @@
+import { useState, useCallback, useEffect } from 'react'
+import { Editor } from '@tiptap/react'
+
+export interface SavedContent {
+  id?: number
+  titulo: string
+  tipo: 'planificacion' | 'material' | 'evaluacion'
+  contenido: any
+  createdAt?: string
+  updatedAt?: string
+}
+
+export function useContentSave() {
+  const [isSaving, setIsSaving] = useState(false)
+  const [savedContents, setSavedContents] = useState<SavedContent[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Cargar contenido guardado desde la API
+  const loadSavedContents = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/archivos')
+      if (response.ok) {
+        const archivos = await response.json()
+        setSavedContents(archivos)
+      } else {
+        console.error('Error al cargar archivos:', response.statusText)
+      }
+    } catch (error) {
+      console.error('Error loading saved contents:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  // Cargar contenido al inicializar
+  useEffect(() => {
+    loadSavedContents()
+  }, [loadSavedContents])
+
+  // Guardar contenido actual
+  const saveContent = useCallback(async (
+    editor: Editor,
+    titulo: string,
+    tipo: 'planificacion' | 'material' | 'evaluacion' = 'planificacion'
+  ): Promise<SavedContent | null> => {
+    if (!editor || !titulo.trim()) {
+      throw new Error('Editor y título son requeridos')
+    }
+
+    setIsSaving(true)
+    try {
+      const content = editor.getJSON()
+      // Validar que sea un JSON de TipTap (type: 'doc')
+      if (!content || typeof content !== 'object' || content.type !== 'doc') {
+        throw new Error('El contenido no tiene un formato válido de TipTap.')
+      }
+      const response = await fetch('/api/archivos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          titulo: titulo.trim(),
+          tipo,
+          contenido: JSON.stringify(content)
+        })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Error al guardar')
+      }
+
+      const newContent = await response.json()
+      
+      // Actualizar estado
+      setSavedContents(prev => [newContent, ...prev])
+      
+      return newContent
+    } catch (error) {
+      console.error('Error saving content:', error)
+      throw error
+    } finally {
+      setIsSaving(false)
+    }
+  }, [])
+
+  // Actualizar contenido existente
+  const updateContent = useCallback(async (
+    id: number,
+    editor: Editor,
+    titulo: string
+  ): Promise<SavedContent | null> => {
+    if (!editor || !titulo.trim()) {
+      throw new Error('Editor y título son requeridos')
+    }
+
+    setIsSaving(true)
+    try {
+      const content = editor.getJSON()
+      // Validar que sea un JSON de TipTap (type: 'doc')
+      if (!content || typeof content !== 'object' || content.type !== 'doc') {
+        throw new Error('El contenido no tiene un formato válido de TipTap.')
+      }
+      const response = await fetch(`/api/archivos/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          titulo: titulo.trim(),
+          tipo: savedContents.find(c => c.id === id)?.tipo || 'planificacion',
+          contenido: JSON.stringify(content)
+        })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Error al actualizar')
+      }
+
+      const updatedContent = await response.json()
+      
+      // Actualizar estado
+      setSavedContents(prev => prev.map(item => 
+        item.id === id ? updatedContent : item
+      ))
+      
+      return updatedContent
+    } catch (error) {
+      console.error('Error updating content:', error)
+      throw error
+    } finally {
+      setIsSaving(false)
+    }
+  }, [savedContents])
+
+  // Eliminar contenido
+  const deleteContent = useCallback(async (id: number): Promise<boolean> => {
+    try {
+      const response = await fetch(`/api/archivos/${id}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Error al eliminar')
+      }
+
+      // Actualizar estado
+      setSavedContents(prev => prev.filter(item => item.id !== id))
+      
+      return true
+    } catch (error) {
+      console.error('Error deleting content:', error)
+      return false
+    }
+  }, [])
+
+  // Cargar contenido en el editor
+  const loadContent = useCallback((id: number): SavedContent | null => {
+    const content = savedContents.find(c => c.id === id)
+    return content || null
+  }, [savedContents])
+
+  return {
+    isSaving,
+    isLoading,
+    savedContents,
+    loadSavedContents,
+    saveContent,
+    updateContent,
+    deleteContent,
+    loadContent
+  }
+} 
