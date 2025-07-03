@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { BookOpen, Sparkles } from "lucide-react";
+import { BookOpen, Sparkles, FileText, Edit3 } from "lucide-react";
 
 export default function Home() {
   return (
@@ -18,15 +18,32 @@ export default function Home() {
         <p className="text-[#5b6478] text-center mb-10 text-lg font-medium">
           Tu tutora pedagógica virtual está listo para comenzar.
         </p>
-        {/* Botón */}
-        <Link href="/entrevista" className="w-full flex justify-center">
-          <button className="flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold text-lg px-10 py-3 rounded-2xl shadow-[0_4px_24px_0_rgba(99,102,241,0.18)] hover:scale-[1.04] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 group">
-            Comenzar Entrevista
-            <span className="transition-transform duration-300 group-hover:rotate-12">
-              <Sparkles size={28} strokeWidth={2.2} className="text-white drop-shadow-[0_1px_4px_rgba(99,102,241,0.18)]" />
-            </span>
-          </button>
-        </Link>
+        
+        {/* Botones */}
+        <div className="w-full space-y-4">
+          <Link href="/entrevista" className="w-full flex justify-center">
+            <button className="flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-bold text-lg px-10 py-3 rounded-2xl shadow-[0_4px_24px_0_rgba(99,102,241,0.18)] hover:scale-[1.04] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 group w-full">
+              Comenzar Entrevista
+              <span className="transition-transform duration-300 group-hover:rotate-12">
+                <Sparkles size={28} strokeWidth={2.2} className="text-white drop-shadow-[0_1px_4px_rgba(99,102,241,0.18)]" />
+              </span>
+            </button>
+          </Link>
+          
+          <Link href="/matrices" className="w-full flex justify-center">
+            <button className="flex items-center justify-center gap-2 bg-white/80 backdrop-blur-sm text-indigo-700 font-semibold text-base px-8 py-3 rounded-2xl border border-indigo-200 shadow-sm hover:bg-white hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 group w-full">
+              <FileText size={20} />
+              Matrices de Especificación
+            </button>
+          </Link>
+          
+          <Link href="/editor" className="w-full flex justify-center">
+            <button className="flex items-center justify-center gap-2 bg-white/80 backdrop-blur-sm text-indigo-700 font-semibold text-base px-8 py-3 rounded-2xl border border-indigo-200 shadow-sm hover:bg-white hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-600 group w-full">
+              <Edit3 size={20} />
+              Editor de Planificaciones
+            </button>
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -10,12 +10,14 @@ datasource db {
 model asignatura {
   id     Int    @id @default(autoincrement())
   nombre String @unique
+  oas    oa[]
   @@map("asignatura")
 }
 
 model nivel {
   id     Int    @id @default(autoincrement())
   nombre String @unique
+  oas    oa[]
   @@map("nivel")
 }
 
@@ -38,5 +40,31 @@ model oa {
   descripcion_oas   String
   basal             Boolean
   minimo_clases     Int
+  nivel             nivel     @relation(fields: [nivel_id], references: [id])
+  asignatura        asignatura @relation(fields: [asignatura_id], references: [id])
   @@map("oa")
+}
+
+model MatrizEspecificacion {
+  id                Int           @id @default(autoincrement())
+  nombre            String
+  total_preguntas   Int
+  createdAt         DateTime      @default(now())
+  oas               MatrizOA[]
+}
+
+model MatrizOA {
+  id                Int           @id @default(autoincrement())
+  matrizId          Int
+  oaId              Int           // Relaciona con OA real
+  matriz            MatrizEspecificacion @relation(fields: [matrizId], references: [id])
+  indicadores       Indicador[]
+}
+
+model Indicador {
+  id                Int           @id @default(autoincrement())
+  matrizOAId        Int
+  descripcion       String
+  preguntas         Int
+  matrizOA          MatrizOA      @relation(fields: [matrizOAId], references: [id])
 } 

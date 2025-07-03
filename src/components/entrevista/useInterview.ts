@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTTS } from "../useTTS";
+import { useTTS } from "./useTTS";
 import { Respuestas } from "./constants";
 
 export function useInterview(preguntas: string[]) {

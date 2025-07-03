@@ -1,11 +1,16 @@
 "use client";
 import React from "react";
-import Sidebar from "./components/entrevista/Sidebar";
-import InterviewCard from "./components/entrevista/InterviewCard";
-import Summary from "./components/entrevista/Summary";
-import OrbVideo from "./components/entrevista/OrbVideo";
-import { useInterview } from "./components/entrevista/useInterview";
-import { steps, preguntas, alternativas, preguntaToStep } from "./components/entrevista/constants";
+import {
+  Sidebar,
+  InterviewCard,
+  Summary,
+  OrbVideo,
+  useInterview,
+  steps,
+  preguntas,
+  alternativas,
+  preguntaToStep
+} from "@/components/entrevista";
 
 export default function Entrevista() {
   const {

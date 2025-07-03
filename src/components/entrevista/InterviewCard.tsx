@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import TypewriterText from "../TypewriterText";
-import Dropdown from "../Dropdown";
+import TypewriterText from "./TypewriterText";
+import Dropdown from "./Dropdown";
 import { Respuestas } from "./constants";
 
 interface InterviewCardProps {
