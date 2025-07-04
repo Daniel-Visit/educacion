@@ -14,12 +14,29 @@ export type PreguntaExtraida = {
 /**
  * Extrae preguntas y alternativas desde un JSON TipTap de evaluación.
  * Soporta alternativas en taskList, bulletList o párrafos, y limpia el texto de la alternativa.
+ * Ignora contenido después del header "Preguntas".
  */
 export function extraerPreguntasAlternativas(json: any): PreguntaExtraida[] {
   const preguntas: PreguntaExtraida[] = []
   const content = json.content || []
   let preguntaNumero = 1
   let i = 0
+
+  // Buscar el inicio de las preguntas (después del header "Preguntas")
+  let startIndex = 0
+  for (let k = 0; k < content.length; k++) {
+    const node = content[k]
+    if (node.type === "heading" && node.content?.[0]?.text) {
+      const headerText = node.content[0].text.toLowerCase().trim()
+      if (headerText.includes("preguntas") || headerText.includes("pregunta")) {
+        startIndex = k + 1
+        break
+      }
+    }
+  }
+
+  // Si no se encuentra el header "Preguntas", empezar desde el principio
+  i = startIndex
 
   while (i < content.length) {
     const node = content[i]

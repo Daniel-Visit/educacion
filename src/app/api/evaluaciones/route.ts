@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { extraerPreguntasAlternativas } from '@/lib/extract-evaluacion'
 
 // GET /api/evaluaciones - listar todas las evaluaciones
 export async function GET() {
@@ -28,27 +27,25 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { archivoId, matrizId, contenido } = body
-    if (!archivoId || !matrizId || !contenido) {
-      return NextResponse.json({ error: 'archivoId, matrizId y contenido son requeridos' }, { status: 400 })
+    const { archivoId, matrizId, contenido, preguntas, respuestasCorrectas } = body
+    if (!archivoId || !matrizId || !contenido || !preguntas) {
+      return NextResponse.json({ error: 'archivoId, matrizId, contenido y preguntas son requeridos' }, { status: 400 })
     }
-    // Extraer preguntas y alternativas del contenido
-    const preguntasExtraidas = extraerPreguntasAlternativas(JSON.parse(contenido))
-    // Crear la evaluación y sus preguntas/alternativas
+    // Crear la evaluación y sus preguntas/alternativas según lo enviado
     // @ts-ignore - Prisma client sync issue
     const evaluacion = await prisma.evaluacion.create({
       data: {
         archivoId,
         matrizId,
         preguntas: {
-          create: preguntasExtraidas.map(p => ({
+          create: preguntas.map((p: any) => ({
             numero: p.numero,
             texto: p.texto,
             alternativas: {
-              create: p.alternativas.map(a => ({
+              create: p.alternativas.map((a: any) => ({
                 letra: a.letra,
                 texto: a.texto,
-                esCorrecta: false // Se puede actualizar luego
+                esCorrecta: respuestasCorrectas?.[p.numero] === a.letra
               }))
             }
           }))

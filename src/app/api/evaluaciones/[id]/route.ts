@@ -1,7 +1,6 @@
 // NOTA: Los modelos Prisma se acceden en minúscula y singular: prisma.evaluacion, prisma.pregunta, prisma.alternativa
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { extraerPreguntasAlternativas } from '@/lib/extract-evaluacion'
 
 // GET /api/evaluaciones/[id] - obtener una evaluación
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
@@ -37,20 +36,18 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
     }
     const body = await request.json()
-    const { contenido, respuestasCorrectas } = body
-    if (!contenido) {
-      return NextResponse.json({ error: 'contenido es requerido' }, { status: 400 })
+    const { contenido, preguntas, respuestasCorrectas } = body
+    if (!contenido || !preguntas) {
+      return NextResponse.json({ error: 'contenido y preguntas son requeridos' }, { status: 400 })
     }
-    // Extraer preguntas y alternativas del contenido
-    const preguntasExtraidas = extraerPreguntasAlternativas(JSON.parse(contenido))
     // Actualizar preguntas y alternativas (borrar y recrear)
     // Primero, borrar preguntas/alternativas existentes
     // @ts-ignore - Prisma client sync issue
     await prisma.alternativa.deleteMany({ where: { pregunta: { evaluacionId: id } } })
     // @ts-ignore - Prisma client sync issue
     await prisma.pregunta.deleteMany({ where: { evaluacionId: id } })
-    // Crear nuevas preguntas/alternativas
-    for (const p of preguntasExtraidas) {
+    // Crear nuevas preguntas/alternativas según lo enviado
+    for (const p of preguntas) {
       // @ts-ignore - Prisma client sync issue
       const pregunta = await prisma.pregunta.create({
         data: {
@@ -66,7 +63,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             preguntaId: pregunta.id,
             letra: a.letra,
             texto: a.texto,
-            esCorrecta: respuestasCorrectas?.[pregunta.numero] === a.letra
+            esCorrecta: respuestasCorrectas?.[p.numero] === a.letra
           }
         })
       }

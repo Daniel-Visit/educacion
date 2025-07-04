@@ -21,6 +21,13 @@ Bienvenido a la documentación completa de la Plataforma Educativa. Esta documen
 - APIs de matrices
 - Validaciones y flujo de trabajo
 
+#### 📝 [Sistema de Evaluaciones](./EVALUACIONES.md)
+- Creación y edición de evaluaciones
+- Editor TipTap con extracción automática
+- Gestión de preguntas y alternativas
+- Modos de creación y edición
+- APIs y base de datos
+
 #### 🎤 [Entrevista Interactiva](./ENTREVISTA.md)
 - Sistema de preguntas dinámicas
 - Text-to-Speech (TTS)
@@ -39,6 +46,18 @@ Bienvenido a la documentación completa de la Plataforma Educativa. Esta documen
 - Scripts de restauración
 - Optimización y troubleshooting
 
+#### 🎣 [Hooks Personalizados](./HOOKS.md)
+- Hooks del editor y evaluaciones
+- Hooks de entrevista y utilidades
+- Patrones de uso y mejores prácticas
+- Ejemplos de implementación
+
+#### 🏗️ [Arquitectura del Sistema](./ARQUITECTURA.md)
+- Patrones de diseño y estructura de código
+- Flujo de datos y decisiones técnicas
+- Escalabilidad y seguridad
+- Testing y deployment
+
 ### 🛠️ Scripts y Utilidades
 
 #### 📋 [Scripts de Restauración](../scripts-restauracion/README.md)
@@ -53,17 +72,20 @@ Bienvenido a la documentación completa de la Plataforma Educativa. Esta documen
 1. **Instalación:** Sigue el [README principal](../README.md)
 2. **Base de datos:** Consulta [DATABASE.md](./DATABASE.md)
 3. **APIs:** Revisa [API.md](./API.md)
-4. **Módulos específicos:** Selecciona según tu interés
+4. **Hooks:** Consulta [HOOKS.md](./HOOKS.md) para patrones y mejores prácticas
+5. **Módulos específicos:** Selecciona según tu interés
 
 ### Para Usuarios Finales
 1. **Editor:** [EDITOR.md](./EDITOR.md) - Crear planificaciones y materiales
-2. **Matrices:** [MATRICES.md](./MATRICES.md) - Gestionar evaluaciones
-3. **Entrevista:** [ENTREVISTA.md](./ENTREVISTA.md) - Sistema interactivo
+2. **Matrices:** [MATRICES.md](./MATRICES.md) - Gestionar matrices de especificación
+3. **Evaluaciones:** [EVALUACIONES.md](./EVALUACIONES.md) - Crear y editar evaluaciones
+4. **Entrevista:** [ENTREVISTA.md](./ENTREVISTA.md) - Sistema interactivo
 
 ## 🔍 Búsqueda por Tema
 
 ### 🎨 Interfaz de Usuario
 - **Editor:** [EDITOR.md](./EDITOR.md) - Componentes TipTap y UI
+- **Evaluaciones:** [EVALUACIONES.md](./EVALUACIONES.md) - Editor y sidebar de preguntas
 - **Entrevista:** [ENTREVISTA.md](./ENTREVISTA.md) - Animaciones y TTS
 - **Matrices:** [MATRICES.md](./MATRICES.md) - Formularios y validación
 
@@ -74,6 +96,7 @@ Bienvenido a la documentación completa de la Plataforma Educativa. Esta documen
 
 ### 🔧 Desarrollo
 - **Configuración:** [README principal](../README.md)
+- **Hooks:** [HOOKS.md](./HOOKS.md) - Patrones y mejores prácticas
 - **APIs:** [API.md](./API.md) - Testing y debugging
 - **Base de datos:** [DATABASE.md](./DATABASE.md) - Migraciones y comandos
 
@@ -85,8 +108,11 @@ educacion-app/
 │   ├── README.md             # Índice de documentación
 │   ├── EDITOR.md             # Documentación del editor
 │   ├── MATRICES.md           # Documentación de matrices
+│   ├── EVALUACIONES.md       # Documentación de evaluaciones
 │   ├── ENTREVISTA.md         # Documentación de entrevista
 │   ├── API.md                # Documentación de APIs
+│   ├── HOOKS.md              # Documentación de hooks
+│   ├── ARQUITECTURA.md       # Documentación de arquitectura
 │   └── DATABASE.md           # Documentación de base de datos
 ├── scripts-restauracion/      # 🛠️ Scripts de restauración
 │   ├── README.md             # Instrucciones de restauración
@@ -119,6 +145,13 @@ educacion-app/
 3. **Creación:** [MATRICES.md](./MATRICES.md) - Flujo de trabajo
 4. **APIs:** [API.md](./API.md) - Endpoints de matrices
 
+### Crear una Evaluación
+1. **Conceptos:** [EVALUACIONES.md](./EVALUACIONES.md) - Explicación del módulo
+2. **Matriz:** [MATRICES.md](./MATRICES.md) - Seleccionar matriz base
+3. **Editor:** [EVALUACIONES.md](./EVALUACIONES.md) - Uso del editor TipTap
+4. **Preguntas:** [EVALUACIONES.md](./EVALUACIONES.md) - Gestión de preguntas y alternativas
+5. **APIs:** [API.md](./API.md) - Endpoints de evaluaciones
+
 ### Usar la Entrevista Interactiva
 1. **Funcionalidades:** [ENTREVISTA.md](./ENTREVISTA.md) - Características
 2. **TTS:** [ENTREVISTA.md](./ENTREVISTA.md) - Configuración de audio
@@ -130,6 +163,7 @@ educacion-app/
 - **Base de datos:** [DATABASE.md](./DATABASE.md) - Sección troubleshooting
 - **APIs:** [API.md](./API.md) - Códigos de error y debugging
 - **Editor:** [EDITOR.md](./EDITOR.md) - Problemas comunes
+- **Evaluaciones:** [EVALUACIONES.md](./EVALUACIONES.md) - Troubleshooting específico
 - **Restauración:** [scripts-restauracion/README.md](../scripts-restauracion/README.md)
 
 ### Logs y Debug
