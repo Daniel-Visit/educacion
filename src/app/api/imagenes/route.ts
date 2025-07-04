@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   try {
@@ -55,11 +53,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Extraer solo la parte base64 pura (sin prefijo)
+    const base64Data = data.split(',')[1]
+
     const imagen = await prisma.imagen.create({
       data: {
         nombre,
         tipo,
-        data,
+        data: base64Data,
         tamaño
       }
     })

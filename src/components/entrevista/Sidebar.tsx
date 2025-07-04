@@ -26,7 +26,7 @@ const Sidebar: React.FC<SidebarProps> = ({ steps, step, preguntaToStep, onStepCl
           <div className="text-sm text-purple-500 font-medium">Guía personalizada</div>
         </div>
       </div>
-      <nav className="flex-1 space-y-2">
+      <nav className="flex-1 space-y-2 mb-10">
         {steps.map((s, idx) => {
           const Icon = s.icon;
           const isActive = preguntaToStep[step] === s.key;

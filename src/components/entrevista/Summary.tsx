@@ -10,7 +10,7 @@ interface SummaryProps {
 const Summary: React.FC<SummaryProps> = ({ respuestas }) => {
   return (
     <div className="flex flex-col flex-1 w-full h-full">
-      <div className="p-8 overflow-y-auto flex-1 rounded-t-3xl">
+      <div className="p-8 flex-1 rounded-t-3xl overflow-y-auto max-h-[50vh] min-h-[300px]">
         <h2 className="text-2xl font-bold text-indigo-800 mb-4">Resumen de tus respuestas</h2>
         <p className="mb-6">Hola Francisca, aquí tienes un resumen de la información que me has proporcionado:</p>
         <div className="space-y-4">
@@ -52,7 +52,7 @@ const Summary: React.FC<SummaryProps> = ({ respuestas }) => {
         </div>
       </div>
       <div className="p-6 border-t border-gray-100 bg-white rounded-b-3xl">
-        <button className="w-full bg-gradient-to-r from-indigo-600 via-fuchsia-500 to-purple-500 text-white font-bold text-lg py-3 rounded-2xl shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg">Continuar a la planificación</button>
+        <button className="w-full bg-gradient-to-r from-indigo-600 via-fuchsia-500 to-purple-500 text-white font-bold text-lg py-3 rounded-2xl shadow-md transition-all duration-200 hover:scale-105 hover:shadow-lg">Guardar y continuar </button>
       </div>
     </div>
   );

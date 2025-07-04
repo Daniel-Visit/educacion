@@ -5,9 +5,62 @@ export interface SavedContent {
   id?: number
   titulo: string
   tipo: 'planificacion' | 'material' | 'evaluacion'
-  contenido: any
+  contenido: string
   createdAt?: string
   updatedAt?: string
+}
+
+// Función para procesar imágenes base64 en el contenido
+async function processImagesInContent(content: any): Promise<any> {
+  if (!content || typeof content !== 'object') {
+    return content
+  }
+
+  // Si es un nodo de imagen con base64, procesarlo
+  if (content.type === 'image' && content.attrs?.src?.startsWith('data:image/')) {
+    try {
+      const base64Data = content.attrs.src
+      const response = await fetch('/api/imagenes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nombre: `imagen_${Date.now()}.png`,
+          tipo: base64Data.split(';')[0].split(':')[1],
+          data: base64Data,
+          tamaño: Math.ceil((base64Data.length * 3) / 4) // Estimación del tamaño
+        })
+      })
+
+      if (response.ok) {
+        const imagen = await response.json()
+        return {
+          ...content,
+          attrs: {
+            ...content.attrs,
+            src: `/api/imagenes/${imagen.id}`
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error procesando imagen:', error)
+      // Si falla, mantener la imagen base64
+    }
+  }
+
+  // Procesar recursivamente el contenido
+  if (content.content && Array.isArray(content.content)) {
+    const processedContent = await Promise.all(
+      content.content.map(async (node: any) => await processImagesInContent(node))
+    )
+    return {
+      ...content,
+      content: processedContent
+    }
+  }
+
+  return content
 }
 
 export function useContentSave() {
@@ -55,6 +108,10 @@ export function useContentSave() {
       if (!content || typeof content !== 'object' || content.type !== 'doc') {
         throw new Error('El contenido no tiene un formato válido de TipTap.')
       }
+
+      // Procesar imágenes base64 antes de guardar
+      const processedContent = await processImagesInContent(content)
+
       const response = await fetch('/api/archivos', {
         method: 'POST',
         headers: {
@@ -63,7 +120,7 @@ export function useContentSave() {
         body: JSON.stringify({
           titulo: titulo.trim(),
           tipo,
-          contenido: JSON.stringify(content)
+          contenido: JSON.stringify(processedContent)
         })
       })
 
@@ -103,6 +160,10 @@ export function useContentSave() {
       if (!content || typeof content !== 'object' || content.type !== 'doc') {
         throw new Error('El contenido no tiene un formato válido de TipTap.')
       }
+
+      // Procesar imágenes base64 antes de guardar
+      const processedContent = await processImagesInContent(content)
+
       const response = await fetch(`/api/archivos/${id}`, {
         method: 'PUT',
         headers: {
@@ -111,7 +172,7 @@ export function useContentSave() {
         body: JSON.stringify({
           titulo: titulo.trim(),
           tipo: savedContents.find(c => c.id === id)?.tipo || 'planificacion',
-          contenido: JSON.stringify(content)
+          contenido: JSON.stringify(processedContent)
         })
       })
 

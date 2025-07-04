@@ -55,6 +55,7 @@ model MatrizEspecificacion {
   total_preguntas Int
   createdAt       DateTime   @default(now())
   oas             MatrizOA[]
+  evaluaciones    Evaluacion[]
 }
 
 model MatrizOA {
@@ -81,6 +82,7 @@ model Archivo {
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt
   imagenes  ArchivoImagen[]
+  evaluaciones Evaluacion[]
 }
 
 model Imagen {
@@ -102,4 +104,39 @@ model ArchivoImagen {
   archivo   Archivo  @relation(fields: [archivoId], references: [id], onDelete: Cascade)
 
   @@unique([archivoId, imagenId])
+}
+
+model Evaluacion {
+  id           Int          @id @default(autoincrement())
+  archivoId    Int          // FK a Archivo (el contenido TipTap)
+  matrizId     Int          // FK a MatrizEspecificacion
+  preguntas    Pregunta[]
+  archivo      Archivo      @relation(fields: [archivoId], references: [id])
+  matriz       MatrizEspecificacion @relation(fields: [matrizId], references: [id])
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@map("evaluacion")
+}
+
+model Pregunta {
+  id           Int          @id @default(autoincrement())
+  evaluacionId Int
+  numero       Int
+  texto        String
+  alternativas Alternativa[]
+  evaluacion   Evaluacion   @relation(fields: [evaluacionId], references: [id])
+
+  @@map("pregunta")
+}
+
+model Alternativa {
+  id           Int          @id @default(autoincrement())
+  preguntaId   Int
+  letra        String       // "a", "b", "c", etc.
+  texto        String
+  esCorrecta   Boolean      @default(false)
+  pregunta     Pregunta     @relation(fields: [preguntaId], references: [id])
+
+  @@map("alternativa")
 }

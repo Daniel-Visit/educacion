@@ -49,13 +49,7 @@ export function useImageUpload() {
         reader.readAsDataURL(file)
       })
 
-      // Simular progreso
-      for (let progress = 10; progress <= 90; progress += 10) {
-        await new Promise(resolve => setTimeout(resolve, 100))
-        setUploadProgress(progress)
-      }
-
-      // Guardar en la base de datos
+      // Subir al backend
       const response = await fetch('/api/imagenes', {
         method: 'POST',
         headers: {
@@ -74,10 +68,9 @@ export function useImageUpload() {
         throw new Error(error.error || 'Error al guardar la imagen')
       }
 
-      const imagen: ImagenData = await response.json()
+      const imagen = await response.json()
       setUploadProgress(100)
-
-      // Devolver URL que referencia la imagen por ID
+      // Devuelve la URL para insertar en el editor
       return `/api/imagenes/${imagen.id}`
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
@@ -85,7 +78,6 @@ export function useImageUpload() {
       throw error
     } finally {
       setIsUploading(false)
-      // Resetear progreso después de un momento
       setTimeout(() => setUploadProgress(0), 1000)
     }
   }, [])

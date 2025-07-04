@@ -110,7 +110,7 @@ export default function EditorPage() {
             </div>
           </div>
           <div className="flex-1 flex flex-col items-center justify-start items-stretch">
-            <div className="bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] w-full max-w-3xl flex-1 flex flex-col items-center min-h-[600px] max-h-[calc(100vh-220px)] mx-auto h-fit p-10 self-start transition-all overflow-y-auto">
+            <div className="bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] w-full max-w-3xl flex-1 flex flex-col items-center min-h-[600px] max-h-[calc(100vh-220px)] mx-auto h-fit p-10 self-start transition-all overflow-y-auto mt-5">
               {loadError && (
                 <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg border border-red-200 text-center">
                   {loadError}

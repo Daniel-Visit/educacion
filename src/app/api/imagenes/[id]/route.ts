@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
@@ -29,8 +27,9 @@ export async function GET(
       )
     }
 
-    // Devolver la imagen como respuesta de imagen
-    return new NextResponse(imagen.data, {
+    // Decodificar la base64 pura y devolver los bytes puros
+    const buffer = Buffer.from(imagen.data, 'base64')
+    return new NextResponse(buffer, {
       headers: {
         'Content-Type': imagen.tipo,
         'Cache-Control': 'public, max-age=31536000', // Cache por 1 año

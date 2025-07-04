@@ -14,6 +14,7 @@ import { Highlight } from "@tiptap/extension-highlight"
 import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
 import { Underline } from "@tiptap/extension-underline"
+import { HorizontalRule } from '@tiptap/extension-horizontal-rule'
 
 // --- Custom Extensions ---
 import { Link } from "@/components/tiptap-extension/link-extension"
@@ -34,6 +35,8 @@ import "@/components/tiptap-node/code-block-node/code-block-node.scss"
 import "@/components/tiptap-node/list-node/list-node.scss"
 import "@/components/tiptap-node/image-node/image-node.scss"
 import "@/components/tiptap-node/paragraph-node/paragraph-node.scss"
+import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node"
+import "@/components/tiptap-node/image-upload-node/image-upload-node.scss"
 
 // --- Tiptap UI ---
 import { HeadingDropdownMenu } from "@/components/tiptap-ui/heading-dropdown-menu"
@@ -59,6 +62,7 @@ import { UndoRedoButton } from "@/components/tiptap-ui/undo-redo-button"
 import { ArrowLeftIcon } from "@/components/tiptap-icons/arrow-left-icon"
 import { HighlighterIcon } from "@/components/tiptap-icons/highlighter-icon"
 import { LinkIcon } from "@/components/tiptap-icons/link-icon"
+import { ImagePlusIcon } from "@/components/tiptap-icons/image-plus-icon"
 
 // --- Hooks ---
 import { useMobile } from "@/hooks/use-mobile"
@@ -90,6 +94,8 @@ const MainToolbarContent = ({
   onLinkClick: () => void
   isMobile: boolean
 }) => {
+  // Log para depuración
+  console.log('Renderizando ImageUploadButton', { editor });
   return (
     <>
       <Spacer />
@@ -143,7 +149,14 @@ const MainToolbarContent = ({
       <ToolbarSeparator />
 
       <ToolbarGroup>
-        <ImageUploadButton editor={editor} text="Add" />
+        {/* <ImageUploadButton editor={editor} text="" /> */}
+        <Button
+          data-style="ghost"
+          onClick={() => editor?.chain().focus().setImageUploadNode().run()}
+          title="Subir imagen (drag & drop o click)"
+        >
+          <ImagePlusIcon className="tiptap-button-icon" />
+        </Button>
       </ToolbarGroup>
 
       <Spacer />
@@ -213,10 +226,21 @@ export function SimpleEditor({ initialContent, onEditorReady }: SimpleEditorProp
       Typography,
       Superscript,
       Subscript,
-
+      HorizontalRule.configure({
+        HTMLAttributes: {
+          class: 'horizontal-rule',
+        },
+      }),
       Selection,
       TrailingNode,
       Link.configure({ openOnClick: false }),
+      ImageUploadNode.configure({
+        accept: 'image/*',
+        maxSize: MAX_FILE_SIZE,
+        limit: 1,
+        upload: handleImageUpload,
+        onError: (error) => console.error('Upload failed:', error),
+      }),
     ],
     content: initialContent || '<p></p>',
   })

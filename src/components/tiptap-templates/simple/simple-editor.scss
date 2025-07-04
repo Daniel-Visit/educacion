@@ -58,17 +58,26 @@ body {
 }
 
 .simple-editor-content {
-  max-width: 640px;
+  max-width: 800px !important;
   width: 100%;
   margin: 0 auto;
+
+  hr.horizontal-rule {
+    border: none;
+    border-top: 2px solid #e2e8f0;
+    margin: 1.5rem 0;
+  }
 }
 
 .simple-editor-content .tiptap.ProseMirror {
-  padding: 3rem 3rem;
+  padding: 3rem;
 }
 
 @media screen and (max-width: 480px) {
   .simple-editor-content .tiptap.ProseMirror {
     padding: 1rem 1.5rem;
   }
+}
+.tiptap.ProseMirror {
+  padding: 3rem;
 }
