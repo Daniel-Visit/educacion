@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Save, AlertCircle, Check } from 'lucide-react';
 import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor';
@@ -53,6 +53,8 @@ export default function EvaluacionForm({
   const [openFab, setOpenFab] = useState(false);
   const [evaluaciones, setEvaluaciones] = useState<any[]>([]);
   const [loadingEvals, setLoadingEvals] = useState(false);
+  const [shouldSetInitialContent, setShouldSetInitialContent] = useState(false);
+  const lastEvaluacionId = useRef<number | null>(null);
 
   // Hook personalizado
   const {
@@ -136,6 +138,15 @@ export default function EvaluacionForm({
     }
   }, [modoEdicion, evaluacionInicial, matrices, dataPreloaded]);
 
+  // Detectar cuando se carga una evaluación nueva (modo edición o desde FAB)
+  useEffect(() => {
+    if ((modoEdicion || evaluacionId) && evaluacionId !== lastEvaluacionId.current) {
+      setShouldSetInitialContent(true);
+      lastEvaluacionId.current = evaluacionId;
+      console.log('[EvaluacionForm] Se va a setear initialContent para evaluación:', evaluacionId);
+    }
+  }, [modoEdicion, evaluacionId]);
+
   // Establecer contenido inicial cuando el editor esté listo
   useEffect(() => {
     if (editorReady && modoEdicion && evaluacionInicial?.archivo?.contenido && dataPreloaded) {
@@ -211,6 +222,15 @@ export default function EvaluacionForm({
   const handleEditorReadyWithContent = (editor: any) => {
     handleEditorReady(editor);
     setEditorReady(true);
+    if (shouldSetInitialContent && (modoEdicion || evaluacionId) && formData.contenido) {
+      try {
+        editor.commands.setContent(formData.contenido);
+        setShouldSetInitialContent(false);
+        console.log('[EvaluacionForm] setContent ejecutado en editorReady');
+      } catch (e) {
+        console.error('[EvaluacionForm] Error al setear contenido inicial:', e);
+      }
+    }
   };
 
   return (
@@ -302,12 +322,18 @@ export default function EvaluacionForm({
             {errors.preguntas && (
               <p className="mb-2 text-sm text-red-600">{errors.preguntas}</p>
             )}
-            <div className="flex-1 bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] p-8 overflow-auto">
-              <SimpleEditor 
-                onEditorReady={handleEditorReadyWithContent}
-                initialContent={null}
-              />
-            </div>
+            {selectedMatriz ? (
+              <div className="flex-1 bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] p-8 overflow-auto">
+                <SimpleEditor 
+                  onEditorReady={handleEditorReadyWithContent}
+                />
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center min-h-[300px] text-gray-400 border-2 border-dashed border-gray-200 rounded-3xl bg-transparent">
+                <span className="text-lg font-semibold mb-2">Selecciona una matriz para comenzar a crear tu evaluación</span>
+                <span className="text-sm">El editor aparecerá aquí una vez que elijas una matriz de especificación.</span>
+              </div>
+            )}
           </div>
         </main>
         {/* Drawer animado para Respuestas Correctas */}
