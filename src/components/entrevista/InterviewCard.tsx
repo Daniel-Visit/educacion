@@ -102,7 +102,7 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] w-full max-w-2xl flex flex-col items-center max-h-[80vh] mx-auto h-fit p-8 self-start mt-8 mb-8 transition-all">
+    <div className="bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] w-full max-w-2xl flex flex-col items-center max-h-[80vh] mx-auto h-fit p-8 self-start mt-8 mb-4 transition-all">
       {step < 8 ? (
         <>
           <div className="block w-full text-xl text-gray-800 text-left mb-6 min-h-[48px] whitespace-pre-line">

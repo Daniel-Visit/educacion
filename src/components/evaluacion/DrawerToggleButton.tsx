@@ -1,35 +1,26 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { PanelLeftClose } from 'lucide-react'
 
 interface DrawerToggleButtonProps {
   isOpen: boolean
   onClick: () => void
-  drawerWidth?: number // en px, default 400
 }
 
 export default function DrawerToggleButton({
   isOpen,
   onClick,
-  drawerWidth = 400,
 }: DrawerToggleButtonProps) {
-  // Offset para que la oreja sobresalga un poco del drawer
-  const offset = 40 // px
+  // Solo mostrar el botón cuando el drawer esté cerrado
+  if (isOpen) return null
 
   return (
-    <motion.button
+    <button
       onClick={onClick}
-      className="fixed top-8 z-50 p-3 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 transition-colors"
-      initial={false}
-      animate={{
-        right: isOpen ? drawerWidth + offset : offset,
-      }}
-      transition={{ type: 'tween', duration: 0.5 }}
-      title={isOpen ? 'Cerrar panel de preguntas' : 'Abrir panel de preguntas'}
-      style={{ position: 'fixed' }}
+      className="fixed top-19.5 right-26 z-10 h-11 w-11 bg-white text-indigo-600 rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.2)] hover:scale-105 transition-all duration-200 flex items-center justify-center"
+      title="Abrir panel de preguntas"
     >
-      {isOpen ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-    </motion.button>
+      <PanelLeftClose size={20} />
+    </button>
   )
 } 

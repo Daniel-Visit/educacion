@@ -9,6 +9,8 @@ import SaveContentModal from '@/components/editor/SaveContentModal'
 import { SavedContent } from '@/hooks/use-content-save'
 import { Editor } from '@tiptap/react'
 import { Save, Sparkles } from 'lucide-react'
+import Fab from '@/components/ui/Fab'
+import { useContentSave } from '@/hooks/use-content-save'
 
 export default function EditorPage() {
   const searchParams = useSearchParams()
@@ -19,6 +21,8 @@ export default function EditorPage() {
   const [currentEditor, setCurrentEditor] = useState<Editor | null>(null)
   const [currentFile, setCurrentFile] = useState<SavedContent | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [openFab, setOpenFab] = useState(false)
+  const { savedContents, isLoading, loadSavedContents } = useContentSave()
 
   // Obtener el tipo desde los parámetros de URL
   useEffect(() => {
@@ -64,6 +68,23 @@ export default function EditorPage() {
       console.log('Generando material de apoyo con IA...')
       // Aquí iría la lógica para generar material sin metodología
     }
+  }
+
+  // Filtrar archivos guardados por tipo
+  const filteredContents = savedContents.filter(content => content.tipo === tipoContenido)
+
+  // Formatear fecha (igual que FabPlanificaciones)
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffTime = Math.abs(now.getTime() - date.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    if (diffDays === 1) return 'hoy'
+    if (diffDays === 2) return 'hace 1 día'
+    if (diffDays <= 7) return `hace ${diffDays - 1} días`
+    if (diffDays <= 30) return `hace ${Math.floor(diffDays / 7)} semanas`
+    if (diffDays <= 365) return `hace ${Math.floor(diffDays / 30)} meses`
+    return `hace ${Math.floor(diffDays / 365)} años`
   }
 
   return (
@@ -120,10 +141,57 @@ export default function EditorPage() {
         onSave={handleSaveSuccess}
         currentFile={currentFile}
       />
-      <FabPlanificaciones 
-        onLoadContent={handleLoadContent} 
-        tipoActual={tipoContenido as 'planificacion' | 'material'}
+      <Fab 
+        onClick={() => setOpenFab(!openFab)}
+        open={openFab}
+        onClose={() => setOpenFab(false)}
+        ariaLabel={openFab ? 'Cerrar archivos' : 'Abrir archivos guardados'}
       />
+      {openFab && (
+        <div
+          data-fab-panel
+          className="fixed top-24 right-22 w-[380px] bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] border border-gray-100 z-40 px-8 pt-8 pb-4 flex flex-col gap-4 animate-fade-in"
+          style={{ minWidth: 340, maxHeight: 'calc(100vh - 120px)' }}
+        >
+          <h2 className="text-lg font-bold text-indigo-700 mb-4">
+            {tipoContenido === 'planificacion' ? 'Planificaciones Guardadas' : 'Materiales Guardados'}
+          </h2>
+          {isLoading ? (
+            <div className="text-center py-8">
+              <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              <p className="text-sm text-gray-500">Cargando...</p>
+            </div>
+          ) : filteredContents.length === 0 ? (
+            <div className="text-center py-8">
+              <svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16V8a2 2 0 012-2h8a2 2 0 012 2v8m-2 4h-4a2 2 0 01-2-2v-4a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2z" /></svg>
+              <p className="text-sm text-gray-500">No hay archivos guardados</p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2 overflow-y-auto max-h-96">
+              {filteredContents.map((content) => (
+                <div
+                  key={content.id}
+                  className="flex items-center gap-4 p-4 rounded-xl cursor-pointer border border-transparent hover:bg-indigo-50 transition-all group"
+                  onClick={() => handleLoadContent(content)}
+                >
+                  <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16V8a2 2 0 012-2h8a2 2 0 012 2v8m-2 4h-4a2 2 0 01-2-2v-4a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2z" /></svg>
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-gray-900 text-sm truncate group-hover:underline">
+                      {content.titulo}
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                      <svg className="w-3 h-3 text-gray-300 mr-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3" /></svg>
+                      {formatDate(content.createdAt || '')}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </>
   )
 } 

@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
+import { useSearchParams } from "next/navigation";
 import {
-  Sidebar,
   InterviewCard,
   Summary,
   OrbVideo,
@@ -13,6 +13,10 @@ import {
 } from "@/components/entrevista";
 
 export default function Entrevista() {
+  const searchParams = useSearchParams();
+  const stepParam = searchParams.get('step');
+  const initialStep = stepParam ? parseInt(stepParam) : 0;
+
   const {
     step,
     respuestas,
@@ -24,42 +28,80 @@ export default function Entrevista() {
     handleSidebarClick,
     setShowCierre,
     setShowResumen,
-  } = useInterview(preguntas);
+  } = useInterview(preguntas, initialStep);
 
   // Saber si el paso es tipo S
   const isTypeS = steps[step]?.tipo === "S";
 
   return (
-    <div className="h-full bg-[#f7f8fd] flex flex-row w-full">
-      <div className="flex w-full max-w-7xl h-full max-h-[calc(100vh-48px)] mx-auto rounded-3xl my-6 bg-white/80 shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] overflow-hidden">
-        {/* Sidebar glassmorphism */}
-        <Sidebar
-          steps={steps}
-          step={step}
-          preguntaToStep={preguntaToStep}
-          onStepClick={handleSidebarClick}
-        />
-        <main className="flex-1 w-full flex flex-col relative h-full min-h-screen justify-start">
-          {/* Orb Video */}
-          <OrbVideo step={step} showResumen={showResumen} />
-          {/* Interview Card */}
-          <InterviewCard
-            step={step}
-            preguntas={preguntas}
-            isTypeS={isTypeS}
-            respuestas={respuestas}
-            alternativas={alternativas}
-            handleSelect={handleSelect}
-            handleNext={handleNext}
-            disableNext={disableNext}
-            showCierre={showCierre}
-            showResumen={showResumen}
-            setShowCierre={setShowCierre}
-            setShowResumen={setShowResumen}
-            renderResumen={() => <Summary respuestas={respuestas} />}
-          />
-        </main>
+    <>
+      {/* Header */}
+      <div className="flex items-center gap-4 pb-2 mb-8">
+        <div className="flex items-center gap-4">
+          <div className="bg-gradient-to-br from-purple-600 to-indigo-500 w-12 h-12 flex items-center justify-center rounded-2xl">
+            <div className="text-white text-xl font-bold">{step + 1}</div>
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-indigo-700 mb-1">
+              Entrevista Personalizada
+            </h1>
+            <p className="text-gray-500 text-base">
+              {steps[step]?.label} - Paso {step + 1} de {steps.length}
+            </p>
+          </div>
+        </div>
+        
+        {/* Indicador de progreso */}
+        <div className="ml-auto flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-32 bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-gradient-to-r from-purple-400 to-indigo-400 h-2 rounded-full transition-all duration-500"
+                style={{ width: `${((step + 1) / steps.length) * 100}%` }}
+              ></div>
+            </div>
+            <span className="text-sm font-semibold text-gray-600">
+              {step + 1}/{steps.length}
+            </span>
+          </div>
+        </div>
       </div>
-    </div>
+
+      {/* Contenido principal sin card blanca */}
+      <div className="w-full max-w-3xl mx-auto px-4">
+        {/* Orb Video y Card solo si no es resumen */}
+        {!showResumen && (
+          <>
+            <div className="relative h-24 rounded-3xl mb-14 w-full">
+              <OrbVideo step={step} showResumen={showResumen} />
+            </div>
+            {/* Interview Card */}
+            <div className="w-full">
+              <InterviewCard
+                step={step}
+                preguntas={preguntas}
+                isTypeS={isTypeS}
+                respuestas={respuestas}
+                alternativas={alternativas}
+                handleSelect={handleSelect}
+                handleNext={handleNext}
+                disableNext={disableNext}
+                showCierre={showCierre}
+                showResumen={showResumen}
+                setShowCierre={setShowCierre}
+                setShowResumen={setShowResumen}
+                renderResumen={() => <Summary respuestas={respuestas} />}
+              />
+            </div>
+          </>
+        )}
+        {/* Resumen centrado y con margen superior si es resumen */}
+        {showResumen && (
+          <div className="mt-16">
+            <Summary respuestas={respuestas} />
+          </div>
+        )}
+      </div>
+    </>
   );
 } 

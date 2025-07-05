@@ -14,7 +14,15 @@ const OrbVideo: React.FC<OrbVideoProps> = ({ step, showResumen }) => {
 
   return (
     <div className="flex justify-center mb-0 mt-4">
-      <video src="/orb.mp4" autoPlay loop muted className="w-40 h-40 object-contain" />
+      <div className="w-30 h-30 rounded-full overflow-hidden mx-auto flex items-center justify-center">
+        <video 
+          src="/orb.mp4" 
+          autoPlay 
+          loop 
+          muted 
+          className="w-full h-full object-cover object-center scale-125"
+        />
+      </div>
     </div>
   );
 };

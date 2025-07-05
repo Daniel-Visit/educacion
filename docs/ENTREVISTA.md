@@ -1,5 +1,20 @@
 # 🎤 Entrevista Interactiva
 
+## Sincronización y Navegación (Actualizado 2024)
+
+La entrevista ahora cuenta con una **sincronización bidireccional profesional** entre el sidebar, la URL y el estado interno:
+
+- El paso actual de la entrevista (`step`) y el máximo paso alcanzado (`maxStep`) se sincronizan con el parámetro `step` en la URL.
+- El usuario solo puede navegar en el sidebar hasta el `maxStep` alcanzado. Los pasos futuros aparecen deshabilitados.
+- Si el usuario navega hacia atrás, puede editar respuestas previas. Si avanza, el sidebar habilita el siguiente paso.
+- Si el usuario intenta ir a un paso futuro (por URL o sidebar), la entrevista lo redirige automáticamente al último paso permitido.
+- El sidebar muestra un check alineado a la derecha en los pasos completados.
+- El resumen y la entrevista siempre están alineados con la URL y el sidebar.
+
+**Notas para desarrolladores:**
+- Para agregar nuevos pasos, solo hay que actualizar el array de pasos y la lógica de preguntas. La sincronización se mantiene automáticamente.
+- El estado de respuestas se conserva al retroceder y puede editarse.
+
 ## Descripción General
 
 El módulo de entrevista interactiva proporciona una experiencia conversacional para recopilar información educativa a través de preguntas dinámicas, respuestas de texto a voz y generación de resúmenes automáticos.
@@ -15,11 +30,11 @@ El módulo de entrevista interactiva proporciona una experiencia conversacional 
 - **Diseño responsive** para todos los dispositivos
 
 ### 🎨 Elementos de Interfaz
-- **Orb animado** como elemento visual central
+- **Orb animado** como elemento visual central (no se muestra en el resumen)
 - **Tarjetas de conversación** con preguntas y respuestas
-- **Sidebar** con progreso y navegación
+- **Sidebar** con progreso, navegación segura y checks alineados
 - **Botones de control** para TTS y navegación
-- **Resumen final** con información recopilada
+- **Resumen final** con información recopilada, centrado y destacado
 
 ## Estructura de Archivos
 
@@ -182,13 +197,17 @@ CREATE TABLE metodologia (
 
 ### Sidebar
 - **Progreso visual** de la entrevista
-- **Navegación rápida** entre preguntas
-- **Controles de audio** para TTS
+- **Navegación segura**: solo hasta el paso alcanzado (`maxStep`)
+- **Pasos futuros deshabilitados** visualmente
+- **Checks alineados a la derecha** en pasos completados
+- **Sincronización con la URL y la entrevista**
 
 ### Summary
 - **Resumen estructurado** de todas las respuestas
-- **Información organizada** por categorías
-- **Opciones de exportación** (futuro)
+- **Diseño centrado, sin Orb ni card de fondo**
+- **Card principal con sombra, icono grande y buen margen superior**
+- **Respuestas organizadas en cards con check**
+- **Botón destacado para continuar**
 
 ## Text-to-Speech (TTS)
 

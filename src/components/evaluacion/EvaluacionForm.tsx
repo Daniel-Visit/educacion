@@ -13,6 +13,7 @@ import PreguntasSidebarContent from '@/components/evaluacion/PreguntasSidebar';
 import SaveModal from '@/components/evaluacion/SaveModal';
 import PreguntasDrawer from '@/components/evaluacion/PreguntasDrawer';
 import DrawerToggleButton from '@/components/evaluacion/DrawerToggleButton';
+import Fab from '@/components/ui/Fab';
 
 interface EvaluacionInicial {
   id: number;
@@ -49,6 +50,9 @@ export default function EvaluacionForm({
   const [editorReady, setEditorReady] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [contentInitialized, setContentInitialized] = useState(false);
+  const [openFab, setOpenFab] = useState(false);
+  const [evaluaciones, setEvaluaciones] = useState<any[]>([]);
+  const [loadingEvals, setLoadingEvals] = useState(false);
 
   // Hook personalizado
   const {
@@ -151,6 +155,49 @@ export default function EvaluacionForm({
     }
   }, [editorReady, modoEdicion, evaluacionInicial, dataPreloaded]);
 
+  // Cargar evaluaciones cuando se abre el FAB y hay una matriz seleccionada
+  useEffect(() => {
+    if (selectedMatriz && openFab) {
+      setLoadingEvals(true)
+      fetch(`/api/evaluaciones`)
+        .then(res => res.json())
+        .then(data => {
+          setEvaluaciones(Array.isArray(data) ? data.filter(e => e.matrizId === selectedMatriz.id) : [])
+        })
+        .finally(() => setLoadingEvals(false))
+    }
+  }, [selectedMatriz, openFab])
+
+  // Formatear fecha (igual que FabPlanificaciones)
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffTime = Math.abs(now.getTime() - date.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    
+    if (diffDays === 1) return 'hoy'
+    if (diffDays === 2) return 'hace 1 día'
+    if (diffDays <= 7) return `hace ${diffDays - 1} días`
+    if (diffDays <= 30) return `hace ${Math.floor(diffDays / 7)} semanas`
+    if (diffDays <= 365) return `hace ${Math.floor(diffDays / 30)} meses`
+    return `hace ${Math.floor(diffDays / 365)} años`
+  }
+
+  const handleLoadEvaluacion = async (evaluacion: any) => {
+    try {
+      const response = await fetch(`/api/evaluaciones/${evaluacion.id}`)
+      if (response.ok) {
+        const evaluacionCompleta = await response.json()
+        handleLoadContent(evaluacionCompleta)
+      } else {
+        console.error('Error al cargar evaluación completa')
+      }
+    } catch (error) {
+      console.error('Error al cargar evaluación:', error)
+    }
+    setOpenFab(false)
+  }
+
   const handleSaveWithValidation = () => {
     if (modoEdicion || evaluacionId) {
       handleSave();
@@ -187,7 +234,7 @@ export default function EvaluacionForm({
             </p>
           </div>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-start pt-2 pr-12">
           <PrimaryButton
             onMouseEnter={() => setIsSaveHovered(true)}
             onMouseLeave={() => setIsSaveHovered(false)}
@@ -279,14 +326,61 @@ export default function EvaluacionForm({
         <DrawerToggleButton isOpen={sidebarOpen} onClick={() => setSidebarOpen(!sidebarOpen)} />
       </div>
       
-      {/* FAB para cargar contenido, siempre debajo del drawer */}
+      {/* Nuevo Fab global */}
       {selectedMatriz && (
-        <FabPlanificaciones
-          onLoadContent={handleLoadContent}
-          tipoActual="evaluacion"
-          matrizId={selectedMatriz.id}
-          className="z-10 fixed bottom-8 right-8"
-        />
+        <>
+          <Fab 
+            onClick={() => setOpenFab(!openFab)}
+            open={openFab}
+            onClose={() => setOpenFab(false)}
+            ariaLabel={openFab ? 'Cerrar archivos' : 'Abrir evaluaciones guardadas'}
+            className="z-10 fixed bottom-8 right-8"
+          />
+          {/* Panel flotante de evaluaciones guardadas */}
+          {openFab && (
+            <div
+              data-fab-panel
+              className="fixed top-24 right-22 w-[380px] bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] border border-gray-100 z-40 px-8 pt-8 pb-4 flex flex-col gap-4 animate-fade-in"
+              style={{ minWidth: 340, maxHeight: 'calc(100vh - 120px)' }}
+            >
+              <h2 className="text-lg font-bold text-indigo-700 mb-4">Evaluaciones Guardadas</h2>
+              {loadingEvals ? (
+                <div className="text-center py-8">
+                  <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                  <p className="text-sm text-gray-500">Cargando...</p>
+                </div>
+              ) : evaluaciones.length === 0 ? (
+                <div className="text-center py-8">
+                  <svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16V8a2 2 0 012-2h8a2 2 0 012 2v8m-2 4h-4a2 2 0 01-2-2v-4a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2z" /></svg>
+                  <p className="text-sm text-gray-500">No hay evaluaciones guardadas</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2 overflow-y-auto max-h-96">
+                  {evaluaciones.map((evaluacion) => (
+                    <div
+                      key={evaluacion.id}
+                      className="flex items-center gap-4 p-4 rounded-xl cursor-pointer border border-transparent hover:bg-indigo-50 transition-all group"
+                      onClick={() => handleLoadEvaluacion(evaluacion)}
+                    >
+                      <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16V8a2 2 0 012-2h8a2 2 0 012 2v8m-2 4h-4a2 2 0 01-2-2v-4a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2z" /></svg>
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-gray-900 text-sm truncate group-hover:underline">
+                          {evaluacion.archivo?.titulo || evaluacion.titulo}
+                        </div>
+                        <div className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                          <svg className="w-3 h-3 text-gray-300 mr-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3" /></svg>
+                          {formatDate(evaluacion.createdAt || evaluacion.archivo?.createdAt || '')}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </>
       )}
       {/* Modal de Guardado */}
       {!modoEdicion && !evaluacionId && (

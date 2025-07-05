@@ -89,7 +89,7 @@ export default function FabPlanificaciones({ onLoadContent, tipoActual, matrizId
     <>
       {/* FAB */}
       <button
-        className={`fixed bottom-8 right-20 w-16 h-16 rounded-full bg-gradient-to-br from-indigo-600 to-purple-500 text-white text-4xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 focus:outline-none ${disabled ? 'opacity-50 pointer-events-none' : ''} ${className || ''}`}
+        className={`fixed bottom-8 right-22 w-16 h-16 rounded-full bg-gradient-to-br from-indigo-600 to-purple-500 text-white text-4xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 focus:outline-none ${disabled ? 'opacity-50 pointer-events-none' : ''} ${className || ''}`}
         onClick={() => !disabled && setOpen(!open)}
         aria-label={open ? "Cerrar archivos" : `Abrir ${getTypeLabel(tipoActual).toLowerCase()}`}
         disabled={disabled}
@@ -100,7 +100,7 @@ export default function FabPlanificaciones({ onLoadContent, tipoActual, matrizId
       {/* Panel flotante */}
       {open && (
         <div
-          className="fixed top-24 right-20 w-[380px] bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] border border-gray-100 z-40 px-8 pt-8 pb-4 flex flex-col gap-4 animate-fade-in"
+          className="fixed top-24 right-22 w-[380px] bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] border border-gray-100 z-40 px-8 pt-8 pb-4 flex flex-col gap-4 animate-fade-in"
           style={{ minWidth: 340, maxHeight: 'calc(100vh - 120px)' }}
         >
           <h2 className="text-lg font-bold text-indigo-700 mb-4">{getTypeLabel(tipoActual)} Guardados</h2>
