@@ -1,8 +1,8 @@
-import { useState } from 'react'
 import { Check, AlertCircle, FileText, Edit2, X, MoreVertical, Trash2, Plus } from 'lucide-react'
 import { PreguntaExtraida } from '@/lib/extract-evaluacion'
+import { useState } from 'react'
 
-interface PreguntasSidebarProps {
+interface PreguntasSidebarContentProps {
   preguntasExtraidas: PreguntaExtraida[]
   respuestasCorrectas: { [preguntaNumero: number]: string }
   onRespuestaChange: (preguntaNumero: number, letra: string) => void
@@ -12,7 +12,7 @@ interface PreguntasSidebarProps {
   error?: string
 }
 
-export default function PreguntasSidebar({
+export default function PreguntasSidebarContent({
   preguntasExtraidas,
   respuestasCorrectas,
   onRespuestaChange,
@@ -20,7 +20,7 @@ export default function PreguntasSidebar({
   onFormDataChange,
   formData,
   error
-}: PreguntasSidebarProps) {
+}: PreguntasSidebarContentProps) {
   const [editingPregunta, setEditingPregunta] = useState<{ 
     numero: number, 
     field: 'texto' | 'alternativa', 
@@ -217,7 +217,7 @@ export default function PreguntasSidebar({
   }
 
   return (
-    <aside className="w-96 border-l border-gray-200 bg-gray-50 p-6 overflow-y-auto">
+    <div className="flex h-full flex-col overflow-y-auto p-6">
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
@@ -271,68 +271,6 @@ export default function PreguntasSidebar({
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="flex flex-row whitespace-nowrap border border-gray-300 rounded-lg bg-white overflow-hidden mr-2">
-                    <button
-                      onClick={() => {
-                        if (pregunta.numero === 1) return
-                        const idx = preguntasExtraidas.findIndex(p => p.numero === pregunta.numero)
-                        if (idx > 0) {
-                          const nuevas = [...preguntasExtraidas]
-                          const temp = nuevas[idx - 1]
-                          nuevas[idx - 1] = nuevas[idx]
-                          nuevas[idx] = temp
-                          // Renumerar
-                          const renum = nuevas.map((p, i) => ({ ...p, numero: i + 1 }))
-                          onPreguntasChange(renum)
-                          // Renumerar respuestasCorrectas
-                          const nuevasRespuestas: { [key: number]: string } = {}
-                          renum.forEach((p, i) => {
-                            const oldNum = preguntasExtraidas.find(q => q.texto === p.texto && q.alternativas === p.alternativas)?.numero
-                            if (oldNum && formData.respuestasCorrectas[oldNum]) {
-                              nuevasRespuestas[i + 1] = formData.respuestasCorrectas[oldNum]
-                            }
-                          })
-                          onFormDataChange({ ...formData, respuestasCorrectas: nuevasRespuestas })
-                        }
-                      }}
-                      className="w-8 h-8 flex items-center justify-center border-r border-gray-300 bg-white text-gray-400 hover:text-indigo-600 hover:bg-gray-100 disabled:opacity-30 focus:outline-none shrink-0"
-                      disabled={pregunta.numero === 1}
-                      title="Subir"
-                      style={{ borderTopLeftRadius: '0.5rem', borderBottomLeftRadius: '0.5rem' }}
-                    >
-                      <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 11V5M8 5L5 8M8 5l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (pregunta.numero === preguntasExtraidas.length) return
-                        const idx = preguntasExtraidas.findIndex(p => p.numero === pregunta.numero)
-                        if (idx < preguntasExtraidas.length - 1) {
-                          const nuevas = [...preguntasExtraidas]
-                          const temp = nuevas[idx + 1]
-                          nuevas[idx + 1] = nuevas[idx]
-                          nuevas[idx] = temp
-                          // Renumerar
-                          const renum = nuevas.map((p, i) => ({ ...p, numero: i + 1 }))
-                          onPreguntasChange(renum)
-                          // Renumerar respuestasCorrectas
-                          const nuevasRespuestas: { [key: number]: string } = {}
-                          renum.forEach((p, i) => {
-                            const oldNum = preguntasExtraidas.find(q => q.texto === p.texto && q.alternativas === p.alternativas)?.numero
-                            if (oldNum && formData.respuestasCorrectas[oldNum]) {
-                              nuevasRespuestas[i + 1] = formData.respuestasCorrectas[oldNum]
-                            }
-                          })
-                          onFormDataChange({ ...formData, respuestasCorrectas: nuevasRespuestas })
-                        }
-                      }}
-                      className="w-8 h-8 flex items-center justify-center bg-white text-gray-400 hover:text-indigo-600 hover:bg-gray-100 disabled:opacity-30 focus:outline-none shrink-0"
-                      disabled={pregunta.numero === preguntasExtraidas.length}
-                      title="Bajar"
-                      style={{ borderTopRightRadius: '0.5rem', borderBottomRightRadius: '0.5rem' }}
-                    >
-                      <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 5v6M8 11L5 8M8 11l3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </button>
-                  </div>
                   <div className="relative dropdown-container">
                     <button
                       onClick={() => handleToggleDropdown('pregunta', pregunta.numero)}
@@ -452,28 +390,28 @@ export default function PreguntasSidebar({
                             >
                               <MoreVertical size={14} />
                             </button>
-                              {openDropdown?.tipo === 'alternativa' && 
-                               openDropdown?.numero === pregunta.numero && 
-                               openDropdown?.alternativaIndex === index && (
-                                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[120px]">
-                                  <button
-                                    onClick={() => handleDropdownAction('edit', 'alternativa', pregunta.numero, index)}
-                                    className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
-                                  >
-                                    <Edit2 size={14} />
-                                    Editar
-                                  </button>
-                                  <button
-                                    onClick={() => handleDropdownAction('delete', 'alternativa', pregunta.numero, index)}
-                                    className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                                  >
-                                    <Trash2 size={14} />
-                                    Eliminar
-                                  </button>
-                                </div>
-                              )}
-                            </div>
+                            {openDropdown?.tipo === 'alternativa' && 
+                             openDropdown?.numero === pregunta.numero && 
+                             openDropdown?.alternativaIndex === index && (
+                              <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[120px]">
+                                <button
+                                  onClick={() => handleDropdownAction('edit', 'alternativa', pregunta.numero, index)}
+                                  className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                >
+                                  <Edit2 size={14} />
+                                  Editar
+                                </button>
+                                <button
+                                  onClick={() => handleDropdownAction('delete', 'alternativa', pregunta.numero, index)}
+                                  className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                >
+                                  <Trash2 size={14} />
+                                  Eliminar
+                                </button>
+                              </div>
+                            )}
                           </div>
+                        </div>
                       )}
                     </div>
                   )
@@ -494,6 +432,6 @@ export default function PreguntasSidebar({
           ))
         )}
       </div>
-    </aside>
+    </div>
   )
 } 

@@ -43,6 +43,7 @@ export function useEvaluacionForm() {
   const [errors, setErrors] = useState<FormErrors>({})
   const [showSuccess, setShowSuccess] = useState(false)
   const [evaluacionId, setEvaluacionId] = useState<number | null>(null)
+  const [isSettingInitialContent, setIsSettingInitialContent] = useState(false)
 
   // Cargar matrices al montar
   useEffect(() => {
@@ -53,7 +54,10 @@ export function useEvaluacionForm() {
   useEffect(() => {
     if (currentEditor) {
       const handleUpdate = () => {
-        handleContentChange()
+        // Evitar actualizaciones durante la configuración inicial
+        if (!isSettingInitialContent) {
+          handleContentChange()
+        }
       }
       
       currentEditor.on('update', handleUpdate)
@@ -62,7 +66,7 @@ export function useEvaluacionForm() {
         currentEditor.off('update', handleUpdate)
       }
     }
-  }, [currentEditor])
+  }, [currentEditor, isSettingInitialContent])
 
   const fetchMatrices = async () => {
     try {
@@ -81,11 +85,14 @@ export function useEvaluacionForm() {
   }
 
   const handleEditorReady = (editor: Editor) => {
-    setCurrentEditor(editor)
+    // Evitar establecer el mismo editor múltiples veces
+    if (currentEditor !== editor) {
+      setCurrentEditor(editor)
+    }
   }
 
   const handleContentChange = () => {
-    if (!currentEditor) return
+    if (!currentEditor || isSettingInitialContent) return
 
     const content = currentEditor.getJSON()
     setFormData(prev => ({ ...prev, contenido: content }))
@@ -164,16 +171,20 @@ export function useEvaluacionForm() {
     if (!validateForm()) return
     setSaving(true)
     try {
+      console.log('Guardando evaluación, evaluacionId:', evaluacionId)
       if (evaluacionId) {
         // Modo edición: PUT
+        console.log('Actualizando evaluación existente con ID:', evaluacionId)
+        const requestBody = {
+          contenido: JSON.stringify(formData.contenido),
+          preguntas: preguntasExtraidas,
+          respuestasCorrectas: formData.respuestasCorrectas
+        }
+        console.log('Datos a enviar:', requestBody)
         const evaluacionResponse = await fetch(`/api/evaluaciones/${evaluacionId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contenido: JSON.stringify(formData.contenido),
-            preguntas: preguntasExtraidas,
-            respuestasCorrectas: formData.respuestasCorrectas
-          })
+          body: JSON.stringify(requestBody)
         })
         if (evaluacionResponse.ok) {
           setShowSaveModal(false)
@@ -230,6 +241,9 @@ export function useEvaluacionForm() {
   }
 
   const handleLoadContent = (content: any) => {
+    // Limpiar errores previos
+    setErrors({})
+    
     // Si viene de evaluacion (de /api/evaluaciones), poblar sidebar con preguntas y alternativas del backend
     if (content.preguntas && content.archivo) {
       setEvaluacionId(content.id)
@@ -249,21 +263,31 @@ export function useEvaluacionForm() {
       let parsedContent = null
       try {
         parsedContent = JSON.parse(content.archivo.contenido)
-      } catch {}
+      } catch (error) {
+        console.error('Error al parsear contenido de evaluación:', error)
+        setErrors({ contenido: 'Error al cargar el contenido de la evaluación.' })
+        return
+      }
+      
       setFormData(prev => ({
         ...prev,
         contenido: parsedContent,
         respuestasCorrectas
       }))
-      if (currentEditor && parsedContent) {
-        currentEditor.commands.setContent(parsedContent)
-      }
+      
       setTitulo(content.archivo.titulo || '')
       return
     }
     
     // Fallback: comportamiento anterior para archivos simples
     setEvaluacionId(null)
+    
+    // Validar que content.contenido existe antes de intentar parsearlo
+    if (!content.contenido) {
+      setErrors({ contenido: 'El archivo no tiene contenido válido.' })
+      return
+    }
+    
     try {
       const parsedContent = JSON.parse(content.contenido)
       if (!parsedContent || typeof parsedContent !== 'object' || parsedContent.type !== 'doc') {
@@ -275,20 +299,13 @@ export function useEvaluacionForm() {
         contenido: parsedContent,
         respuestasCorrectas: content.respuestasCorrectas || {}
       }))
-      if (currentEditor) {
-        currentEditor.commands.setContent(parsedContent)
-      }
+      
       try {
         const preguntas = extraerPreguntasAlternativas(parsedContent)
         setPreguntasExtraidas(preguntas)
       } catch (error) {
         setPreguntasExtraidas([])
       }
-      setErrors(prev => {
-        const newErrors = { ...prev }
-        delete newErrors.contenido
-        return newErrors
-      })
     } catch (error) {
       setErrors({ contenido: 'Error al leer el archivo: formato inválido.' })
       console.error('Error parsing content:', error)
@@ -300,6 +317,13 @@ export function useEvaluacionForm() {
   }
 
   const updateFormData = (updates: Partial<EvaluacionFormData>) => {
+    // Si se está actualizando el contenido y no hay contenido previo, marcar que estamos estableciendo contenido inicial
+    if (updates.contenido && !formData.contenido) {
+      setIsSettingInitialContent(true)
+      // Usar un timeout más largo para asegurar que el editor se configure completamente
+      setTimeout(() => setIsSettingInitialContent(false), 500)
+    }
+    
     setFormData(prev => ({ ...prev, ...updates }))
   }
 
@@ -316,12 +340,14 @@ export function useEvaluacionForm() {
     errors,
     showSuccess,
     evaluacionId,
+    currentEditor,
     
     // Setters
     setPreguntasExtraidas,
     setShowSaveModal,
     setTitulo,
     setShowSuccess,
+    setEvaluacionId,
     
     // Handlers
     handleEditorReady,

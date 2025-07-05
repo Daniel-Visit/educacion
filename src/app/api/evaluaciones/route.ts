@@ -9,14 +9,19 @@ export async function GET() {
       include: {
         archivo: true,
         matriz: true,
-        preguntas: {
-          include: {
-            alternativas: true
-          }
-        }
+        preguntas: true
       }
     })
-    return NextResponse.json(evaluaciones)
+    // Mapear para devolver solo los campos necesarios
+    const data = evaluaciones.map(ev => ({
+      id: ev.id,
+      titulo: ev.archivo?.titulo || '',
+      matrizId: ev.matrizId,
+      matrizNombre: ev.matriz?.nombre || '',
+      preguntasCount: ev.preguntas?.length || 0,
+      createdAt: ev.createdAt
+    }))
+    return NextResponse.json(data)
   } catch (error) {
     console.error('Error al obtener evaluaciones:', error)
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })

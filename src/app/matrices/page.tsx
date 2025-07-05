@@ -122,28 +122,23 @@ export default function MatricesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f8fd] flex flex-col w-full">
-      <div className="w-full max-w-7xl mx-auto mt-6 mb-6 rounded-3xl bg-white/80 shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="p-8 border-b border-gray-200 sticky top-0 z-10 bg-white/80 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-indigo-700 mb-1">
-                Matrices de Especificación
-              </h1>
-              <p className="text-gray-500 text-base">
-                Gestiona las matrices de especificación para evaluaciones
-              </p>
-            </div>
-            <PrimaryButton onClick={handleCreateMatriz} className="flex items-center gap-2">
-              <Plus size={20} />
-              Nueva Matriz
-            </PrimaryButton>
-          </div>
+    <>
+      <div className="flex items-center justify-between pb-2">
+        <div>
+          <h1 className="text-3xl font-bold text-indigo-700 mb-1">
+            Matrices de Especificación
+          </h1>
+          <p className="text-gray-500 text-base">
+            Gestiona las matrices de especificación para evaluaciones
+          </p>
         </div>
+        <PrimaryButton onClick={handleCreateMatriz} className="flex items-center gap-2">
+          <Plus size={20} />
+          Nueva Matriz
+        </PrimaryButton>
+      </div>
 
-        {/* Content */}
-        <div className="flex-1 p-8">
+      <div className="flex-1">
           {matrices.length === 0 ? (
             <div className="text-center py-16">
               <FileText size={64} className="mx-auto text-gray-300 mb-4" />
@@ -158,83 +153,81 @@ export default function MatricesPage() {
               </PrimaryButton>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl shadow border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-2xl shadow border border-gray-200 overflow-hidden mt-8">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gradient-to-r from-indigo-100 via-indigo-50 to-purple-100 rounded-t-2xl shadow-md sticky top-0 z-10">
-                    <tr>
-                      <th className="px-6 py-5 text-left text-base font-bold text-indigo-700 border-b border-indigo-100">Nombre</th>
-                      <th className="px-6 py-5 text-center text-base font-bold text-indigo-700 border-b border-indigo-100">Preguntas</th>
-                      <th className="px-6 py-5 text-center text-base font-bold text-indigo-700 border-b border-indigo-100">OAs</th>
-                      <th className="px-6 py-5 text-center text-base font-bold text-indigo-700 border-b border-indigo-100">Creada</th>
-                      <th className="px-6 py-5 text-center text-base font-bold text-indigo-700 border-b border-indigo-100 w-32">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {matrices.map((matriz) => (
-                      <tr key={matriz.id} className="hover:bg-indigo-50/40 transition-colors group">
-                        <td className="px-6 py-4 text-left align-middle">
-                          <div className="font-bold text-lg text-gray-900 mb-1 flex items-center gap-2">
-                            {matriz.nombre}
-                            <span className="ml-2 px-2 py-0.5 rounded-full bg-gray-100 text-xs text-gray-500 font-semibold">ID: {matriz.id}</span>
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {matriz.oas.map(oa => oa.oa?.oas_id).filter(Boolean).join(', ')}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-center align-middle">
-                          <span className="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 font-semibold text-sm">
-                            {matriz.total_preguntas} preguntas
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-center align-middle">
-                          <span className="inline-block px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold text-sm">
-                            {matriz.oas?.length || 0} OAs
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-center align-middle">
-                          <span className="text-sm text-gray-600">
-                            {formatDate(matriz.createdAt)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-center align-middle">
-                          <div className="flex items-center justify-center gap-2">
+                <thead className="bg-gradient-to-r from-indigo-100 via-indigo-50 to-purple-100 rounded-t-2xl shadow-md sticky top-0 z-10">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-sm font-bold text-indigo-700 border-b border-indigo-100">Nombre</th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-indigo-700 border-b border-indigo-100">Preguntas</th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-indigo-700 border-b border-indigo-100">OAs</th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-indigo-700 border-b border-indigo-100">Creada</th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-indigo-700 border-b border-indigo-100 w-32">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {matrices.map((matriz) => (
+                    <tr key={matriz.id} className="hover:bg-indigo-50/40 transition-colors group">
+                      <td className="px-6 py-3 text-left align-middle">
+                        <div className="font-bold text-base text-gray-900 mb-1">
+                          {matriz.nombre}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {matriz.oas.map(oa => oa.oa?.oas_id).filter(Boolean).join(', ')}
+                        </div>
+                      </td>
+                      <td className="px-6 py-3 text-center align-middle">
+                        <span className="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 font-semibold text-xs">
+                          {matriz.total_preguntas} preguntas
+                        </span>
+                      </td>
+                      <td className="px-6 py-3 text-center align-middle">
+                        <span className="inline-block px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold text-xs">
+                          {matriz.oas?.length || 0} OAs
+                        </span>
+                      </td>
+                      <td className="px-6 py-3 text-center align-middle">
+                        <span className="text-xs text-gray-600">
+                          {formatDate(matriz.createdAt)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3 text-center align-middle">
+                                                  <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => handleViewMatriz(matriz.id)}
-                              className="h-10 w-10 flex items-center justify-center rounded-lg text-gray-700 transition-colors hover:bg-gray-100 hover:border hover:border-gray-300 border border-transparent"
+                              className="h-8 w-8 flex items-center justify-center rounded-lg text-gray-700 transition-colors hover:bg-gray-100 hover:border hover:border-gray-300 border border-transparent"
                               title="Ver matriz"
                               style={{ aspectRatio: '1 / 1' }}
                             >
-                              <Eye size={20} className="text-gray-700" />
+                              <Eye size={16} className="text-gray-700" />
                             </button>
                             <button
                               onClick={() => handleEditMatriz(matriz.id)}
-                              className="h-10 w-10 flex items-center justify-center rounded-lg text-gray-700 transition-colors hover:bg-gray-100 hover:border hover:border-gray-300 border border-transparent"
+                              className="h-8 w-8 flex items-center justify-center rounded-lg text-gray-700 transition-colors hover:bg-gray-100 hover:border hover:border-gray-300 border border-transparent"
                               title="Editar matriz"
                               style={{ aspectRatio: '1 / 1' }}
                             >
-                              <Edit size={20} className="text-gray-700" />
+                              <Edit size={16} className="text-gray-700" />
                             </button>
                             <button
                               onClick={() => handleDeleteMatriz(matriz.id)}
                               disabled={deletingId === matriz.id}
-                              className={`h-10 w-10 flex items-center justify-center rounded-lg text-red-600 transition-colors hover:bg-red-50 hover:border hover:border-red-300 border border-transparent ${deletingId === matriz.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              className={`h-8 w-8 flex items-center justify-center rounded-lg text-red-600 transition-colors hover:bg-red-50 hover:border hover:border-red-300 border border-transparent ${deletingId === matriz.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                               title="Eliminar matriz"
                               style={{ aspectRatio: '1 / 1' }}
                             >
-                              <Trash2 size={20} className="text-red-600" />
+                              <Trash2 size={16} className="text-red-600" />
                             </button>
                           </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             </div>
           )}
         </div>
-      </div>
 
       {/* Modales de confirmación y alerta */}
       <Dialog open={showDeleteModal} onClose={() => setShowDeleteModal(false)} className="fixed z-50 inset-0 overflow-y-auto">
@@ -264,6 +257,6 @@ export default function MatricesPage() {
           </div>
         </Dialog>
       )}
-    </div>
+    </>
   );
 }

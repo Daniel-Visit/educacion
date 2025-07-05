@@ -204,6 +204,7 @@ export function SimpleEditor({ initialContent, onEditorReady }: SimpleEditorProp
     "main" | "highlighter" | "link"
   >("main")
   const toolbarRef = React.useRef<HTMLDivElement>(null)
+  const [contentInitialized, setContentInitialized] = React.useState(false)
 
   const editor = useEditor({
     immediatelyRender: false,

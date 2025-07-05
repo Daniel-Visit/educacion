@@ -29,7 +29,7 @@ export default function MatrizSelector({
   error 
 }: MatrizSelectorProps) {
   return (
-    <div className="mb-8">
+    <div className="mb-8 mt-6">
       <label className="block text-sm font-medium text-gray-700 mb-3">
         Matriz de Especificación *
       </label>

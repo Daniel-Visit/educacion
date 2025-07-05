@@ -7,9 +7,10 @@ interface FabPlanificacionesProps {
   tipoActual: 'planificacion' | 'material' | 'evaluacion'
   matrizId?: number | null
   disabled?: boolean
+  className?: string
 }
 
-export default function FabPlanificaciones({ onLoadContent, tipoActual, matrizId, disabled }: FabPlanificacionesProps) {
+export default function FabPlanificaciones({ onLoadContent, tipoActual, matrizId, disabled, className }: FabPlanificacionesProps) {
   const [open, setOpen] = useState(false);
   const { savedContents, isLoading } = useContentSave();
   const [evaluaciones, setEvaluaciones] = useState<any[]>([]);
@@ -59,9 +60,27 @@ export default function FabPlanificaciones({ onLoadContent, tipoActual, matrizId
     return `hace ${Math.floor(diffDays / 365)} años`
   }
 
-  const handleLoadContent = (content: any) => {
-    if (onLoadContent) {
-      onLoadContent(content)
+  const handleLoadContent = async (content: any) => {
+    if (tipoActual === 'evaluacion' && content.id) {
+      // Para evaluaciones, obtener datos completos desde la API
+      try {
+        const response = await fetch(`/api/evaluaciones/${content.id}`)
+        if (response.ok) {
+          const evaluacionCompleta = await response.json()
+          if (onLoadContent) {
+            onLoadContent(evaluacionCompleta)
+          }
+        } else {
+          console.error('Error al cargar evaluación completa')
+        }
+      } catch (error) {
+        console.error('Error al cargar evaluación:', error)
+      }
+    } else {
+      // Para otros tipos, usar el contenido directamente
+      if (onLoadContent) {
+        onLoadContent(content)
+      }
     }
     setOpen(false)
   }
@@ -70,7 +89,7 @@ export default function FabPlanificaciones({ onLoadContent, tipoActual, matrizId
     <>
       {/* FAB */}
       <button
-        className={`fixed bottom-8 right-20 w-16 h-16 rounded-full bg-gradient-to-br from-indigo-600 to-purple-500 text-white text-4xl flex items-center justify-center transition-all duration-300 z-50 hover:scale-110 active:scale-95 focus:outline-none ${disabled ? 'opacity-50 pointer-events-none' : ''}`}
+        className={`fixed bottom-8 right-20 w-16 h-16 rounded-full bg-gradient-to-br from-indigo-600 to-purple-500 text-white text-4xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 focus:outline-none ${disabled ? 'opacity-50 pointer-events-none' : ''} ${className || ''}`}
         onClick={() => !disabled && setOpen(!open)}
         aria-label={open ? "Cerrar archivos" : `Abrir ${getTypeLabel(tipoActual).toLowerCase()}`}
         disabled={disabled}
