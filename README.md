@@ -65,8 +65,8 @@ npx prisma db push
 
 4. **Restaurar datos iniciales**
 ```bash
-node scripts-restauracion/restore-all-data.js
-node scripts-restauracion/restore-archivos-ejemplo.js
+node scripts-restauracion/restore-all-data-fixed.js
+node scripts-restauracion/restore-archivos-ejemplo-fixed.js
 ```
 
 5. **Ejecutar el servidor de desarrollo**
@@ -139,9 +139,9 @@ npx prisma generate  # Regenerar cliente Prisma
 npx prisma db push   # Aplicar cambios al esquema
 
 # Restauración de datos
-node scripts-restauracion/restore-all-data.js
+node scripts-restauracion/restore-all-data-fixed.js
 node scripts-restauracion/restore-oas.js
-node scripts-restauracion/restore-archivos-ejemplo.js
+node scripts-restauracion/restore-archivos-ejemplo-fixed.js
 ```
 
 ## 📊 Base de Datos
