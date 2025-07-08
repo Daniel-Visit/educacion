@@ -57,24 +57,21 @@ cd educacion
 npm install
 ```
 
-3. **Configurar la base de datos**
+3. **Configurar la base de datos (SIMPLIFICADO)**
 ```bash
+# Crear archivo .env con la URL de la base de datos
+echo DATABASE_URL="file:./dev.db" > .env
+
+# Generar el cliente de Prisma (la base de datos ya está incluida)
 npx prisma generate
-npx prisma db push
 ```
 
-4. **Restaurar datos iniciales**
-```bash
-node scripts-restauracion/restore-all-data-fixed.js
-node scripts-restauracion/restore-archivos-ejemplo-fixed.js
-```
-
-5. **Ejecutar el servidor de desarrollo**
+4. **Ejecutar el servidor de desarrollo**
 ```bash
 npm run dev
 ```
 
-6. **Abrir en el navegador**
+5. **Abrir en el navegador**
 ```
 http://localhost:3000
 ```
@@ -138,10 +135,9 @@ npx prisma studio    # Interfaz visual de la BD
 npx prisma generate  # Regenerar cliente Prisma
 npx prisma db push   # Aplicar cambios al esquema
 
-# Restauración de datos
-node scripts-restauracion/restore-all-data-fixed.js
-node scripts-restauracion/restore-oas.js
-node scripts-restauracion/restore-archivos-ejemplo-fixed.js
+# Base de datos (ya incluida)
+# La base de datos completa con todos los datos ya está incluida en el repositorio
+# No es necesario restaurar nada manualmente
 ```
 
 ## 📊 Base de Datos
@@ -155,8 +151,14 @@ node scripts-restauracion/restore-archivos-ejemplo-fixed.js
 - **imagen:** Imágenes subidas por usuarios
 - **MatrizEspecificacion:** Matrices de especificación
 
-### Restauración de Datos
-Si necesitas restaurar la base de datos, consulta la documentación en `scripts-restauracion/README.md`.
+### Base de Datos Completa
+La base de datos SQLite (`prisma/dev.db`) ya incluye todos los datos:
+- 13 asignaturas del currículum chileno
+- 12 niveles educativos
+- 12 metodologías de enseñanza
+- 37 Objetivos de Aprendizaje (OAs)
+- Archivos de ejemplo
+- No es necesario restaurar nada manualmente
 
 ## 🔒 Seguridad y Respaldo
 
