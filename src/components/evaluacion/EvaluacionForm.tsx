@@ -11,8 +11,8 @@ import { usePreguntasEditor } from '@/hooks/use-preguntas-editor';
 import MatrizSelector from '@/components/evaluacion/MatrizSelector';
 import PreguntasSidebarContent from '@/components/evaluacion/PreguntasSidebar';
 import SaveModal from '@/components/evaluacion/SaveModal';
-import PreguntasDrawer from '@/components/evaluacion/PreguntasDrawer';
-import DrawerToggleButton from '@/components/evaluacion/DrawerToggleButton';
+import Drawer from '@/components/ui/Drawer';
+import DrawerToggle from '@/components/ui/DrawerToggle';
 import Fab from '@/components/ui/Fab';
 
 interface EvaluacionInicial {
@@ -337,7 +337,7 @@ export default function EvaluacionForm({
           </div>
         </main>
         {/* Drawer animado para Respuestas Correctas */}
-        <PreguntasDrawer isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}>
+        <Drawer isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}>
           <PreguntasSidebarContent
             preguntasExtraidas={preguntasExtraidas}
             respuestasCorrectas={formData.respuestasCorrectas}
@@ -347,9 +347,9 @@ export default function EvaluacionForm({
             formData={formData}
             error={errors.respuestas}
           />
-        </PreguntasDrawer>
+        </Drawer>
         {/* Oreja siempre visible y animada */}
-        <DrawerToggleButton isOpen={sidebarOpen} onClick={() => setSidebarOpen(!sidebarOpen)} />
+        <DrawerToggle isOpen={sidebarOpen} onClick={() => setSidebarOpen(!sidebarOpen)} />
       </div>
       
       {/* Nuevo Fab global */}

@@ -1,0 +1,105 @@
+# 📝 Changelog
+
+Todos los cambios notables en este proyecto serán documentados en este archivo.
+
+El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
+y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.1.0] - 2025-07-04
+
+### ✨ Agregado
+- **Módulo de Planificación Anual** completamente funcional
+  - Calendario interactivo con eventos por eje
+  - Sistema de asignación de OAs con validaciones
+  - Colores diferenciados por eje temático
+  - Filtros avanzados por eje y OAs asignables
+  - Drawer lateral para gestión de OAs
+  - Componentes modulares y reutilizables
+
+### 🏗️ Arquitectura
+- **Refactorización completa** de la página de planificación anual
+- **Componentes modulares:**
+  - `FiltrosDrawer.tsx` - Filtros del drawer
+  - `OACard.tsx` - Tarjeta individual de OA
+  - `EjeSection.tsx` - Sección completa de eje
+  - `OADrawerContent.tsx` - Contenido del drawer
+  - `types.ts` - Tipos compartidos
+- **Hook personalizado:** `use-planificacion-anual.ts`
+- **Tipado fuerte** con TypeScript en todos los componentes
+
+### 🎨 Interfaz de Usuario
+- **Navegación mejorada:**
+  - Ítem "Planificación Anual" en el sidebar principal
+  - Tarjeta destacada en la página de inicio
+  - Ícono Calendar para identificación visual
+- **Sistema de colores por eje:**
+  - Sky, Amber, Violet, Rose, Emerald, Orange
+  - Rotación cíclica para ejes adicionales
+- **Validaciones visuales:**
+  - Botones habilitados/deshabilitados según secuencia
+  - Contadores de clases asignadas
+  - Indicadores de OA basal
+
+### 🔧 Funcionalidades
+- **Cálculo automático de fechas:**
+  - Horarios fijos (Martes y Jueves, 9-10 y 12-13)
+  - Distribución desde julio 2025
+  - Módulos de 1 hora cada uno
+- **Validaciones de secuencia:**
+  - Respeto del mínimo de clases por OA
+  - Secuencia obligatoria dentro de cada eje
+  - Prevención de asignaciones inválidas
+- **Filtros avanzados:**
+  - Dropdown para filtrar por eje
+  - Switch para mostrar solo OAs asignables
+  - Filtrado combinado en tiempo real
+
+### 📚 Documentación
+- **Documentación completa** del módulo en `docs/PLANIFICACION_ANUAL.md`
+- **Actualización del README** principal
+- **Estructura del proyecto** actualizada
+- **Casos de uso** y troubleshooting documentados
+
+### 🔗 Integración
+- **API `/api/ejes`** para obtener OAs agrupados por eje
+- **Compatibilidad** con el sistema de navegación existente
+- **Relación** con otros módulos (Editor, Evaluaciones, Matrices)
+
+## [1.0.0] - 2025-07-01
+
+### ✨ Agregado
+- **Editor de Contenido** con TipTap
+- **Sistema de Evaluaciones** con matrices de especificación
+- **Entrevista Pedagógica** interactiva con TTS
+- **Gestión de Matrices** de especificación
+- **APIs REST** para todos los módulos
+- **Base de datos** con Prisma y SQLite
+- **Sistema de navegación** con sidebar
+- **Documentación completa** del proyecto
+
+### 🏗️ Arquitectura
+- **Next.js 14** con App Router
+- **TypeScript** para tipado fuerte
+- **Tailwind CSS** para estilos
+- **Prisma** como ORM
+- **Componentes modulares** y reutilizables
+
+### 🎨 Interfaz de Usuario
+- **Diseño moderno** y responsivo
+- **Tema consistente** en toda la aplicación
+- **Componentes UI** personalizados
+- **Animaciones** y transiciones suaves
+
+---
+
+## Tipos de Cambios
+
+- **✨ Agregado** para nuevas funcionalidades
+- **🐛 Corregido** para correcciones de bugs
+- **💥 Cambiado** para cambios que rompen la compatibilidad
+- **🗑️ Eliminado** para funcionalidades eliminadas
+- **🔧 Mejorado** para mejoras en funcionalidades existentes
+- **📚 Documentación** para cambios en documentación
+- **🏗️ Arquitectura** para cambios en la estructura del proyecto
+- **🎨 Interfaz de Usuario** para cambios en la UI/UX
+- **🔗 Integración** para cambios en integraciones externas 

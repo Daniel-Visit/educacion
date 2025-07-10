@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { BookOpen, Sparkles, FileText, Edit3, CheckSquare, MessageSquare, ArrowRight, Users, Brain, Zap } from "lucide-react";
+import { BookOpen, Sparkles, FileText, Edit3, CheckSquare, MessageSquare, ArrowRight, Users, Brain, Zap, Calendar } from "lucide-react";
 
 export default function Home() {
   const sections = [
@@ -14,6 +14,16 @@ export default function Home() {
       href: "/entrevista",
       features: ["IA Conversacional", "Análisis Personalizado", "Recomendaciones"],
       isPrimary: true
+    },
+    {
+      title: "Planificación Anual",
+      description: "Gestiona la planificación anual de clases con calendario interactivo y asignación de objetivos de aprendizaje",
+      icon: Calendar,
+      gradient: "from-violet-500 to-purple-600",
+      bgGradient: "from-violet-50 to-purple-50",
+      borderColor: "border-violet-200",
+      href: "/planificacion-anual",
+      features: ["Calendario Interactivo", "OAs por Eje", "Distribución Temporal"]
     },
     {
       title: "Evaluaciones",

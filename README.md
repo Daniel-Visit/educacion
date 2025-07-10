@@ -86,10 +86,12 @@ educacion-app/
 │   │   ├── editor/            # Editor de contenido
 │   │   ├── entrevista/        # Entrevista interactiva
 │   │   ├── matrices/          # Gestión de matrices
+│   │   ├── planificacion-anual/ # Planificación anual
 │   │   └── simple/            # Editor simple
 │   ├── components/            # Componentes React
 │   │   ├── editor/           # Componentes del editor
 │   │   ├── entrevista/       # Componentes de entrevista
+│   │   ├── planificacion-anual/ # Componentes de planificación anual
 │   │   ├── tiptap-*          # Componentes TipTap
 │   │   └── ui/               # Componentes UI básicos
 │   ├── hooks/                # Custom hooks
@@ -101,6 +103,13 @@ educacion-app/
 ```
 
 ## 🎮 Uso de la Aplicación
+
+### Planificación Anual
+1. Navega a `/planificacion-anual`
+2. Abre el drawer "Objetivos de Aprendizaje"
+3. Filtra por eje o muestra solo OAs asignables
+4. Asigna clases a OAs usando los botones + y -
+5. Visualiza la distribución en el calendario interactivo
 
 ### Editor de Contenido
 1. Navega a `/editor`

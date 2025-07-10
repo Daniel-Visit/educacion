@@ -29,6 +29,7 @@ const navigation = [
   { name: 'Inicio', href: '/', icon: Home },
   { name: 'Evaluaciones', href: '/evaluaciones', icon: CheckSquare },
   { name: 'Matrices', href: '/matrices', icon: FileText },
+  { name: 'Planificación', href: '/planificacion-anual', icon: Calendar },
   { 
     name: 'Editor', 
     href: '/editor', 

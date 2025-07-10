@@ -4,19 +4,22 @@ import { motion, AnimatePresence } from 'framer-motion'
 import React from 'react'
 import { X } from 'lucide-react'
 
-interface PreguntasDrawerProps {
+interface DrawerProps {
   isOpen?: boolean
   onClose: () => void
   children: React.ReactNode
+  header?: React.ReactNode
+  width?: number | string // Nuevo: ancho opcional
 }
 
-export default function PreguntasDrawer({
+export default function Drawer({
   isOpen = false,
   onClose,
   children,
-}: PreguntasDrawerProps) {
+  header,
+  width = 400,
+}: DrawerProps) {
   const handleOverlayClick = (e: React.MouseEvent) => {
-    // Solo cerrar si el clic fue directamente en el overlay, no en sus hijos
     if (e.target === e.currentTarget) {
       onClose()
     }
@@ -42,14 +45,12 @@ export default function PreguntasDrawer({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'tween', duration: 0.5 }}
-            className="fixed inset-y-0 right-0 z-100 w-[400px] bg-white shadow-xl flex flex-col"
-            style={{ willChange: 'transform' }}
+            className="fixed inset-y-0 right-0 z-100 bg-white shadow-xl flex flex-col"
+            style={{ willChange: 'transform', width: typeof width === 'number' ? `${width}px` : width }}
           >
-            {/* Header profesional */}
+            {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
-              <div>
-                
-              </div>
+              <div>{header}</div>
               <button
                 onClick={onClose}
                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
@@ -58,8 +59,7 @@ export default function PreguntasDrawer({
                 <X size={20} />
               </button>
             </div>
-            
-            {/* Contenido del drawer */}
+            {/* Drawer content */}
             <div className="flex-1 overflow-y-auto">
               {children}
             </div>

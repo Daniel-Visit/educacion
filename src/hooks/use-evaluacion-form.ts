@@ -268,13 +268,18 @@ export function useEvaluacionForm() {
         setErrors({ contenido: 'Error al cargar el contenido de la evaluación.' })
         return
       }
-      
+      // Seleccionar la matriz correspondiente si está disponible
+      if (content.matriz && matrices.length > 0) {
+        const matriz = matrices.find(m => m.id === content.matriz.id)
+        if (matriz) {
+          handleMatrizSelect(matriz)
+        }
+      }
       setFormData(prev => ({
         ...prev,
         contenido: parsedContent,
         respuestasCorrectas
       }))
-      
       setTitulo(content.archivo.titulo || '')
       return
     }
