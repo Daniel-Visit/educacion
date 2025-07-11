@@ -19,9 +19,9 @@ export default function Home() {
       title: "Planificación Anual",
       description: "Gestiona la planificación anual de clases con calendario interactivo y asignación de objetivos de aprendizaje",
       icon: Calendar,
-      gradient: "from-violet-500 to-purple-600",
-      bgGradient: "from-violet-50 to-purple-50",
-      borderColor: "border-violet-200",
+      gradient: "from-orange-500 to-red-500",
+      bgGradient: "from-orange-50 to-red-50",
+      borderColor: "border-orange-200",
       href: "/planificacion-anual",
       features: ["Calendario Interactivo", "OAs por Eje", "Distribución Temporal"]
     },
@@ -35,26 +35,27 @@ export default function Home() {
       href: "/evaluaciones",
       features: ["Matrices de Especificación", "Preguntas Automáticas", "Respuestas Correctas"]
     },
+    
+    {
+      title: "Planificaciones Clase a Clase",
+      description: "Crea planificaciones de clase y materiales de apoyo con un editor avanzado y herramientas de IA",
+      icon: Edit3,
+      gradient: "from-blue-500 to-cyan-600",
+      bgGradient: "from-blue-50 to-cyan-50",
+      borderColor: "border-blue-200",
+      href: "/editor",
+      features: ["Editor TipTap", "Generación con IA", "Materiales de Apoyo"]
+    },
     {
       title: "Matrices de Especificación",
       description: "Diseña matrices detalladas que guíen la creación de evaluaciones alineadas con objetivos de aprendizaje",
       icon: FileText,
-      gradient: "from-blue-500 to-cyan-600",
-      bgGradient: "from-blue-50 to-cyan-50",
-      borderColor: "border-blue-200",
+      gradient: "from-red-500 to-pink-600",
+      bgGradient: "from-red-50 to-pink-50",
+      borderColor: "border-red-200",
       href: "/matrices",
       features: ["Objetivos de Aprendizaje", "Criterios de Evaluación", "Especificaciones Detalladas"]
     },
-    {
-      title: "Editor de Planificaciones",
-      description: "Crea planificaciones de clase y materiales de apoyo con un editor avanzado y herramientas de IA",
-      icon: Edit3,
-      gradient: "from-orange-500 to-red-500",
-      bgGradient: "from-orange-50 to-red-50",
-      borderColor: "border-orange-200",
-      href: "/editor",
-      features: ["Editor TipTap", "Generación con IA", "Materiales de Apoyo"]
-    }
   ];
 
   return (

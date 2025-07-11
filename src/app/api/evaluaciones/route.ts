@@ -4,7 +4,6 @@ import { prisma } from '@/lib/prisma'
 // GET /api/evaluaciones - listar todas las evaluaciones
 export async function GET() {
   try {
-    // @ts-ignore - Prisma client sync issue
     const evaluaciones = await prisma.evaluacion.findMany({
       include: {
         archivo: true,
@@ -24,7 +23,8 @@ export async function GET() {
     return NextResponse.json(data)
   } catch (error) {
     console.error('Error al obtener evaluaciones:', error)
-    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
+    // Devuelve SIEMPRE un array, aunque esté vacío, para evitar romper el frontend
+    return NextResponse.json([])
   }
 }
 
@@ -32,12 +32,10 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { archivoId, matrizId, contenido, preguntas, respuestasCorrectas } = body
-    if (!archivoId || !matrizId || !contenido || !preguntas) {
-      return NextResponse.json({ error: 'archivoId, matrizId, contenido y preguntas son requeridos' }, { status: 400 })
+    const { archivoId, matrizId, preguntas, respuestasCorrectas } = body
+    if (!archivoId || !matrizId || !preguntas) {
+      return NextResponse.json({ error: 'archivoId, matrizId y preguntas son requeridos' }, { status: 400 })
     }
-    // Crear la evaluación y sus preguntas/alternativas según lo enviado
-    // @ts-ignore - Prisma client sync issue
     const evaluacion = await prisma.evaluacion.create({
       data: {
         archivoId,

@@ -66,6 +66,12 @@ Bienvenido a la documentación completa de la Plataforma Educativa. Esta documen
 - Verificación de integridad
 - Instrucciones de uso
 
+#### 🚧 [Tareas Pendientes](./TAREAS_PENDIENTES.md)
+- Configuración de horario docente
+- Gestión de planificaciones guardadas
+- Integración y mejoras del sistema
+- Funcionalidades avanzadas
+
 ## 🚀 Guías de Inicio Rápido
 
 ### Para Desarrolladores
@@ -77,9 +83,10 @@ Bienvenido a la documentación completa de la Plataforma Educativa. Esta documen
 
 ### Para Usuarios Finales
 1. **Editor:** [EDITOR.md](./EDITOR.md) - Crear planificaciones y materiales
-2. **Matrices:** [MATRICES.md](./MATRICES.md) - Gestionar matrices de especificación
-3. **Evaluaciones:** [EVALUACIONES.md](./EVALUACIONES.md) - Crear y editar evaluaciones
-4. **Entrevista:** [ENTREVISTA.md](./ENTREVISTA.md) - Sistema interactivo
+2. **Planificación Anual:** [PLANIFICACION_ANUAL.md](./PLANIFICACION_ANUAL.md) - Gestionar distribución de OAs
+3. **Matrices:** [MATRICES.md](./MATRICES.md) - Gestionar matrices de especificación
+4. **Evaluaciones:** [EVALUACIONES.md](./EVALUACIONES.md) - Crear y editar evaluaciones
+5. **Entrevista:** [ENTREVISTA.md](./ENTREVISTA.md) - Sistema interactivo
 
 ## 🔍 Búsqueda por Tema
 
@@ -88,6 +95,7 @@ Bienvenido a la documentación completa de la Plataforma Educativa. Esta documen
 - **Evaluaciones:** [EVALUACIONES.md](./EVALUACIONES.md) - Editor y sidebar de preguntas
 - **Entrevista:** [ENTREVISTA.md](./ENTREVISTA.md) - Animaciones y TTS
 - **Matrices:** [MATRICES.md](./MATRICES.md) - Formularios y validación
+- **Planificación Anual:** [PLANIFICACION_ANUAL.md](./PLANIFICACION_ANUAL.md) - Calendario y gestión de OAs
 
 ### 💾 Gestión de Datos
 - **Base de datos:** [DATABASE.md](./DATABASE.md) - Estructura y consultas

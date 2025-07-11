@@ -8,17 +8,21 @@ datasource db {
 }
 
 model asignatura {
-  id     Int    @id @default(autoincrement())
-  nombre String @unique
-  oas    oa[]
+  id         Int                  @id @default(autoincrement())
+  nombre     String               @unique
+  horarios   Horario[]
+  oas        oa[]
+  profesores ProfesorAsignatura[]
 
   @@map("asignatura")
 }
 
 model nivel {
-  id     Int    @id @default(autoincrement())
-  nombre String @unique
-  oas    oa[]
+  id         Int             @id @default(autoincrement())
+  nombre     String          @unique
+  horarios   Horario[]
+  oas        oa[]
+  profesores ProfesorNivel[]
 
   @@map("nivel")
 }
@@ -34,7 +38,7 @@ model metodologia {
 }
 
 model oa {
-  id              Int        @id @default(autoincrement())
+  id              Int            @id @default(autoincrement())
   nivel_id        Int
   asignatura_id   Int
   eje_id          Int
@@ -43,19 +47,20 @@ model oa {
   descripcion_oas String
   basal           Boolean
   minimo_clases   Int
-  asignatura      asignatura @relation(fields: [asignatura_id], references: [id])
-  nivel           nivel      @relation(fields: [nivel_id], references: [id])
+  asignaciones    AsignacionOA[]
+  asignatura      asignatura     @relation(fields: [asignatura_id], references: [id])
+  nivel           nivel          @relation(fields: [nivel_id], references: [id])
 
   @@map("oa")
 }
 
 model MatrizEspecificacion {
-  id              Int        @id @default(autoincrement())
+  id              Int          @id @default(autoincrement())
   nombre          String
   total_preguntas Int
-  createdAt       DateTime   @default(now())
-  oas             MatrizOA[]
+  createdAt       DateTime     @default(now())
   evaluaciones    Evaluacion[]
+  oas             MatrizOA[]
 }
 
 model MatrizOA {
@@ -75,13 +80,13 @@ model Indicador {
 }
 
 model Archivo {
-  id        Int             @id @default(autoincrement())
-  titulo    String
-  tipo      String
-  contenido String
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
-  imagenes  ArchivoImagen[]
+  id           Int             @id @default(autoincrement())
+  titulo       String
+  tipo         String
+  contenido    String
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  imagenes     ArchivoImagen[]
   evaluaciones Evaluacion[]
 }
 
@@ -106,37 +111,140 @@ model ArchivoImagen {
   @@unique([archivoId, imagenId])
 }
 
-model Evaluacion {
-  id           Int          @id @default(autoincrement())
-  archivoId    Int          // FK a Archivo (el contenido TipTap)
-  matrizId     Int          // FK a MatrizEspecificacion
-  preguntas    Pregunta[]
-  archivo      Archivo      @relation(fields: [archivoId], references: [id])
-  matriz       MatrizEspecificacion @relation(fields: [matrizId], references: [id])
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+model Profesor {
+  id          Int                     @id @default(autoincrement())
+  rut         String                  @unique(map: "sqlite_autoindex_profesor_1")
+  nombre      String
+  email       String?
+  telefono    String?
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+  horario     Horario[]
+  modulos     ModuloHorarioProfesor[]
+  asignaturas ProfesorAsignatura[]
+  niveles     ProfesorNivel[]
 
-  @@map("evaluacion")
+  @@map("profesor")
+}
+
+model ProfesorAsignatura {
+  id           Int        @id @default(autoincrement())
+  profesorId   Int
+  asignaturaId Int
+  asignatura   asignatura @relation(fields: [asignaturaId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profesor     Profesor   @relation(fields: [profesorId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([profesorId, asignaturaId], map: "sqlite_autoindex_profesor_asignatura_1")
+  @@map("profesor_asignatura")
+}
+
+model ProfesorNivel {
+  id         Int      @id @default(autoincrement())
+  profesorId Int
+  nivelId    Int
+  nivel      nivel    @relation(fields: [nivelId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profesor   Profesor @relation(fields: [profesorId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([profesorId, nivelId], map: "sqlite_autoindex_profesor_nivel_1")
+  @@map("profesor_nivel")
+}
+
+model Horario {
+  id              Int                  @id @default(autoincrement())
+  nombre          String
+  docenteId       Int
+  asignaturaId    Int
+  nivelId         Int
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  nivel           nivel                @relation(fields: [nivelId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  asignatura      asignatura           @relation(fields: [asignaturaId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profesor        Profesor             @relation(fields: [docenteId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  modulos         ModuloHorario[]
+  planificaciones PlanificacionAnual[]
+
+  @@map("horario")
+}
+
+model ModuloHorario {
+  id           Int                     @id @default(autoincrement())
+  horarioId    Int
+  dia          String
+  horaInicio   String
+  duracion     Int
+  orden        Int
+  asignaciones AsignacionOA[]
+  horario      Horario                 @relation(fields: [horarioId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  profesores   ModuloHorarioProfesor[]
+
+  @@map("modulo_horario")
+}
+
+model ModuloHorarioProfesor {
+  id              Int           @id @default(autoincrement())
+  moduloHorarioId Int
+  profesorId      Int
+  rol             String
+  profesor        Profesor      @relation(fields: [profesorId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  moduloHorario   ModuloHorario @relation(fields: [moduloHorarioId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([moduloHorarioId, profesorId, rol], map: "sqlite_autoindex_modulo_horario_profesor_1")
+  @@map("modulo_horario_profesor")
+}
+
+model PlanificacionAnual {
+  id           Int            @id @default(autoincrement())
+  nombre       String
+  horarioId    Int
+  ano          Int
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  asignaciones AsignacionOA[]
+  horario      Horario        @relation(fields: [horarioId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("planificacion_anual")
+}
+
+model AsignacionOA {
+  id              Int                 @id @default(autoincrement())
+  planificacionId Int?
+  moduloHorarioId Int?
+  oaId            Int
+  cantidadClases  Int                 @default(1)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  oa              oa                  @relation(fields: [oaId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  moduloHorario   ModuloHorario?      @relation(fields: [moduloHorarioId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  planificacion   PlanificacionAnual? @relation(fields: [planificacionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("asignacion_oa")
+}
+
+model Alternativa {
+  id         Int      @id @default(autoincrement())
+  preguntaId Int
+  letra      String
+  texto      String
+  esCorrecta Boolean  @default(false)
+  pregunta   Pregunta @relation(fields: [preguntaId], references: [id])
+}
+
+model Evaluacion {
+  id        Int                  @id @default(autoincrement())
+  archivoId Int
+  matrizId  Int
+  createdAt DateTime             @default(now())
+  updatedAt DateTime
+  matriz    MatrizEspecificacion @relation(fields: [matrizId], references: [id])
+  archivo   Archivo              @relation(fields: [archivoId], references: [id])
+  preguntas Pregunta[]
 }
 
 model Pregunta {
-  id           Int          @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   evaluacionId Int
   numero       Int
   texto        String
   alternativas Alternativa[]
-  evaluacion   Evaluacion   @relation(fields: [evaluacionId], references: [id])
-
-  @@map("pregunta")
-}
-
-model Alternativa {
-  id           Int          @id @default(autoincrement())
-  preguntaId   Int
-  letra        String       // "a", "b", "c", etc.
-  texto        String
-  esCorrecta   Boolean      @default(false)
-  pregunta     Pregunta     @relation(fields: [preguntaId], references: [id])
-
-  @@map("alternativa")
+  evaluacion   Evaluacion    @relation(fields: [evaluacionId], references: [id])
 }

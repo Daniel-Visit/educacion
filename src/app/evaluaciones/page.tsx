@@ -28,10 +28,14 @@ export default function EvaluacionesPage() {
     fetch('/api/evaluaciones')
       .then(res => res.json())
       .then(data => {
-        setEvaluaciones(data);
+        console.log('Datos recibidos de la API:', data);
+        // Asegurar que data sea siempre un array
+        const evaluacionesArray = Array.isArray(data) ? data : [];
+        setEvaluaciones(evaluacionesArray);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('Error al cargar evaluaciones:', error);
         setAlert({ type: 'error', message: 'Error al cargar las evaluaciones' });
         setLoading(false);
       });
@@ -125,7 +129,7 @@ export default function EvaluacionesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {evaluaciones.map((ev) => (
+                  {Array.isArray(evaluaciones) && evaluaciones.map((ev) => (
                     <tr key={ev.id} className="hover:bg-indigo-50/40 transition-colors group">
                       <td className="px-6 py-3 text-left align-middle">
                         <div className="font-bold text-base text-gray-900 mb-1">
