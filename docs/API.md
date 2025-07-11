@@ -4,6 +4,272 @@
 
 La plataforma educativa cuenta con un conjunto completo de APIs REST para gestionar todos los aspectos del sistema, desde contenido educativo hasta gestión de archivos e imágenes.
 
+## 🚨 Lecciones Aprendidas - APIs
+
+### ⚠️ **PRINCIPIOS FUNDAMENTALES DE APIS**
+
+#### 1. **Estructura de Respuestas Consistente**
+**Regla de Oro:** Los endpoints GET deben devolver SIEMPRE arrays directos, nunca objetos.
+
+```typescript
+// ✅ CORRECTO - GET devuelve array directo
+export async function GET() {
+  try {
+    const data = await getData()
+    return NextResponse.json(data) // Array directo
+  } catch (error) {
+    console.error('Error:', error)
+    return NextResponse.json([]) // Array vacío en error
+  }
+}
+
+// ❌ INCORRECTO - GET devuelve objeto
+export async function GET() {
+  try {
+    const data = await getData()
+    return NextResponse.json({ data: data }) // Objeto con data
+  } catch (error) {
+    return NextResponse.json({ error: 'Error' }) // Objeto de error
+  }
+}
+```
+
+#### 2. **Manejo de Errores Frontend-Friendly**
+**Regla:** Los errores no deben romper el frontend, deben devolver arrays vacíos.
+
+```typescript
+// ✅ CORRECTO - Error handling que no rompe frontend
+export async function GET() {
+  try {
+    const data = await getData()
+    return NextResponse.json(data)
+  } catch (error) {
+    console.error('Error al obtener datos:', error)
+    return NextResponse.json([]) // Array vacío, no objeto de error
+  }
+}
+```
+
+#### 3. **Nombres de Relaciones Prisma**
+**Regla:** Usar SIEMPRE los nombres exactos del schema, no los generados por el cliente.
+
+```typescript
+// ✅ CORRECTO - Nombres del schema
+const evaluaciones = await prisma.evaluacion.findMany({
+  include: {
+    archivo: true,        // Del schema
+    matriz: true,         // Del schema
+    preguntas: true       // Del schema
+  }
+})
+
+// ❌ INCORRECTO - Nombres del cliente generado
+const evaluaciones = await prisma.evaluacion.findMany({
+  include: {
+    Archivo: true,        // Del cliente generado
+    MatrizEspecificacion: true,  // Del cliente generado
+    Pregunta: true        // Del cliente generado
+  }
+})
+```
+
+### 🔧 **LINEAMIENTOS DE DESARROLLO DE APIS**
+
+#### 1. **Patrón Estándar para GET Endpoints**
+```typescript
+export async function GET() {
+  try {
+    // 1. Obtener datos
+    const data = await prisma.model.findMany({
+      include: {
+        // relaciones en minúscula según schema
+      }
+    })
+    
+    // 2. Mapear a formato esperado por frontend
+    const mappedData = data.map(item => ({
+      id: item.id,
+      // otros campos...
+    }))
+    
+    // 3. Devolver array directo
+    return NextResponse.json(mappedData)
+  } catch (error) {
+    // 4. Log error para debugging
+    console.error('Error al obtener datos:', error)
+    
+    // 5. Devolver array vacío (no objeto de error)
+    return NextResponse.json([])
+  }
+}
+```
+
+#### 2. **Patrón Estándar para POST Endpoints**
+```typescript
+export async function POST(request: NextRequest) {
+  try {
+    // 1. Validar request
+    const body = await request.json()
+    if (!body.requiredField) {
+      return NextResponse.json(
+        { error: 'Campo requerido' }, 
+        { status: 400 }
+      )
+    }
+    
+    // 2. Crear en base de datos
+    const created = await prisma.model.create({
+      data: body,
+      include: {
+        // relaciones necesarias
+      }
+    })
+    
+    // 3. Devolver objeto creado
+    return NextResponse.json(created, { status: 201 })
+  } catch (error) {
+    console.error('Error al crear:', error)
+    return NextResponse.json(
+      { error: 'Error interno del servidor' }, 
+      { status: 500 }
+    )
+  }
+}
+```
+
+#### 3. **Validación de Tipos en Frontend**
+```typescript
+// ✅ CORRECTO - Validación robusta
+const response = await fetch('/api/endpoint')
+const data = await response.json()
+
+// Validar que sea array
+const arrayData = Array.isArray(data) ? data : []
+
+// Usar en componente
+{Array.isArray(arrayData) && arrayData.map(item => (
+  <div key={item.id}>{item.name}</div>
+))}
+```
+
+### 📋 **CHECKLIST PARA NUEVAS APIS**
+
+#### Antes de Implementar
+- [ ] Verificar nombres de relaciones en schema.prisma
+- [ ] Regenerar cliente Prisma: `npx prisma generate`
+- [ ] Planificar estructura de respuesta (array vs objeto)
+- [ ] Definir validaciones necesarias
+
+#### Durante Implementación
+- [ ] Seguir patrón estándar GET/POST
+- [ ] Usar nombres correctos de relaciones
+- [ ] Implementar error handling robusto
+- [ ] Agregar logs para debugging
+
+#### Después de Implementación
+- [ ] Probar con curl: `curl /api/endpoint`
+- [ ] Verificar formato de respuesta
+- [ ] Probar en frontend
+- [ ] Verificar que no rompe funcionalidades existentes
+
+### 🚫 **ERRORES COMUNES A EVITAR**
+
+#### 1. **Inconsistencia en Formato de Respuesta**
+```typescript
+// ❌ NO HACER - Inconsistente
+GET /api/evaluaciones → [{ id: 1, name: "test" }]
+GET /api/matrices → { data: [{ id: 1, name: "test" }] }
+```
+
+#### 2. **Cambiar Nombres de Relaciones Sin Verificar**
+```typescript
+// ❌ NO HACER
+const data = await prisma.evaluacion.findMany({
+  include: {
+    Archivo: true,  // Cambió sin verificar schema
+    MatrizEspecificacion: true  // Cambió sin verificar schema
+  }
+})
+```
+
+#### 3. **Error Handling que Rompe Frontend**
+```typescript
+// ❌ NO HACER
+catch (error) {
+  return NextResponse.json({ error: 'Error' }) // Rompe frontend
+}
+```
+
+### 🔍 **DEBUGGING DE APIS**
+
+#### Logs Útiles
+```typescript
+// En API
+console.log('Datos obtenidos:', data)
+console.error('Error en API:', error)
+
+// En frontend
+console.log('Respuesta de API:', data)
+console.log('Tipo de respuesta:', typeof data)
+console.log('Es array:', Array.isArray(data))
+```
+
+#### Testing con curl
+```bash
+# Probar GET
+curl http://localhost:3000/api/endpoint
+
+# Probar POST
+curl -X POST http://localhost:3000/api/endpoint \
+  -H "Content-Type: application/json" \
+  -d '{"field": "value"}'
+
+# Verificar formato
+curl http://localhost:3000/api/endpoint | jq .
+```
+
+#### Verificación de Schema
+```bash
+# Verificar relaciones en schema
+cat prisma/schema.prisma | grep -A 10 "model ModelName"
+
+# Regenerar cliente
+npx prisma generate
+```
+
+### 📊 **ESTÁNDARES DE DOCUMENTACIÓN**
+
+#### Para Cada API
+- **Endpoint:** URL completa
+- **Método:** GET, POST, PUT, DELETE
+- **Parámetros:** Query params, body params
+- **Respuesta:** Formato exacto (array u objeto)
+- **Ejemplo:** Comando curl completo
+- **Errores:** Posibles códigos de error
+
+#### Ejemplo de Documentación
+```markdown
+### GET `/api/evaluaciones`
+Obtiene todas las evaluaciones.
+
+**Response:** `Array<Evaluacion>`
+```typescript
+{
+  id: number
+  titulo: string
+  matrizId: number
+  matrizNombre: string
+  preguntasCount: number
+  createdAt: string
+}[]
+```
+
+**Ejemplo:**
+```bash
+curl http://localhost:3000/api/evaluaciones
+```
+```
+
 ## Estructura de APIs
 
 ```

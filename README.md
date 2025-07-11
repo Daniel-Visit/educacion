@@ -38,6 +38,127 @@ Una plataforma integral para la gestión educativa que incluye planificación de
 - **UI Components:** Headless UI, Floating UI
 - **Iconos:** Lucide React
 
+## 🚨 Lecciones Aprendidas
+
+### ⚠️ **PRINCIPIOS FUNDAMENTALES (NO VIOLAR)**
+
+#### 1. **Preservación de Funcionalidad Existente**
+- **NUNCA** modificar APIs que funcionan sin testing exhaustivo
+- **SIEMPRE** verificar que el frontend reciba el formato esperado
+- **ANTES** de cambiar nombres de relaciones Prisma, verificar impacto en APIs
+- **MANTENER** compatibilidad hacia atrás en cambios de API
+
+#### 2. **Gestión de Errores Frontend**
+- **SIEMPRE** validar que `data` sea un array antes de usar `.map()`
+- **PROTEGER** contra errores de tipo: `Array.isArray(data) && data.map()`
+- **MANEJAR** casos edge: arrays vacíos, objetos de error, null/undefined
+- **LOGGING** para debugging: `console.log('Datos recibidos:', data)`
+
+#### 3. **Sincronización Prisma-API**
+- **REGENERAR** cliente Prisma después de cambios en schema: `npx prisma generate`
+- **VERIFICAR** nombres de relaciones: schema vs cliente generado
+- **TESTEAR** APIs inmediatamente después de cambios
+- **DOCUMENTAR** cambios en relaciones para futuras referencias
+
+#### 4. **Estructura de Respuestas API**
+- **GET endpoints** deben devolver SIEMPRE arrays (no objetos `{ data: [...] }`)
+- **Error handling** debe devolver arrays vacíos `[]` en lugar de objetos de error
+- **Consistencia** en formato de respuesta entre todos los endpoints
+- **Validación** de tipos en frontend para cada respuesta
+
+### 🔧 **LINEAMIENTOS DE DESARROLLO**
+
+#### Antes de Hacer Cambios
+```bash
+# 1. Verificar estado actual
+git status
+git diff
+
+# 2. Crear backup si es necesario
+mkdir backup_feature_name
+cp -r src/app/api/feature backup_feature_name/
+
+# 3. Probar funcionalidad actual
+curl http://localhost:3000/api/endpoint
+```
+
+#### Después de Cambios
+```bash
+# 1. Regenerar Prisma si es necesario
+npx prisma generate
+
+# 2. Reiniciar servidor
+npm run dev
+
+# 3. Probar todas las funcionalidades afectadas
+# 4. Verificar en navegador
+```
+
+### 🚫 **ERRORES COMUNES A EVITAR**
+
+#### 1. **Cambios en Relaciones Prisma**
+❌ **INCORRECTO:**
+```typescript
+// Cambiar nombres sin verificar impacto
+const evaluaciones = await prisma.evaluacion.findMany({
+  include: {
+    Archivo: true,  // Cambió de 'archivo' a 'Archivo'
+    MatrizEspecificacion: true  // Cambió de 'matriz' a 'MatrizEspecificacion'
+  }
+})
+```
+
+✅ **CORRECTO:**
+```typescript
+// Mantener nombres del schema
+const evaluaciones = await prisma.evaluacion.findMany({
+  include: {
+    archivo: true,
+    matriz: true,
+    preguntas: true
+  }
+})
+```
+
+#### 2. **Manejo de Respuestas API**
+❌ **INCORRECTO:**
+```typescript
+// Frontend sin validación
+const data = await res.json()
+setEvaluaciones(data)  // Puede fallar si data no es array
+```
+
+✅ **CORRECTO:**
+```typescript
+// Frontend con validación robusta
+const data = await res.json()
+const evaluacionesArray = Array.isArray(data) ? data : []
+setEvaluaciones(evaluacionesArray)
+```
+
+### 📋 **CHECKLIST DE VERIFICACIÓN**
+
+#### Antes de Commit
+- [ ] Todas las APIs devuelven el formato esperado
+- [ ] Frontend maneja casos edge (arrays vacíos, errores)
+- [ ] No hay errores de console en navegador
+- [ ] Funcionalidades existentes siguen funcionando
+- [ ] Cliente Prisma regenerado si hubo cambios en schema
+- [ ] Servidor reiniciado y probado
+
+#### Antes de Push
+- [ ] Tests pasan (si existen)
+- [ ] Documentación actualizada
+- [ ] Commit message descriptivo
+- [ ] Backup de cambios importantes
+
+### 📚 **Documentación Completa**
+Para más detalles sobre lecciones aprendidas, patrones de código y troubleshooting, consulta:
+- **[Lecciones Aprendidas Completas](docs/LECCIONES_APRENDIDAS.md)** - Documento principal de lecciones
+- **[Documentación de APIs](docs/API.md)** - Lecciones específicas de APIs
+- **[Documentación de Evaluaciones](docs/EVALUACIONES.md)** - Lecciones específicas del módulo de evaluaciones
+- **[Índice de Documentación](docs/README.md)** - Documentación completa del proyecto
+
 ## 📦 Instalación
 
 ### Prerrequisitos

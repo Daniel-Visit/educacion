@@ -14,6 +14,223 @@ El módulo de evaluaciones permite crear, editar y gestionar evaluaciones basada
 - [Casos de Uso](#casos-de-uso)
 - [Troubleshooting](#troubleshooting)
 
+## 🚨 Lecciones Aprendidas - Evaluaciones
+
+### ⚠️ **PROBLEMAS CRÍTICOS RESUELTOS**
+
+#### 1. **Error: `evaluaciones.map is not a function`**
+**Problema:** El frontend fallaba al intentar hacer `.map()` sobre datos que no eran arrays.
+
+**Causa Raíz:** 
+- APIs devolviendo objetos `{ data: [...] }` en lugar de arrays directos
+- Cambios en nombres de relaciones Prisma sin actualizar APIs
+- Falta de validación en el frontend
+
+**Solución Implementada:**
+```typescript
+// En el frontend (src/app/evaluaciones/page.tsx)
+useEffect(() => {
+  fetch('/api/evaluaciones')
+    .then(res => res.json())
+    .then(data => {
+      console.log('Datos recibidos de la API:', data);
+      // Asegurar que data sea siempre un array
+      const evaluacionesArray = Array.isArray(data) ? data : [];
+      setEvaluaciones(evaluacionesArray);
+      setLoading(false);
+    })
+    .catch((error) => {
+      console.error('Error al cargar evaluaciones:', error);
+      setAlert({ type: 'error', message: 'Error al cargar las evaluaciones' });
+      setLoading(false);
+    });
+}, []);
+
+// En el render
+{Array.isArray(evaluaciones) && evaluaciones.map((ev) => (
+  <tr key={ev.id}>
+    {/* contenido */}
+  </tr>
+))}
+```
+
+#### 2. **Inconsistencia en Nombres de Relaciones Prisma**
+**Problema:** Las APIs usaban nombres de relaciones que no coincidían con el schema.
+
+**Causa Raíz:**
+- Cliente Prisma generado con nombres diferentes al schema
+- Cambios en relaciones sin regenerar cliente
+- Falta de sincronización entre schema y código
+
+**Solución Implementada:**
+```typescript
+// API corregida (src/app/api/evaluaciones/route.ts)
+const evaluaciones = await prisma.evaluacion.findMany({
+  include: {
+    archivo: true,        // ✅ Nombres del schema
+    matriz: true,         // ✅ Nombres del schema
+    preguntas: true       // ✅ Nombres del schema
+  }
+})
+
+// Mapeo correcto
+const data = evaluaciones.map(ev => ({
+  id: ev.id,
+  titulo: ev.archivo?.titulo || '',
+  matrizId: ev.matrizId,
+  matrizNombre: ev.matriz?.nombre || '',
+  preguntasCount: ev.preguntas?.length || 0,
+  createdAt: ev.createdAt
+}))
+```
+
+#### 3. **Estructura de Respuestas API Inconsistente**
+**Problema:** Algunas APIs devolvían objetos, otras arrays.
+
+**Solución Implementada:**
+```typescript
+// GET endpoints SIEMPRE devuelven arrays
+export async function GET() {
+  try {
+    // ... lógica de obtención
+    return NextResponse.json(data) // ✅ Array directo
+  } catch (error) {
+    console.error('Error al obtener evaluaciones:', error)
+    return NextResponse.json([]) // ✅ Array vacío en caso de error
+  }
+}
+```
+
+### 🔧 **LINEAMIENTOS ESPECÍFICOS PARA EVALUACIONES**
+
+#### 1. **Validación Frontend Obligatoria**
+```typescript
+// SIEMPRE validar antes de usar .map()
+const evaluacionesArray = Array.isArray(data) ? data : []
+
+// SIEMPRE validar en el render
+{Array.isArray(evaluaciones) && evaluaciones.map((ev) => (
+  // contenido
+))}
+```
+
+#### 2. **Nombres de Relaciones Prisma**
+```typescript
+// ✅ CORRECTO - Usar nombres del schema
+include: {
+  archivo: true,
+  matriz: true,
+  preguntas: true,
+  alternativas: true
+}
+
+// ❌ INCORRECTO - No cambiar nombres arbitrariamente
+include: {
+  Archivo: true,
+  MatrizEspecificacion: true,
+  Pregunta: true,
+  Alternativa: true
+}
+```
+
+#### 3. **Regeneración de Cliente Prisma**
+```bash
+# Después de cambios en schema.prisma
+npx prisma generate
+
+# Verificar que los tipos coincidan
+npx prisma studio
+```
+
+#### 4. **Testing de APIs**
+```bash
+# Probar endpoint inmediatamente
+curl http://localhost:3000/api/evaluaciones
+
+# Verificar formato de respuesta
+curl http://localhost:3000/api/evaluaciones | jq .
+```
+
+### 📋 **CHECKLIST PARA CAMBIOS EN EVALUACIONES**
+
+#### Antes de Modificar
+- [ ] Verificar estado actual: `git status`
+- [ ] Probar API actual: `curl /api/evaluaciones`
+- [ ] Verificar frontend funciona
+- [ ] Crear backup si es necesario
+
+#### Durante Modificaciones
+- [ ] Cambios incrementales
+- [ ] Testing después de cada cambio
+- [ ] Verificar nombres de relaciones Prisma
+- [ ] Logs para debugging
+
+#### Después de Modificaciones
+- [ ] Regenerar Prisma: `npx prisma generate`
+- [ ] Reiniciar servidor: `npm run dev`
+- [ ] Probar API: `curl /api/evaluaciones`
+- [ ] Verificar frontend: navegar a `/evaluaciones`
+- [ ] Probar todas las funcionalidades
+
+### 🚫 **ERRORES COMUNES A EVITAR**
+
+#### 1. **Cambiar Nombres de Relaciones Sin Verificar**
+```typescript
+// ❌ NO HACER
+const evaluaciones = await prisma.evaluacion.findMany({
+  include: {
+    Archivo: true,  // Cambió sin verificar
+    MatrizEspecificacion: true  // Cambió sin verificar
+  }
+})
+```
+
+#### 2. **Frontend Sin Validación**
+```typescript
+// ❌ NO HACER
+const data = await res.json()
+setEvaluaciones(data)  // Sin validar si es array
+```
+
+#### 3. **APIs Devuelven Objetos**
+```typescript
+// ❌ NO HACER
+return NextResponse.json({ data: evaluaciones })
+```
+
+### 🔍 **DEBUGGING ESPECÍFICO**
+
+#### Logs Útiles
+```typescript
+// En el frontend
+console.log('Datos recibidos de la API:', data)
+console.log('Tipo de datos:', typeof data)
+console.log('Es array:', Array.isArray(data))
+
+// En la API
+console.error('Error al obtener evaluaciones:', error)
+```
+
+#### Verificación de Schema
+```bash
+# Verificar schema actual
+cat prisma/schema.prisma | grep -A 10 "model Evaluacion"
+
+# Verificar cliente generado
+npx prisma generate
+```
+
+#### Testing de Endpoints
+```bash
+# Probar GET
+curl http://localhost:3000/api/evaluaciones
+
+# Probar POST
+curl -X POST http://localhost:3000/api/evaluaciones \
+  -H "Content-Type: application/json" \
+  -d '{"archivoId": 1, "matrizId": 1, "preguntas": []}'
+```
+
 ## ✨ Características Principales
 
 ### 🎨 Editor Avanzado

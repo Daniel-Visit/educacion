@@ -2,6 +2,160 @@
 
 Bienvenido a la documentación completa de la Plataforma Educativa. Esta documentación está organizada por módulos para facilitar la navegación y comprensión del sistema.
 
+## 🎯 Contexto del Proyecto
+
+### Propósito
+Plataforma educativa inteligente diseñada para docentes, que integra:
+- **Editor avanzado TipTap** para crear planificaciones y materiales
+- **Sistema de evaluaciones** basado en matrices de especificación
+- **Entrevista pedagógica interactiva** con IA conversacional
+- **Planificación anual** con distribución de objetivos de aprendizaje
+- **Gestión de horarios** para docentes y asignaturas
+
+### Usuario Objetivo
+**Docentes de educación básica y media** que necesitan:
+- Crear planificaciones de clase de alta calidad
+- Generar evaluaciones alineadas con el currículum
+- Gestionar su tiempo y horarios de manera eficiente
+- Recibir asistencia pedagógica personalizada
+
+## 🚨 Lecciones Aprendidas y Lineamientos Críticos
+
+### ⚠️ **PRINCIPIOS FUNDAMENTALES (NO VIOLAR)**
+
+#### 1. **Preservación de Funcionalidad Existente**
+- **NUNCA** modificar APIs que funcionan sin testing exhaustivo
+- **SIEMPRE** verificar que el frontend reciba el formato esperado
+- **ANTES** de cambiar nombres de relaciones Prisma, verificar impacto en APIs
+- **MANTENER** compatibilidad hacia atrás en cambios de API
+
+#### 2. **Gestión de Errores Frontend**
+- **SIEMPRE** validar que `data` sea un array antes de usar `.map()`
+- **PROTEGER** contra errores de tipo: `Array.isArray(data) && data.map()`
+- **MANEJAR** casos edge: arrays vacíos, objetos de error, null/undefined
+- **LOGGING** para debugging: `console.log('Datos recibidos:', data)`
+
+#### 3. **Sincronización Prisma-API**
+- **REGENERAR** cliente Prisma después de cambios en schema: `npx prisma generate`
+- **VERIFICAR** nombres de relaciones: schema vs cliente generado
+- **TESTEAR** APIs inmediatamente después de cambios
+- **DOCUMENTAR** cambios en relaciones para futuras referencias
+
+#### 4. **Estructura de Respuestas API**
+- **GET endpoints** deben devolver SIEMPRE arrays (no objetos `{ data: [...] }`)
+- **Error handling** debe devolver arrays vacíos `[]` en lugar de objetos de error
+- **Consistencia** en formato de respuesta entre todos los endpoints
+- **Validación** de tipos en frontend para cada respuesta
+
+### 🔧 **LINEAMIENTOS DE DESARROLLO**
+
+#### 1. **Antes de Hacer Cambios**
+```bash
+# 1. Verificar estado actual
+git status
+git diff
+
+# 2. Crear backup si es necesario
+mkdir backup_feature_name
+cp -r src/app/api/feature backup_feature_name/
+
+# 3. Probar funcionalidad actual
+curl http://localhost:3000/api/endpoint
+```
+
+#### 2. **Durante el Desarrollo**
+```bash
+# 1. Cambios incrementales
+# 2. Testing después de cada cambio
+# 3. Verificar que no se rompe nada existente
+# 4. Logs para debugging
+```
+
+#### 3. **Después de Cambios**
+```bash
+# 1. Regenerar Prisma si es necesario
+npx prisma generate
+
+# 2. Reiniciar servidor
+npm run dev
+
+# 3. Probar todas las funcionalidades afectadas
+# 4. Verificar en navegador
+```
+
+### 🚫 **ERRORES COMUNES A EVITAR**
+
+#### 1. **Cambios en Relaciones Prisma**
+❌ **INCORRECTO:**
+```typescript
+// Cambiar nombres sin verificar impacto
+const evaluaciones = await prisma.evaluacion.findMany({
+  include: {
+    Archivo: true,  // Cambió de 'archivo' a 'Archivo'
+    MatrizEspecificacion: true  // Cambió de 'matriz' a 'MatrizEspecificacion'
+  }
+})
+```
+
+✅ **CORRECTO:**
+```typescript
+// Mantener nombres del schema
+const evaluaciones = await prisma.evaluacion.findMany({
+  include: {
+    archivo: true,
+    matriz: true,
+    preguntas: true
+  }
+})
+```
+
+#### 2. **Manejo de Respuestas API**
+❌ **INCORRECTO:**
+```typescript
+// Frontend sin validación
+const data = await res.json()
+setEvaluaciones(data)  // Puede fallar si data no es array
+```
+
+✅ **CORRECTO:**
+```typescript
+// Frontend con validación robusta
+const data = await res.json()
+const evaluacionesArray = Array.isArray(data) ? data : []
+setEvaluaciones(evaluacionesArray)
+```
+
+#### 3. **Renderizado sin Validación**
+❌ **INCORRECTO:**
+```jsx
+{evaluaciones.map((ev) => (
+  <div key={ev.id}>{ev.titulo}</div>
+))}
+```
+
+✅ **CORRECTO:**
+```jsx
+{Array.isArray(evaluaciones) && evaluaciones.map((ev) => (
+  <div key={ev.id}>{ev.titulo}</div>
+))}
+```
+
+### 📋 **CHECKLIST DE VERIFICACIÓN**
+
+#### Antes de Commit
+- [ ] Todas las APIs devuelven el formato esperado
+- [ ] Frontend maneja casos edge (arrays vacíos, errores)
+- [ ] No hay errores de console en navegador
+- [ ] Funcionalidades existentes siguen funcionando
+- [ ] Cliente Prisma regenerado si hubo cambios en schema
+- [ ] Servidor reiniciado y probado
+
+#### Antes de Push
+- [ ] Tests pasan (si existen)
+- [ ] Documentación actualizada
+- [ ] Commit message descriptivo
+- [ ] Backup de cambios importantes
+
 ## 🗂️ Índice de Documentación
 
 ### 📖 Documentación General
@@ -72,14 +226,21 @@ Bienvenido a la documentación completa de la Plataforma Educativa. Esta documen
 - Integración y mejoras del sistema
 - Funcionalidades avanzadas
 
+#### 🧪 [Testing Strategy](./TESTING_STRATEGY.md)
+- Estrategia completa de testing
+- Configuración de Jest
+- Tests de API y componentes
+- Cobertura y calidad
+
 ## 🚀 Guías de Inicio Rápido
 
 ### Para Desarrolladores
 1. **Instalación:** Sigue el [README principal](../README.md)
-2. **Base de datos:** Consulta [DATABASE.md](./DATABASE.md)
-3. **APIs:** Revisa [API.md](./API.md)
-4. **Hooks:** Consulta [HOOKS.md](./HOOKS.md) para patrones y mejores prácticas
-5. **Módulos específicos:** Selecciona según tu interés
+2. **Lecciones aprendidas:** Lee esta sección completa antes de empezar
+3. **Base de datos:** Consulta [DATABASE.md](./DATABASE.md)
+4. **APIs:** Revisa [API.md](./API.md)
+5. **Hooks:** Consulta [HOOKS.md](./HOOKS.md) para patrones y mejores prácticas
+6. **Módulos específicos:** Selecciona según tu interés
 
 ### Para Usuarios Finales
 1. **Editor:** [EDITOR.md](./EDITOR.md) - Crear planificaciones y materiales
@@ -113,7 +274,7 @@ Bienvenido a la documentación completa de la Plataforma Educativa. Esta documen
 ```
 educacion-app/
 ├── docs/                      # 📚 Documentación
-│   ├── README.md             # Índice de documentación
+│   ├── README.md             # Índice de documentación (ESTE ARCHIVO)
 │   ├── EDITOR.md             # Documentación del editor
 │   ├── MATRICES.md           # Documentación de matrices
 │   ├── EVALUACIONES.md       # Documentación de evaluaciones
@@ -121,7 +282,13 @@ educacion-app/
 │   ├── API.md                # Documentación de APIs
 │   ├── HOOKS.md              # Documentación de hooks
 │   ├── ARQUITECTURA.md       # Documentación de arquitectura
-│   └── DATABASE.md           # Documentación de base de datos
+│   ├── DATABASE.md           # Documentación de base de datos
+│   ├── TESTING_STRATEGY.md   # Estrategia de testing
+│   └── TAREAS_PENDIENTES.md  # Tareas pendientes
+├── horarios_backup/          # 🔄 Backup de funcionalidad de horarios
+│   ├── src/app/api/horarios/ # APIs de horarios
+│   ├── src/components/horarios/ # Componentes de horarios
+│   └── use-horarios.ts       # Hook de horarios
 ├── scripts-restauracion/      # 🛠️ Scripts de restauración
 │   ├── README.md             # Instrucciones de restauración
 │   ├── restore-all-data.js   # Restaurar todos los datos
@@ -132,6 +299,10 @@ educacion-app/
 │   ├── components/           # Componentes React
 │   ├── hooks/                # Custom hooks
 │   └── lib/                  # Utilidades
+├── tests/                    # 🧪 Tests del sistema
+│   ├── api/                  # Tests de APIs
+│   ├── components/           # Tests de componentes
+│   └── integration/          # Tests de integración
 ├── prisma/                   # 🗄️ Base de datos
 │   ├── schema.prisma         # Esquema de base de datos
 │   ├── dev.db               # Base de datos SQLite
@@ -179,20 +350,52 @@ educacion-app/
 - **Base de datos:** `npx prisma studio` - Interfaz visual
 - **APIs:** [API.md](./API.md) - Ejemplos de testing
 
+### Errores Críticos y Soluciones
+
+#### Error: `evaluaciones.map is not a function`
+**Causa:** API devuelve objeto en lugar de array
+**Solución:** 
+```typescript
+// En el frontend
+const data = await res.json()
+const evaluacionesArray = Array.isArray(data) ? data : []
+setEvaluaciones(evaluacionesArray)
+```
+
+#### Error: `Property 'archivo' does not exist`
+**Causa:** Nombres de relaciones Prisma incorrectos
+**Solución:**
+```bash
+npx prisma generate
+# Verificar nombres en schema.prisma
+```
+
+#### Error: `Route used params.id without awaiting`
+**Causa:** Next.js 15 requiere await en params
+**Solución:**
+```typescript
+export async function GET({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  // resto del código
+}
+```
+
 ## 📈 Contribución
 
 ### Para Contribuir
 1. **Fork** el repositorio
 2. **Crea** una rama para tu feature
-3. **Documenta** tus cambios
-4. **Actualiza** la documentación relevante
-5. **Envía** un Pull Request
+3. **Lee** las lecciones aprendidas en esta documentación
+4. **Documenta** tus cambios
+5. **Actualiza** la documentación relevante
+6. **Envía** un Pull Request
 
 ### Estándares de Documentación
 - **Markdown** para todos los archivos
 - **Emojis** para mejor navegación
 - **Ejemplos de código** cuando sea posible
 - **Sección de troubleshooting** en cada módulo
+- **Lecciones aprendidas** documentadas
 
 ## 🔗 Enlaces Útiles
 
@@ -215,5 +418,6 @@ educacion-app/
 ---
 
 **Última actualización:** Julio 2025  
-**Versión de documentación:** 1.0  
-**Mantenido por:** Equipo de Desarrollo 
+**Versión de documentación:** 2.0  
+**Mantenido por:** Equipo de Desarrollo  
+**Estado:** Funcionalidad de evaluaciones restaurada, sistema estable 
