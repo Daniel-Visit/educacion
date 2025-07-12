@@ -43,7 +43,8 @@ const navigation = [
     icon: Calendar,
     submenu: [
       { name: 'Horarios', href: '/horarios' },
-      { name: 'Planificación Anual', href: '/planificacion-anual' }
+      { name: 'Planificación Anual', href: '/planificacion-anual' },
+      { name: 'Planificaciones', href: '/planificacion-anual/listado' }
     ]
   },
   { 

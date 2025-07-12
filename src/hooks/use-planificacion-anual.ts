@@ -37,7 +37,10 @@ function getModuloDate(baseDate: Date, moduloIdx: number, modulos: {dia: string,
   return fecha;
 }
 
-export function usePlanificacionAnual(horarioSeleccionado?: { modulos?: any[], fechaPrimeraClase?: string }) {
+export function usePlanificacionAnual(
+  horarioSeleccionado?: { modulos?: any[], fechaPrimeraClase?: string },
+  planificacionId?: string
+) {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [ejes, setEjes] = useState<Eje[]>([]);
   const [oaClases, setOaClases] = useState<OAClases>({});
@@ -45,7 +48,10 @@ export function usePlanificacionAnual(horarioSeleccionado?: { modulos?: any[], f
   const [showOnlyAssignable, setShowOnlyAssignable] = useState(false);
   const [selectedEjeId, setSelectedEjeId] = useState<string>("Todos");
   const [skippedOAs, setSkippedOAs] = useState<Set<number>>(new Set());
+  const [planificacionActual, setPlanificacionActual] = useState<any>(null);
+  const [loadingPlanificacion, setLoadingPlanificacion] = useState(false);
 
+  // Cargar ejes y OAs
   useEffect(() => {
     setLoadingOAs(true);
     fetch("/api/ejes")
@@ -63,6 +69,74 @@ export function usePlanificacionAnual(horarioSeleccionado?: { modulos?: any[], f
       })
       .finally(() => setLoadingOAs(false));
   }, []);
+
+  // Cargar planificación existente si se proporciona un ID
+  useEffect(() => {
+    if (planificacionId) {
+      setLoadingPlanificacion(true);
+      fetch(`/api/planificaciones/${planificacionId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.error) {
+            console.error("Error al cargar planificación:", data.error);
+            return;
+          }
+          
+          setPlanificacionActual(data);
+          
+          // Cargar asignaciones de OAs
+          const asignaciones: OAClases = {};
+          data.asignaciones?.forEach((asignacion: any) => {
+            asignaciones[asignacion.oaId] = asignacion.cantidadClases;
+          });
+          setOaClases(asignaciones);
+          
+          // Generar eventos del calendario basados en las asignaciones
+          const eventos: CalendarEvent[] = [];
+          let eventoIndex = 0;
+          
+          Object.entries(asignaciones).forEach(([oaId, cantidadClases]) => {
+            const oa = data.asignaciones?.find((a: any) => a.oaId === parseInt(oaId))?.oa;
+            if (oa) {
+              for (let i = 0; i < cantidadClases; i++) {
+                const eje = ejes.find((e: Eje) => e.oas.some((o: OA) => o.id === parseInt(oaId)));
+                const ejeColor = (eje ? getEjeColor(eje.id) : "sky") as EventColor;
+                
+                const modulos = data.horario?.modulos && data.horario.modulos.length > 0 
+                  ? data.horario.modulos 
+                  : modulosFijos;
+                
+                const fechaBase = data.horario?.fechaPrimeraClase
+                  ? new Date(data.horario.fechaPrimeraClase)
+                  : new Date(2025, 6, 1);
+                
+                const start = getModuloDate(fechaBase, eventoIndex, modulos);
+                const end = new Date(start);
+                end.setHours(end.getHours() + (modulos[eventoIndex % modulos.length]?.duracion ? modulos[eventoIndex % modulos.length].duracion / 60 : 1));
+                
+                eventos.push({
+                  id: Math.random().toString(36).slice(2),
+                  title: oa.oas_id,
+                  start,
+                  end,
+                  allDay: false,
+                  color: ejeColor,
+                  location: `${modulos[eventoIndex % modulos.length]?.dia} ${modulos[eventoIndex % modulos.length]?.horaInicio}`,
+                });
+                
+                eventoIndex++;
+              }
+            }
+          });
+          
+          setEvents(eventos);
+        })
+        .catch((error) => {
+          console.error("Error al cargar planificación:", error);
+        })
+        .finally(() => setLoadingPlanificacion(false));
+    }
+  }, [planificacionId, ejes]);
 
   // Lógica para sumar/restar clases a un OA
   const handleAddClase = (oa: OA, prevOA: OA | null) => {
@@ -182,11 +256,111 @@ export function usePlanificacionAnual(horarioSeleccionado?: { modulos?: any[], f
     }))
     .filter((e: Eje) => e.oas.length > 0);
 
+  // Función para guardar planificación
+  const guardarPlanificacion = async (nombre: string, horarioId: string) => {
+    try {
+      const asignaciones = Object.entries(oaClases)
+        .filter(([_, cantidad]) => cantidad > 0)
+        .map(([oaId, cantidad]) => ({
+          oaId: parseInt(oaId),
+          cantidadClases: cantidad,
+        }));
+
+      const response = await fetch("/api/planificaciones", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre,
+          horarioId: parseInt(horarioId),
+          ano: new Date().getFullYear(),
+          asignaciones,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al guardar planificación");
+      }
+
+      const data = await response.json();
+      setPlanificacionActual(data);
+      return data;
+    } catch (error) {
+      console.error("Error al guardar planificación:", error);
+      throw error;
+    }
+  };
+
+  // Función para actualizar planificación
+  const actualizarPlanificacion = async (nombre: string) => {
+    if (!planificacionActual) {
+      throw new Error("No hay planificación para actualizar");
+    }
+
+    try {
+      const asignaciones = Object.entries(oaClases)
+        .filter(([_, cantidad]) => cantidad > 0)
+        .map(([oaId, cantidad]) => ({
+          oaId: parseInt(oaId),
+          cantidadClases: cantidad,
+        }));
+
+      const response = await fetch(`/api/planificaciones/${planificacionActual.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre,
+          asignaciones,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al actualizar planificación");
+      }
+
+      const data = await response.json();
+      setPlanificacionActual(data);
+      return data;
+    } catch (error) {
+      console.error("Error al actualizar planificación:", error);
+      throw error;
+    }
+  };
+
+  // Función para eliminar planificación
+  const eliminarPlanificacion = async () => {
+    if (!planificacionActual) {
+      throw new Error("No hay planificación para eliminar");
+    }
+
+    try {
+      const response = await fetch(`/api/planificaciones/${planificacionActual.id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al eliminar planificación");
+      }
+
+      setPlanificacionActual(null);
+      setOaClases({});
+      setEvents([]);
+      return true;
+    } catch (error) {
+      console.error("Error al eliminar planificación:", error);
+      throw error;
+    }
+  };
+
   return {
     events,
     ejes,
     oaClases,
     loadingOAs,
+    loadingPlanificacion,
     showOnlyAssignable,
     setShowOnlyAssignable,
     selectedEjeId,
@@ -194,6 +368,7 @@ export function usePlanificacionAnual(horarioSeleccionado?: { modulos?: any[], f
     ejeOptions,
     ejesFiltrados,
     skippedOAs,
+    planificacionActual,
     handleAddClase,
     handleRemoveClase,
     handleActivateSkippedOA,
@@ -201,5 +376,8 @@ export function usePlanificacionAnual(horarioSeleccionado?: { modulos?: any[], f
     handleEventAdd,
     handleEventUpdate,
     handleEventDelete,
+    guardarPlanificacion,
+    actualizarPlanificacion,
+    eliminarPlanificacion,
   };
 } 

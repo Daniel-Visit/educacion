@@ -5,6 +5,34 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2025-07-10
+
+### ✨ Agregado
+- **Página de Listado de Planificaciones** (`/planificacion-anual/listado`)
+  - Lista todas las planificaciones guardadas
+  - Acciones para editar/eliminar cada planificación
+  - Paginación para manejar múltiples planificaciones
+  - Botón para crear nueva planificación
+  - Diseño consistente con el listado de horarios
+
+### 🔧 Mejorado
+- **Navegación del Sidebar:**
+  - Agregado submenu "Planificaciones" en la sección "Planificación"
+  - Enlace directo al listado de planificaciones
+  - Estructura de navegación más organizada
+
+### 🐛 Corregido
+- **Carga de Planificaciones Existentes:**
+  - Al editar una planificación existente, el horario se preselecciona automáticamente
+  - El dropdown de horario aparece bloqueado cuando se edita una planificación
+  - No se pide seleccionar un horario nuevo al editar
+  - Los datos de la planificación se cargan correctamente
+
+### 🏗️ Arquitectura
+- **Estructura de archivos corregida:**
+  - Movido `listado.tsx` a `listado/page.tsx` para cumplir con Next.js App Router
+  - Eliminado archivo incorrecto que causaba error 404
+
 ## [1.1.0] - 2025-07-04
 
 ### ✨ Agregado

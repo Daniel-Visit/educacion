@@ -254,7 +254,18 @@ export default function EvaluacionForm({
             </p>
           </div>
         </div>
-        <div className="flex gap-3 items-start pt-2 pr-12">
+      </div>
+      {/* Fila de MatrizSelector y botón */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex-1">
+          <MatrizSelector
+            matrices={matrices}
+            selectedMatriz={selectedMatriz}
+            onMatrizSelect={handleMatrizSelect}
+            error={errors.matriz}
+          />
+        </div>
+        <div className="flex-shrink-0 mt-6 me-1">
           <PrimaryButton
             onMouseEnter={() => setIsSaveHovered(true)}
             onMouseLeave={() => setIsSaveHovered(false)}
@@ -304,13 +315,6 @@ export default function EvaluacionForm({
       <div className="flex-1 flex overflow-hidden">
         {/* Editor Principal */}
         <main className="flex-1 flex flex-col overflow-auto">
-          {/* Selector de Matriz */}
-          <MatrizSelector
-            matrices={matrices}
-            selectedMatriz={selectedMatriz}
-            onMatrizSelect={handleMatrizSelect}
-            error={errors.matriz}
-          />
           {/* Editor TipTap */}
           <div className="flex-1 flex flex-col mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-3">

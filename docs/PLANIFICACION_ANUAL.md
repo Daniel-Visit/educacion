@@ -270,9 +270,14 @@ function getModuloDate(baseDate: Date, moduloIdx: number, modulos: any[]) {
 ## 🔗 Integración con Sistema Existente
 
 ### Navegación
-- **Sidebar principal:** Ítem "Planificación Anual" con ícono Calendar
+- **Sidebar principal:** Ítem "Planificación" con submenu:
+  - "Planificación Anual" - Crear nueva planificación
+  - "Planificaciones" - Listado de planificaciones guardadas
+  - "Horarios" - Gestión de horarios
 - **Página de inicio:** Tarjeta destacada en el dashboard
-- **URL:** `/planificacion-anual`
+- **URLs:** 
+  - `/planificacion-anual` - Crear/editar planificación
+  - `/planificacion-anual/listado` - Listado de planificaciones
 
 ### APIs Utilizadas
 - **`/api/ejes`:** Obtiene OAs agrupados por eje
@@ -306,14 +311,24 @@ function getModuloDate(baseDate: Date, moduloIdx: number, modulos: any[]) {
 ```bash
 # Navegar a la página de planificación anual
 http://localhost:3000/planificacion-anual
+
+# Navegar al listado de planificaciones
+http://localhost:3000/planificacion-anual/listado
 ```
 
-### 2. Flujo de Trabajo
-1. **Abrir drawer:** Hacer clic en "Objetivos de Aprendizaje"
-2. **Filtrar ejes:** Usar dropdown para ver ejes específicos
-3. **Asignar clases:** Usar botones + para agregar clases a OAs
-4. **Ver calendario:** Los eventos aparecen automáticamente
-5. **Ajustar:** Usar botones - para remover clases si es necesario
+### 2. Navegación desde el Sidebar
+- **Planificación → Planificación Anual:** Crear nueva planificación
+- **Planificación → Planificaciones:** Ver listado de planificaciones guardadas
+- **Planificación → Horarios:** Gestionar horarios disponibles
+
+### 3. Flujo de Trabajo
+1. **Seleccionar horario:** Elegir un horario existente o crear uno nuevo
+2. **Abrir drawer:** Hacer clic en "Objetivos de Aprendizaje"
+3. **Filtrar ejes:** Usar dropdown para ver ejes específicos
+4. **Asignar clases:** Usar botones + para agregar clases a OAs
+5. **Ver calendario:** Los eventos aparecen automáticamente
+6. **Guardar:** Usar botón "Guardar Planificación" para persistir cambios
+7. **Ajustar:** Usar botones - para remover clases si es necesario
 
 ### 3. Validaciones
 - **Secuencia:** No se puede asignar un OA si el anterior no cumple mínimo
@@ -339,6 +354,13 @@ http://localhost:3000/planificacion-anual
 2. Enfocarse en OAs de ese eje
 3. Completar asignación del eje
 4. Cambiar a siguiente eje
+
+### Caso 4: Gestión de Planificaciones Guardadas
+1. Navegar a "Planificaciones" en el sidebar
+2. Ver listado de todas las planificaciones guardadas
+3. Hacer clic en "Ver/Editar" para modificar una planificación
+4. El horario se preselecciona automáticamente
+5. Realizar cambios y guardar con "Actualizar"
 
 ## 🔧 Configuración y Personalización
 

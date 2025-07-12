@@ -226,11 +226,19 @@ educacion-app/
 ## 🎮 Uso de la Aplicación
 
 ### Planificación Anual
-1. Navega a `/planificacion-anual`
-2. Abre el drawer "Objetivos de Aprendizaje"
-3. Filtra por eje o muestra solo OAs asignables
-4. Asigna clases a OAs usando los botones + y -
-5. Visualiza la distribución en el calendario interactivo
+1. Navega a `/planificacion-anual` o usa el sidebar "Planificación → Planificación Anual"
+2. Selecciona un horario existente o crea uno nuevo
+3. Abre el drawer "Objetivos de Aprendizaje"
+4. Filtra por eje o muestra solo OAs asignables
+5. Asigna clases a OAs usando los botones + y -
+6. Visualiza la distribución en el calendario interactivo
+7. Guarda la planificación con el botón "Guardar"
+
+### Gestión de Planificaciones
+1. Navega a `/planificacion-anual/listado` o usa el sidebar "Planificación → Planificaciones"
+2. Ve todas las planificaciones guardadas
+3. Haz clic en "Ver/Editar" para modificar una planificación existente
+4. El horario se preselecciona automáticamente al editar
 
 ### Editor de Contenido
 1. Navega a `/editor`
