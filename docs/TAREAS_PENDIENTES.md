@@ -20,16 +20,20 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 
 ## 🚧 Tareas Pendientes
 
-### 🧪 **Fase 0: Implementación de Testing (COMPLETADO ✅)**
-- [x] **Configurar Jest + Supertest** para testing de APIs
-- [x] **Crear estructura de carpetas** para tests
-- [x] **Implementar tests para API de horarios** existente
-- [x] **Establecer workflow de testing** automático
-- [x] **Configurar scripts de testing** en package.json
-- [x] **Documentar estrategia de testing** continua
-- [x] **Crear tests para APIs existentes** (evaluaciones, archivos, etc.)
+### 🚀 **FASE PRIORITARIA: Escalabilidad (3 días intensivos)**
+**Estado:** 🔥 **ALTA PRIORIDAD** - Aplazado testing por escalabilidad
 
-### 🧪 **Fase Final: Testing Completo de la Plataforma (4 días intensivos)**
+#### **Plan de Escalabilidad (Ver docs/PLAN_ESCALABILIDAD.md)**
+- [ ] **Día 1:** Migración a PostgreSQL + NextAuth
+- [ ] **Día 2:** Redis + SWR + Optimización
+- [ ] **Día 3:** Sentry + Analytics + Deploy
+
+**Justificación:** La escalabilidad es crítica para el éxito del producto. El testing se puede implementar después de tener una base sólida y usuarios reales.
+
+### 🧪 **Fase 1: Testing Completo de la Plataforma (APLAZADO)**
+**Estado:** ⏸️ **APLAZADO** - Se implementará después de la escalabilidad
+
+#### **Plan de Testing (4 días intensivos) - POST ESCALABILIDAD**
 
 #### **📋 Plan Eficiente - 4 Días Intensivos**
 
@@ -89,6 +93,11 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 - [ ] **Tests automatizados**: Scripts de generación
 - [ ] **Priorización inteligente**: Crítico → Importante → Opcional
 - [ ] **Paralelización**: 2 desarrolladores trabajando simultáneamente
+
+#### **🔄 Cronograma Actualizado**
+1. **Semana 1:** Escalabilidad (3 días) + Funcionalidades críticas (2 días)
+2. **Semana 2:** Testing completo (4 días) + Optimización (1 día)
+3. **Semana 3:** Funcionalidades avanzadas + Monetización inicial
 
 ### 🔧 Fase 1: Configuración de Horario Docente
 

@@ -5,6 +5,29 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2025-07-10
+
+### 📋 Planificación
+- **Plan de Escalabilidad Documentado:**
+  - Documentación completa en `docs/PLAN_ESCALABILIDAD.md`
+  - Cronograma de 3 días para implementar escalabilidad
+  - Stack tecnológico enterprise-grade definido
+  - Análisis de costos y ROI detallado
+
+### 🔄 Priorización
+- **Testing Aplazado por Escalabilidad:**
+  - Priorizada la escalabilidad sobre testing completo
+  - Plan de testing movido a post-escalabilidad
+  - Justificación: base sólida antes de testing exhaustivo
+  - Cronograma actualizado en `docs/TAREAS_PENDIENTES.md`
+
+### 🎯 Objetivos
+- **Metas de Escalabilidad Definidas:**
+  - 2,000+ usuarios simultáneos
+  - Tiempo de respuesta < 1.5 segundos
+  - Uptime 99.9%
+  - Capacidad para generar ingresos
+
 ## [1.1.1] - 2025-07-10
 
 ### ✨ Agregado
