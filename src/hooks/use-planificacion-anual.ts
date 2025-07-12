@@ -37,13 +37,14 @@ function getModuloDate(baseDate: Date, moduloIdx: number, modulos: {dia: string,
   return fecha;
 }
 
-export function usePlanificacionAnual() {
+export function usePlanificacionAnual(horarioSeleccionado?: { modulos?: any[], fechaPrimeraClase?: string }) {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [ejes, setEjes] = useState<Eje[]>([]);
   const [oaClases, setOaClases] = useState<OAClases>({});
   const [loadingOAs, setLoadingOAs] = useState(false);
   const [showOnlyAssignable, setShowOnlyAssignable] = useState(false);
   const [selectedEjeId, setSelectedEjeId] = useState<string>("Todos");
+  const [skippedOAs, setSkippedOAs] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     setLoadingOAs(true);
@@ -65,20 +66,25 @@ export function usePlanificacionAnual() {
 
   // Lógica para sumar/restar clases a un OA
   const handleAddClase = (oa: OA, prevOA: OA | null) => {
-    if (prevOA && oaClases[prevOA.id] < prevOA.minimo_clases) return;
+    // Los OA del eje "actitud" pueden asignarse sin restricciones
+    if (oa.eje_descripcion.toLowerCase() !== 'actitud' && 
+        !skippedOAs.has(oa.id) && 
+        prevOA && 
+        oaClases[prevOA.id] < prevOA.minimo_clases) return;
     setOaClases((prev) => ({ ...prev, [oa.id]: (prev[oa.id] || 0) + 1 }));
-    
     // Encontrar el eje al que pertenece este OA para obtener su color
     const eje = ejes.find((e: Eje) => e.oas.some((o: OA) => o.id === oa.id));
     const ejeColor = (eje ? getEjeColor(eje.id) : "sky") as EventColor;
-    
-    // Calcular fecha real del módulo
+    // Calcular fecha real del módulo usando los módulos del horario seleccionado
+    const modulos = horarioSeleccionado?.modulos && horarioSeleccionado.modulos.length > 0 ? horarioSeleccionado.modulos : modulosFijos;
     const moduloIdx = events.length;
-    const fechaBase = new Date(2025, 6, 1); // 1 de julio de 2025 (martes)
-    const modulo = modulosFijos[moduloIdx % modulosFijos.length];
-    const start = getModuloDate(fechaBase, moduloIdx, modulosFijos);
+    const fechaBase = horarioSeleccionado?.fechaPrimeraClase
+      ? new Date(horarioSeleccionado.fechaPrimeraClase)
+      : new Date(2025, 6, 1); // fallback
+    const modulo = modulos[moduloIdx % modulos.length];
+    const start = getModuloDate(fechaBase, moduloIdx, modulos);
     const end = new Date(start);
-    end.setHours(end.getHours() + 1);
+    end.setHours(end.getHours() + (modulo.duracion ? modulo.duracion / 60 : 1));
     setEvents((prev) => [
       ...prev,
       {
@@ -88,7 +94,7 @@ export function usePlanificacionAnual() {
         end,
         allDay: false,
         color: ejeColor,
-        location: `${modulo.dia} ${modulo.horaInicio}-${modulo.horaFin}`,
+        location: `${modulo.dia} ${modulo.horaInicio}${modulo.horaFin ? '-' + modulo.horaFin : ''}`,
       },
     ]);
   };
@@ -125,6 +131,25 @@ export function usePlanificacionAnual() {
     setEvents(events.filter((event) => event.id !== eventId));
   };
 
+  // Función para activar OA saltando la lógica de restricción
+  const handleActivateSkippedOA = (oa: OA, eje: Eje) => {
+    // Marcar el OA como saltado (habilitado)
+    setSkippedOAs(prev => new Set([...prev, oa.id]));
+  };
+
+  // Función para desactivar OA que fueron saltados
+  const handleDeactivateSkippedOA = (oa: OA) => {
+    // Solo permitir desactivar OA que fueron saltados
+    if (!skippedOAs.has(oa.id)) return;
+    
+    // Remover el OA de la lista de saltados
+    setSkippedOAs(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(oa.id);
+      return newSet;
+    });
+  };
+
   // Obtener lista de ejes para el dropdown
   const ejeOptions = [
     { value: "Todos", label: "Todos" },
@@ -145,6 +170,12 @@ export function usePlanificacionAnual() {
       ...e,
       oas: e.oas.filter((oa: OA, idx: number, arr: OA[]) => {
         if (!showOnlyAssignable) return true;
+        
+        // Los OA del eje "actitud" son siempre asignables
+        if (oa.eje_descripcion.toLowerCase() === 'actitud') {
+          return true;
+        }
+        
         const prevOA = idx > 0 ? arr[idx - 1] : null;
         return !prevOA || (oaClases[prevOA.id] || 0) >= prevOA.minimo_clases;
       }),
@@ -162,8 +193,11 @@ export function usePlanificacionAnual() {
     setSelectedEjeId,
     ejeOptions,
     ejesFiltrados,
+    skippedOAs,
     handleAddClase,
     handleRemoveClase,
+    handleActivateSkippedOA,
+    handleDeactivateSkippedOA,
     handleEventAdd,
     handleEventUpdate,
     handleEventDelete,

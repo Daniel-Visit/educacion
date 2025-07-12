@@ -11,8 +11,11 @@ interface OADrawerContentProps {
   setShowOnlyAssignable: (value: boolean) => void;
   ejeOptions: { value: string; label: string }[];
   oaClases: OAClases;
+  skippedOAs: Set<number>;
   onAddClase: (oa: OA, prevOA: OA | null) => void;
   onRemoveClase: (oa: OA, nextOA: OA | null) => void;
+  onActivateSkippedOA: (oa: OA, eje: Eje) => void;
+  onDeactivateSkippedOA: (oa: OA) => void;
 }
 
 export default function OADrawerContent({
@@ -24,8 +27,11 @@ export default function OADrawerContent({
   setShowOnlyAssignable,
   ejeOptions,
   oaClases,
+  skippedOAs,
   onAddClase,
   onRemoveClase,
+  onActivateSkippedOA,
+  onDeactivateSkippedOA,
 }: OADrawerContentProps) {
   return (
     <div className="p-8">
@@ -48,8 +54,11 @@ export default function OADrawerContent({
               eje={eje}
               ejeIdx={ejeIdx}
               oaClases={oaClases}
+              skippedOAs={skippedOAs}
               onAddClase={onAddClase}
               onRemoveClase={onRemoveClase}
+              onActivateSkippedOA={onActivateSkippedOA}
+              onDeactivateSkippedOA={onDeactivateSkippedOA}
             />
           ))}
         </div>

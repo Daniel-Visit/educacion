@@ -117,6 +117,7 @@ model Profesor {
   nombre      String
   email       String?
   telefono    String?
+  fechaNacimiento DateTime?
   createdAt   DateTime                @default(now())
   updatedAt   DateTime                @updatedAt
   horario     Horario[]
@@ -150,18 +151,19 @@ model ProfesorNivel {
 }
 
 model Horario {
-  id              Int                  @id @default(autoincrement())
-  nombre          String
-  docenteId       Int
-  asignaturaId    Int
-  nivelId         Int
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime             @updatedAt
-  nivel           nivel                @relation(fields: [nivelId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  asignatura      asignatura           @relation(fields: [asignaturaId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  profesor        Profesor             @relation(fields: [docenteId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  modulos         ModuloHorario[]
-  planificaciones PlanificacionAnual[]
+  id                Int                  @id @default(autoincrement())
+  nombre            String
+  docenteId         Int
+  asignaturaId      Int
+  nivelId           Int
+  fechaPrimeraClase DateTime?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  nivel             nivel                @relation(fields: [nivelId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  asignatura        asignatura           @relation(fields: [asignaturaId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profesor          Profesor             @relation(fields: [docenteId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  modulos           ModuloHorario[]
+  planificaciones   PlanificacionAnual[]
 
   @@map("horario")
 }

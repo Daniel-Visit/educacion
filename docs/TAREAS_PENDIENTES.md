@@ -11,6 +11,13 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   - Componentes modulares y refactorizados
   - Documentación completa
 
+- ✅ **Sistema de Botones de Eje** - Implementado (Hoy)
+  - Botones `+` y `-` en cada eje para habilitar/deshabilitar OA
+  - Lógica de restricción mejorada con OA del eje "actitud" siempre disponibles
+  - Control granular de asignación de OA fuera del orden estricto
+  - Integración completa con sistema de filtrado existente
+  - Documentación técnica completa
+
 ## 🚧 Tareas Pendientes
 
 ### 🧪 **Fase 0: Implementación de Testing (COMPLETADO ✅)**

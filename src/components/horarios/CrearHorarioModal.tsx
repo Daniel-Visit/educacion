@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { Calendar, Clock, Users, Plus, Trash2, Save } from 'lucide-react';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import SecondaryButton from '@/components/ui/SecondaryButton';
-import Dropdown from '@/components/entrevista/Dropdown';
+import GlobalDropdown from '@/components/ui/GlobalDropdown';
+import { DatePicker } from '@/components/ui/datepicker/datepicker';
 import { useHorarios } from '@/hooks/use-horarios';
 import React from 'react';
 // Importar Listbox de Headless UI y ChevronDown
@@ -15,6 +16,8 @@ interface CrearHorarioModalProps {
   isOpen: boolean;
   onClose: () => void;
   onHorarioCreated: (horarioId: number) => void;
+  modoEdicion?: boolean;
+  horarioInicial?: any;
 }
 
 interface Modulo {
@@ -86,11 +89,12 @@ function NiceDropdown({ value, onChange, options, placeholder }: NiceDropdownPro
   );
 }
 
-export default function CrearHorarioModal({ isOpen, onClose, onHorarioCreated }: CrearHorarioModalProps) {
+export default function CrearHorarioModal({ isOpen, onClose, onHorarioCreated, modoEdicion = false, horarioInicial }: CrearHorarioModalProps) {
   const [nombre, setNombre] = useState('');
   const [asignaturaId, setAsignaturaId] = useState('');
   const [nivelId, setNivelId] = useState('');
   const [docenteId, setDocenteId] = useState('');
+  const [fechaPrimeraClase, setFechaPrimeraClase] = useState('');
   const [modulos, setModulos] = useState<Modulo[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -103,7 +107,8 @@ export default function CrearHorarioModal({ isOpen, onClose, onHorarioCreated }:
     createHorario,
     loading: loadingData,
     loadHorarios,
-    loadInitialData
+    loadInitialData,
+    updateHorario
   } = useHorarios();
 
   // Cargar niveles y datos al abrir el modal si están vacíos
@@ -115,6 +120,32 @@ export default function CrearHorarioModal({ isOpen, onClose, onHorarioCreated }:
     }
     // No retornar nada
   }, [isOpen]);
+
+  // Precargar datos si es edición
+  React.useEffect(() => {
+    if (modoEdicion && horarioInicial && isOpen) {
+      setNombre(horarioInicial.nombre || '');
+      setAsignaturaId(horarioInicial.asignatura?.id?.toString() || '');
+      setNivelId(horarioInicial.nivel?.id?.toString() || '');
+      setDocenteId(horarioInicial.profesor?.id?.toString() || '');
+      setFechaPrimeraClase(horarioInicial.fechaPrimeraClase ? new Date(horarioInicial.fechaPrimeraClase).toISOString().split('T')[0] : '');
+      setModulos((horarioInicial.modulos || []).map((m: any) => ({
+        id: m.id?.toString() || Date.now().toString() + Math.random(),
+        dia: m.dia,
+        horaInicio: m.horaInicio,
+        duracion: m.duracion,
+      })));
+      setError(null);
+    } else if (!isOpen) {
+      setNombre('');
+      setAsignaturaId('');
+      setNivelId('');
+      setDocenteId('');
+      setFechaPrimeraClase('');
+      setModulos([]);
+      setError(null);
+    }
+  }, [modoEdicion, horarioInicial, isOpen]);
 
   const handleAddModulo = () => {
     const nuevoModulo: Modulo = {
@@ -151,6 +182,10 @@ export default function CrearHorarioModal({ isOpen, onClose, onHorarioCreated }:
     }
     if (!docenteId) {
       setError('Debes seleccionar un profesor titular');
+      return false;
+    }
+    if (!fechaPrimeraClase) {
+      setError('Debes seleccionar la fecha de la primera clase');
       return false;
     }
     if (modulos.length === 0) {
@@ -196,7 +231,7 @@ export default function CrearHorarioModal({ isOpen, onClose, onHorarioCreated }:
   }
 
   const isFormValid = () => {
-    if (!nombre.trim() || !asignaturaId || !nivelId || !docenteId || modulos.length === 0) return false;
+    if (!nombre.trim() || !asignaturaId || !nivelId || !docenteId || !fechaPrimeraClase || modulos.length === 0) return false;
     // Validar módulos repetidos
     const seen = new Set();
     for (const modulo of modulos) {
@@ -230,6 +265,7 @@ export default function CrearHorarioModal({ isOpen, onClose, onHorarioCreated }:
         asignaturaId: parseInt(asignaturaId),
         nivelId: parseInt(nivelId),
         docenteId: parseInt(docenteId),
+        fechaPrimeraClase: new Date(fechaPrimeraClase),
         modulos: modulos.map(modulo => ({
           dia: modulo.dia,
           horaInicio: modulo.horaInicio,
@@ -237,10 +273,15 @@ export default function CrearHorarioModal({ isOpen, onClose, onHorarioCreated }:
           orden: 1,
         })),
       };
-      const nuevoHorario = await createHorario(horarioData);
-      onHorarioCreated(nuevoHorario.data.id);
+      if (modoEdicion && horarioInicial?.id) {
+        const actualizado = await updateHorario(horarioInicial.id, horarioData);
+        onHorarioCreated(actualizado.data.id);
+      } else {
+        const nuevoHorario = await createHorario(horarioData);
+        onHorarioCreated(nuevoHorario.data.id);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al crear horario');
+      setError(err instanceof Error ? err.message : 'Error al guardar horario');
     } finally {
       setLoading(false);
     }
@@ -256,170 +297,148 @@ export default function CrearHorarioModal({ isOpen, onClose, onHorarioCreated }:
     onClose();
   };
 
-  // Opciones para los dropdowns
-  const opcionesProfesores = profesores.map(profesor => ({
-    value: profesor.id.toString(),
-    label: profesor.nombre
-  }));
-  const opcionesAsignaturas = asignaturas.map(asignatura => ({
-    value: asignatura.id.toString(),
-    label: asignatura.nombre
-  }));
-  const opcionesNiveles = niveles.map(nivel => ({
-    value: nivel.id.toString(),
-    label: nivel.nombre
-  }));
+  // Opciones para los dropdowns principales
+  const asignaturaOptions = asignaturas.map(a => ({ value: a.id.toString(), label: a.nombre }));
+  const nivelOptions = niveles.map(n => ({ value: n.id.toString(), label: n.nombre }));
+  const profesorOptions = profesores.map(p => ({ value: p.id.toString(), label: p.nombre }));
 
   return (
-    isOpen && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20">
-        <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full p-0 relative animate-fade-in max-h-[90vh] flex flex-col">
-          <div className="sticky top-0 z-10 bg-white px-8 pt-8 pb-4 rounded-t-2xl flex items-start justify-between">
-            <div>
-              <h2 className="flex items-center gap-2 text-2xl font-bold text-indigo-700 mb-1">
-                <Calendar className="w-6 h-6" />
-                Crear Nuevo Horario
-              </h2>
-              <p className="text-gray-500 text-base">Configura tu horario docente para la planificación anual</p>
-            </div>
-            <button
-              className="text-gray-400 hover:text-gray-700 text-xl ml-4 mt-1"
-              onClick={handleClose}
-              aria-label="Cerrar"
-            >
-              ×
-            </button>
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/30 transition-all ${isOpen ? '' : 'hidden'}`}
+      style={{ minHeight: '100vh' }}
+    >
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-8 relative flex flex-col max-h-[90vh] overflow-y-auto" style={{ minHeight: '600px' }}>
+        <button className="absolute top-4 right-4 text-gray-400 text-2xl hover:text-gray-600 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-50 transition" onClick={onClose}>
+          ×
+        </button>
+        <h2 className="text-2xl font-bold text-indigo-700 mb-1 flex items-center gap-2">
+          <Calendar className="w-6 h-6 text-indigo-400" />
+          {modoEdicion ? 'Editar Horario' : 'Crear Nuevo Horario'}
+        </h2>
+        <p className="text-gray-500 mb-6">Configura tu horario docente para la planificación anual</p>
+
+        {/* Inputs principales en grid compacto */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Horario *</label>
+            <input
+              type="text"
+              className="w-full rounded-lg border px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              value={nombre}
+              onChange={e => setNombre(e.target.value)}
+              placeholder="Ej: Horario Lenguaje 2do Básico"
+            />
           </div>
-          <div className="flex-1 overflow-y-auto px-8 pb-8 mt-2">
-            {error && touched && (
-              <div className="bg-red-100 text-red-700 rounded-md px-3 py-2 text-sm mb-4">
-                {error}
-              </div>
-            )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-700">Nombre del Horario *</label>
-                <input
-                  className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200 text-gray-900"
-                  value={nombre}
-                  onChange={e => setNombre(e.target.value)}
-                  placeholder="Ej: Horario Matemáticas 4°A"
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-700">Profesor Titular *</label>
-                <NiceDropdown
-                  value={docenteId}
-                  onChange={setDocenteId}
-                  options={opcionesProfesores}
-                  placeholder="Seleccionar profesor"
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-700">Asignatura *</label>
-                <NiceDropdown
-                  value={asignaturaId}
-                  onChange={setAsignaturaId}
-                  options={opcionesAsignaturas}
-                  placeholder="Seleccionar asignatura"
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-700">Nivel *</label>
-                {opcionesNiveles.length === 0 ? (
-                  <div className="text-gray-400 text-sm italic border border-gray-200 rounded-lg px-4 py-2 bg-gray-50">No hay niveles disponibles</div>
-                ) : (
-                  <NiceDropdown
-                    value={nivelId}
-                    onChange={setNivelId}
-                    options={opcionesNiveles}
-                    placeholder="Seleccionar nivel"
-                  />
-                )}
-              </div>
-            </div>
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="flex items-center gap-2 text-base font-semibold text-gray-700">
-                  <Clock className="w-5 h-5" />
-                  Módulos del Horario
-                </span>
-                <SecondaryButton onClick={handleAddModulo} className="flex items-center gap-2 px-4 py-2 text-sm">
-                  <Plus className="w-4 h-4" /> Agregar Módulo
-                </SecondaryButton>
-              </div>
-              <div className="max-h-64 overflow-y-auto space-y-2">
-                {modulos.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg py-8 bg-gray-50">
-                    <Clock className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                    <span className="text-gray-500 text-sm font-medium mb-1">No hay módulos</span>
-                    <span className="text-gray-400 text-sm">Agrega módulos para configurar tu horario.</span>
-                  </div>
-                ) : (
-                  modulos.map((modulo, index) => (
-                    <div key={modulo.id} className="border border-indigo-200 rounded-lg p-3 bg-gradient-to-r from-indigo-50 to-purple-50 flex flex-col md:flex-row md:items-center md:gap-4 gap-2">
-                      <span className="font-medium text-sm text-gray-700 md:w-20">Módulo {index + 1}</span>
-                      <div className="flex flex-1 flex-col md:flex-row md:items-center gap-2 md:gap-3">
-                        <div className="flex flex-col gap-1 md:w-32">
-                          <label className="text-xs text-gray-600">Día</label>
-                          <NiceDropdown
-                            value={modulo.dia}
-                            onChange={value => handleModuloChange(modulo.id, 'dia', value)}
-                            options={DIAS_SEMANA}
-                            placeholder="Seleccionar día"
-                          />
-                        </div>
-                        <div className="flex flex-col gap-1 md:w-28">
-                          <label className="text-xs text-gray-600">Hora de Inicio</label>
-                          <NiceDropdown
-                            value={modulo.horaInicio}
-                            onChange={value => handleModuloChange(modulo.id, 'horaInicio', value)}
-                            options={HORAS_DISPONIBLES.map(hora => ({ value: hora, label: hora }))}
-                            placeholder="Seleccionar hora"
-                          />
-                        </div>
-                        <div className="flex flex-col gap-1 md:w-28">
-                          <label className="text-xs text-gray-600">Duración</label>
-                          <NiceDropdown
-                            value={modulo.duracion.toString()}
-                            onChange={value => handleModuloChange(modulo.id, 'duracion', parseInt(value))}
-                            options={DURACIONES}
-                            placeholder="Seleccionar duración"
-                          />
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleRemoveModulo(modulo.id)}
-                        className="h-8 w-8 flex items-center justify-center rounded-lg text-red-600 hover:bg-red-50 hover:border hover:border-red-300 border border-transparent ml-auto"
-                        title="Eliminar módulo"
-                        style={{ aspectRatio: '1 / 1' }}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-            <div className="flex justify-end gap-3 mt-8">
-              <SecondaryButton onClick={handleClose}>Cancelar</SecondaryButton>
-              <PrimaryButton onClick={handleSubmit} disabled={loading || loadingData || !isFormValid()} className="flex items-center gap-2">
-                {loading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Creando...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4" />
-                    Crear Horario
-                  </>
-                )}
-              </PrimaryButton>
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Profesor Titular *</label>
+            <GlobalDropdown
+              value={docenteId}
+              onChange={setDocenteId}
+              options={profesorOptions}
+              placeholder="Selecciona un profesor"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Asignatura *</label>
+            <GlobalDropdown
+              value={asignaturaId}
+              onChange={setAsignaturaId}
+              options={asignaturaOptions}
+              placeholder="Selecciona una asignatura"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nivel *</label>
+            <GlobalDropdown
+              value={nivelId}
+              onChange={setNivelId}
+              options={nivelOptions}
+              placeholder="Selecciona un nivel"
+            />
           </div>
         </div>
+
+        {/* Fecha de primera clase */}
+        <div className="mb-6">
+          <DatePicker
+            label="Fecha Primera Clase *"
+            value={fechaPrimeraClase ? new Date(fechaPrimeraClase) : undefined}
+            onChange={(date) => setFechaPrimeraClase(date ? date.toISOString().split('T')[0] : '')}
+            placeholder="Selecciona la fecha de inicio"
+            minDate={new Date("2025-01-01")}
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Esta fecha es el punto de partida de la planificación anual.
+          </p>
+        </div>
+
+        {/* Módulos del Horario */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-2">
+              <Clock className="w-5 h-5 text-indigo-400" />
+              <span className="font-semibold text-gray-700">Módulos del Horario</span>
+            </div>
+            <button
+              type="button"
+              className="px-3 py-1.5 bg-green-50 text-green-700 rounded-lg font-medium text-sm hover:bg-green-100 border border-green-200 transition-colors"
+              onClick={handleAddModulo}
+            >
+              + Agregar Módulo
+            </button>
+          </div>
+          <div className="space-y-3 pr-0">
+            {modulos.map((modulo, idx) => (
+              <div key={modulo.id} className="flex items-center justify-between bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl px-3 py-2">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <span className="text-xs text-gray-500 font-semibold min-w-[70px]">Módulo {idx + 1}</span>
+                  <GlobalDropdown
+                    value={modulo.dia}
+                    onChange={(v: string) => handleModuloChange(modulo.id, 'dia', v)}
+                    options={DIAS_SEMANA}
+                    placeholder="Día"
+                    className="min-w-[140px]"
+                  />
+                  <GlobalDropdown
+                    value={modulo.horaInicio}
+                    onChange={(v: string) => handleModuloChange(modulo.id, 'horaInicio', v)}
+                    options={HORAS_DISPONIBLES.map(h => ({ value: h, label: h }))}
+                    placeholder="Hora inicio"
+                    className="min-w-[130px]"
+                  />
+                  <GlobalDropdown
+                    value={modulo.duracion.toString()}
+                    onChange={(v: string) => handleModuloChange(modulo.id, 'duracion', parseInt(v))}
+                    options={DURACIONES}
+                    placeholder="Duración"
+                    className="min-w-[140px]"
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="ml-2 flex items-center justify-center w-8 h-8 rounded-md border border-transparent text-red-500 hover:text-red-700 hover:bg-red-50 hover:border-red-200 transition-colors"
+                  onClick={() => handleRemoveModulo(modulo.id)}
+                  title="Eliminar módulo"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {error && <div className="text-red-500 mb-2 text-sm">{error}</div>}
+
+        {/* Footer al final del flujo, siempre visible */}
+        <div className="mt-4 px-8 bg-white rounded-b-3xl flex justify-end gap-3 shadow-[0_-2px_16px_-8px_rgba(80,80,120,0.06)]">
+          <SecondaryButton onClick={onClose} className="min-w-[120px] h-12 flex items-center justify-center text-base font-medium border border-gray-300 bg-white hover:bg-gray-50 transition-colors">
+            Cancelar
+          </SecondaryButton>
+          <PrimaryButton onClick={handleSubmit} disabled={loading || !isFormValid()} className="min-w-[160px] h-12 flex items-center justify-center text-base font-semibold">
+            <Save className="w-5 h-5 mr-2" /> {modoEdicion ? 'Guardar Cambios' : 'Crear Horario'}
+          </PrimaryButton>
+        </div>
       </div>
-    )
+    </div>
   );
 } 

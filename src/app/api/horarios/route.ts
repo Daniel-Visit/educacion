@@ -45,12 +45,12 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { nombre, docenteId, asignaturaId, nivelId, modulos } = body;
+    const { nombre, docenteId, asignaturaId, nivelId, fechaPrimeraClase, modulos } = body;
 
     // Validaciones básicas
-    if (!nombre || !docenteId || !asignaturaId || !nivelId) {
+    if (!nombre || !docenteId || !asignaturaId || !nivelId || !fechaPrimeraClase) {
       return NextResponse.json(
-        { error: 'Nombre, docente, asignatura y nivel son obligatorios' },
+        { error: 'Nombre, docente, asignatura, nivel y fecha de primera clase son obligatorios' },
         { status: 400 }
       );
     }
@@ -111,7 +111,8 @@ export async function POST(request: NextRequest) {
           nombre: nombre.trim(),
           docenteId: parseInt(docenteId),
           asignaturaId: parseInt(asignaturaId),
-          nivelId: parseInt(nivelId)
+          nivelId: parseInt(nivelId),
+          fechaPrimeraClase: new Date(fechaPrimeraClase)
         }
       });
 

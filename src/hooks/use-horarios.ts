@@ -23,6 +23,7 @@ interface Horario {
   asignatura: Asignatura;
   nivel: Nivel;
   profesor: Profesor;
+  fechaPrimeraClase?: string;
   createdAt: string;
   modulos: Array<{
     id: number;
@@ -118,6 +119,7 @@ export function useHorarios() {
     asignaturaId: number;
     nivelId: number;
     docenteId: number;
+    fechaPrimeraClase?: Date;
     modulos: Array<{
       dia: string;
       horaInicio: string;
@@ -189,6 +191,7 @@ export function useHorarios() {
         asignaturaId: horario.asignatura.id,
         nivelId: horario.nivel.id,
         docenteId: horario.profesor.id,
+        fechaPrimeraClase: horario.fechaPrimeraClase ? new Date(horario.fechaPrimeraClase) : undefined,
         modulos: horario.modulos.map(modulo => ({
           dia: modulo.dia,
           horaInicio: modulo.horaInicio,
@@ -207,6 +210,41 @@ export function useHorarios() {
     }
   }, [horarios, createHorario]);
 
+  const updateHorario = useCallback(async (horarioId: number, horarioData: {
+    nombre: string;
+    asignaturaId: number;
+    nivelId: number;
+    docenteId: number;
+    fechaPrimeraClase?: Date;
+    modulos: Array<{
+      dia: string;
+      horaInicio: string;
+      duracion: number;
+      orden: number;
+    }>;
+  }) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(`/api/horarios/${horarioId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(horarioData),
+      });
+      if (!response.ok) {
+        throw new Error('Error al actualizar horario');
+      }
+      const updatedHorario = await response.json();
+      setHorarios(prev => prev.map(h => h.id === horarioId ? updatedHorario.data : h));
+      return updatedHorario;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadInitialData();
   }, [loadInitialData]);
@@ -223,5 +261,6 @@ export function useHorarios() {
     deleteHorario,
     duplicateHorario,
     loadInitialData,
+    updateHorario,
   };
 } 

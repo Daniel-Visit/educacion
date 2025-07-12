@@ -19,7 +19,8 @@ import {
   Clock,
   Users,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  ClipboardList
 } from 'lucide-react'
 
 // Importar constantes de la entrevista
@@ -27,9 +28,24 @@ import { steps, preguntaToStep } from '@/components/entrevista/constants'
 
 const navigation = [
   { name: 'Inicio', href: '/', icon: Home },
-  { name: 'Evaluaciones', href: '/evaluaciones', icon: CheckSquare },
-  { name: 'Matrices', href: '/matrices', icon: FileText },
-  { name: 'Planificación', href: '/planificacion-anual', icon: Calendar },
+  { 
+    name: 'Evaluación', 
+    href: '/evaluaciones', 
+    icon: ClipboardList,
+    submenu: [
+      { name: 'Evaluaciones', href: '/evaluaciones' },
+      { name: 'Matrices', href: '/matrices' }
+    ]
+  },
+  { 
+    name: 'Planificación', 
+    href: '/planificacion-anual', 
+    icon: Calendar,
+    submenu: [
+      { name: 'Horarios', href: '/horarios' },
+      { name: 'Planificación Anual', href: '/planificacion-anual' }
+    ]
+  },
   { 
     name: 'Editor', 
     href: '/editor', 

@@ -56,7 +56,7 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const { nombre, docenteId, asignaturaId, nivelId, modulos } = body;
+    const { nombre, docenteId, asignaturaId, nivelId, fechaPrimeraClase, modulos } = body;
 
     // Verificar si el horario existe
     // @ts-ignore - Prisma client sync issue
@@ -72,9 +72,9 @@ export async function PUT(
     }
 
     // Validaciones básicas
-    if (!nombre || !docenteId || !asignaturaId || !nivelId) {
+    if (!nombre || !docenteId || !asignaturaId || !nivelId || !fechaPrimeraClase) {
       return NextResponse.json(
-        { error: 'Nombre, docente, asignatura y nivel son obligatorios' },
+        { error: 'Nombre, docente, asignatura, nivel y fecha de primera clase son obligatorios' },
         { status: 400 }
       );
     }
@@ -136,7 +136,8 @@ export async function PUT(
           nombre: nombre.trim(),
           docenteId: parseInt(docenteId),
           asignaturaId: parseInt(asignaturaId),
-          nivelId: parseInt(nivelId)
+          nivelId: parseInt(nivelId),
+          fechaPrimeraClase: new Date(fechaPrimeraClase)
         }
       });
 

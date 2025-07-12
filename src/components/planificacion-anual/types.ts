@@ -4,6 +4,7 @@ export interface OA {
   descripcion_oas: string;
   minimo_clases: number;
   basal?: boolean;
+  eje_descripcion: string;
 }
 
 export interface Eje {

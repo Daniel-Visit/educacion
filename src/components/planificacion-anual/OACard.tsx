@@ -4,6 +4,7 @@ import { OA, OAClases } from "./types";
 interface OACardProps {
   oa: OA;
   oaClases: OAClases;
+  skippedOAs: Set<number>;
   onAddClase: (oa: OA, prevOA: OA | null) => void;
   onRemoveClase: (oa: OA, nextOA: OA | null) => void;
   prevOA: OA | null;
@@ -13,12 +14,15 @@ interface OACardProps {
 export default function OACard({
   oa,
   oaClases,
+  skippedOAs,
   onAddClase,
   onRemoveClase,
   prevOA,
   nextOA,
 }: OACardProps) {
   const prevOk = !prevOA || (oaClases[prevOA.id] || 0) >= prevOA.minimo_clases;
+  const isSkipped = skippedOAs.has(oa.id);
+  const canAdd = prevOk || isSkipped || oa.eje_descripcion.toLowerCase() === 'actitud';
   const nextHasClases = nextOA && (oaClases[nextOA.id] || 0) > 0;
   const currentClases = oaClases[oa.id] || 0;
 
@@ -53,12 +57,12 @@ export default function OACard({
       <div className="flex items-center gap-3 ml-6">
         <button
           className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-2xl transition-all shadow ${
-            prevOk
+            canAdd
               ? "bg-gradient-to-r from-indigo-600 to-purple-500 hover:from-indigo-700 hover:to-purple-600"
               : "bg-gray-200 cursor-not-allowed"
           }`}
           onClick={() => onAddClase(oa, prevOA)}
-          disabled={!prevOk}
+          disabled={!canAdd}
           tabIndex={0}
         >
           +
