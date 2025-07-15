@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { BookOpen, Sparkles, FileText, Edit3, CheckSquare, MessageSquare, ArrowRight, Users, Brain, Zap, Calendar } from "lucide-react";
+import { BookOpen, Sparkles, FileText, Edit3, CheckSquare, MessageSquare, ArrowRight, Users, Brain, Zap, Calendar, School } from "lucide-react";
 
 export default function Home() {
   const sections = [
@@ -16,7 +16,7 @@ export default function Home() {
       isPrimary: true
     },
     {
-      title: "Planificación Anual",
+      title: "Planificación Anual de Clases",
       description: "Gestiona la planificación anual de clases con calendario interactivo y asignación de objetivos de aprendizaje",
       icon: Calendar,
       gradient: "from-orange-500 to-red-500",
@@ -24,6 +24,16 @@ export default function Home() {
       borderColor: "border-orange-200",
       href: "/planificacion-anual",
       features: ["Calendario Interactivo", "OAs por Eje", "Distribución Temporal"]
+    },
+    {
+      title: "Planificaciones Clase a Clase",
+      description: "Crea planificaciones de clase y materiales de apoyo con un editor avanzado y herramientas de IA",
+      icon: Edit3,
+      gradient: "from-blue-500 to-cyan-600",
+      bgGradient: "from-blue-50 to-cyan-50",
+      borderColor: "border-blue-200",
+      href: "/editor",
+      features: ["Editor TipTap", "Generación con IA", "Materiales de Apoyo"]
     },
     {
       title: "Evaluaciones",
@@ -36,16 +46,7 @@ export default function Home() {
       features: ["Matrices de Especificación", "Preguntas Automáticas", "Respuestas Correctas"]
     },
     
-    {
-      title: "Planificaciones Clase a Clase",
-      description: "Crea planificaciones de clase y materiales de apoyo con un editor avanzado y herramientas de IA",
-      icon: Edit3,
-      gradient: "from-blue-500 to-cyan-600",
-      bgGradient: "from-blue-50 to-cyan-50",
-      borderColor: "border-blue-200",
-      href: "/editor",
-      features: ["Editor TipTap", "Generación con IA", "Materiales de Apoyo"]
-    },
+    
     {
       title: "Matrices de Especificación",
       description: "Diseña matrices detalladas que guíen la creación de evaluaciones alineadas con objetivos de aprendizaje",
@@ -147,7 +148,7 @@ export default function Home() {
       </div>
       
       {/* Footer Stats */}
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+      <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
         <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl p-4 text-center">
           <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center mx-auto mb-2">
             <Brain size={16} className="text-white" />
@@ -168,8 +169,15 @@ export default function Home() {
           <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center mx-auto mb-2">
             <Zap size={16} className="text-white" />
           </div>
-          <h3 className="text-sm font-semibold text-gray-900 mb-1">Herramientas Avanzadas</h3>
-          <p className="text-gray-600 text-xs">Editor profesional y generación con IA</p>
+          <h3 className="text-sm font-semibold text-gray-900 mb-1">Contexto territorial</h3>
+          <p className="text-gray-600 text-xs">Información actualizados del contexto territorial </p>
+        </div>
+        <div className="bg-white/50 backdrop-blur-sm border border-gray-200 rounded-xl p-4 text-center">
+          <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg flex items-center justify-center mx-auto mb-2">
+            <School size={16} className="text-white" />
+          </div>
+          <h3 className="text-sm font-semibold text-gray-900 mb-1">Datos del colegio</h3>
+          <p className="text-gray-600 text-xs">Información histórica del colegio</p>
         </div>
       </div>
     </>
