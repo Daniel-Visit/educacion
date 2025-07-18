@@ -355,6 +355,87 @@ export function usePlanificacionAnual(
     }
   };
 
+  // Función para importar CSV
+  const handleImportCSV = async (oasNombres: string[]) => {
+    try {
+      console.log("Importando OA:", oasNombres);
+
+      // Crear un mapa de todos los OAs por nombre para búsqueda rápida
+      const oasMap = new Map();
+      ejes.forEach((eje: Eje) => {
+        eje.oas.forEach((oa: OA) => {
+          // Mapear por oas_id (código del OA)
+          oasMap.set(oa.oas_id, oa);
+          // También mapear por descripción (por si acaso)
+          oasMap.set(oa.descripcion_oas, oa);
+        });
+      });
+
+      // Limpiar eventos y asignaciones actuales
+      setEvents([]);
+      setOaClases({});
+
+      // Procesar cada OA del CSV
+      let eventoIndex = 0;
+      const nuevosEventos: any[] = [];
+      const nuevasAsignaciones: any = {};
+
+      for (const oaNombre of oasNombres) {
+        // Buscar el OA en el mapa
+        const oa = oasMap.get(oaNombre);
+        
+        if (oa) {
+          console.log(`OA encontrado: ${oa.oas_id} - ${oa.descripcion_oas}`);
+          
+          // Incrementar el contador de clases para este OA
+          nuevasAsignaciones[oa.id] = (nuevasAsignaciones[oa.id] || 0) + 1;
+          
+          // Encontrar el eje al que pertenece este OA para obtener su color
+          const eje = ejes.find((e: Eje) => e.oas.some((o: OA) => o.id === oa.id));
+          const ejeColor = (eje ? getEjeColor(eje.id) : "sky") as any;
+          
+          // Calcular fecha real del módulo usando los módulos del horario seleccionado
+          const modulos = horarioSeleccionado?.modulos && horarioSeleccionado.modulos.length > 0 
+            ? horarioSeleccionado.modulos 
+            : modulosFijos;
+          
+          const fechaBase = horarioSeleccionado?.fechaPrimeraClase
+            ? new Date(horarioSeleccionado.fechaPrimeraClase)
+            : new Date(2025, 6, 1);
+          
+          const start = getModuloDate(fechaBase, eventoIndex, modulos);
+          const end = new Date(start);
+          end.setHours(end.getHours() + (modulos[eventoIndex % modulos.length]?.duracion ? modulos[eventoIndex % modulos.length].duracion / 60 : 1));
+          
+          nuevosEventos.push({
+            id: Math.random().toString(36).slice(2),
+            title: oa.oas_id,
+            start,
+            end,
+            allDay: false,
+            color: ejeColor,
+            location: `${modulos[eventoIndex % modulos.length]?.dia} ${modulos[eventoIndex % modulos.length]?.horaInicio}`,
+          });
+          
+          eventoIndex++;
+        } else {
+          console.warn(`OA no encontrado: ${oaNombre}`);
+        }
+      }
+
+      // Actualizar el estado con los nuevos eventos y asignaciones
+      setEvents(nuevosEventos);
+      setOaClases(nuevasAsignaciones);
+
+      console.log(`Importación completada: ${nuevosEventos.length} eventos creados`);
+      return { success: true, eventosCreados: nuevosEventos.length };
+      
+    } catch (error) {
+      console.error("Error al importar CSV:", error);
+      throw error;
+    }
+  };
+
   return {
     events,
     ejes,
@@ -379,5 +460,6 @@ export function usePlanificacionAnual(
     guardarPlanificacion,
     actualizarPlanificacion,
     eliminarPlanificacion,
+    handleImportCSV,
   };
 } 

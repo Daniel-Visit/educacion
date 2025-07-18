@@ -28,6 +28,7 @@ import { steps, preguntaToStep } from '@/components/entrevista/constants'
 
 const navigation = [
   { name: 'Inicio', href: '/', icon: Home },
+
   { 
     name: 'Evaluación', 
     href: '/evaluaciones', 
@@ -35,6 +36,15 @@ const navigation = [
     submenu: [
       { name: 'Evaluaciones', href: '/evaluaciones' },
       { name: 'Matrices', href: '/matrices' }
+    ]
+  },
+  { 
+    name: 'Resultados', 
+    href: '/resultados-evaluaciones', 
+    icon: CheckCircle2,
+    submenu: [
+      { name: 'Ver Resultados', href: '/resultados-evaluaciones' },
+      { name: 'Cargar Resultados', href: '/correccion-evaluaciones' }
     ]
   },
   { 

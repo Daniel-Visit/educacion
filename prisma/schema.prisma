@@ -20,6 +20,7 @@ model asignatura {
 model nivel {
   id         Int             @id @default(autoincrement())
   nombre     String          @unique
+  alumnos    Alumno[]
   horarios   Horario[]
   oas        oa[]
   profesores ProfesorNivel[]
@@ -112,18 +113,18 @@ model ArchivoImagen {
 }
 
 model Profesor {
-  id          Int                     @id @default(autoincrement())
-  rut         String                  @unique(map: "sqlite_autoindex_profesor_1")
-  nombre      String
-  email       String?
-  telefono    String?
+  id              Int                     @id @default(autoincrement())
+  rut             String                  @unique(map: "sqlite_autoindex_profesor_1")
+  nombre          String
+  email           String?
+  telefono        String?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
   fechaNacimiento DateTime?
-  createdAt   DateTime                @default(now())
-  updatedAt   DateTime                @updatedAt
-  horario     Horario[]
-  modulos     ModuloHorarioProfesor[]
-  asignaturas ProfesorAsignatura[]
-  niveles     ProfesorNivel[]
+  horario         Horario[]
+  modulos         ModuloHorarioProfesor[]
+  asignaturas     ProfesorAsignatura[]
+  niveles         ProfesorNivel[]
 
   @@map("profesor")
 }
@@ -156,9 +157,9 @@ model Horario {
   docenteId         Int
   asignaturaId      Int
   nivelId           Int
-  fechaPrimeraClase DateTime?
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
+  fechaPrimeraClase DateTime?
   nivel             nivel                @relation(fields: [nivelId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   asignatura        asignatura           @relation(fields: [asignaturaId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   profesor          Profesor             @relation(fields: [docenteId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -222,6 +223,22 @@ model AsignacionOA {
   @@map("asignacion_oa")
 }
 
+model Alumno {
+  id        Int      @id @default(autoincrement())
+  rut       String   @unique(map: "sqlite_autoindex_alumno_1")
+  nombre    String
+  apellido  String
+  curso     String?
+  nivelId   Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  nivel     nivel?   @relation(fields: [nivelId], references: [id])
+  resultados ResultadoAlumno[]
+
+  @@index([nivelId])
+  @@map("alumno")
+}
+
 model Alternativa {
   id         Int      @id @default(autoincrement())
   preguntaId Int
@@ -232,21 +249,66 @@ model Alternativa {
 }
 
 model Evaluacion {
-  id        Int                  @id @default(autoincrement())
-  archivoId Int
-  matrizId  Int
-  createdAt DateTime             @default(now())
-  updatedAt DateTime
-  matriz    MatrizEspecificacion @relation(fields: [matrizId], references: [id])
-  archivo   Archivo              @relation(fields: [archivoId], references: [id])
-  preguntas Pregunta[]
+  id         Int                   @id @default(autoincrement())
+  archivoId  Int
+  matrizId   Int
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime
+  matriz     MatrizEspecificacion  @relation(fields: [matrizId], references: [id])
+  archivo    Archivo               @relation(fields: [archivoId], references: [id])
+  preguntas  Pregunta[]
+  resultados ResultadoEvaluacion[]
 }
 
 model Pregunta {
-  id           Int           @id @default(autoincrement())
+  id           Int               @id @default(autoincrement())
   evaluacionId Int
   numero       Int
   texto        String
   alternativas Alternativa[]
-  evaluacion   Evaluacion    @relation(fields: [evaluacionId], references: [id])
+  evaluacion   Evaluacion        @relation(fields: [evaluacionId], references: [id])
+  respuestas   RespuestaAlumno[]
+}
+
+model ResultadoEvaluacion {
+  id           Int               @id @default(autoincrement())
+  nombre       String
+  evaluacionId Int
+  fechaCarga   DateTime          @default(now())
+  totalAlumnos Int
+  escalaNota   Float             @default(7.0)
+  resultados   ResultadoAlumno[]
+  evaluacion   Evaluacion        @relation(fields: [evaluacionId], references: [id])
+
+  @@index([evaluacionId])
+}
+
+model ResultadoAlumno {
+  id                    Int                 @id @default(autoincrement())
+  resultadoEvaluacionId Int
+  alumnoId              Int
+  puntajeTotal          Float
+  puntajeMaximo         Float
+  porcentaje            Float
+  nota                  Float
+  respuestas            RespuestaAlumno[]
+  resultadoEvaluacion   ResultadoEvaluacion @relation(fields: [resultadoEvaluacionId], references: [id], onDelete: Cascade)
+  alumno                Alumno             @relation(fields: [alumnoId], references: [id], onDelete: Cascade)
+
+  @@index([alumnoId])
+  @@index([resultadoEvaluacionId])
+}
+
+model RespuestaAlumno {
+  id                Int             @id @default(autoincrement())
+  resultadoAlumnoId Int
+  preguntaId        Int
+  alternativaDada   String
+  esCorrecta        Boolean
+  puntajeObtenido   Float
+  pregunta          Pregunta        @relation(fields: [preguntaId], references: [id])
+  resultadoAlumno   ResultadoAlumno @relation(fields: [resultadoAlumnoId], references: [id], onDelete: Cascade)
+
+  @@index([preguntaId])
+  @@index([resultadoAlumnoId])
 }

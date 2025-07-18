@@ -73,22 +73,26 @@ export default function PlanificacionAnualPage() {
     initialHorarioId.current = null;
   };
 
-  const handleImportCSV = async (oas: string[]) => {
+  const handleImportCSVLocal = async (oas: string[]) => {
     if (!horarioSeleccionado) return;
 
     setImporting(true);
     try {
-      // TODO: Implementar lógica de importación
       console.log("Importando OA:", oas);
       console.log("Horario seleccionado:", horarioSeleccionado);
 
-      // Simular proceso de importación
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
+      // Usar la función del hook para importar
+      const resultado = await handleImportCSV(oas);
+      
+      console.log(`Importación completada: ${resultado.eventosCreados} eventos creados`);
       setShowImportModal(false);
-      // TODO: Recargar eventos después de la importación
+      
+      // Mostrar mensaje de éxito
+      alert(`Importación completada exitosamente.\n${resultado.eventosCreados} eventos creados.`);
+      
     } catch (error) {
       console.error("Error al importar:", error);
+      alert("Error al importar el CSV. Por favor, verifica el formato del archivo.");
     } finally {
       setImporting(false);
     }
@@ -136,6 +140,7 @@ export default function PlanificacionAnualPage() {
     handleEventDelete,
     guardarPlanificacion,
     actualizarPlanificacion,
+    handleImportCSV,
   } = usePlanificacionAnual(horarioSeleccionado, planificacionId || undefined);
 
   // Preseleccionar horario cuando se carga una planificación existente
@@ -180,7 +185,7 @@ export default function PlanificacionAnualPage() {
             </div>
           )}
         </div>
-        <div className="flex flex-row gap-3 w-full md:w-auto justify-end">
+        <div className="flex flex-row gap-3 w-full md:w-auto justify-end mt-14">
           {horarioSeleccionado && (
             <>
               <button
@@ -335,7 +340,7 @@ export default function PlanificacionAnualPage() {
       <ImportarCSVModal
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
-        onImport={handleImportCSV}
+        onImport={handleImportCSVLocal}
         loading={importing}
       />
 

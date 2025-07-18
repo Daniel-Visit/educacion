@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Trash2, Edit, Plus, FileText } from 'lucide-react';
+import { Trash2, Edit, Plus, FileText, CheckCircle2, BarChart3, Calendar, Target, Users, Clock } from 'lucide-react';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import SecondaryButton from '@/components/ui/SecondaryButton';
 import { useRouter } from 'next/navigation';
@@ -75,111 +75,266 @@ export default function EvaluacionesPage() {
     });
   };
 
+  const getRandomGradient = (id: number) => {
+    const gradients = [
+      'from-indigo-500 to-purple-600',
+      'from-emerald-500 to-teal-600',
+      'from-amber-500 to-orange-600',
+      'from-rose-500 to-pink-600',
+      'from-blue-500 to-cyan-600',
+      'from-violet-500 to-purple-600'
+    ];
+    return gradients[id % gradients.length];
+  };
+
+  const getHoverColor = (id: number) => {
+    const hoverColors = [
+      'hover:bg-red-500/30', // indigo/purple
+      'hover:bg-red-500/30', // emerald/teal
+      'hover:bg-red-500/30', // amber/orange
+      'hover:bg-red-500/30', // rose/pink
+      'hover:bg-red-500/30', // blue/cyan
+      'hover:bg-red-500/30'  // violet/purple
+    ];
+    return hoverColors[id % hoverColors.length];
+  };
+
+  const getTextColor = (id: number) => {
+    const textColors = [
+      'text-indigo-200', // indigo/purple
+      'text-emerald-200', // emerald/teal
+      'text-amber-200',   // amber/orange
+      'text-rose-200',    // rose/pink
+      'text-blue-200',    // blue/cyan
+      'text-violet-200'   // violet/purple
+    ];
+    return textColors[id % textColors.length];
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 font-medium">Cargando evaluaciones...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
-      <div className="flex items-center justify-between pb-2">
-        <div>
-          <h1 className="text-3xl font-bold text-indigo-700 mb-1">
-            Evaluaciones
-          </h1>
-          <p className="text-gray-500 text-base">
-            Gestiona las evaluaciones creadas en la plataforma
-          </p>
+      {/* Header compacto */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white shadow-lg mb-6 mt-4">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <div className="bg-white/20 p-2 rounded-lg">
+              <CheckCircle2 className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">Evaluaciones</h1>
+              <p className="text-indigo-100 text-sm">
+                Gestiona las evaluaciones creadas en la plataforma
+              </p>
+            </div>
+          </div>
+          <Link href="/evaluaciones/crear">
+            <PrimaryButton 
+              className="bg-white/20 border-white/30 text-white hover:bg-white/30 hover:border-white/50"
+            >
+              <Plus size={16} className="mr-2" />
+              Nueva Evaluación
+            </PrimaryButton>
+          </Link>
         </div>
-        <Link href="/evaluaciones/crear">
-          <PrimaryButton className="flex items-center gap-2">
-            <Plus size={20} />
-            Nueva Evaluación
-          </PrimaryButton>
-        </Link>
+        
+        {/* Stats compactas */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-indigo-200" />
+              <div>
+                <p className="text-indigo-200 text-xs">Total Evaluaciones</p>
+                <p className="text-lg font-bold">{evaluaciones.length}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <Target className="h-4 w-4 text-indigo-200" />
+              <div>
+                <p className="text-indigo-200 text-xs">Total Preguntas</p>
+                <p className="text-lg font-bold">
+                  {evaluaciones.reduce((sum, e) => sum + (e.preguntasCount || 0), 0)}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-indigo-200" />
+              <div>
+                <p className="text-indigo-200 text-xs">Matrices Únicas</p>
+                <p className="text-lg font-bold">
+                  {new Set(evaluaciones.map(e => e.matrizNombre).filter(Boolean)).size}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-indigo-200" />
+              <div>
+                <p className="text-indigo-200 text-xs">Última Creada</p>
+                <p className="text-lg font-bold">
+                  {evaluaciones.length > 0 ? formatDate(evaluaciones[0].createdAt) : '-'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="flex-1">
-        {loading ? (
+      {/* Contenido principal */}
+      <div className="space-y-6">
+        {evaluaciones.length === 0 ? (
           <div className="text-center py-16">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Cargando evaluaciones...</p>
-          </div>
-        ) : evaluaciones.length === 0 ? (
-          <div className="text-center py-16">
-            <FileText size={64} className="mx-auto text-gray-300 mb-4" />
-            <h3 className="text-2xl font-semibold text-gray-900 mb-2">
-              No hay evaluaciones creadas
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Crea tu primera evaluación para comenzar
-            </p>
-            <Link href="/evaluaciones/crear">
-              <PrimaryButton>
-                Crear Evaluación
-              </PrimaryButton>
-            </Link>
+            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-12 border-2 border-dashed border-indigo-200">
+              <CheckCircle2 size={80} className="mx-auto text-indigo-400 mb-6" />
+              <h3 className="text-3xl font-bold text-indigo-900 mb-4">
+                No hay evaluaciones creadas
+              </h3>
+              <p className="text-indigo-600 text-lg mb-8 max-w-md mx-auto">
+                Crea tu primera evaluación para comenzar a evaluar el aprendizaje de tus estudiantes
+              </p>
+              <Link href="/evaluaciones/crear">
+                <PrimaryButton 
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-3 text-lg"
+                >
+                  <Plus size={24} className="mr-2" />
+                  Crear Primera Evaluación
+                </PrimaryButton>
+              </Link>
+            </div>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl shadow border border-gray-200 overflow-hidden mt-8">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gradient-to-r from-indigo-100 via-indigo-50 to-purple-100 rounded-t-2xl shadow-md sticky top-0 z-10">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-indigo-700 border-b border-indigo-100">Título</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-indigo-700 border-b border-indigo-100">Matriz</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-indigo-700 border-b border-indigo-100">Preguntas</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-indigo-700 border-b border-indigo-100">Creada</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-indigo-700 border-b border-indigo-100 w-32">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {Array.isArray(evaluaciones) && evaluaciones.map((ev) => (
-                    <tr key={ev.id} className="hover:bg-indigo-50/40 transition-colors group">
-                      <td className="px-6 py-3 text-left align-middle">
-                        <div className="font-bold text-base text-gray-900 mb-1">
-                          {ev.titulo}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {ev.matrizNombre || '-'}
-                        </div>
-                      </td>
-                      <td className="px-6 py-3 text-center align-middle">
-                        <span className="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 font-semibold text-xs">
-                          {ev.matrizNombre || '-'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-3 text-center align-middle">
-                        <span className="inline-block px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold text-xs">
-                          {typeof ev.preguntasCount === 'number' ? `${ev.preguntasCount} preguntas` : '-'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-3 text-center align-middle">
-                        <span className="text-xs text-gray-600">
-                          {formatDate(ev.createdAt)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-3 text-center align-middle">
-                        <div className="flex items-center justify-center gap-2">
+          <div className="space-y-6">
+            {/* Grid responsivo */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+              {evaluaciones.map((evaluacion) => (
+                <div 
+                  key={evaluacion.id} 
+                  className="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl hover:scale-105 transition-all duration-300 min-h-[380px] max-w-sm mx-auto w-full"
+                >
+                  {/* Header con gradiente */}
+                  <div className={`bg-gradient-to-r ${getRandomGradient(evaluacion.id)} p-4 text-white relative overflow-hidden`}>
+                    <div className="absolute inset-0 bg-black/10"></div>
+                    <div className="relative z-10">
+                      <div className="flex items-start justify-between mb-3">
+                        <h3 className="text-base font-bold leading-tight pr-2 line-clamp-2">{evaluacion.titulo}</h3>
+                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                           <button
-                            onClick={() => router.push(`/evaluaciones/${ev.id}/editar`)}
-                            className="h-8 w-8 flex items-center justify-center rounded-lg text-gray-700 transition-colors hover:bg-gray-100 hover:border hover:border-gray-300 border border-transparent"
+                            onClick={() => router.push(`/evaluaciones/${evaluacion.id}/editar`)}
+                            className="p-1.5 bg-white/20 backdrop-blur-sm rounded-md hover:bg-white/30 transition-colors"
                             title="Editar evaluación"
-                            style={{ aspectRatio: '1 / 1' }}
                           >
-                            <Edit size={16} className="text-gray-700" />
+                            <Edit size={12} />
                           </button>
                           <button
-                            onClick={() => handleEliminar(ev.id)}
-                            disabled={eliminandoId === ev.id}
-                            className={`h-8 w-8 flex items-center justify-center rounded-lg text-red-600 transition-colors hover:bg-red-50 hover:border hover:border-red-300 border border-transparent ${eliminandoId === ev.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            onClick={() => handleEliminar(evaluacion.id)}
+                            disabled={eliminandoId === evaluacion.id}
+                            className={`p-1.5 bg-white/20 backdrop-blur-sm rounded-md ${getHoverColor(evaluacion.id)} transition-colors ${eliminandoId === evaluacion.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                             title="Eliminar evaluación"
-                            style={{ aspectRatio: '1 / 1' }}
                           >
-                            <Trash2 size={16} className="text-red-600" />
+                            <Trash2 size={12} />
                           </button>
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </div>
+                      
+                      {/* Stats en el header */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 text-center">
+                          <p className={`text-xs ${getTextColor(evaluacion.id)}`}>Preguntas</p>
+                          <p className="text-sm font-bold">{evaluacion.preguntasCount || 0}</p>
+                        </div>
+                        <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 text-center">
+                          <p className={`text-xs ${getTextColor(evaluacion.id)}`}>Matriz</p>
+                          <p className="text-sm font-bold">{evaluacion.matrizNombre ? '✓' : '✗'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Contenido del card */}
+                  <div className="p-4 space-y-3 flex flex-col h-full">
+                    {/* Información de la matriz */}
+                    <div className="flex-1">
+                      <h4 className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
+                        <BarChart3 size={12} />
+                        Matriz de Especificación
+                      </h4>
+                      <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg p-2 border border-emerald-100">
+                        <span className="text-xs font-medium text-emerald-800 line-clamp-2">
+                          {evaluacion.matrizNombre || 'Sin matriz asignada'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Detalles adicionales */}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                        <Target size={10} />
+                        <span>{evaluacion.preguntasCount || 0} preguntas totales</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                        <Clock size={10} />
+                        <span>Creada el {formatDate(evaluacion.createdAt)}</span>
+                      </div>
+                    </div>
+
+                    {/* Acciones en el footer */}
+                    <div className="pt-2 border-t border-gray-100">
+                      <div className="flex gap-1.5">
+                        <button
+                          onClick={() => router.push(`/evaluaciones/${evaluacion.id}/editar`)}
+                          className="flex-1 bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 py-1.5 px-2 rounded-md font-medium hover:from-emerald-100 hover:to-teal-100 transition-all duration-200 text-xs"
+                        >
+                          <Edit size={12} className="mr-1" />
+                          Editar
+                        </button>
+                        <Link
+                          href={`/correccion-evaluaciones`}
+                          className="flex-1 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 py-1.5 px-2 rounded-md font-medium hover:from-blue-100 hover:to-indigo-100 transition-all duration-200 text-xs text-center"
+                        >
+                          <CheckCircle2 size={12} className="mr-1" />
+                          Corregir
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
+
+            {/* Paginación simple si hay muchas evaluaciones */}
+            {evaluaciones.length > 20 && (
+              <div className="flex items-center justify-center gap-2 pt-6">
+                <button className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                  Anterior
+                </button>
+                <div className="flex gap-1">
+                  <button className="px-3 py-2 text-sm font-medium text-white bg-emerald-600 rounded-md">1</button>
+                  <button className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">2</button>
+                  <button className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">3</button>
+                </div>
+                <button className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                  Siguiente
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -198,6 +353,7 @@ export default function EvaluacionesPage() {
           </div>
         </div>
       </Dialog>
+      
       {alert && (
         <Dialog open={!!alert} onClose={() => setAlert(null)} className="fixed z-50 inset-0 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen px-4">

@@ -1,30 +1,35 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
-// GET /api/evaluaciones - listar todas las evaluaciones
 export async function GET() {
   try {
     const evaluaciones = await prisma.evaluacion.findMany({
       include: {
         archivo: true,
         matriz: true,
-        preguntas: true
-      }
-    })
-    // Mapear para devolver solo los campos necesarios
-    const data = evaluaciones.map(ev => ({
-      id: ev.id,
-      titulo: ev.archivo?.titulo || '',
-      matrizId: ev.matrizId,
-      matrizNombre: ev.matriz?.nombre || '',
-      preguntasCount: ev.preguntas?.length || 0,
-      createdAt: ev.createdAt
-    }))
-    return NextResponse.json(data)
+        preguntas: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    // Transformar los datos para que coincidan con el formato esperado
+    const evaluacionesFormateadas = evaluaciones.map(evaluacion => ({
+      id: evaluacion.id,
+      titulo: evaluacion.archivo.titulo,
+      matrizNombre: evaluacion.matriz.nombre,
+      preguntasCount: evaluacion.preguntas.length,
+      createdAt: evaluacion.createdAt.toISOString(),
+    }));
+
+    return NextResponse.json(evaluacionesFormateadas);
   } catch (error) {
-    console.error('Error al obtener evaluaciones:', error)
-    // Devuelve SIEMPRE un array, aunque esté vacío, para evitar romper el frontend
-    return NextResponse.json([])
+    console.error('Error fetching evaluaciones:', error);
+    return NextResponse.json(
+      { error: 'Error interno del servidor' },
+      { status: 500 }
+    );
   }
 }
 
@@ -36,6 +41,7 @@ export async function POST(request: NextRequest) {
     if (!archivoId || !matrizId || !preguntas) {
       return NextResponse.json({ error: 'archivoId, matrizId y preguntas son requeridos' }, { status: 400 })
     }
+    
     const evaluacion = await prisma.evaluacion.create({
       data: {
         archivoId,

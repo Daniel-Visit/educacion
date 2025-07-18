@@ -182,6 +182,13 @@ setEvaluaciones(evaluacionesArray)
 - Modos de creación y edición
 - APIs y base de datos
 
+#### 📊 [Corrección de Evaluaciones](./CORRECCION_EVALUACIONES.md)
+- Carga de resultados desde archivos CSV
+- Procesamiento automático de puntuaciones
+- Almacenamiento estructurado de resultados
+- Cálculo de notas y estadísticas
+- APIs para procesamiento de datos
+
 #### 🎤 [Entrevista Interactiva](./ENTREVISTA.md)
 - Sistema de preguntas dinámicas
 - Text-to-Speech (TTS)
