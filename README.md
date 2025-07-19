@@ -29,6 +29,12 @@ Una plataforma integral para la gestión educativa que incluye planificación de
 - 12 metodologías de enseñanza
 - 37 Objetivos de Aprendizaje (OAs)
 
+### 🎨 **Componentes Reutilizables**
+- Sistema de headers consistentes para toda la plataforma
+- Estados de carga, error y éxito unificados
+- Componentes modales reutilizables
+- Utilidades centralizadas para cálculos y exportación
+
 ## 🛠️ Tecnologías Utilizadas
 
 - **Frontend:** Next.js 15, React 19, TypeScript

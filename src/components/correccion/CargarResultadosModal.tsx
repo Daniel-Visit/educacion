@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { LoadingState, ErrorState, ModalHeader, SuccessState } from '@/components/resultados';
 import { 
   Upload, 
   FileText, 
@@ -132,29 +133,13 @@ export default function CargarResultadosModal({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col">
-        {/* Header fijo */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-t-2xl flex-shrink-0">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl">
-                <Upload className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold">Cargar Resultados</h3>
-                <p className="text-indigo-100">
-                  {evaluacionNombre}
-                </p>
-              </div>
-            </div>
-            <Button 
-              variant="ghost" 
-              onClick={onClose}
-              className="text-white hover:bg-white/20 p-2"
-            >
-              <X className="h-6 w-6" />
-            </Button>
-          </div>
-        </div>
+        <ModalHeader
+          title="Cargar Resultados"
+          subtitle={evaluacionNombre}
+          icon={<Upload className="h-6 w-6 text-white" />}
+          onClose={onClose}
+          gradient="from-indigo-600 to-purple-600"
+        />
 
         {/* Contenido con scroll */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
@@ -315,21 +300,11 @@ export default function CargarResultadosModal({
 
           {/* Mensajes de error/éxito */}
           {error && (
-            <Alert className="border-red-200 bg-red-50">
-              <AlertTriangle className="h-4 w-4 text-red-600" />
-              <AlertDescription className="text-red-800">
-                {error}
-              </AlertDescription>
-            </Alert>
+            <ErrorState message={error} />
           )}
 
           {success && (
-            <Alert className="border-emerald-200 bg-emerald-50">
-              <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-              <AlertDescription className="text-emerald-800">
-                ¡Resultados cargados exitosamente!
-              </AlertDescription>
-            </Alert>
+            <SuccessState message="¡Resultados cargados exitosamente!" />
           )}
 
           {/* Botones de acción */}

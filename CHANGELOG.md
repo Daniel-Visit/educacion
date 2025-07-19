@@ -5,6 +5,57 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4] - 2025-07-18
+
+### 🎨 Refactorización de Componentes
+- **Sistema de Componentes Reutilizables:**
+  - `ResultadosHeader` - Header consistente para páginas de resultados
+  - `LoadingState` - Estado de carga uniforme en toda la aplicación
+  - `ErrorState` - Estado de error consistente
+  - `SuccessState` - Estado de éxito uniforme
+  - `ModalHeader` - Header para modales reutilizable
+- **Utilidades Centralizadas:**
+  - `resultados-utils.ts` - Funciones para cálculos y exportación
+  - Cálculo de notas según nivel de exigencia
+  - Generación de estadísticas y rangos de porcentaje
+  - Exportación CSV optimizada
+
+### 🔧 Optimización de Código
+- **Eliminación de Duplicación:**
+  - ~100 líneas de código duplicado eliminadas
+  - Funciones centralizadas en utilidades
+  - Componentes reutilizables en lugar de código repetido
+- **Refactorización de Páginas:**
+  - Página de gráficos completamente refactorizada
+  - Página principal de resultados optimizada
+  - Modal de carga de resultados mejorado
+
+### 🎯 Mejoras de UX/UI
+- **Consistencia Visual:**
+  - Headers uniformes en todas las páginas de resultados
+  - Estados de loading, error y éxito consistentes
+  - Gradientes coherentes por funcionalidad
+- **Optimizaciones de Layout:**
+  - Alineación horizontal de metadatos en gráficos
+  - Espaciado consistente entre elementos
+  - Promedio de notas mostrado junto al total de estudiantes
+
+### 📚 Documentación
+- **Documentación de Cambios:** `docs/CAMBIOS_20250718.md`
+- **Actualización de Arquitectura:** Nuevos patrones de componentes
+- **Tareas Pendientes:** Homologación de headers en toda la plataforma
+- **Backup de Base de Datos:** Múltiples puntos de restauración
+
+### 🏗️ Arquitectura
+- **Patrón de Componentes Reutilizables:**
+  - Exportaciones centralizadas en `src/components/resultados/index.ts`
+  - Interfaces TypeScript bien definidas
+  - Props configurables para máxima flexibilidad
+- **Estructura de Utilidades:**
+  - Funciones puras para cálculos
+  - Separación clara de responsabilidades
+  - Testing-friendly architecture
+
 ## [1.1.3] - 2025-07-10
 
 ### 💰 Análisis Financiero

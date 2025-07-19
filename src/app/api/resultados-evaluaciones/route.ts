@@ -1,31 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const resultados = await prisma.resultadoEvaluacion.findMany({
       include: {
         evaluacion: {
-          select: {
-            id: true,
-            titulo: true,
-            matriz: {
-              select: {
-                nombre: true
-              }
-            },
-            preguntas: {
-              select: {
-                id: true
-              }
-            }
+          include: {
+            archivo: true,
+            matriz: true
           }
         },
         resultados: {
-          select: {
-            puntajeTotal: true,
-            puntajeMaximo: true,
-            nota: true
+          include: {
+            alumno: true
           }
         }
       },
@@ -35,37 +23,34 @@ export async function GET() {
     });
 
     // Transformar los datos para el frontend
-    const resultadosTransformados = resultados.map(resultado => {
-      // Calcular estadísticas
-      const totalAlumnos = resultado.resultados.length;
-      const promedioPuntaje = totalAlumnos > 0 
-        ? Math.round((resultado.resultados.reduce((sum, r) => sum + (r.puntajeTotal / r.puntajeMaximo * 100), 0) / totalAlumnos))
-        : 0;
-      
-      const aprobados = resultado.resultados.filter(r => r.nota >= 4.0).length;
-      const porcentajeAprobacion = totalAlumnos > 0 
-        ? Math.round((aprobados / totalAlumnos) * 100)
-        : 0;
-
-      return {
-        id: resultado.id,
-        evaluacionId: resultado.evaluacionId,
-        fechaCarga: resultado.fechaCarga.toISOString(),
-        totalAlumnos: totalAlumnos,
-        promedioPuntaje: promedioPuntaje,
-        porcentajeAprobacion: porcentajeAprobacion,
-        evaluacion: {
-          id: resultado.evaluacion.id,
-          titulo: resultado.evaluacion.titulo,
-          matrizNombre: resultado.evaluacion.matriz.nombre,
-          preguntasCount: resultado.evaluacion.preguntas.length
+    const resultadosTransformados = resultados.map(resultado => ({
+      id: resultado.id,
+      evaluacionId: resultado.evaluacionId,
+      fechaCarga: resultado.fechaCarga.toISOString(),
+      totalAlumnos: resultado.totalAlumnos,
+      escalaNota: resultado.escalaNota,
+      evaluacion: {
+        id: resultado.evaluacion.id,
+        titulo: resultado.evaluacion.archivo.titulo,
+        matrizNombre: resultado.evaluacion.matriz.nombre,
+        preguntasCount: resultado.evaluacion.matriz.total_preguntas
+      },
+      resultados: resultado.resultados.map(resultadoAlumno => ({
+        id: resultadoAlumno.id,
+        puntajeTotal: resultadoAlumno.puntajeTotal,
+        puntajeMaximo: resultadoAlumno.puntajeMaximo,
+        porcentaje: resultadoAlumno.porcentaje,
+        alumno: {
+          id: resultadoAlumno.alumno.id,
+          nombre: resultadoAlumno.alumno.nombre,
+          apellido: resultadoAlumno.alumno.apellido
         }
-      };
-    });
+      }))
+    }));
 
     return NextResponse.json(resultadosTransformados);
   } catch (error) {
-    console.error('Error obteniendo resultados de evaluaciones:', error);
+    console.error('Error fetching resultados:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }

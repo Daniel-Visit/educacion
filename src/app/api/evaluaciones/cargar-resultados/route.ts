@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 
       // Buscar la alternativa correcta
       const alternativaCorrecta = pregunta.alternativas.find(a => a.esCorrecta);
-      const esCorrecta = alternativaCorrecta?.letra === alternativaDada;
+      const esCorrecta = alternativaCorrecta?.letra.toUpperCase() === alternativaDada.toUpperCase();
       const puntajeObtenido = esCorrecta ? 1 : 0;
 
       // Agrupar por alumno

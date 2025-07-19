@@ -158,8 +158,8 @@ export async function POST(request: NextRequest) {
       respuestasPorAlumno.get(alumnoId).push({
         preguntaId: preguntaInfo.id,
         alternativaDada,
-        esCorrecta: alternativaDada === preguntaInfo.alternativaCorrecta,
-        puntajeObtenido: alternativaDada === preguntaInfo.alternativaCorrecta ? 1 : 0
+        esCorrecta: alternativaDada.toUpperCase() === preguntaInfo.alternativaCorrecta.toUpperCase(),
+        puntajeObtenido: alternativaDada.toUpperCase() === preguntaInfo.alternativaCorrecta.toUpperCase() ? 1 : 0
       });
     }
 

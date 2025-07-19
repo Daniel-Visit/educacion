@@ -1,52 +1,81 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { BarChart3, FileText, Users, TrendingUp, CheckCircle2, Award, Eye, Download, Calendar } from 'lucide-react';
+import { BarChart3, FileText, Users, TrendingUp, Award, Eye, Download, Calendar, Trash2, ChevronDown, ChevronRight, AlertTriangle, X } from 'lucide-react';
 import GlobalDropdown from '@/components/ui/GlobalDropdown';
+import { ResultadosHeader, LoadingState, ErrorState } from '@/components/resultados';
+import { calcularNota, calcularEstadisticas, generarCSV, descargarCSV } from '@/lib/resultados-utils';
 
-interface Evaluacion {
-  id: number;
-  titulo: string;
-  matrizNombre: string;
-  preguntasCount: number;
-  createdAt: string;
-}
+// Estilos CSS para arreglar el problema del border-radius
+const accordionStyles = `
+  .accordion-button {
+    background-clip: padding-box;
+    border-radius: inherit;
+  }
+  .accordion-button:hover {
+    background-clip: padding-box;
+  }
+`;
 
 interface ResultadoEvaluacion {
   id: number;
   evaluacionId: number;
   fechaCarga: string;
   totalAlumnos: number;
-  promedioPuntaje: number;
-  porcentajeAprobacion: number;
-  evaluacion: Evaluacion;
+  escalaNota: number;
+  evaluacion: {
+    id: number;
+    titulo: string;
+    matrizNombre: string;
+    preguntasCount: number;
+  };
+  resultados: {
+    id: number;
+    puntajeTotal: number;
+    puntajeMaximo: number;
+    porcentaje: number;
+    alumno: {
+      id: number;
+      nombre: string;
+      apellido: string;
+    };
+  }[];
 }
 
 export default function ResultadosEvaluacionesPage() {
-  const [evaluaciones, setEvaluaciones] = useState<Evaluacion[]>([]);
   const [resultados, setResultados] = useState<ResultadoEvaluacion[]>([]);
-  const [evaluacionSeleccionada, setEvaluacionSeleccionada] = useState<string>("");
-  const [resultadoSeleccionado, setResultadoSeleccionado] = useState<ResultadoEvaluacion | null>(null);
+  const [resultadoSeleccionado, setResultadoSeleccionado] = useState<number | null>(null);
+  const [nivelExigencia, setNivelExigencia] = useState<string>("60");
   const [isLoading, setIsLoading] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [resultadoAEliminar, setResultadoAEliminar] = useState<ResultadoEvaluacion | null>(null);
+  const [tablaAbierta, setTablaAbierta] = useState(true);
 
   useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (isLoading) {
+        console.log('Timeout alcanzado, forzando fin de carga');
+        setIsLoading(false);
+      }
+    }, 10000);
+
     cargarDatos();
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const cargarDatos = async () => {
     try {
-      // Cargar evaluaciones
-      const responseEvaluaciones = await fetch('/api/evaluaciones');
-      if (responseEvaluaciones.ok) {
-        const dataEvaluaciones = await responseEvaluaciones.json();
-        setEvaluaciones(dataEvaluaciones);
-      }
-
-      // Cargar resultados
+      console.log('Cargando datos...');
+      
       const responseResultados = await fetch('/api/resultados-evaluaciones');
+      console.log('Respuesta resultados:', responseResultados.status);
+      
       if (responseResultados.ok) {
         const dataResultados = await responseResultados.json();
-        setResultados(dataResultados);
+        console.log('Datos resultados:', dataResultados);
+        setResultados(Array.isArray(dataResultados) ? dataResultados : []);
+      } else {
+        console.error('Error al cargar resultados:', responseResultados.status);
       }
     } catch (error) {
       console.error('Error cargando datos:', error);
@@ -55,238 +84,341 @@ export default function ResultadosEvaluacionesPage() {
     }
   };
 
-  const handleEvaluacionChange = (evaluacionId: string) => {
-    setEvaluacionSeleccionada(evaluacionId);
+
+
+  const handleEliminarResultado = (resultado: ResultadoEvaluacion) => {
+    setResultadoAEliminar(resultado);
+    setShowDeleteModal(true);
   };
 
-  const resultadosFiltrados = evaluacionSeleccionada 
-    ? resultados.filter(r => r.evaluacionId.toString() === evaluacionSeleccionada)
-    : resultados;
+  const confirmarEliminacion = async () => {
+    if (!resultadoAEliminar) return;
 
-  const statsGenerales = {
-    totalResultados: resultados.length,
-    totalAlumnos: resultados.reduce((sum, r) => sum + r.totalAlumnos, 0),
-    promedioGeneral: resultados.length > 0 
-      ? Math.round(resultados.reduce((sum, r) => sum + r.promedioPuntaje, 0) / resultados.length)
-      : 0,
-    evaluacionesConResultados: new Set(resultados.map(r => r.evaluacionId)).size
+    try {
+      const response = await fetch(`/api/resultados-evaluaciones/${resultadoAEliminar.id}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        setResultados(resultados.filter(r => r.id !== resultadoAEliminar.id));
+        if (resultadoSeleccionado === resultadoAEliminar.id) {
+          setResultadoSeleccionado(null);
+        }
+        setShowDeleteModal(false);
+        setResultadoAEliminar(null);
+      } else {
+        alert('Error al eliminar el resultado');
+      }
+    } catch (error) {
+      console.error('Error eliminando resultado:', error);
+      alert('Error al eliminar el resultado');
+    }
+  };
+
+  const cancelarEliminacion = () => {
+    setShowDeleteModal(false);
+    setResultadoAEliminar(null);
+  };
+
+  const handleDescargarCSV = (resultado: ResultadoEvaluacion) => {
+    const csvContent = generarCSV(resultado.resultados, parseInt(nivelExigencia), resultado.evaluacion.titulo);
+    descargarCSV(csvContent, resultado.evaluacion.titulo);
   };
 
   if (isLoading) {
     return (
       <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-            <p className="text-indigo-600 font-medium">Cargando resultados...</p>
-          </div>
-        </div>
+        <LoadingState message="Cargando resultados..." />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
-      {/* Header compacto */}
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-6 text-white shadow-lg mb-6 mt-0">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-4">
-            <div className="bg-white/20 p-2 rounded-lg">
-              <BarChart3 className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">Resultados de Evaluaciones</h1>
-              <p className="text-emerald-100 text-sm">
-                Visualiza y analiza los resultados de evaluaciones ya cargados
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        {/* Stats compactas */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-emerald-200" />
-              <div>
-                <p className="text-emerald-200 text-xs">Total Resultados</p>
-                <p className="text-lg font-bold">{statsGenerales.totalResultados}</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-emerald-200" />
-              <div>
-                <p className="text-emerald-200 text-xs">Total Alumnos</p>
-                <p className="text-lg font-bold">{statsGenerales.totalAlumnos}</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-emerald-200" />
-              <div>
-                <p className="text-emerald-200 text-xs">Promedio General</p>
-                <p className="text-lg font-bold">{statsGenerales.promedioGeneral}%</p>
-              </div>
-            </div>
-          </div>
+    <div className="container mx-auto p-6 space-y-6">
+      <ResultadosHeader
+        title="Resultados de Evaluaciones"
+        subtitle="Visualiza y analiza los resultados guardados"
+        icon={<BarChart3 className="h-6 w-6 text-white" />}
+        totalCount={resultados.length}
+        totalLabel="Total Resultados"
+      />
 
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <Award className="h-4 w-4 text-emerald-200" />
-              <div>
-                <p className="text-emerald-200 text-xs">Evaluaciones</p>
-                <p className="text-lg font-bold">{statsGenerales.evaluacionesConResultados}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filtros */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="bg-emerald-100 p-2 rounded-lg">
-            <Eye className="h-5 w-5 text-emerald-600" />
+      {/* Configuración de Nivel de Exigencia */}
+      <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-4">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="bg-blue-100 p-2 rounded-lg">
+            <Award className="h-5 w-5 text-blue-600" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Filtros de Visualización</h2>
-            <p className="text-gray-600 text-sm">Filtra los resultados por evaluación específica</p>
+            <h2 className="text-lg font-bold text-gray-900">Configuración de Notas</h2>
+            <p className="text-gray-600 text-sm">Ajusta el nivel de exigencia para recalcular las notas</p>
           </div>
         </div>
         
-        <div className="flex gap-4 items-end">
+        <div className="flex items-center gap-4">
           <div className="flex-1">
             <label className="text-sm font-semibold text-gray-700 mb-2 block">
-              Filtrar por Evaluación
+              Nivel de Exigencia
             </label>
             <GlobalDropdown
-              value={evaluacionSeleccionada}
-              onChange={handleEvaluacionChange}
+              value={nivelExigencia}
+              onChange={setNivelExigencia}
               options={[
-                { value: "", label: "Todas las evaluaciones" },
-                ...evaluaciones
-                  .filter(e => resultados.some(r => r.evaluacionId === e.id))
-                  .map((evaluacion) => ({
-                    value: evaluacion.id.toString(),
-                    label: `${evaluacion.titulo} - ${evaluacion.matrizNombre}`
-                  }))
+                { value: "10", label: "10% - Muy Baja" },
+                { value: "20", label: "20% - Baja" },
+                { value: "30", label: "30% - Moderadamente Baja" },
+                { value: "40", label: "40% - Moderada" },
+                { value: "50", label: "50% - Moderadamente Alta" },
+                { value: "55", label: "55% - Alta" },
+                { value: "60", label: "60% - Muy Alta" },
+                { value: "70", label: "70% - Extremadamente Alta" },
+                { value: "80", label: "80% - Muy Exigente" },
+                { value: "90", label: "90% - Extremadamente Exigente" },
+                { value: "100", label: "100% - Máxima Exigencia" }
               ]}
-              placeholder="Todas las evaluaciones"
-              className="h-12"
+              placeholder="Selecciona nivel de exigencia"
+              className="h-10"
             />
+          </div>
+          <div className="text-sm text-gray-600">
+            <p><strong>Nota 4:</strong> {nivelExigencia}% de respuestas correctas</p>
+            <p><strong>Escala:</strong> 1.00 - 7.00</p>
           </div>
         </div>
       </div>
 
       {/* Lista de Resultados */}
-      {resultadosFiltrados.length > 0 ? (
-        <div className="space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="bg-blue-100 p-2 rounded-lg">
-              <BarChart3 className="h-5 w-5 text-blue-600" />
+      {resultados.length > 0 ? (
+        <div className="space-y-4">
+          {/* Selector de Resultado */}
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-emerald-100 p-2 rounded-lg">
+                <FileText className="h-5 w-5 text-emerald-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Seleccionar Resultado</h3>
+                <p className="text-gray-600 text-sm">Elige un resultado guardado para analizar</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">Resultados Disponibles</h2>
-              <p className="text-gray-600 text-sm">
-                {resultadosFiltrados.length} resultado{resultadosFiltrados.length !== 1 ? 's' : ''} encontrado{resultadosFiltrados.length !== 1 ? 's' : ''}
-              </p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                  Resultado a Visualizar
+                </label>
+                <GlobalDropdown
+                  value={resultadoSeleccionado?.toString() || ""}
+                  onChange={(value) => setResultadoSeleccionado(value ? parseInt(value) : null)}
+                  options={[
+                    { value: "", label: "Selecciona un resultado" },
+                    ...resultados.map((resultado) => ({
+                      value: resultado.id.toString(),
+                      label: `${resultado.evaluacion.titulo} - ${resultado.evaluacion.matrizNombre} (${resultado.totalAlumnos} alumnos, ${new Date(resultado.fechaCarga).toLocaleDateString()})`
+                    }))
+                  ]}
+                  placeholder="Selecciona un resultado"
+                  className="h-12"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {resultadosFiltrados.map((resultado) => (
-              <div key={resultado.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                {/* Header de la card */}
-                <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 text-white">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-white/20 p-2 rounded-lg">
-                        <FileText className="h-5 w-5 text-white" />
+          {/* Detalles del Resultado Seleccionado */}
+          {resultadoSeleccionado && (() => {
+            const resultado = resultados.find(r => r.id === resultadoSeleccionado);
+            if (!resultado) return null;
+            
+            const stats = calcularEstadisticas(resultado.resultados, parseInt(nivelExigencia));
+            
+            return (
+              <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+                {/* Header del resultado */}
+                <div className="p-6 border-b border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900">{resultado.evaluacion.titulo}</h3>
+                      <p className="text-gray-600">{resultado.evaluacion.matrizNombre}</p>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Cargado el {new Date(resultado.fechaCarga).toLocaleDateString()}
+                      </p>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <button 
+                        onClick={() => handleEliminarResultado(resultado)}
+                        className="bg-red-100 hover:bg-red-200 text-red-700 p-2 rounded-lg transition-colors"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Estadísticas */}
+                <div className="p-6 border-b border-gray-100">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-100 rounded-xl border border-blue-200">
+                      <div className="bg-blue-600 p-3 rounded-lg">
+                        <Users className="h-6 w-6 text-white" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-lg">{resultado.evaluacion.titulo}</h3>
-                        <p className="text-blue-100 text-sm">{resultado.evaluacion.matrizNombre}</p>
+                        <p className="text-sm font-medium text-blue-700">Total Alumnos</p>
+                        <p className="text-lg font-bold text-blue-900">{stats.totalAlumnos}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="bg-white/20 px-3 py-1 rounded-full text-xs font-semibold">
-                        ID: {resultado.id}
+                    
+                    <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-xl border border-emerald-200">
+                      <div className="bg-emerald-600 p-3 rounded-lg">
+                        <TrendingUp className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-emerald-700">Promedio Nota</p>
+                        <p className="text-lg font-bold text-emerald-900">{stats.promedioNota}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl border border-orange-200">
+                      <div className="bg-orange-600 p-3 rounded-lg">
+                        <Award className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-orange-700">Aprobación</p>
+                        <p className="text-lg font-bold text-orange-900">{stats.porcentajeAprobacion}%</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Contenido de la card */}
-                <div className="p-6 space-y-4">
-                  {/* Stats principales */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl border border-emerald-200">
-                      <div className="bg-emerald-600 p-2 rounded-lg w-fit mx-auto mb-2">
-                        <Users className="h-4 w-4 text-white" />
-                      </div>
-                      <p className="text-emerald-700 text-xs font-medium">Alumnos</p>
-                      <p className="text-emerald-900 text-lg font-bold">{resultado.totalAlumnos}</p>
-                    </div>
-                    
-                    <div className="text-center p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
-                      <div className="bg-blue-600 p-2 rounded-lg w-fit mx-auto mb-2">
-                        <TrendingUp className="h-4 w-4 text-white" />
-                      </div>
-                      <p className="text-blue-700 text-xs font-medium">Promedio</p>
-                      <p className="text-blue-900 text-lg font-bold">{resultado.promedioPuntaje}%</p>
-                    </div>
-                  </div>
-
-                  {/* Porcentaje de aprobación */}
-                  <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200">
-                    <div className="bg-orange-600 p-2 rounded-lg w-fit mx-auto mb-2">
-                      <Award className="h-4 w-4 text-white" />
-                    </div>
-                    <p className="text-orange-700 text-xs font-medium">Aprobación</p>
-                    <p className="text-orange-900 text-xl font-bold">{resultado.porcentajeAprobacion}%</p>
-                  </div>
-
-                  {/* Fecha de carga */}
-                  <div className="flex items-center gap-2 text-gray-600 text-sm">
-                    <Calendar className="h-4 w-4" />
-                    <span>Cargado: {new Date(resultado.fechaCarga).toLocaleDateString()}</span>
-                  </div>
-
-                  {/* Acciones */}
-                  <div className="flex gap-2 pt-4 border-t border-gray-100">
+                {/* Tabla de alumnos con notas calculadas - Acordeón */}
+                <div className="p-6">
+                  <div className="mb-6">
                     <button 
-                      onClick={() => setResultadoSeleccionado(resultado)}
-                      className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-2 px-4 rounded-lg font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2"
+                      onClick={() => setTablaAbierta(!tablaAbierta)}
+                      className={`w-full p-4 bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 transition-all duration-200 flex items-center justify-between border border-gray-200 shadow-sm ${
+                        tablaAbierta ? 'rounded-t-xl border-b-0' : 'rounded-xl'
+                      }`}
                     >
-                      <Eye className="h-4 w-4" />
-                      Ver Detalles
+                      <h4 className="font-semibold text-indigo-900 flex items-center gap-2">
+                        <BarChart3 className="h-4 w-4 text-indigo-600" />
+                        Detalle por Alumno ({resultado.resultados.length} alumnos)
+                      </h4>
+                      {tablaAbierta ? (
+                        <ChevronDown className="h-5 w-5 text-indigo-600" />
+                      ) : (
+                        <ChevronRight className="h-5 w-5 text-indigo-600" />
+                      )}
                     </button>
-                    <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded-lg transition-colors duration-200">
+                    
+                    {tablaAbierta && (
+                      <div className="bg-white border border-gray-200 border-t-0 rounded-b-xl shadow-sm">
+                        <div className="overflow-x-auto transition-all duration-300 ease-in-out">
+                          <table className="w-full">
+                            <thead className="bg-gradient-to-r from-indigo-50 to-purple-50">
+                              <tr>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">Alumno</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">Puntaje</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">% Correctas</th>
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">Nota</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                              {resultado.resultados.map((resultadoAlumno) => {
+                                const nota = calcularNota(resultadoAlumno.porcentaje, parseInt(nivelExigencia));
+                                return (
+                                  <tr key={resultadoAlumno.id} className="hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-colors">
+                                    <td className="px-4 py-3">
+                                      <div className="font-medium text-gray-900">
+                                        {resultadoAlumno.alumno.nombre} {resultadoAlumno.alumno.apellido}
+                                      </div>
+                                    </td>
+                                    <td className="px-4 py-3">
+                                      <div className="text-gray-700 font-medium">
+                                        {resultadoAlumno.puntajeTotal}/{resultadoAlumno.puntajeMaximo}
+                                      </div>
+                                    </td>
+                                    <td className="px-4 py-3">
+                                      <div className="text-gray-700 font-medium">
+                                        {resultadoAlumno.porcentaje.toFixed(1)}%
+                                      </div>
+                                    </td>
+                                    <td className="px-4 py-3">
+                                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
+                                        nota >= 4.0 
+                                          ? 'bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-800 border border-emerald-200' 
+                                          : 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border border-red-200'
+                                      }`}>
+                                        {nota}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={() => {
+                        // Guardar datos calculados en sessionStorage
+                        const resultadoGraficos = {
+                          id: resultado.id.toString(),
+                          nombre: resultado.evaluacion.titulo,
+                          fecha: resultado.fechaCarga,
+                          evaluacion: {
+                            id: resultado.evaluacion.id.toString(),
+                            nombre: resultado.evaluacion.titulo,
+                            matriz: {
+                              id: "1", // Placeholder
+                              nombre: resultado.evaluacion.matrizNombre,
+                              nivelExigencia: parseInt(nivelExigencia)
+                            }
+                          },
+                          respuestasAlumnos: resultado.resultados.map(resultadoAlumno => ({
+                            id: resultadoAlumno.id.toString(),
+                            alumno: {
+                              id: resultadoAlumno.alumno.id.toString(),
+                              nombre: resultadoAlumno.alumno.nombre,
+                              apellido: resultadoAlumno.alumno.apellido
+                            },
+                            nota: calcularNota(resultadoAlumno.porcentaje, parseInt(nivelExigencia)),
+                            porcentaje: resultadoAlumno.porcentaje
+                          }))
+                        };
+                        sessionStorage.setItem('resultadoGraficos', JSON.stringify(resultadoGraficos));
+                        window.location.href = `/resultados-evaluaciones/graficos?id=${resultado.id}`;
+                      }}
+                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200"
+                    >
+                      <BarChart3 className="h-4 w-4" />
+                      Ver Gráficos
+                    </button>
+                    <button 
+                      onClick={() => handleDescargarCSV(resultado)}
+                      className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-6 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200"
+                    >
                       <Download className="h-4 w-4" />
+                      Descargar CSV
                     </button>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            );
+          })()}
         </div>
       ) : (
         <div className="text-center py-12">
           <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-8 border-2 border-dashed border-emerald-200">
             <BarChart3 className="h-16 w-16 text-emerald-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-emerald-900 mb-2">
-              {evaluacionSeleccionada ? 'No hay resultados para esta evaluación' : 'No hay resultados disponibles'}
+              No hay resultados disponibles
             </h3>
             <p className="text-emerald-600 mb-4">
-              {evaluacionSeleccionada 
-                ? 'Esta evaluación aún no tiene resultados cargados'
-                : 'Primero necesitas cargar resultados de evaluaciones en la sección de Corrección'
-              }
+              Primero necesitas cargar resultados de evaluaciones en la sección de Corrección
             </p>
             <button 
               onClick={() => window.location.href = '/correccion-evaluaciones'}
@@ -298,165 +430,65 @@ export default function ResultadosEvaluacionesPage() {
         </div>
       )}
 
-      {/* Detalles del Resultado Seleccionado */}
-      {resultadoSeleccionado && (
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="bg-blue-100 p-2 rounded-lg">
-                <BarChart3 className="h-5 w-5 text-blue-600" />
+      {/* Modal de Confirmación de Eliminación */}
+      {showDeleteModal && resultadoAEliminar && (
+        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+            {/* Header del modal */}
+            <div className="bg-red-50 border-b border-red-200 p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="bg-red-100 p-2 rounded-lg">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">Confirmar Eliminación</h3>
+                    <p className="text-sm text-gray-600">Esta acción no se puede deshacer</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={cancelarEliminacion}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">Detalles del Resultado</h2>
-                <p className="text-gray-600 text-sm">
-                  Análisis detallado de: {resultadoSeleccionado.evaluacion.titulo}
+            </div>
+
+            {/* Contenido del modal */}
+            <div className="p-6">
+              <div className="mb-4">
+                <p className="text-gray-700 mb-2">
+                  ¿Estás seguro de que quieres eliminar el siguiente resultado?
                 </p>
-              </div>
-            </div>
-            <button 
-              onClick={() => setResultadoSeleccionado(null)}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-2 rounded-lg transition-colors duration-200"
-            >
-              ✕
-            </button>
-          </div>
-
-          {/* Información General */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
-              <div className="flex items-center gap-3">
-                <div className="bg-blue-600 p-2 rounded-lg">
-                  <FileText className="h-4 w-4 text-white" />
-                </div>
-                <div>
-                  <p className="text-blue-700 text-xs font-medium">Evaluación</p>
-                  <p className="text-blue-900 font-bold">{resultadoSeleccionado.evaluacion.titulo}</p>
+                <div className="bg-gray-50 rounded-lg p-3 border">
+                  <p className="font-semibold text-gray-900">{resultadoAEliminar.evaluacion.titulo}</p>
+                  <p className="text-sm text-gray-600">{resultadoAEliminar.evaluacion.matrizNombre}</p>
+                  <p className="text-xs text-gray-500">
+                    {resultadoAEliminar.totalAlumnos} alumnos • {new Date(resultadoAEliminar.fechaCarga).toLocaleDateString()}
+                  </p>
                 </div>
               </div>
-            </div>
 
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
-              <div className="flex items-center gap-3">
-                <div className="bg-purple-600 p-2 rounded-lg">
-                  <Users className="h-4 w-4 text-white" />
-                </div>
-                <div>
-                  <p className="text-purple-700 text-xs font-medium">Total Alumnos</p>
-                  <p className="text-purple-900 font-bold">{resultadoSeleccionado.totalAlumnos}</p>
-                </div>
+              <div className="flex gap-3">
+                <button 
+                  onClick={cancelarEliminacion}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  onClick={confirmarEliminacion}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Eliminar
+                </button>
               </div>
             </div>
-
-            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-4 border border-emerald-200">
-              <div className="flex items-center gap-3">
-                <div className="bg-emerald-600 p-2 rounded-lg">
-                  <TrendingUp className="h-4 w-4 text-white" />
-                </div>
-                <div>
-                  <p className="text-emerald-700 text-xs font-medium">Promedio</p>
-                  <p className="text-emerald-900 font-bold">{resultadoSeleccionado.promedioPuntaje}%</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 border border-orange-200">
-              <div className="flex items-center gap-3">
-                <div className="bg-orange-600 p-2 rounded-lg">
-                  <Award className="h-4 w-4 text-white" />
-                </div>
-                <div>
-                  <p className="text-orange-700 text-xs font-medium">Aprobación</p>
-                  <p className="text-orange-900 font-bold">{resultadoSeleccionado.porcentajeAprobacion}%</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Información Adicional */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Información de la Evaluación</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Matriz:</span>
-                  <span className="font-medium">{resultadoSeleccionado.evaluacion.matrizNombre}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Preguntas:</span>
-                  <span className="font-medium">{resultadoSeleccionado.evaluacion.preguntasCount}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Fecha de Carga:</span>
-                  <span className="font-medium">{new Date(resultadoSeleccionado.fechaCarga).toLocaleDateString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">ID Resultado:</span>
-                  <span className="font-medium">{resultadoSeleccionado.id}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Análisis de Rendimiento</h3>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">Promedio General</span>
-                    <span className="font-medium">{resultadoSeleccionado.promedioPuntaje}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                      style={{ width: `${resultadoSeleccionado.promedioPuntaje}%` }}
-                    ></div>
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">Tasa de Aprobación</span>
-                    <span className="font-medium">{resultadoSeleccionado.porcentajeAprobacion}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-emerald-600 h-2 rounded-full transition-all duration-300" 
-                      style={{ width: `${resultadoSeleccionado.porcentajeAprobacion}%` }}
-                    ></div>
-                  </div>
-                </div>
-
-                <div className="pt-2">
-                  <div className="text-sm text-gray-600 mb-2">Distribución de Notas:</div>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="bg-emerald-100 text-emerald-800 px-2 py-1 rounded">
-                      Aprobados: {Math.round(resultadoSeleccionado.totalAlumnos * resultadoSeleccionado.porcentajeAprobacion / 100)}
-                    </div>
-                    <div className="bg-red-100 text-red-800 px-2 py-1 rounded">
-                      Reprobados: {Math.round(resultadoSeleccionado.totalAlumnos * (100 - resultadoSeleccionado.porcentajeAprobacion) / 100)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Acciones */}
-          <div className="flex gap-3 mt-8 pt-6 border-t border-gray-100">
-            <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Ver Gráficos Detallados
-            </button>
-            <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2">
-              <Download className="h-4 w-4" />
-              Exportar Reporte
-            </button>
-            <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Ver Alumnos Individuales
-            </button>
           </div>
         </div>
       )}
     </div>
   );
-} 
+}

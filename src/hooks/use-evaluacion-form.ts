@@ -178,7 +178,8 @@ export function useEvaluacionForm() {
         const requestBody = {
           contenido: JSON.stringify(formData.contenido),
           preguntas: preguntasExtraidas,
-          respuestasCorrectas: formData.respuestasCorrectas
+          respuestasCorrectas: formData.respuestasCorrectas,
+          matrizId: selectedMatriz?.id || null
         }
         console.log('Datos a enviar:', requestBody)
         const evaluacionResponse = await fetch(`/api/evaluaciones/${evaluacionId}`, {

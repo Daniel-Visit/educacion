@@ -641,3 +641,103 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 **Estado:** 📋 Planificado  
 **Última actualización:** Julio 2025  
 **Responsable:** Equipo de Desarrollo 
+
+# TAREAS PENDIENTES
+
+## 🎯 **HOMOLOGACIÓN DE HEADERS - PRIORIDAD ALTA**
+
+### **Objetivo**
+Homologar todos los headers de la plataforma al estilo del componente `ResultadosHeader` para mantener consistencia visual en toda la aplicación.
+
+### **Componente de Referencia**
+- **Archivo**: `src/components/resultados/ResultadosHeader.tsx`
+- **Estilo**: Gradiente emerald-teal, icono con fondo blanco/20, contador en esquina superior derecha
+- **Props**: `title`, `subtitle`, `icon`, `totalCount`, `totalLabel`, `showBackButton`, `showExportButton`
+
+### **Páginas a Homologar**
+
+#### **Páginas Principales**
+- [ ] `/matrices` - Listado de matrices
+- [ ] `/matrices/crear` - Crear matriz
+- [ ] `/matrices/[id]` - Ver matriz específica
+- [ ] `/matrices/[id]/editar` - Editar matriz
+- [ ] `/evaluaciones` - Listado de evaluaciones
+- [ ] `/evaluaciones/crear` - Crear evaluación
+- [ ] `/evaluaciones/[id]` - Ver evaluación específica
+- [ ] `/evaluaciones/[id]/editar` - Editar evaluación
+
+#### **Páginas de Gestión**
+- [ ] `/horarios` - Gestión de horarios
+- [ ] `/planificacion-anual` - Planificación anual
+- [ ] `/planificacion-anual/listado` - Listado de planificaciones
+- [ ] `/editor` - Editor de contenido
+
+#### **Páginas de Administración**
+- [ ] `/asignaturas` - Gestión de asignaturas
+- [ ] `/profesores` - Gestión de profesores
+- [ ] `/niveles` - Gestión de niveles
+- [ ] `/metodologias` - Gestión de metodologías
+
+### **Criterios de Homologación**
+
+#### **Estructura Visual**
+```tsx
+<ResultadosHeader
+  title="Título de la Página"
+  subtitle="Descripción o instrucciones"
+  icon={<IconComponent className="h-6 w-6 text-white" />}
+  totalCount={count}
+  totalLabel="Etiqueta del Contador"
+  showBackButton={true} // Si aplica
+  showExportButton={true} // Si aplica
+/>
+```
+
+#### **Gradientes por Categoría**
+- **Evaluaciones**: `from-emerald-600 to-teal-600` (actual)
+- **Matrices**: `from-blue-600 to-indigo-600`
+- **Horarios**: `from-purple-600 to-pink-600`
+- **Planificación**: `from-orange-600 to-red-600`
+- **Administración**: `from-gray-600 to-slate-600`
+
+#### **Iconos Sugeridos**
+- **Matrices**: `Grid3X3` o `Table`
+- **Evaluaciones**: `FileText` o `ClipboardList`
+- **Horarios**: `Calendar` o `Clock`
+- **Planificación**: `CalendarDays` o `Target`
+- **Administración**: `Settings` o `Database`
+
+### **Beneficios Esperados**
+- 🎨 **Consistencia visual** en toda la plataforma
+- 🧩 **Componentes reutilizables** y mantenibles
+- 📱 **Experiencia de usuario** mejorada
+- 🔧 **Desarrollo más eficiente** con patrones establecidos
+
+### **Notas Técnicas**
+- Mantener la funcionalidad existente intacta
+- Solo cambiar la presentación visual del header
+- Asegurar que los contadores muestren información relevante
+- Considerar responsive design en todos los headers
+
+---
+
+## 📋 **OTRAS TAREAS PENDIENTES**
+
+### **Refactorización de Componentes**
+- [ ] Refactorizar página de carga de resultados usando componentes reutilizables
+- [ ] Crear componentes comunes para formularios (inputs, selects, etc.)
+- [ ] Estandarizar modales y diálogos
+
+### **Mejoras de UX/UI**
+- [ ] Implementar skeleton loading en todas las páginas
+- [ ] Mejorar feedback visual en formularios
+- [ ] Optimizar responsive design en móviles
+
+### **Testing**
+- [ ] Completar tests de integración para flujos principales
+- [ ] Agregar tests unitarios para componentes reutilizables
+- [ ] Implementar tests E2E para flujos críticos
+
+---
+
+*Última actualización: $(date)* 

@@ -149,6 +149,61 @@ function useEvaluacionContext() {
 }
 ```
 
+### 5. Reusable Components Pattern
+```tsx
+// Componente base reutilizable
+function ResultadosHeader({ 
+  title, 
+  subtitle, 
+  icon, 
+  totalCount, 
+  totalLabel,
+  showBackButton,
+  showExportButton 
+}) {
+  return (
+    <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-6 text-white shadow-lg">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="bg-white/20 p-2 rounded-lg">
+            {icon}
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold">{title}</h1>
+            {subtitle && <p className="text-emerald-100 text-sm">{subtitle}</p>}
+          </div>
+        </div>
+        <div className="bg-white/10 rounded-lg p-3">
+          <div className="flex items-center gap-2">
+            <div>
+              <p className="text-emerald-200 text-xs">{totalLabel}</p>
+              <p className="text-lg font-bold">{totalCount}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Uso consistente en toda la aplicación
+function GraficosPage() {
+  return (
+    <div>
+      <ResultadosHeader
+        title="Gráficos de Resultados"
+        subtitle="Análisis visual de rendimiento"
+        icon={<BarChart3 className="h-6 w-6 text-white" />}
+        totalCount={totalAlumnos}
+        totalLabel="Total Estudiantes"
+        showBackButton={true}
+      />
+      {/* Contenido de la página */}
+    </div>
+  )
+}
+```
+
 ## 📁 Estructura de Código
 
 ### Organización de Carpetas
@@ -168,6 +223,13 @@ src/
 │   ├── editor/                   # Componentes del editor
 │   ├── evaluacion/               # Componentes de evaluaciones
 │   ├── entrevista/               # Componentes de entrevista
+│   ├── resultados/               # Componentes reutilizables de resultados
+│   │   ├── ResultadosHeader.tsx  # Header consistente para páginas
+│   │   ├── LoadingState.tsx      # Estado de carga uniforme
+│   │   ├── ErrorState.tsx        # Estado de error consistente
+│   │   ├── SuccessState.tsx      # Estado de éxito uniforme
+│   │   ├── ModalHeader.tsx       # Header para modales
+│   │   └── index.ts              # Exportaciones centralizadas
 │   ├── tiptap-ui/                # Componentes UI de TipTap
 │   └── ui/                       # Componentes UI base
 ├── hooks/                        # Hooks personalizados
@@ -178,6 +240,7 @@ src/
 ├── lib/                          # Utilidades y configuraciones
 │   ├── prisma.ts                 # Cliente de Prisma
 │   ├── extract-evaluacion.ts     # Extractor de preguntas
+│   ├── resultados-utils.ts       # Utilidades para resultados y estadísticas
 │   └── tiptap-utils.ts           # Utilidades de TipTap
 └── styles/                       # Estilos globales
     ├── _variables.scss           # Variables CSS
