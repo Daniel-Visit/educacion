@@ -5,6 +5,43 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.5] - 2025-07-19
+
+### ✨ **Nuevas Funcionalidades**
+- **Tooltips de Preguntas:** Implementación de tooltips interactivos que muestran el texto real de las preguntas al hacer hover sobre los números en la tabla de resultados
+- **Nueva API Endpoint:** `/api/evaluaciones/:id/preguntas` para obtener preguntas de evaluaciones específicas
+- **Hook Personalizado:** `useEvaluacionData` para manejo centralizado de datos de evaluaciones
+
+### 🔧 **Mejoras**
+- **Refactorización Completa:** Página de gráficos refactorizada de 742 a 541 líneas (27% reducción)
+- **Componentes Reutilizables:** Nuevos componentes `ErrorDisplay` y `QuestionTooltip`
+- **Separación de Responsabilidades:** Lógica de datos separada de UI mediante hook personalizado
+- **Eliminación de Código Duplicado:** Estados de error unificados y código duplicado eliminado
+
+### 🎨 **UI/UX**
+- **Tooltips Mejorados:** Posicionamiento correcto, sin flecha, cursor pointer, texto en formato original
+- **Responsive Design:** Tooltips con ancho ajustable (`min-w-sm max-w-xl`)
+- **Transiciones Suaves:** Opacidad en hover para mejor experiencia visual
+
+### 🐛 **Correcciones**
+- **CSS Inline:** Corregido uso de CSS inline en favor de clases de Tailwind
+- **Logs de Debug:** Limpieza de logs excesivos para mejor rendimiento
+- **Manejo de Errores:** Mejorado manejo de errores sin romper la UI
+
+### 📚 **Documentación**
+- **API.md:** Documentación de nueva API de preguntas
+- **HOOKS.md:** Documentación del hook `useEvaluacionData`
+- **RESUMEN_EJECUTIVO_HOY.md:** Actualizado con cambios de hoy
+- **TAREAS_PENDIENTES.md:** Marcadas como completadas las tareas de refactorización
+
+### 🔍 **Detalles Técnicos**
+- **APIs:** Nueva API que retorna array directo de preguntas ordenadas por número
+- **Componentes:** 3 nuevos componentes reutilizables creados
+- **Hooks:** 1 nuevo hook personalizado para manejo de datos
+- **Líneas de Código:** 201 líneas eliminadas, código más mantenible
+
+---
+
 ## [1.1.4] - 2025-07-18
 
 ### 🎨 Refactorización de Componentes

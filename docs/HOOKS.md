@@ -213,6 +213,93 @@ function PreguntasSidebar({ preguntas, onPreguntasChange }) {
 }
 ```
 
+### useEvaluacionData
+**Ubicación:** `src/hooks/use-evaluacion-data.ts`
+
+Hook personalizado para manejar la carga de datos de evaluaciones y preguntas.
+
+**Propósito:** Centralizar la lógica de carga de datos de evaluaciones, incluyendo resultados y preguntas.
+
+**Parámetros:**
+- `evaluacionId` (string | number): ID de la evaluación a cargar
+
+**Retorna:**
+```typescript
+{
+  resultadoData: ResultadoAlumno[] | null;
+  preguntas: Pregunta[] | null;
+  loading: boolean;
+  error: string | null;
+}
+```
+
+**Tipos:**
+```typescript
+interface ResultadoAlumno {
+  id: number;
+  alumno: {
+    rut: string;
+    nombre: string;
+    apellido: string;
+  };
+  puntajeTotal: number;
+  puntajeMaximo: number;
+  porcentaje: number;
+  nota: number;
+  respuestas: RespuestaAlumno[];
+}
+
+interface Pregunta {
+  id: number;
+  numero: number;
+  texto: string;
+}
+
+interface RespuestaAlumno {
+  id: number;
+  preguntaId: number;
+  alternativaDada: string;
+  esCorrecta: boolean;
+  puntajeObtenido: number;
+}
+```
+
+**Características:**
+- ✅ **Carga paralela:** Resultados y preguntas se cargan simultáneamente
+- ✅ **Error handling:** Manejo robusto de errores sin romper UI
+- ✅ **Transformación de datos:** Convierte datos al formato esperado
+- ✅ **Estados de carga:** Loading, error y success manejados
+- ✅ **Reutilizable:** Se puede usar en múltiples componentes
+
+**Ejemplo de uso:**
+```tsx
+import { useEvaluacionData } from '@/hooks/use-evaluacion-data';
+
+function GraficosPage({ params }: { params: { id: string } }) {
+  const { resultadoData, preguntas, loading, error } = useEvaluacionData(params.id);
+
+  if (loading) return <LoadingState />;
+  if (error) return <ErrorDisplay message={error} />;
+  if (!resultadoData || !preguntas) return <ErrorDisplay message="No se encontraron datos" />;
+
+  return (
+    <div>
+      {/* Renderizar tabla con resultadoData y preguntas */}
+    </div>
+  );
+}
+```
+
+**APIs utilizadas:**
+- `GET /api/evaluaciones/:id/resultados` - Para obtener resultados
+- `GET /api/evaluaciones/:id/preguntas` - Para obtener preguntas
+
+**Beneficios:**
+- **Separación de responsabilidades:** Lógica de datos separada de UI
+- **Reutilización:** Se puede usar en múltiples páginas
+- **Testing:** Fácil de testear de forma aislada
+- **Mantenibilidad:** Cambios en APIs solo requieren modificar el hook
+
 ## 🎤 Hooks de Entrevista
 
 ### useInterview

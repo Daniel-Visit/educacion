@@ -765,3 +765,86 @@ console.error(`[API Error] ${method} ${path}:`, error)
 - [ ] Métricas en tiempo real
 - [ ] Backup automático de datos
 - [ ] API para exportación masiva 
+
+## 📋 **APIs de Evaluaciones**
+
+### **GET /api/evaluaciones**
+Obtiene todas las evaluaciones con información básica.
+
+**Respuesta:**
+```json
+[
+  {
+    "id": 8,
+    "titulo": "Prueba 3",
+    "matrizNombre": "Matriz de Prueba desde Script",
+    "preguntasCount": 20,
+    "createdAt": "2025-07-05T05:33:42.091Z"
+  }
+]
+```
+
+### **GET /api/evaluaciones/:id/resultados**
+Obtiene los resultados de una evaluación específica.
+
+**Respuesta:**
+```json
+[
+  {
+    "id": 153,
+    "alumno": {
+      "rut": "1-1752891726239",
+      "nombre": "Ashley",
+      "apellido": "Amira Sepulveda Morales"
+    },
+    "puntajeTotal": 20,
+    "puntajeMaximo": 20,
+    "porcentaje": 100,
+    "nota": 7,
+    "respuestas": [
+      {
+        "id": 2973,
+        "preguntaId": 1,
+        "alternativaDada": "A",
+        "esCorrecta": true,
+        "puntajeObtenido": 1
+      }
+    ]
+  }
+]
+```
+
+### **GET /api/evaluaciones/:id/preguntas** ⭐ **NUEVO**
+Obtiene las preguntas de una evaluación específica.
+
+**Parámetros:**
+- `id` (path): ID de la evaluación
+
+**Respuesta:**
+```json
+[
+  {
+    "id": 144,
+    "numero": 1,
+    "texto": "¿A qué se dirigía la lechera al mercado?"
+  },
+  {
+    "id": 145,
+    "numero": 2,
+    "texto": "¿Qué iba haciendo la lechera mientras se dirigía al mercado?"
+  }
+]
+```
+
+**Características:**
+- ✅ **Ordenado por:** Número de pregunta
+- ✅ **Error handling:** Array vacío en caso de error
+- ✅ **Formato consistente:** Array directo (no objeto)
+- ✅ **Uso:** Tooltips en página de gráficos de resultados
+
+**Ejemplo de uso:**
+```typescript
+const response = await fetch(`/api/evaluaciones/${evaluacionId}/preguntas`);
+const preguntas = await response.json();
+// preguntas es un array de { id, numero, texto }
+``` 
