@@ -1,38 +1,93 @@
-﻿id;nivel_id;asignatura_id;eje_id;eje_descripcion;oas_id;descripcion_oas;basal;minimo_clases
-1;2;7;1;Lectura - Comprensión;OA 01;Leer textos significativos que incluyan palabras con hiatos y diptongos, con grupos consonánticos y con combinación ce-ci, que-qui, ge-gi, gue-gui, güe-güi.;true;10
-2;2;7;1;Lectura - Comprensión;OA 02;Leer en voz alta para adquirir fluidez;false;8
-3;2;7;1;Lectura - Comprensión;OA 03;Comprender textos aplicando estrategias de comprensión lectora;true;11
-4;2;7;1;Lectura - Comprensión;OA 04;Leer independientemente y ampliar repertorio de lecturas;true;11
-5;2;7;1;Lectura - Comprensión;OA 05;Demostrar comprensión de las narraciones leídas;true;11
-6;2;7;1;Lectura - Comprensión;OA 06;Leer habitualmente y disfrutar los mejores poemas de autor y de la tradición oral adecuados a su edad.;false;8
-7;2;7;1;Lectura - Comprensión;OA 07;Leer independientemente y comprender textos no literarios;false;8
-8;2;7;1;Lectura - Comprensión;OA 08;Desarrollar el gusto por la lectura, leyendo habitualmente diversos textos.;true;10
-9;2;7;1;Lectura - Comprensión;OA 09;Asistir habitualmente a la biblioteca para encontrar información y elegir libros, cuidando el material en favor del uso común.;true;10
-10;2;7;1;Lectura - Comprensión;OA 10;Buscar información sobre un tema en una fuente dada por el docente (página de internet, sección del diario, capítulo de un libro, etc.), para llevar a cabo una investigación.;true;10
-11;2;7;1;Lectura - Comprensión;OA 11;Desarrollar la curiosidad por las palabras o expresiones que desconocen y adquirir el hábito de averiguar su significado.;true;10
-12;2;7;1;Lectura - Comprensión;OA 12;Escribir frecuentemente, para desarrollar la creatividad y expresar sus ideas, textos como poemas, diarios de vida, anécdotas, cartas, recados, etc.;false;8
-13;2;7;2;Escritura - Producción;OA 13;Escribir creativamente narraciones (experiencias personales, relatos de hechos, cuentos, etc.) que tengan inicio, desarrollo y desenlace.;true;10
-14;2;7;2;Escritura - Producción;OA 14;Escribir artículos informativos para comunicar información sobre un tema.;false;8
-15;2;7;2;Escritura - Producción;OA 15;Escribir con letra clara, separando las palabras con un espacio para que puedan ser leídas por otros con facilidad.;false;8
-16;2;7;2;Escritura - Producción;OA 16;Planificar la escritura;false;8
-17;2;7;2;Escritura - Producción;OA 17;Revisión y edición de textos propios para transmitir ideas claramente;false;8
-18;2;7;2;Escritura - Producción;OA 18;Incorporar de manera pertinente en la escritura el vocabulario nuevo extraído de textos escuchados o leídos.;true;10
-19;2;7;2;Escritura - Producción;OA 19;Comprender la función de los artículos, sustantivos y adjetivos en textos orales y escritos, y reemplazarlos o combinarlos de diversas maneras para enriquecer o precisar sus producciones.;false;8
-20;2;7;2;Escritura - Producción;OA 20;Identificar el género y número de las palabras para asegurar la concordancia en sus escritos.;false;8
-21;2;7;2;Escritura - Producción;OA 21;Escribir correctamente para facilitar la comprensión al lector;true;10
-22;2;7;2;Escritura - Producción;OA 22;Comprender y disfrutar versiones completas de obras narradas por un adulto;false;8
-23;2;7;3;Comunicación oral;OA 23;Comprender textos orales para obtener información y desarrollar curiosidad;true;10
-24;2;7;3;Comunicación oral;OA 24;Disfrutar de la experiencia de asistir a obras de teatro infantiles o representaciones para ampliar sus posibilidades de expresión, desarrollar su creatividad y familiarizarse con el género.;false;8
-25;2;7;3;Comunicación oral;OA 25;Participar activamente en conversaciones grupales sobre textos;true;10
-26;2;7;3;Comunicación oral;OA 26;Interactuar según convenciones sociales en diferentes situaciones;false;8
-27;2;7;3;Comunicación oral;OA 27;Expresarse coherente y articuladamente sobre temas de interés;false;8
-28;2;7;3;Comunicación oral;OA 28;Incorporar de manera pertinente en sus intervenciones orales el vocabulario nuevo extraído de textos escuchados o leídos.;false;8
-29;2;7;3;Comunicación oral;OA 29;Desempeñar diferentes roles para desarrollar su lenguaje y autoestima, y aprender a trabajar en equipo.;false;8
-30;2;7;3;Comunicación oral;OA 30;Recitar con entonación y expresión poemas, rimas, canciones, trabalenguas y adivinanzas para fortalecer la confianza en sí mismos, aumentar el vocabulario y desarrollar su capacidad expresiva.;false;8
-31;2;7;4;Actitud;OAA A;Demostrar interés y una actitud activa frente a la lectura, orientada al disfrute de la misma y a la valoración del conocimiento que se puede obtener a partir de ella.;false;5
-32;2;7;4;Actitud;OAA B;Demostrar disposición e interés por compartir ideas, experiencias y opiniones con otros.;false;5
-33;2;7;4;Actitud;OAA C;Demostrar disposición e interés por expresarse de manera creativa por medio de la comunicación oral y escrita.;false;5
-34;2;7;4;Actitud;OAA D;Realizar tareas y trabajos de forma rigurosa y perseverante, con el fin de desarrollarlos de manera adecuada a los propósitos de la asignatura.;false;5
-35;2;7;4;Actitud;OAA E;Reflexionar sobre sí mismo, sus ideas y sus intereses para comprenderse y valorarse.;false;5
-36;2;7;4;Actitud;OAA F;Demostrar empatía hacia los demás, comprendiendo el contexto en el que se sitúan.;false;5
-37;2;7;4;Actitud;OAA G;Demostrar respeto por las diversas opiniones y puntos de vista, reconociendo el diálogo como una herramienta de enriquecimiento personal y social.;false;5
+﻿id;nivel_id;asignatura_id;eje_id;eje_descripcion;tipo_eje;oas_id;descripcion_oas;basal;minimo_clases
+1;2;7;1;Lectura - Comprensión;Contenido;OA 01;Leer textos significativos que incluyan palabras con hiatos y diptongos, con grupos consonánticos y con combinación ce-ci, que-qui, ge-gi, gue-gui, güe-güi.;TRUE;10
+2;2;7;1;Lectura - Comprensión;Contenido;OA 02;Leer en voz alta para adquirir fluidez;FALSE;8
+3;2;7;1;Lectura - Comprensión;Contenido;OA 03;Comprender textos aplicando estrategias de comprensión lectora;TRUE;11
+4;2;7;1;Lectura - Comprensión;Contenido;OA 04;Leer independientemente y ampliar repertorio de lecturas;TRUE;11
+5;2;7;1;Lectura - Comprensión;Contenido;OA 05;Demostrar comprensión de las narraciones leídas;TRUE;11
+6;2;7;1;Lectura - Comprensión;Contenido;OA 06;Leer habitualmente y disfrutar los mejores poemas de autor y de la tradición oral adecuados a su edad.;FALSE;8
+7;2;7;1;Lectura - Comprensión;Contenido;OA 07;Leer independientemente y comprender textos no literarios;FALSE;8
+8;2;7;1;Lectura - Comprensión;Contenido;OA 08;Desarrollar el gusto por la lectura, leyendo habitualmente diversos textos.;TRUE;10
+9;2;7;1;Lectura - Comprensión;Contenido;OA 09;Asistir habitualmente a la biblioteca para encontrar información y elegir libros, cuidando el material en favor del uso común.;TRUE;10
+10;2;7;1;Lectura - Comprensión;Contenido;OA 10;Buscar información sobre un tema en una fuente dada por el docente (página de internet, sección del diario, capítulo de un libro, etc.), para llevar a cabo una investigación.;TRUE;10
+11;2;7;1;Lectura - Comprensión;Contenido;OA 11;Desarrollar la curiosidad por las palabras o expresiones que desconocen y adquirir el hábito de averiguar su significado.;TRUE;10
+12;2;7;1;Lectura - Comprensión;Contenido;OA 12;Escribir frecuentemente, para desarrollar la creatividad y expresar sus ideas, textos como poemas, diarios de vida, anécdotas, cartas, recados, etc.;FALSE;8
+13;2;7;2;Escritura - Producción;Contenido;OA 13;Escribir creativamente narraciones (experiencias personales, relatos de hechos, cuentos, etc.) que tengan inicio, desarrollo y desenlace.;TRUE;10
+14;2;7;2;Escritura - Producción;Contenido;OA 14;Escribir artículos informativos para comunicar información sobre un tema.;FALSE;8
+15;2;7;2;Escritura - Producción;Contenido;OA 15;Escribir con letra clara, separando las palabras con un espacio para que puedan ser leídas por otros con facilidad.;FALSE;8
+16;2;7;2;Escritura - Producción;Contenido;OA 16;Planificar la escritura;FALSE;8
+17;2;7;2;Escritura - Producción;Contenido;OA 17;Revisión y edición de textos propios para transmitir ideas claramente;FALSE;8
+18;2;7;2;Escritura - Producción;Contenido;OA 18;Incorporar de manera pertinente en la escritura el vocabulario nuevo extraído de textos escuchados o leídos.;TRUE;10
+19;2;7;2;Escritura - Producción;Contenido;OA 19;Comprender la función de los artículos, sustantivos y adjetivos en textos orales y escritos, y reemplazarlos o combinarlos de diversas maneras para enriquecer o precisar sus producciones.;FALSE;8
+20;2;7;2;Escritura - Producción;Contenido;OA 20;Identificar el género y número de las palabras para asegurar la concordancia en sus escritos.;FALSE;8
+21;2;7;2;Escritura - Producción;Contenido;OA 21;Escribir correctamente para facilitar la comprensión al lector;TRUE;10
+22;2;7;2;Escritura - Producción;Contenido;OA 22;Comprender y disfrutar versiones completas de obras narradas por un adulto;FALSE;8
+23;2;7;3;Comunicación oral;Contenido;OA 23;Comprender textos orales para obtener información y desarrollar curiosidad;TRUE;10
+24;2;7;3;Comunicación oral;Contenido;OA 24;Disfrutar de la experiencia de asistir a obras de teatro infantiles o representaciones para ampliar sus posibilidades de expresión, desarrollar su creatividad y familiarizarse con el género.;FALSE;8
+25;2;7;3;Comunicación oral;Contenido;OA 25;Participar activamente en conversaciones grupales sobre textos;TRUE;10
+26;2;7;3;Comunicación oral;Contenido;OA 26;Interactuar según convenciones sociales en diferentes situaciones;FALSE;8
+27;2;7;3;Comunicación oral;Contenido;OA 27;Expresarse coherente y articuladamente sobre temas de interés;FALSE;8
+28;2;7;3;Comunicación oral;Contenido;OA 28;Incorporar de manera pertinente en sus intervenciones orales el vocabulario nuevo extraído de textos escuchados o leídos.;FALSE;8
+29;2;7;3;Comunicación oral;Contenido;OA 29;Desempeñar diferentes roles para desarrollar su lenguaje y autoestima, y aprender a trabajar en equipo.;FALSE;8
+30;2;7;3;Comunicación oral;Contenido;OA 30;Recitar con entonación y expresión poemas, rimas, canciones, trabalenguas y adivinanzas para fortalecer la confianza en sí mismos, aumentar el vocabulario y desarrollar su capacidad expresiva.;FALSE;8
+31;2;7;4;Actitud;Actitud;OAA A;Demostrar interés y una actitud activa frente a la lectura, orientada al disfrute de la misma y a la valoración del conocimiento que se puede obtener a partir de ella.;FALSE;5
+32;2;7;4;Actitud;Actitud;OAA B;Demostrar disposición e interés por compartir ideas, experiencias y opiniones con otros.;FALSE;5
+33;2;7;4;Actitud;Actitud;OAA C;Demostrar disposición e interés por expresarse de manera creativa por medio de la comunicación oral y escrita.;FALSE;5
+34;2;7;4;Actitud;Actitud;OAA D;Realizar tareas y trabajos de forma rigurosa y perseverante, con el fin de desarrollarlos de manera adecuada a los propósitos de la asignatura.;FALSE;5
+35;2;7;4;Actitud;Actitud;OAA E;Reflexionar sobre sí mismo, sus ideas y sus intereses para comprenderse y valorarse.;FALSE;5
+36;2;7;4;Actitud;Actitud;OAA F;Demostrar empatía hacia los demás, comprendiendo el contexto en el que se sitúan.;FALSE;5
+37;2;7;4;Actitud;Actitud;OAA G;Demostrar respeto por las diversas opiniones y puntos de vista, reconociendo el diálogo como una herramienta de enriquecimiento personal y social.;FALSE;5
+38;2;9;1;Números y operaciones;Contenido;OA 01;Contar números del 0 al 1 000 de 2 en 2, de 5 en 5, de 10 en 10 y de 100 en 100, hacia adelante y hacia atrás, empezando por cualquier número menor que 1 000.;FALSE;8
+39;2;9;1;Números y operaciones;Contenido;OA 02;Leer números del 0 al 100 y representarlos en forma concreta, pictórica y simbólica.;TRUE;9
+40;2;9;1;Números y operaciones;Contenido;OA 03;Comparar y ordenar números del 0 al 100 de menor a mayor y viceversa, usando material concreto y monedas nacionales de manera manual y/o por medio de software educativo.;TRUE;9
+41;2;9;1;Números y operaciones;Contenido;OA 04;Estimar cantidades hasta 100 en situaciones concretas, usando un referente.;FALSE;8
+42;2;9;1;Números y operaciones;Contenido;OA 05;Componer y descomponer números del 0 a 100 de manera aditiva, en forma concreta, pictórica y simbólica.;TRUE;9
+43;2;9;1;Números y operaciones;Contenido;OA 06;"Describir y aplicar estrategias de cálculo mental para adiciones y sustracciones hasta 20:
+
+completar 10
+usar dobles y mitades
+""uno más uno menos""
+""dos más dos menos""
+usar la reversibilidad de las operaciones.";FALSE;8
+44;2;9;1;Números y operaciones;Contenido;OA 07;Identificar las unidades y decenas en números del 0 al 100, representando las cantidades de acuerdo a su valor posicional, con material concreto, pictórico y simbólico.;TRUE;9
+45;2;9;1;Números y operaciones;Contenido;OA 08;Demostrar y explicar de manera concreta, pictórica y simbólica el efecto de sumar y restar 0 a un número.;FALSE;9
+46;2;9;1;Números y operaciones;Contenido;OA 09;"Demostrar que comprende la adición y la sustracción en el ámbito del 0 al 100:
+
+usando un lenguaje cotidiano y matemático para describir acciones desde su propia experiencia
+resolviendo problemas con una variedad de representaciones concretas y pictóricas, de manera manual y/o usando software educativo
+registrando el proceso en forma simbólica
+aplicando los resultados de las adiciones y sustracciones de los números del 0 a 20 sin realizar cálculos
+aplicando el algoritmo de la adición y sustracción sin considerar reserva
+creando problemas matemáticos en contextos familiares y resolviéndolos.";TRUE;9
+47;2;9;1;Números y operaciones;Contenido;OA 10;"Demostrar que comprende la relación entre la adición y la sustracción al usar la ""familia de operaciones"" en cálculos aritméticos y la resolución de problemas.";FALSE;9
+48;2;9;1;Números y operaciones;Contenido;OA 11;"Demostrar que comprende la multiplicación:
+
+usando representaciones concretas y pictóricas
+expresando una multiplicación como una adición de sumandos iguales
+usando la distributividad como estrategia para construir las tablas del 2, del 5 y del 10
+resolviendo problemas que involucren las tablas del 2, del 5 y del 10.";TRUE;9
+49;2;9;2;Patrones y Álgebra;Contenido;OA 12;Crear, representar y continuar una variedad de patrones numéricos y completar los elementos faltantes, de manera manual y/o usando software educativo.;TRUE;9
+50;2;9;2;Patrones y Álgebra;Contenido;OA 13;Demostrar, explicar y registrar la igualdad y la desigualdad en forma concreta y pictórica del 0 al 20, usando el símbolo igual (=) y los símbolos no igual (>, <).;TRUE;9
+51;2;9;3;Geometría;Contenido;OA 14;Representar y describir la posición de objetos y personas en relación a sí mismos y a otros objetos y personas, incluyendo derecha e izquierda y usando material concreto y dibujos.;FALSE;8
+52;2;9;3;Geometría;Contenido;OA 15;Describir, comparar y construir figuras 2D (triángulos, cuadrados, rectángulos y círculos) con material concreto.;TRUE;9
+53;2;9;3;Geometría;Contenido;OA 16;Describir, comparar y construir figuras 3D (cubos, paralelepípedos, esferas y conos) con diversos materiales.;TRUE;9
+54;2;9;4;Medición;Contenido;OA 17;Identificar días, semanas, meses y fechas en el calendario.;FALSE;8
+55;2;9;4;Medición;Contenido;OA 18;Leer horas y medias horas en relojes digitales, en el contexto de la resolución de problemas.;FALSE;9
+56;2;9;4;Medición;Contenido;OA 19;Determinar la longitud de objetos, usando unidades de medidas no estandarizadas y unidades estandarizadas (cm y m), en el contexto de la resolución de problemas.;TRUE;9
+57;2;9;5;Datos y probabilidades;Contenido;OA 20;Recolectar y registrar datos para responder preguntas estadísticas sobre juegos con monedas y dados, usando bloques y tablas de conteo y pictogramas.;TRUE;9
+58;2;9;5;Datos y probabilidades;Contenido;OA 21;Registrar en tablas y gráficos de barra simple, resultados de juegos aleatorios con dados y monedas.;FALSE;8
+59;2;9;5;Datos y probabilidades;Contenido;OA 22;Construir, leer e interpretar pictogramas con escala y gráficos de barra simple.;TRUE;9
+60;2;9;6;Argumentar y comunicar;Habilidad;OAH C;Describir situaciones de la realidad con lenguaje matemático.;FALSE;0
+61;2;9;6;Argumentar y comunicar;Habilidad;OAH D;Comunicar el resultado de descubrimientos de relaciones, patrones y reglas, entre otros, empleando expresiones matemáticas.;FALSE;0
+62;2;9;6;Argumentar y comunicar;Habilidad;OAH E;Explicar las soluciones propias y los procedimientos utilizados.;FALSE;0
+63;2;9;7;Modelar;Habilidad;OAH F;Aplicar y seleccionar modelos que involucren sumas, restas y orden de cantidades.;FALSE;0
+64;2;9;7;Modelar;Habilidad;OAH G;Expresar, a partir de representaciones pictóricas y explicaciones dadas, acciones y situaciones cotidianas en lenguaje matemático.;FALSE;0
+65;2;9;8;Representar;Habilidad;OAH H;Elegir y utilizar representaciones concretas, pictóricas y simbólicas para representar enunciados.;FALSE;0
+66;2;9;8;Representar;Habilidad;OAH I;Crear un relato basado en una expresión matemática simple.;FALSE;0
+67;2;9;9;Resolver problemas;Habilidad;OAH A;"Emplear diversas estrategias para resolver problemas: a través de ensayo y error; aplicando conocimientos adquiridos.";FALSE;0
+68;2;9;9;Resolver problemas;Habilidad;OAH B;Comprobar enunciados, usando material concreto y gráfico.;FALSE;0
+69;2;9;10;Actitud;Actitud;OAA A;Manifestar un estilo de trabajo ordenado y metódico.;FALSE;6
+70;2;9;10;Actitud;Actitud;OAA B;Abordar de manera flexible y creativa la búsqueda de soluciones a problemas.;FALSE;6
+71;2;9;10;Actitud;Actitud;OAA C;Manifestar curiosidad e interés por el aprendizaje de las matemáticas.;FALSE;6
+72;2;9;10;Actitud;Actitud;OAA D;Manifestar una actitud positiva frente a sí mismo y sus capacidades.;FALSE;6
+73;2;9;10;Actitud;Actitud;OAA E;Demostrar una actitud de esfuerzo y perseverancia.;FALSE;6
+74;2;9;10;Actitud;Actitud;OAA F;Expresar y escuchar ideas de forma respetuosa.;FALSE;6

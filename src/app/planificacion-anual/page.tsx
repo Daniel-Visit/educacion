@@ -10,7 +10,7 @@ import { usePlanificacionAnual } from "@/hooks/use-planificacion-anual";
 import { useHorarios } from "@/hooks/use-horarios";
 import GlobalDropdown from "@/components/ui/GlobalDropdown";
 import { useSearchParams } from "next/navigation";
-import { CloudUpload, Save } from "lucide-react";
+import { CloudUpload, Save, Calendar, FileText, Clock } from "lucide-react";
 import PrimaryButton from "@/components/ui/PrimaryButton";
 
 export default function PlanificacionAnualPage() {
@@ -164,34 +164,29 @@ export default function PlanificacionAnualPage() {
 
   return (
     <div className="p-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-indigo-700 mb-1">
-            Planificación Anual
-          </h1>
-          <p className="text-gray-500 text-base mb-2">
-            Gestiona la planificación anual de clases
-          </p>
-          {planificacionActual && (
-            <div className="mt-3 p-3 bg-indigo-50 border border-indigo-200 rounded-lg">
-              <p className="text-indigo-800 text-sm">
-                <strong>Editando:</strong> {planificacionActual.nombre}
-                <span className="ml-2 text-indigo-600">
-                  (Creada:{" "}
-                  {new Date(planificacionActual.createdAt).toLocaleDateString()}
-                  )
-                </span>
+      {/* Header moderno */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white shadow-lg mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <div className="bg-white/20 p-2 rounded-lg">
+              <Calendar className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white mb-1">
+                Planificación Anual
+              </h1>
+              <p className="text-indigo-100 text-sm">
+                Gestiona la planificación anual de clases
               </p>
             </div>
-          )}
-        </div>
-        <div className="flex flex-row gap-3 w-full md:w-auto justify-end mt-14">
+          </div>
+          
+          {/* Botones de acción */}
           {horarioSeleccionado && (
-            <>
+            <div className="flex gap-3">
               <button
                 onClick={() => setShowImportModal(true)}
-                className="flex items-center justify-center gap-2 px-4 h-12 text-base font-medium bg-gradient-to-r from-green-600 to-emerald-500 text-white rounded-lg hover:bg-gradient-to-r hover:from-green-700 hover:to-emerald-600 transition-colors min-w-[160px]"
-                style={{ minHeight: "48px", height: "48px" }}
+                className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
               >
                 <CloudUpload className="w-4 h-4" />
                 Importar CSV
@@ -202,8 +197,7 @@ export default function PlanificacionAnualPage() {
                     setPlanificacionNombre(planificacionActual.nombre);
                     setShowSaveModal(true);
                   }}
-                  className="flex items-center justify-center gap-2 px-4 h-12 text-base font-medium bg-gradient-to-r  from-purple-600 to-pink-500 text-white rounded-lg hover:bg-gradient-to-r hover:from-blue-700 hover:to-indigo-600 transition-colors min-w-[180px]"
-                  style={{ minHeight: "48px", height: "48px" }}
+                  className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
                 >
                   <Save className="w-4 h-4" />
                   Actualizar
@@ -211,20 +205,71 @@ export default function PlanificacionAnualPage() {
               ) : (
                 <button
                   onClick={() => setShowSaveModal(true)}
-                  className="flex items-center justify-center gap-2 px-4 h-12 text-base font-medium bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-lg hover:bg-gradient-to-r hover:from-purple-700 hover:to-pink-600 transition-colors min-w-[180px]"
-                  style={{ minHeight: "48px", height: "48px" }}
+                  className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
                 >
                   <Save className="w-4 h-4" />
                   Guardar
                 </button>
               )}
-            </>
+            </div>
           )}
         </div>
+        
+        {/* Stats y información */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-indigo-200" />
+              <div>
+                <p className="text-indigo-200 text-xs">Horario Seleccionado</p>
+                <p className="text-lg font-bold">
+                  {horarioSeleccionado ? horarioSeleccionado.nombre : 'Ninguno'}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-indigo-200" />
+              <div>
+                <p className="text-indigo-200 text-xs">Estado</p>
+                <p className="text-lg font-bold">
+                  {planificacionActual ? 'Editando' : 'Nueva'}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-indigo-200" />
+              <div>
+                <p className="text-indigo-200 text-xs">Planificación</p>
+                <p className="text-lg font-bold">
+                  {planificacionActual ? planificacionActual.nombre : 'Sin guardar'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Información de edición */}
+        {planificacionActual && (
+          <div className="mt-4 p-3 bg-white/10 rounded-lg border border-white/20">
+            <p className="text-indigo-100 text-sm">
+              <strong>Editando:</strong> {planificacionActual.nombre}
+              <span className="ml-2 text-indigo-200">
+                (Creada: {new Date(planificacionActual.createdAt).toLocaleDateString()})
+              </span>
+            </p>
+          </div>
+                )}
       </div>
-      <div className="flex items-center gap-4 mb-6">
+      
+      <div className="mb-6">
         <label
-          className="text-base font-medium text-gray-700"
+          className="block text-sm font-medium text-gray-700 mb-2"
           htmlFor="horario-dropdown"
         >
           Selecciona un horario:
@@ -240,6 +285,7 @@ export default function PlanificacionAnualPage() {
           />
         </div>
       </div>
+
       {/* Modal de confirmación de selección de horario */}
       {showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 ">
@@ -302,7 +348,7 @@ export default function PlanificacionAnualPage() {
               }
               setOaDrawerOpen(true);
             }}
-            title="Objetivos de Aprendizaje"
+            title="Abrir Panel"
           />
         </div>
       </div>

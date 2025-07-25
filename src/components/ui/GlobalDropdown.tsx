@@ -33,6 +33,7 @@ export default function GlobalDropdown({
 }: Props) {
   const [buttonEl, setButtonEl] = React.useState<HTMLDivElement | null>(null);
   const [menuStyle, setMenuStyle] = React.useState<React.CSSProperties>({});
+  const [opensUp, setOpensUp] = React.useState(false);
 
   // Encontrar el label del valor actual
   const currentLabel = options.find(opt => getOptionValue(opt) === value);
@@ -41,16 +42,28 @@ export default function GlobalDropdown({
   const handleOpenChange = React.useCallback((isOpen: boolean) => {
     if (isOpen && buttonEl) {
       const rect = buttonEl.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const menuHeight = Math.min(options.length * 40 + 20, 240); // Altura estimada del menú (máx 240px)
+      
+      // Determinar si abrir hacia arriba o hacia abajo
+      const spaceBelow = viewportHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      const shouldOpenUp = spaceBelow < menuHeight && spaceAbove > menuHeight;
+      
+      setOpensUp(shouldOpenUp);
+      
       setMenuStyle({
         position: 'absolute',
-        top: rect.bottom + window.scrollY,
+        top: shouldOpenUp 
+          ? rect.top + window.scrollY - menuHeight 
+          : rect.bottom + window.scrollY,
         left: rect.left + window.scrollX,
         width: rect.width, // igualar ancho al botón
         minWidth: rect.width,
         zIndex: 9999
       });
     }
-  }, [buttonEl]);
+  }, [buttonEl, options.length]);
 
   return (
     <Listbox value={value} onChange={onChange} disabled={disabled} as={React.Fragment}>
@@ -64,7 +77,7 @@ export default function GlobalDropdown({
           <div className={`relative ${className}`} ref={setButtonEl}>
             <Listbox.Button className="w-full rounded-lg border px-3 py-2 bg-white text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed">
               <span className="truncate whitespace-nowrap block max-w-full">{currentLabel ? getOptionLabel(currentLabel) : <span className="text-gray-400">{placeholder}</span>}</span>
-              <ChevronDown className="w-5 h-5 text-gray-400 ml-2" />
+              <ChevronDown className={`w-5 h-5 text-gray-400 ml-2 transition-transform duration-200 ${opensUp ? 'rotate-180' : ''}`} />
             </Listbox.Button>
             {open && buttonEl && createPortal(
               <Listbox.Options style={menuStyle} className="bg-white border rounded-lg shadow-lg max-h-60 overflow-auto">

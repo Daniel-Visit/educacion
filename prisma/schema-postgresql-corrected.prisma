@@ -3,46 +3,29 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model asignatura {
-  id         Int                    @id @default(autoincrement())
-  nombre     String                 @unique
-  matrices   MatrizEspecificacion[]
+  id         Int                  @id @default(autoincrement())
+  nombre     String               @unique
   horarios   Horario[]
   oas        oa[]
   profesores ProfesorAsignatura[]
-  asignatura_niveles AsignaturaNivel[]
 
   @@map("asignatura")
 }
 
 model nivel {
-  id         Int                    @id @default(autoincrement())
-  nombre     String                 @unique
-  matrices   MatrizEspecificacion[]
+  id         Int             @id @default(autoincrement())
+  nombre     String          @unique
   alumnos    Alumno[]
   horarios   Horario[]
   oas        oa[]
   profesores ProfesorNivel[]
-  asignatura_niveles AsignaturaNivel[]
 
   @@map("nivel")
-}
-
-model AsignaturaNivel {
-  id              Int    @id @default(autoincrement())
-  asignatura_id   Int
-  nivel_id        Int
-  codigo          String @unique // "LE02", "MA02", "CI03", etc.
-  descripcion     String // "Lenguaje 2° Básico", "Matemáticas 2° Básico"
-  asignatura      asignatura @relation(fields: [asignatura_id], references: [id])
-  nivel           nivel @relation(fields: [nivel_id], references: [id])
-
-  @@unique([asignatura_id, nivel_id]) // Evitar duplicados
-  @@map("asignatura_nivel")
 }
 
 model metodologia {
@@ -61,7 +44,6 @@ model oa {
   asignatura_id   Int
   eje_id          Int
   eje_descripcion String
-  tipo_eje        String?        // Temporalmente opcional para migración
   oas_id          String
   descripcion_oas String
   basal           Boolean
@@ -77,12 +59,8 @@ model MatrizEspecificacion {
   id              Int          @id @default(autoincrement())
   nombre          String
   total_preguntas Int
-  asignatura_id   Int
-  nivel_id        Int
   createdAt       DateTime     @default(now())
   evaluaciones    Evaluacion[]
-  nivel           nivel        @relation(fields: [nivel_id], references: [id])
-  asignatura      asignatura   @relation(fields: [asignatura_id], references: [id])
   oas             MatrizOA[]
 }
 
@@ -246,16 +224,16 @@ model AsignacionOA {
 }
 
 model Alumno {
-  id         Int               @id @default(autoincrement())
-  rut        String            @unique(map: "sqlite_autoindex_alumno_1")
-  nombre     String
-  apellido   String
-  curso      String?
-  nivelId    Int?
-  createdAt  DateTime          @default(now())
-  updatedAt  DateTime          @updatedAt
+  id        Int      @id @default(autoincrement())
+  rut       String   @unique(map: "sqlite_autoindex_alumno_1")
+  nombre    String
+  apellido  String
+  curso     String?
+  nivelId   Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  nivel     nivel?   @relation(fields: [nivelId], references: [id])
   resultados ResultadoAlumno[]
-  nivel      nivel?            @relation(fields: [nivelId], references: [id])
 
   @@index([nivelId])
   @@map("alumno")
@@ -314,8 +292,8 @@ model ResultadoAlumno {
   porcentaje            Float
   nota                  Float
   respuestas            RespuestaAlumno[]
-  alumno                Alumno              @relation(fields: [alumnoId], references: [id], onDelete: Cascade)
   resultadoEvaluacion   ResultadoEvaluacion @relation(fields: [resultadoEvaluacionId], references: [id], onDelete: Cascade)
+  alumno                Alumno             @relation(fields: [alumnoId], references: [id], onDelete: Cascade)
 
   @@index([alumnoId])
   @@index([resultadoEvaluacionId])
@@ -333,4 +311,4 @@ model RespuestaAlumno {
 
   @@index([preguntaId])
   @@index([resultadoAlumnoId])
-}
+} 

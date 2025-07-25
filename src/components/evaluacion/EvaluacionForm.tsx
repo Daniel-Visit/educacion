@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save, AlertCircle, Check } from 'lucide-react';
+import { ArrowLeft, Save, AlertCircle, Check, FileText, Target, Clock } from 'lucide-react';
 import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import FabPlanificaciones from '@/components/editor/FabPlanificaciones';
@@ -235,37 +235,32 @@ export default function EvaluacionForm({
 
   return (
     <>
-      <div className="flex items-center justify-between pb-2">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => router.back()}
-            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h1 className="text-3xl font-bold text-indigo-700 mb-1">
-              {modoEdicion || evaluacionId ? 'Editar Evaluación' : 'Crear Nueva Evaluación'}
-            </h1>
-            <p className="text-gray-500 text-base">
-              {modoEdicion || evaluacionId
-                ? 'Edita tu evaluación existente'
-                : 'Crea una evaluación basada en una matriz de especificación'}
-            </p>
+      {/* Header moderno */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white shadow-lg mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.back()}
+              className="p-2 text-white/80 hover:bg-white/20 rounded-lg transition-all duration-200"
+            >
+              <ArrowLeft size={20} />
+            </button>
+            <div className="bg-white/20 p-2 rounded-lg">
+              <FileText className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white mb-1">
+                {modoEdicion || evaluacionId ? 'Editar Evaluación' : 'Crear Nueva Evaluación'}
+              </h1>
+              <p className="text-indigo-100 text-sm">
+                {modoEdicion || evaluacionId
+                  ? 'Edita tu evaluación existente'
+                  : 'Crea una evaluación basada en una matriz de especificación'}
+              </p>
+            </div>
           </div>
-        </div>
-      </div>
-      {/* Fila de MatrizSelector y botón */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex-1">
-          <MatrizSelector
-            matrices={matrices}
-            selectedMatriz={selectedMatriz}
-            onMatrizSelect={handleMatrizSelect}
-            error={errors.matriz}
-          />
-        </div>
-        <div className="flex-shrink-0 mt-6 me-1">
+          
+          {/* Botón de acción */}
           <PrimaryButton
             onMouseEnter={() => setIsSaveHovered(true)}
             onMouseLeave={() => setIsSaveHovered(false)}
@@ -279,9 +274,9 @@ export default function EvaluacionForm({
               preguntasExtraidas.length === 0 ||
               preguntasExtraidas.some(p => !formData.respuestasCorrectas[p.numero])
             }
-            className="flex items-center gap-2 relative"
+            className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
           >
-            <Save size={20} />
+            <Save className="w-4 h-4" />
             {modoEdicion || evaluacionId ? 'Actualizar' : 'Guardar'} Evaluación
             {preguntasExtraidas.length > 0 && (
               <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
@@ -302,6 +297,54 @@ export default function EvaluacionForm({
             )}
           </PrimaryButton>
         </div>
+        
+        {/* Stats y información */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <Target className="h-4 w-4 text-indigo-200" />
+              <div>
+                <p className="text-indigo-200 text-xs">Matriz Seleccionada</p>
+                <p className="text-lg font-bold">
+                  {selectedMatriz ? selectedMatriz.nombre : 'Ninguna'}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-indigo-200" />
+              <div>
+                <p className="text-indigo-200 text-xs">Preguntas Creadas</p>
+                <p className="text-lg font-bold">
+                  {preguntasExtraidas.length}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <Check className="h-4 w-4 text-indigo-200" />
+              <div>
+                <p className="text-indigo-200 text-xs">Respuestas Marcadas</p>
+                <p className="text-lg font-bold">
+                  {Object.keys(formData.respuestasCorrectas).length}/{preguntasExtraidas.length}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Fila de MatrizSelector */}
+      <div className="mb-6">
+        <MatrizSelector
+          matrices={matrices}
+          selectedMatriz={selectedMatriz}
+          onMatrizSelect={handleMatrizSelect}
+          error={errors.matriz}
+        />
       </div>
 
       {/* Errores generales */}
@@ -312,11 +355,11 @@ export default function EvaluacionForm({
         </div>
       )}
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col">
         {/* Editor Principal */}
-        <main className="flex-1 flex flex-col overflow-auto">
+        <main className="flex-1 flex flex-col">
           {/* Editor TipTap */}
-          <div className="flex-1 flex flex-col mt-4">
+          <div className="flex flex-col mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Contenido de la Evaluación *
             </label>
@@ -327,13 +370,13 @@ export default function EvaluacionForm({
               <p className="mb-2 text-sm text-red-600">{errors.preguntas}</p>
             )}
             {selectedMatriz ? (
-              <div className="flex-1 bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] p-8 overflow-auto">
+              <div className="bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] p-8 min-h-[400px]">
                 <SimpleEditor 
                   onEditorReady={handleEditorReadyWithContent}
                 />
               </div>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center min-h-[300px] text-gray-400 border-2 border-dashed border-gray-200 rounded-3xl bg-transparent">
+              <div className="flex flex-col items-center justify-center min-h-[300px] text-gray-400 border-2 border-dashed border-gray-200 rounded-3xl bg-transparent">
                 <span className="text-lg font-semibold mb-2">Selecciona una matriz para comenzar a crear tu evaluación</span>
                 <span className="text-sm">El editor aparecerá aquí una vez que elijas una matriz de especificación.</span>
               </div>

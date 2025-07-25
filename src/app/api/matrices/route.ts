@@ -3,6 +3,14 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+interface OAData {
+  oaId: number;
+  indicadores: Array<{
+    descripcion: string;
+    preguntas: number;
+  }>;
+}
+
 export async function GET() {
   try {
     // @ts-ignore - Prisma client sync issue
@@ -73,11 +81,11 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { nombre, total_preguntas, oas } = body;
+    const { nombre, total_preguntas, asignatura_id, nivel_id, oas } = body;
 
-    if (!nombre || !total_preguntas || !oas || !Array.isArray(oas)) {
+    if (!nombre || !total_preguntas || !asignatura_id || !nivel_id || !oas || !Array.isArray(oas)) {
       return NextResponse.json(
-        { error: 'Datos incompletos o inválidos' },
+        { error: 'Datos incompletos o inválidos. Se requiere nombre, total_preguntas, asignatura_id, nivel_id y oas' },
         { status: 400 }
       );
     }
@@ -87,11 +95,13 @@ export async function POST(request: NextRequest) {
       data: {
         nombre,
         total_preguntas,
+        asignatura_id,
+        nivel_id,
         oas: {
-          create: oas.map((oa: any) => ({
+          create: oas.map((oa: OAData) => ({
             oaId: oa.oaId,
             indicadores: {
-              create: oa.indicadores.map((indicador: any) => ({
+              create: oa.indicadores.map((indicador) => ({
                 descripcion: indicador.descripcion,
                 preguntas: indicador.preguntas,
               })),
@@ -105,6 +115,10 @@ export async function POST(request: NextRequest) {
             indicadores: true,
           },
         },
+        // @ts-ignore - Prisma client sync issue
+        asignatura: true,
+        // @ts-ignore - Prisma client sync issue
+        nivel: true,
       },
     });
 

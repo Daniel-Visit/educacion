@@ -399,7 +399,7 @@ export default function ResultadosEvaluacionesPage() {
                     </button>
                     <button 
                       onClick={() => handleDescargarCSV(resultado)}
-                      className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-6 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200"
+                      className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 hover:border-gray-400 px-6 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 shadow-sm hover:shadow-md transition-all duration-200"
                     >
                       <Download className="h-4 w-4" />
                       Descargar CSV

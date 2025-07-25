@@ -27,6 +27,8 @@ export async function GET(
             indicadores: true,
           },
         },
+        asignatura: true,
+        nivel: true,
       },
     });
 
@@ -96,11 +98,11 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { nombre, total_preguntas, oas } = body;
+    const { nombre, total_preguntas, asignatura_id, nivel_id, oas } = body;
 
-    if (!nombre || !total_preguntas || !oas || !Array.isArray(oas)) {
+    if (!nombre || !total_preguntas || !asignatura_id || !nivel_id || !oas || !Array.isArray(oas)) {
       return NextResponse.json(
-        { error: 'Datos incompletos o inválidos' },
+        { error: 'Datos incompletos o inválidos. Se requiere nombre, total_preguntas, asignatura_id, nivel_id y oas' },
         { status: 400 }
       );
     }
@@ -127,6 +129,8 @@ export async function PUT(
       data: {
         nombre,
         total_preguntas,
+        asignatura_id,
+        nivel_id,
         oas: {
           create: oas.map((oa: any) => ({
             oaId: oa.oaId,
@@ -145,6 +149,8 @@ export async function PUT(
             indicadores: true,
           },
         },
+        asignatura: true,
+        nivel: true,
       },
     });
 

@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import SecondaryButton from '@/components/ui/SecondaryButton';
-import { Play, Edit3, Trash2, Calendar, MoreVertical, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Play, Edit3, Trash2, Calendar, ChevronLeft, ChevronRight, Users, FileText } from 'lucide-react';
 import CrearHorarioModal from './CrearHorarioModal';
 import { useHorarios } from '@/hooks/use-horarios';
 import React, { useEffect, useRef, useState } from 'react';
@@ -27,31 +27,39 @@ export default function HorariosList() {
   const { horarios, loadHorarios, deleteHorario } = useHorarios();
   const [modalOpen, setModalOpen] = React.useState(false);
   const [horarioEditando, setHorarioEditando] = useState<any | null>(null);
-  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
-  const menuRef = useRef<HTMLDivElement | null>(null);
   const [pagina, setPagina] = useState(1);
   const porPagina = 6;
   const totalPaginas = Math.ceil(horarios.length / porPagina);
   const horariosPagina = horarios.slice((pagina - 1) * porPagina, pagina * porPagina);
 
+  // Funciones de gradientes ordenados
+  const getGradient = (index: number) => {
+    const gradients = [
+      'from-emerald-500 to-teal-600',    // 1. Verde
+      'from-amber-500 to-orange-600',    // 2. Naranja
+      'from-indigo-500 to-purple-600',       // 3. Índigo
+      'from-cyan-500 to-blue-600',       // 4. Cyan
+      'from-rose-500 to-pink-600',   // 5. Rose
+      'from-violet-500 to-fuchsia-600'     // 6. Violet
+    ];
+    return gradients[index % gradients.length];
+  };
+
+  const getHoverGradient = (index: number) => {
+    const hoverGradients = [
+      'hover:from-emerald-600 hover:to-teal-700',  // 1. Verde
+      'hover:from-amber-600 hover:to-orange-700',  // 2. Naranja
+      'hover:from-indigo-600 hover:to-purple-700',     // 3. Índigo
+      'hover:from-cyan-600 hover:to-blue-700',     // 4. Cyan
+      'hover:from-rose-600 hover:to-pink-700', // 5. Rose
+      'hover:from-violet-600 hover:to-fuchsia-700'   // 6. Violet
+    ];
+    return hoverGradients[index % hoverGradients.length];
+  };
+
   useEffect(() => {
     loadHorarios();
   }, [loadHorarios]);
-
-  // Cerrar menú al hacer click fuera
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setOpenMenuId(null);
-      }
-    }
-    if (openMenuId !== null) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [openMenuId]);
 
   // Log de depuración
   if (typeof window !== 'undefined') {
@@ -70,15 +78,65 @@ export default function HorariosList() {
 
   return (
     <>
-      <div className="flex items-center justify-between pb-2">
-        <div>
-          <h1 className="text-3xl font-bold text-indigo-700 mb-1">Horarios Docentes</h1>
-          <p className="text-gray-500 text-base">Gestiona los horarios docentes para la planificación anual</p>
+      {/* Header compacto */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white shadow-lg mb-6 mt-0">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <div className="bg-white/20 p-2 rounded-lg">
+              <Calendar className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">Horarios Docentes</h1>
+              <p className="text-indigo-100 text-sm">
+                Gestiona los horarios docentes para la planificación anual
+              </p>
+            </div>
+          </div>
+          <PrimaryButton 
+            onClick={() => setModalOpen(true)} 
+            className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
+          >
+            <Calendar className="w-4 h-4" />
+            Nuevo Horario
+          </PrimaryButton>
         </div>
-        <PrimaryButton onClick={() => setModalOpen(true)} className="flex items-center gap-2">
-          <Calendar size={20} />
-          Nuevo Horario
-        </PrimaryButton>
+        
+        {/* Stats compactas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-indigo-200" />
+              <div>
+                <p className="text-indigo-200 text-xs">Total Horarios</p>
+                <p className="text-lg font-bold">{horarios.length}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-indigo-200" />
+              <div>
+                <p className="text-indigo-200 text-xs">Profesores</p>
+                <p className="text-lg font-bold">
+                  {new Set(horarios.map(h => h.profesor?.id).filter(Boolean)).size}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-indigo-200" />
+              <div>
+                <p className="text-indigo-200 text-xs">Asignaturas</p>
+                <p className="text-lg font-bold">
+                  {new Set(horarios.map(h => h.asignatura?.id).filter(Boolean)).size}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <CrearHorarioModal
         isOpen={modalOpen || !!horarioEditando}
@@ -96,48 +154,87 @@ export default function HorariosList() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
-            {horariosPagina.map((horario) => (
-              <div key={horario.id} className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-2xl shadow-lg p-6 flex flex-col gap-4 relative transition-transform hover:scale-[1.025] hover:shadow-2xl">
-                {/* Botón de acciones arriba a la derecha */}
-                <div className="absolute top-4 right-4 z-10" ref={openMenuId === horario.id ? menuRef : undefined}>
-                  <button
-                    onClick={() => setOpenMenuId(openMenuId === horario.id ? null : horario.id)}
-                    className="h-9 w-9 flex items-center justify-center rounded-lg bg-transparent hover:bg-gradient-to-r from-indigo-100 to-purple-100 hover:border hover:border-indigo-300 hover:text-indigo-700  text-gray-500 transition"
-                    title="Acciones"
-                  >
-                    <MoreVertical size={20} />
-                  </button>
-                  {openMenuId === horario.id && (
-                    <div className="absolute right-0 top-full mt-2 p-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 min-w-[140px]">
-                      <button
-                        onClick={() => { window.location.href = `/planificacion-anual?horarioId=${horario.id}`; setOpenMenuId(null); }}
-                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 rounded-lg"
-                      >
-                        <Play size={16} /> Seleccionar
-                      </button>
-                      <button
-                        onClick={() => { setHorarioEditando(horario); setOpenMenuId(null); }}
-                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2 rounded-lg"
-                      >
-                        <Edit3 size={16} /> Editar
-                      </button>
-                      <button
-                        onClick={() => { deleteHorario(horario.id); setOpenMenuId(null); }}
-                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 rounded-lg"
-                      >
-                        <Trash2 size={16} /> Eliminar
-                      </button>
-                    </div>
-                  )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+            {horariosPagina.map((horario, index) => (
+              <div key={horario.id} className="group bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden">
+                {/* Accent line superior */}
+                <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${getGradient(index)}`}></div>
+                
+                {/* Botones de acciones */}
+                <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => window.location.href = `/planificacion-anual?horarioId=${horario.id}`}
+                      className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/80 backdrop-blur-sm border border-gray-200 hover:bg-white hover:border-gray-300 text-gray-600 hover:text-gray-800 transition-all duration-200 shadow-sm"
+                      title="Seleccionar horario"
+                    >
+                      <Play size={16} />
+                    </button>
+                    <button
+                      onClick={() => setHorarioEditando(horario)}
+                      className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/80 backdrop-blur-sm border border-gray-200 hover:bg-white hover:border-gray-300 text-gray-600 hover:text-gray-800 transition-all duration-200 shadow-sm"
+                      title="Editar horario"
+                    >
+                      <Edit3 size={16} />
+                    </button>
+                    <button
+                      onClick={() => deleteHorario(horario.id)}
+                      className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/80 backdrop-blur-sm border border-gray-200 hover:bg-white hover:border-gray-300 text-red-600 hover:text-red-700 transition-all duration-200 shadow-sm"
+                      title="Eliminar horario"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
-                {/* Resto del contenido de la tarjeta */}
-                <Calendar size={40} className="text-indigo-400 mb-2 mx-auto" />
-                <h2 className="text-xl font-bold text-indigo-800 text-center mb-1">{horario.nombre}</h2>
-                <div className="flex flex-wrap justify-center gap-2 mb-2">
-                  <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">{horario.asignatura?.nombre || '-'}</span>
-                  <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">{horario.nivel?.nombre || '-'}</span>
-                  <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold">{horario.profesor?.nombre || '-'}</span>
+                
+                {/* Contenido principal */}
+                <div className="p-6">
+                  {/* Icono y título */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`h-10 w-10 bg-gradient-to-br ${getGradient(index)} rounded-xl flex items-center justify-center shadow-sm`}>
+                      <Calendar size={20} className="text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-semibold text-gray-900 truncate">{horario.nombre}</h3>
+                    </div>
+                  </div>
+                  
+                  {/* Información del horario */}
+                  <div className="space-y-4">
+                    {/* Asignatura con label arriba */}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                        <span className="text-gray-600 font-medium text-sm">Asignatura</span>
+                      </div>
+                      <span className="text-gray-900 font-semibold text-sm block pl-4 truncate">{horario.asignatura?.nombre || 'No asignada'}</span>
+                    </div>
+                    
+                    {/* Nivel */}
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                      <span className="text-gray-600 font-medium">Nivel:</span>
+                      <span className="text-gray-900 font-semibold">{horario.nivel?.nombre || 'No asignado'}</span>
+                    </div>
+                    
+                    {/* Profesor */}
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                      <span className="text-gray-600 font-medium">Profesor:</span>
+                      <span className="text-gray-900 font-semibold">{horario.profesor?.nombre || 'No asignado'}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Botón de acción principal */}
+                  <div className="mt-6 pt-4 border-t border-gray-100">
+                    <button
+                      onClick={() => window.location.href = `/planificacion-anual?horarioId=${horario.id}`}
+                      className={`w-full bg-gradient-to-r ${getGradient(index)} ${getHoverGradient(index)} text-white py-2.5 px-4 rounded-xl font-medium text-sm transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 group/btn`}
+                    >
+                      <Play size={16} className="group-hover/btn:scale-110 transition-transform" />
+                      Usar Horario
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

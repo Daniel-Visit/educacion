@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, FileText, Trash2, Edit, Eye, BarChart3, Calendar, Target, Users } from 'lucide-react';
+import { Plus, FileText, Trash2, Edit, Eye, BarChart3, Calendar, Target, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import SecondaryButton from '@/components/ui/SecondaryButton';
 import { Dialog } from '@headlessui/react';
@@ -44,6 +44,10 @@ export default function MatricesPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
   const [alert, setAlert] = useState<{ type: 'error' | 'success', message: string } | null>(null);
+  
+  // Estado de paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const matricesPerPage = 6;
 
   useEffect(() => {
     fetchMatrices();
@@ -110,40 +114,86 @@ export default function MatricesPage() {
     });
   };
 
-  const getRandomGradient = (id: number) => {
+  const getGradient = (index: number) => {
     const gradients = [
-      'from-indigo-500 to-purple-600',
-      'from-emerald-500 to-teal-600',
-      'from-amber-500 to-orange-600',
-      'from-rose-500 to-pink-600',
-      'from-blue-500 to-cyan-600',
-      'from-violet-500 to-purple-600'
+      'from-emerald-500 to-teal-600',    // 1. Verde
+      'from-amber-500 to-orange-600',    // 2. Naranja
+      'from-indigo-500 to-purple-600',   // 3. Índigo
+      'from-cyan-500 to-blue-600',       // 4. Azul
+      'from-rose-500 to-pink-600',       // 5. Rosa
+      'from-violet-500 to-fuchsia-600'     // 6. Violet
     ];
-    return gradients[id % gradients.length];
+    return gradients[index % gradients.length];
   };
 
-  const getTextColor = (id: number) => {
+  const getTextColor = (index: number) => {
     const textColors = [
-      'text-indigo-200', // indigo/purple
-      'text-emerald-200', // emerald/teal
-      'text-amber-200',   // amber/orange
-      'text-rose-200',    // rose/pink
-      'text-blue-200',    // blue/cyan
-      'text-violet-200'   // violet/purple
+      'text-emerald-200', // 1. Verde
+      'text-amber-200',   // 2. Naranja
+      'text-indigo-200',    // 3. Rosa
+      'text-cyan-200',    // 4. Azul
+      'text-rose-200',  // 5. Índigo
+      'text-violet-200'     // 6. Teal
     ];
-    return textColors[id % textColors.length];
+    return textColors[index % textColors.length];
   };
 
-  const getHoverColor = (id: number) => {
-    const hoverColors = [
-      'hover:bg-red-500/30', // indigo/purple
-      'hover:bg-red-500/30', // emerald/teal
-      'hover:bg-red-500/30', // amber/orange
-      'hover:bg-red-500/30', // rose/pink
-      'hover:bg-red-500/30', // blue/cyan
-      'hover:bg-red-500/30'  // violet/purple
+  const getHoverGradient = (index: number) => {
+    const hoverGradients = [
+      'hover:from-emerald-600 hover:to-teal-700',  // 1. Verde
+      'hover:from-amber-600 hover:to-orange-700',  // 2. Naranja
+      'hover:from-indigo-600 hover:to-purple-700', // 3. Índigo
+      'hover:from-cyan-600 hover:to-blue-700',     // 4. Azul
+      'hover:from-rose-600 hover:to-pink-700',     // 5. Rosa
+      'hover:from-violet-600 hover:to-fuchsia-700' // 6. Violet
     ];
-    return hoverColors[id % hoverColors.length];
+    return hoverGradients[index % hoverGradients.length];
+  };
+
+  // Funciones de paginación
+  const totalPages = Math.ceil(matrices.length / matricesPerPage);
+  const startIndex = (currentPage - 1) * matricesPerPage;
+  const endIndex = startIndex + matricesPerPage;
+  const currentMatrices = matrices.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
   };
 
   if (loading) {
@@ -159,37 +209,43 @@ export default function MatricesPage() {
 
   return (
     <>
-      {/* Header compacto */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white shadow-lg mb-6 mt-4">
+      {/* Header moderno */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white shadow-lg mb-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
             <div className="bg-white/20 p-2 rounded-lg">
               <BarChart3 className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Matrices de Especificación</h1>
+              <h1 className="text-2xl font-bold text-white mb-1">
+                Matrices de Especificación
+              </h1>
               <p className="text-indigo-100 text-sm">
                 Gestiona las matrices de especificación para evaluaciones
               </p>
             </div>
           </div>
+          
+          {/* Botones de acción */}
           <PrimaryButton 
             onClick={handleCreateMatriz} 
-            className="bg-white/20 border-white/30 text-white hover:bg-white/30 hover:border-white/50"
+            className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
           >
-            <Plus size={16} className="mr-2" />
+            <Plus className="w-4 h-4" />
             Nueva Matriz
           </PrimaryButton>
         </div>
         
-        {/* Stats compactas */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* Stats y información */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white/10 rounded-lg p-3">
             <div className="flex items-center gap-2">
               <FileText className="h-4 w-4 text-indigo-200" />
               <div>
                 <p className="text-indigo-200 text-xs">Total Matrices</p>
-                <p className="text-lg font-bold">{matrices.length}</p>
+                <p className="text-lg font-bold">
+                  {matrices.length}
+                </p>
               </div>
             </div>
           </div>
@@ -258,129 +314,137 @@ export default function MatricesPage() {
         ) : (
           <div className="space-y-6">
             {/* Grid responsivo */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-              {matrices.map((matriz) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {currentMatrices.map((matriz, index) => (
                 <div 
                   key={matriz.id} 
-                  className="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl hover:scale-105 transition-all duration-300 min-h-[380px] max-w-sm mx-auto w-full"
+                  className="group bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden"
                 >
-                  {/* Header con gradiente */}
-                  <div className={`bg-gradient-to-r ${getRandomGradient(matriz.id)} p-4 text-white relative overflow-hidden`}>
-                    <div className="absolute inset-0 bg-black/10"></div>
-                    <div className="relative z-10">
-                      <div className="flex items-start justify-between mb-3">
-                        <h3 className="text-base font-bold leading-tight pr-2 line-clamp-2">{matriz.nombre}</h3>
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                          <button
-                            onClick={() => handleViewMatriz(matriz.id)}
-                            className="p-1.5 bg-white/20 backdrop-blur-sm rounded-md hover:bg-white/30 transition-colors"
-                            title="Ver matriz"
-                          >
-                            <Eye size={12} />
-                          </button>
-                          <button
-                            onClick={() => handleEditMatriz(matriz.id)}
-                            className="p-1.5 bg-white/20 backdrop-blur-sm rounded-md hover:bg-white/30 transition-colors"
-                            title="Editar matriz"
-                          >
-                            <Edit size={12} />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteMatriz(matriz.id)}
-                            disabled={deletingId === matriz.id}
-                            className={`p-1.5 bg-white/20 backdrop-blur-sm rounded-md ${getHoverColor(matriz.id)} transition-colors ${deletingId === matriz.id ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            title="Eliminar matriz"
-                          >
-                            <Trash2 size={12} />
-                          </button>
-                        </div>
-                      </div>
-                      
-                      {/* Stats en el header */}
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 text-center">
-                          <p className={`text-xs ${getTextColor(matriz.id)}`}>Preguntas</p>
-                          <p className="text-sm font-bold">{matriz.total_preguntas}</p>
-                        </div>
-                        <div className="bg-white/20 backdrop-blur-sm rounded-lg p-2 text-center">
-                          <p className={`text-xs ${getTextColor(matriz.id)}`}>OAs</p>
-                          <p className="text-sm font-bold">{matriz.oas?.length || 0}</p>
-                        </div>
-                      </div>
+                  {/* Accent line superior */}
+                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${getGradient(index)}`}></div>
+                  
+                  {/* Botones de acciones */}
+                  <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => handleViewMatriz(matriz.id)}
+                        className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/80 backdrop-blur-sm border border-gray-200 hover:bg-white hover:border-gray-300 text-gray-600 hover:text-gray-800 transition-all duration-200 shadow-sm"
+                        title="Ver matriz"
+                      >
+                        <Eye size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleEditMatriz(matriz.id)}
+                        className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/80 backdrop-blur-sm border border-gray-200 hover:bg-white hover:border-gray-300 text-gray-600 hover:text-gray-800 transition-all duration-200 shadow-sm"
+                        title="Editar matriz"
+                      >
+                        <Edit size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteMatriz(matriz.id)}
+                        disabled={deletingId === matriz.id}
+                        className={`h-8 w-8 flex items-center justify-center rounded-lg bg-white/80 backdrop-blur-sm border border-gray-200 hover:bg-white hover:border-gray-300 text-red-600 hover:text-red-700 transition-all duration-200 shadow-sm ${deletingId === matriz.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        title="Eliminar matriz"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
                   </div>
-
-                  {/* Contenido del card */}
-                  <div className="p-4 space-y-3 flex flex-col h-full">
-                    {/* OAs */}
-                    <div className="flex-1">
-                      <h4 className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
-                        <Target size={12} />
-                        Objetivos de Aprendizaje
-                      </h4>
+                  
+                  {/* Contenido principal */}
+                  <div className="p-6">
+                    {/* Icono y título */}
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className={`h-10 w-10 bg-gradient-to-br ${getGradient(index)} rounded-xl flex items-center justify-center shadow-sm`}>
+                        <BarChart3 size={20} className="text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-semibold text-gray-900 truncate">{matriz.nombre}</h3>
+                      </div>
+                    </div>
+                    
+                    {/* Información de la matriz */}
+                    <div className="space-y-4">
+                      {/* Total de preguntas */}
                       <div className="space-y-1">
-                        {matriz.oas?.slice(0, 2).map((oa, index) => (
-                          <div key={oa.id} className="flex items-center gap-1.5">
-                            <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
-                            <span className="text-xs text-gray-600 font-medium">
-                              {oa.oa?.oas_id}
-                            </span>
-                          </div>
-                        ))}
-                        {matriz.oas?.length > 2 && (
-                          <div className="text-xs text-indigo-600 font-medium">
-                            +{matriz.oas.length - 2} más...
-                          </div>
-                        )}
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                          <span className="text-gray-600 font-medium text-sm">Total Preguntas</span>
+                        </div>
+                        <span className="text-gray-900 font-semibold text-sm block pl-4">{matriz.total_preguntas}</span>
+                      </div>
+                      
+                      {/* Total de OAs */}
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                          <span className="text-gray-600 font-medium text-sm">Objetivos de Aprendizaje</span>
+                        </div>
+                        <span className="text-gray-900 font-semibold text-sm block pl-4">{matriz.oas?.length || 0} OAs</span>
+                      </div>
+                      
+                      {/* Fecha de creación */}
+                      <div className="flex items-center gap-2 text-sm">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        <span className="text-gray-600 font-medium">Creada:</span>
+                        <span className="text-gray-900 font-semibold">{formatDate(matriz.createdAt)}</span>
                       </div>
                     </div>
-
-                    {/* Fecha de creación */}
-                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                      <Calendar size={10} />
-                      <span>Creada el {formatDate(matriz.createdAt)}</span>
-                    </div>
-
-                    {/* Acciones en el footer */}
-                    <div className="pt-2 border-t border-gray-100">
-                      <div className="flex gap-1.5">
-                        <button
-                          onClick={() => handleViewMatriz(matriz.id)}
-                          className="flex-1 bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 py-1.5 px-2 rounded-md font-medium hover:from-indigo-100 hover:to-purple-100 transition-all duration-200 text-xs"
-                        >
-                          <Eye size={12} className="mr-1" />
-                          Ver
-                        </button>
-                        <button
-                          onClick={() => handleEditMatriz(matriz.id)}
-                          className="flex-1 bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 py-1.5 px-2 rounded-md font-medium hover:from-emerald-100 hover:to-teal-100 transition-all duration-200 text-xs"
-                        >
-                          <Edit size={12} className="mr-1" />
-                          Editar
-                        </button>
-                      </div>
+                    
+                    {/* Botón de acción principal */}
+                    <div className="mt-6 pt-4 border-t border-gray-100">
+                      <button
+                        onClick={() => handleViewMatriz(matriz.id)}
+                        className={`w-full bg-gradient-to-r ${getGradient(index)} ${getHoverGradient(index)} text-white py-2.5 px-4 rounded-xl font-medium text-sm transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 group/btn`}
+                      >
+                        <Eye size={16} className="group-hover/btn:scale-110 transition-transform" />
+                        Ver Matriz
+                      </button>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Paginación simple si hay muchas matrices */}
-            {matrices.length > 20 && (
-              <div className="flex items-center justify-center gap-2 pt-6">
-                <button className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                  Anterior
+                        {/* Paginación exacta estilo imagen */}
+            <div className="flex justify-center mt-8">
+              <nav className="inline-flex items-center gap-4 select-none" aria-label="Pagination">
+                <button
+                  className="flex items-center gap-1 text-[1.7rem] text-gray-800 font-normal px-2 py-1 rounded-md hover:bg-gray-50 transition disabled:opacity-40"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft size={20} strokeWidth={2.2} /> 
                 </button>
-                <div className="flex gap-1">
-                  <button className="px-3 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md">1</button>
-                  <button className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">2</button>
-                  <button className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">3</button>
+                <div className="flex items-center gap-4">
+                  {getPageNumbers().map((page, index) =>
+                    page === '...'
+                      ? <span key={index} className="text-3xl text-gray-700 font-light px-2">•••</span>
+                      : <button
+                          key={page}
+                          className={
+                            currentPage === page
+                              ? 'flex items-center justify-center text-sm font-medium rounded-xl border-2 border-gray-200 bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] px-4 py-2'
+                              : 'flex items-center justify-center text-sm font-normal rounded-xl px-4 py-2 hover:bg-gray-50 transition'
+                          }
+                          onClick={() => typeof page === 'number' ? handlePageChange(page) : null}
+                          aria-current={currentPage === page ? 'page' : undefined}
+                        >
+                          {page}
+                        </button>
+                  )}
                 </div>
-                <button className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                  Siguiente
+                <button
+                  className="flex items-center gap-1 text-[1.7rem] text-gray-800 font-normal px-2 py-1 rounded-md hover:bg-gray-50 transition disabled:opacity-40"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                   <ChevronRight size={20} strokeWidth={2.2} />
                 </button>
-              </div>
-            )}
+              </nav>
+            </div>
+
+
           </div>
         )}
       </div>

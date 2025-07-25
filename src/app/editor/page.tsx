@@ -8,7 +8,7 @@ import FabPlanificaciones from '@/components/editor/FabPlanificaciones'
 import SaveContentModal from '@/components/editor/SaveContentModal'
 import { SavedContent } from '@/hooks/use-content-save'
 import { Editor } from '@tiptap/react'
-import { Save, Sparkles } from 'lucide-react'
+import { Save, Sparkles, FileText, BookOpen, Edit3, Clock } from 'lucide-react'
 import Fab from '@/components/ui/Fab'
 import { useContentSave } from '@/hooks/use-content-save'
 
@@ -89,33 +89,86 @@ export default function EditorPage() {
 
   return (
     <>
-      <div className="flex items-center justify-between pb-2">
-        <div>
-          <h1 className="text-3xl font-bold text-indigo-700 mb-1">
-            {tipoContenido === 'planificacion' ? 'Planificación de Clase' : 'Material de Apoyo'}
-          </h1>
-          <p className="text-gray-500 text-base">
-            {tipoContenido === 'planificacion'
-              ? 'Crea y edita la planificación detallada de tus clases'
-              : 'Gestiona el material de apoyo para tus estudiantes'}
-          </p>
+      {/* Header moderno */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white shadow-lg mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <div className="bg-white/20 p-2 rounded-lg">
+              {tipoContenido === 'planificacion' ? (
+                <FileText className="h-6 w-6 text-white" />
+              ) : (
+                <BookOpen className="h-6 w-6 text-white" />
+              )}
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white mb-1">
+                {tipoContenido === 'planificacion' ? 'Planificación de Clase' : 'Material de Apoyo'}
+              </h1>
+              <p className="text-indigo-100 text-sm">
+                {tipoContenido === 'planificacion'
+                  ? 'Crea y edita la planificación detallada de tus clases'
+                  : 'Gestiona el material de apoyo para tus estudiantes'}
+              </p>
+            </div>
+          </div>
+          
+          {/* Botones de acción */}
+          <div className="flex gap-3">
+            <button
+              onClick={() => setOpenSaveModal(true)}
+              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
+            >
+              <Save className="w-4 h-4" />
+              {currentFile ? 'Guardar Cambios' : 'Guardar'}
+            </button>
+            <button
+              onClick={handleGenerateIA}
+              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
+            >
+              <Sparkles className="w-4 h-4" />
+              Generar con IA
+            </button>
+          </div>
         </div>
-        <div className="flex gap-3">
-          <button
-            className="px-6 py-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 text-white font-semibold shadow hover:from-green-700 hover:to-emerald-600 transition-all text-base flex items-center gap-2"
-            onClick={() => setOpenSaveModal(true)}
-          >
-            <Save className="w-4 h-4" />
-            {currentFile ? 'Guardar Cambios' : 'Guardar'}
-          </button>
-          <button
-            className="px-6 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-semibold shadow hover:from-indigo-700 hover:to-purple-600 transition-all text-base flex items-center gap-2"
-            onClick={handleGenerateIA}
-          >
-            <Sparkles className="w-4 h-4" />
-            Generar con IA
-          </button>
+        
+        {/* Stats y información */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-indigo-200" />
+              <div>
+                <p className="text-indigo-200 text-xs">Tipo de Contenido</p>
+                <p className="text-lg font-bold">
+                  {tipoContenido === 'planificacion' ? 'Planificación' : 'Material'}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-indigo-200" />
+              <div>
+                <p className="text-indigo-200 text-xs">Archivos Guardados</p>
+                <p className="text-lg font-bold">
+                  {filteredContents.length}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
+        
+        {/* Información del archivo actual */}
+        {currentFile && (
+          <div className="mt-4 p-3 bg-white/10 rounded-lg border border-white/20">
+            <p className="text-indigo-100 text-sm">
+              <strong>Editando:</strong> {currentFile.titulo}
+              <span className="ml-2 text-indigo-200">
+                (Creado: {currentFile.createdAt ? formatDate(currentFile.createdAt) : 'Fecha no disponible'})
+              </span>
+            </p>
+          </div>
+        )}
       </div>
       
       <div className="flex-1 flex flex-col items-center justify-start items-stretch">

@@ -48,14 +48,14 @@ export default function Home() {
     
     
     {
-      title: "Matrices de Especificación",
-      description: "Diseña matrices detalladas que guíen la creación de evaluaciones alineadas con objetivos de aprendizaje",
+      title: "Resultados de Evaluaciones",
+      description: "Revisa los resultados de las evaluaciones de tus estudiantes y analiza el desempeño de cada uno",
       icon: FileText,
       gradient: "from-red-500 to-pink-600",
       bgGradient: "from-red-50 to-pink-50",
       borderColor: "border-red-200",
-      href: "/matrices",
-      features: ["Objetivos de Aprendizaje", "Criterios de Evaluación", "Especificaciones Detalladas"]
+      href: "/resultado-evaluaciones",
+      features: ["Carga de Resultados", "Análisis de Desempeño", "Informes Detallados"]
     },
   ];
 
