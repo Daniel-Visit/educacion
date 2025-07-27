@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ChevronsUpDown, Check, X, Plus, Clock, BarChart3, Target } from 'lucide-react';
+import { ArrowLeft, ChevronsUpDown, Check, X, Plus, Clock, BarChart3, Target, BookOpen, Zap } from 'lucide-react';
 import { Listbox } from '@headlessui/react';
 import { Dialog } from '@headlessui/react';
 import PrimaryButton from '@/components/ui/PrimaryButton';
@@ -19,6 +19,7 @@ interface OA {
   nivel: { nombre: string };
   asignatura: { nombre: string };
   basal?: boolean;
+  tipo_eje: 'Contenido' | 'Habilidad' | 'Actitud';
 }
 
 interface Indicador {
@@ -38,10 +39,20 @@ export default function CrearMatrizPage() {
   const [ejes, setEjes] = useState<Eje[]>([]);
   const [asignaturas, setAsignaturas] = useState<{id: number, nombre: string}[]>([]);
   const [niveles, setNiveles] = useState<{id: number, nombre: string}[]>([]);
-  const [selectedEje, setSelectedEje] = useState<number | null>(null);
   const [selectedAsignatura, setSelectedAsignatura] = useState<number | null>(null);
   const [selectedNivel, setSelectedNivel] = useState<number | null>(null);
+  
+  // Estados para ejes de contenido
+  const [selectedEjeContenido, setSelectedEjeContenido] = useState<number | null>(null);
+  const [selectedOAsContenido, setSelectedOAsContenido] = useState<OA[]>([]);
+  
+  // Estados para ejes de habilidad
+  const [selectedEjeHabilidad, setSelectedEjeHabilidad] = useState<number | null>(null);
+  const [selectedOAsHabilidad, setSelectedOAsHabilidad] = useState<OA[]>([]);
+  
+  // Estado combinado para la API (se mantiene para compatibilidad)
   const [selectedOAs, setSelectedOAs] = useState<OA[]>([]);
+  
   const [totalPreguntas, setTotalPreguntas] = useState(0);
   const [oaIndicadores, setOAIndicadores] = useState<{[oaId:number]: Indicador[]}>({});
   const [matrizName, setMatrizName] = useState('');
@@ -93,9 +104,18 @@ export default function CrearMatrizPage() {
     return oas.filter(oa => oa.asignatura_id === selectedAsignatura && oa.nivel_id === selectedNivel);
   }, [oas, selectedAsignatura, selectedNivel]);
 
-  // Extraer ejes únicos de los OAs filtrados usando useMemo
-  const ejesDisponibles = useMemo(() => {
-    return oasDeAsignaturaNivel.reduce((acc: Eje[], oa) => {
+  // Separar OAs por tipo_eje
+  const oasContenido = useMemo(() => {
+    return oasDeAsignaturaNivel.filter(oa => oa.tipo_eje === 'Contenido');
+  }, [oasDeAsignaturaNivel]);
+
+  const oasHabilidad = useMemo(() => {
+    return oasDeAsignaturaNivel.filter(oa => oa.tipo_eje === 'Habilidad');
+  }, [oasDeAsignaturaNivel]);
+
+  // Extraer ejes únicos de contenido
+  const ejesContenido = useMemo(() => {
+    return oasContenido.reduce((acc: Eje[], oa) => {
       const ejeExistente = acc.find(e => e.id === oa.eje_id);
       if (!ejeExistente) {
         acc.push({
@@ -105,30 +125,64 @@ export default function CrearMatrizPage() {
       }
       return acc;
     }, []);
-  }, [oasDeAsignaturaNivel]);
+  }, [oasContenido]);
 
-  // Filtrar OAs por eje seleccionado usando useMemo
-  const oasDelEje = useMemo(() => {
-    if (!selectedEje) return [];
-    return oasDeAsignaturaNivel.filter(oa => oa.eje_id === selectedEje);
-  }, [oasDeAsignaturaNivel, selectedEje]);
+  // Extraer ejes únicos de habilidad
+  const ejesHabilidad = useMemo(() => {
+    return oasHabilidad.reduce((acc: Eje[], oa) => {
+      const ejeExistente = acc.find(e => e.id === oa.eje_id);
+      if (!ejeExistente) {
+        acc.push({
+          id: oa.eje_id,
+          descripcion: oa.eje_descripcion
+        });
+      }
+      return acc;
+    }, []);
+  }, [oasHabilidad]);
 
+  // Filtrar OAs por eje de contenido seleccionado
+  const oasDelEjeContenido = useMemo(() => {
+    if (!selectedEjeContenido) return [];
+    return oasContenido.filter(oa => oa.eje_id === selectedEjeContenido);
+  }, [oasContenido, selectedEjeContenido]);
+
+  // Filtrar OAs por eje de habilidad seleccionado
+  const oasDelEjeHabilidad = useMemo(() => {
+    if (!selectedEjeHabilidad) return [];
+    return oasHabilidad.filter(oa => oa.eje_id === selectedEjeHabilidad);
+  }, [oasHabilidad, selectedEjeHabilidad]);
+
+  // Combinar OAs seleccionados para la API
   useEffect(() => {
-    setEjes(ejesDisponibles);
-    
-    // Limpiar eje seleccionado si no está disponible en los nuevos ejes
-    if (selectedEje && !ejesDisponibles.find(e => e.id === selectedEje)) {
-      setSelectedEje(null);
-    }
-  }, [ejesDisponibles, selectedEje]);
+    const oasCombinados = [...selectedOAsContenido, ...selectedOAsHabilidad];
+    setSelectedOAs(oasCombinados);
+  }, [selectedOAsContenido, selectedOAsHabilidad]);
 
-  // Efecto separado para limpiar OAs cuando cambia asignatura o nivel
+  // Limpiar selecciones cuando cambia asignatura o nivel
   useEffect(() => {
-    if (selectedOAs.length > 0) {
-      setSelectedOAs([]);
-      setOAIndicadores({});
-    }
+    setSelectedEjeContenido(null);
+    setSelectedEjeHabilidad(null);
+    setSelectedOAsContenido([]);
+    setSelectedOAsHabilidad([]);
+    setOAIndicadores({});
   }, [selectedAsignatura, selectedNivel]);
+
+  // Limpiar eje de contenido si no está disponible
+  useEffect(() => {
+    if (selectedEjeContenido && !ejesContenido.find(e => e.id === selectedEjeContenido)) {
+      setSelectedEjeContenido(null);
+      setSelectedOAsContenido([]);
+    }
+  }, [ejesContenido, selectedEjeContenido]);
+
+  // Limpiar eje de habilidad si no está disponible
+  useEffect(() => {
+    if (selectedEjeHabilidad && !ejesHabilidad.find(e => e.id === selectedEjeHabilidad)) {
+      setSelectedEjeHabilidad(null);
+      setSelectedOAsHabilidad([]);
+    }
+  }, [ejesHabilidad, selectedEjeHabilidad]);
 
   const fetchOAs = async () => {
     try {
@@ -169,7 +223,7 @@ export default function CrearMatrizPage() {
 
 
   const validateForm = () => {
-    const newErrors: {[key: string]: string} = {};
+    const newErrors: any = {};
 
     if (!selectedAsignatura) {
       newErrors.asignatura = 'Debe seleccionar una asignatura';
@@ -179,11 +233,7 @@ export default function CrearMatrizPage() {
       newErrors.nivel = 'Debe seleccionar un nivel';
     }
 
-    if (!selectedEje) {
-      newErrors.eje = 'Debe seleccionar un eje';
-    }
-
-    if (selectedOAs.length === 0) {
+    if (selectedOAsContenido.length === 0 && selectedOAsHabilidad.length === 0) {
       newErrors.oa = 'Debe seleccionar al menos un OA';
     }
 
@@ -193,6 +243,43 @@ export default function CrearMatrizPage() {
 
     if (totalPreguntas === 0) {
       newErrors.indicadores = 'El total de preguntas debe ser mayor a 0';
+    }
+
+    // Validar que cada OA tenga al menos un indicador con al menos 1 pregunta
+    const allOAsHaveIndicators = [...selectedOAsContenido, ...selectedOAsHabilidad].every(oa => {
+      const indicadores = oaIndicadores[oa.id] || [];
+      return indicadores.length > 0 && indicadores.some(ind => ind.preguntas > 0);
+    });
+
+    if (!allOAsHaveIndicators) {
+      // Encontrar OAs específicos que no tienen indicadores
+      const oasWithoutIndicators = [...selectedOAsContenido, ...selectedOAsHabilidad].filter(oa => {
+        const indicadores = oaIndicadores[oa.id] || [];
+        return indicadores.length === 0 || !indicadores.some(ind => ind.preguntas > 0);
+      });
+      
+      if (oasWithoutIndicators.length > 0) {
+        const oaNames = oasWithoutIndicators.map(oa => oa.oas_id).join(', ');
+        newErrors.indicadores = `Los siguientes OAs deben tener al menos un indicador con al menos 1 pregunta: ${oaNames}`;
+      } else {
+        newErrors.indicadores = 'Cada OA debe tener al menos un indicador con al menos 1 pregunta';
+      }
+    }
+
+    // Validar que cada tipo de eje sume exactamente el total de preguntas (solo si hay ambos tipos)
+    if (hasBothTypes) {
+      if (totalPreguntasContenido !== totalPreguntas) {
+        newErrors.contenido = `Las preguntas de contenido deben sumar exactamente ${totalPreguntas} (actual: ${totalPreguntasContenido})`;
+      }
+
+      if (totalPreguntasHabilidad !== totalPreguntas) {
+        newErrors.habilidad = `Las preguntas de habilidad deben sumar exactamente ${totalPreguntas} (actual: ${totalPreguntasHabilidad})`;
+      }
+    } else {
+      // Si solo hay un tipo, validar el total general
+      if (totalPreguntasIndicadores !== totalPreguntas) {
+        newErrors.indicadores = `El total de preguntas debe ser exactamente ${totalPreguntas} (actual: ${totalPreguntasIndicadores})`;
+      }
     }
 
     setErrors(newErrors);
@@ -242,20 +329,52 @@ export default function CrearMatrizPage() {
     }
   };
 
-  const isValid = selectedAsignatura && selectedNivel && selectedEje && selectedOAs.length > 0 && matrizName.trim() && totalPreguntas > 0;
+  const isValid = selectedAsignatura && selectedNivel && (selectedEjeContenido || selectedEjeHabilidad) && (selectedOAsContenido.length > 0 || selectedOAsHabilidad.length > 0) && matrizName.trim() && totalPreguntas > 0;
 
-  const handleOaChange = (oas: OA[]) => {
-    const hayIndicadores = Object.values(oaIndicadores).some(arr => arr && arr.length > 0 && arr.some(ind => ind.descripcion.trim() || ind.preguntas > 0));
-    if (step === 3 && hayIndicadores && JSON.stringify(oas.map(o => o.id)) !== JSON.stringify(selectedOAs.map(o => o.id))) {
-      setPendingOAs(oas);
-      setShowOaChangeModal(true);
-    } else {
-      setSelectedOAs(oas);
-    }
-  };
-
-  // Calcula el total de preguntas de los indicadores
+  // Calcula el total de preguntas de los indicadores por tipo de eje
   const totalPreguntasIndicadores = Object.values(oaIndicadores).flat().reduce((sum, ind) => sum + (ind.preguntas || 0), 0);
+  
+  // Calcular totales separados por tipo de eje
+  const totalPreguntasContenido = selectedOAsContenido.reduce((sum, oa) => {
+    const indicadores = oaIndicadores[oa.id] || [];
+    return sum + indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0);
+  }, 0);
+  
+  const totalPreguntasHabilidad = selectedOAsHabilidad.reduce((sum, oa) => {
+    const indicadores = oaIndicadores[oa.id] || [];
+    return sum + indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0);
+  }, 0);
+  
+  // Validar que cada OA tenga al menos un indicador con al menos 1 pregunta
+  const allOAsHaveIndicators = [...selectedOAsContenido, ...selectedOAsHabilidad].every(oa => {
+    const indicadores = oaIndicadores[oa.id] || [];
+    return indicadores.length > 0 && indicadores.some(ind => ind.preguntas > 0);
+  });
+
+  // Validar OAs de contenido específicamente
+  const allOAsContenidoHaveIndicators = selectedOAsContenido.every(oa => {
+    const indicadores = oaIndicadores[oa.id] || [];
+    return indicadores.length > 0 && indicadores.some(ind => ind.preguntas > 0);
+  });
+
+  // Validar OAs de habilidad específicamente
+  const allOAsHabilidadHaveIndicators = selectedOAsHabilidad.every(oa => {
+    const indicadores = oaIndicadores[oa.id] || [];
+    return indicadores.length > 0 && indicadores.some(ind => ind.preguntas > 0);
+  });
+  
+  // Determinar si hay ambos tipos de eje
+  const hasBothTypes = selectedOAsContenido.length > 0 && selectedOAsHabilidad.length > 0;
+  
+  // Validación final: 
+  // - Si hay ambos tipos: ambos deben sumar el total Y cada OA debe tener indicadores
+  // - Si solo hay un tipo: el total debe ser correcto Y cada OA debe tener indicadores
+  const isStep3Valid = hasBothTypes 
+    ? (totalPreguntasContenido === totalPreguntas && totalPreguntasHabilidad === totalPreguntas && allOAsHaveIndicators)
+    : (totalPreguntasIndicadores === totalPreguntas && allOAsHaveIndicators);
+  
+  // Para mostrar el total correcto en el contador
+  const totalPreguntasToShow = hasBothTypes ? totalPreguntasContenido : totalPreguntasIndicadores;
 
   return (
     <>
@@ -391,22 +510,24 @@ export default function CrearMatrizPage() {
                         <ChevronsUpDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
                       </span>
                     </Listbox.Button>
-                    <Listbox.Options className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      {asignaturas.map(asignatura => (
-                        <Listbox.Option key={asignatura.id} value={asignatura.id} className={({ active }) => `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'}` }>
-                          {({ selected }) => (
-                            <>
-                              <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>{asignatura.nombre}</span>
-                              {selected ? (
-                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
-                                  <Check className="h-5 w-5" aria-hidden="true" />
-                                </span>
-                              ) : null}
-                            </>
-                          )}
-                        </Listbox.Option>
-                      ))}
-                    </Listbox.Options>
+                    <div className="relative">
+                      <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        {asignaturas.map(asignatura => (
+                          <Listbox.Option key={asignatura.id} value={asignatura.id} className={({ active }) => `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'}` }>
+                            {({ selected }) => (
+                              <>
+                                <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>{asignatura.nombre}</span>
+                                {selected ? (
+                                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
+                                    <Check className="h-5 w-5" aria-hidden="true" />
+                                  </span>
+                                ) : null}
+                              </>
+                            )}
+                          </Listbox.Option>
+                        ))}
+                      </Listbox.Options>
+                    </div>
                   </div>
                 </Listbox>
               </div>
@@ -456,7 +577,7 @@ export default function CrearMatrizPage() {
         {step === 2 && (
           <div className="space-y-6 mb-8">
             {/* Verificar si hay OAs disponibles */}
-            {oasDeAsignaturaNivel.length === 0 ? (
+            {oasContenido.length === 0 && oasHabilidad.length === 0 ? (
               <div className="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 border border-amber-200 rounded-3xl p-8 shadow-lg">
                 <div className="text-center">
                   {/* Icono decorativo */}
@@ -474,7 +595,7 @@ export default function CrearMatrizPage() {
                   {/* Descripción */}
                   <div className="max-w-md mx-auto space-y-3">
                     <p className="text-amber-700 text-base leading-relaxed">
-                      No se encontraron Objetivos de Aprendizaje para la combinación de&nbsp;
+                      No se encontraron Objetivos de Aprendizaje (contenido o habilidad) para la combinación de&nbsp;
                       <span className="font-semibold text-amber-800">
                         {asignaturas.find(a => a.id === selectedAsignatura)?.nombre}
                       </span>
@@ -518,92 +639,190 @@ export default function CrearMatrizPage() {
               </div>
             ) : (
               <>
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1">
-                    <Listbox value={selectedEje} onChange={setSelectedEje}>
-                      <div className="relative mt-1">
-                        <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">Eje</Listbox.Label>
-                        <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                          <span className="block truncate">
-                            {selectedEje ? ejesDisponibles.find(e => e.id === selectedEje)?.descripcion : 'Selecciona un eje'}
-                          </span>
-                          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                            <ChevronsUpDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                          </span>
-                        </Listbox.Button>
-                        <Listbox.Options className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                          {ejesDisponibles.map(eje => (
-                            <Listbox.Option key={eje.id} value={eje.id} className={({ active }) => `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'}` }>
-                              {({ selected }) => (
-                                <>
-                                  <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>{eje.descripcion}</span>
-                                  {selected ? (
-                                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
-                                      <Check className="h-5 w-5" aria-hidden="true" />
-                                    </span>
-                                  ) : null}
-                                </>
-                              )}
-                            </Listbox.Option>
-                          ))}
-                        </Listbox.Options>
-                      </div>
-                    </Listbox>
-                  </div>
-                  <div className="flex-1">
-                    <Listbox value={selectedOAs} onChange={handleOaChange} multiple>
-                      <div className="relative mt-1">
-                        <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">OA (Habilidad)</Listbox.Label>
-                        <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                          <span className="block truncate">
-                            {selectedOAs.length === 0 ? 'Selecciona uno o más OA' : `${selectedOAs.length} seleccionados`}
-                          </span>
-                          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                            <ChevronsUpDown className="h-5 w-5 text-white" aria-hidden="true" />
-                          </span>
-                        </Listbox.Button>
-                        {selectedOAs.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mt-2">
-                            {selectedOAs.map(oa => (
-                              <span key={oa.id} className="flex items-center bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm">
-                                {oa.oas_id}
-                                <button
-                                  type="button"
-                                  onClick={() => handleOaChange(selectedOAs.filter(o => o.id !== oa.id))}
-                                  className="ml-1 text-indigo-400 hover:text-indigo-700 focus:outline-none"
-                                  aria-label={`Eliminar ${oa.oas_id}`}
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              </span>
-                            ))}
+                <div className="space-y-4">
+                  {/* Fila 1: Eje de Contenido + OAs de Contenido */}
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex-1">
+                      <Listbox value={selectedEjeContenido} onChange={setSelectedEjeContenido}>
+                        <div className="relative mt-1">
+                          <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">Eje de Contenido</Listbox.Label>
+                          <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <span className="block truncate">
+                              {selectedEjeContenido ? ejesContenido.find(e => e.id === selectedEjeContenido)?.descripcion : 'Selecciona un eje de contenido'}
+                            </span>
+                            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                              <ChevronsUpDown className="h-5 h-5 text-gray-400" aria-hidden="true" />
+                            </span>
+                          </Listbox.Button>
+                          <div className="relative">
+                            <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                              {ejesContenido.map(eje => (
+                                <Listbox.Option key={eje.id} value={eje.id} className={({ active }) => `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'}` }>
+                                  {({ selected }) => (
+                                    <>
+                                      <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>{eje.descripcion}</span>
+                                      {selected ? (
+                                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
+                                          <Check className="h-5 w-5" aria-hidden="true" />
+                                        </span>
+                                      ) : null}
+                                    </>
+                                  )}
+                                </Listbox.Option>
+                              ))}
+                            </Listbox.Options>
                           </div>
-                        )}
-                        <Listbox.Options className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                          {oasDelEje.map(oa => (
-                            <Listbox.Option key={oa.id} value={oa} className={({ active }) => `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'}` }>
-                              {({ selected }) => (
-                                <>
-                                  <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>{oa.oas_id} - {oa.descripcion_oas.substring(0, 50)}...</span>
-                                  {selected ? (
-                                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
-                                      <Check className="h-5 w-5" aria-hidden="true" />
-                                    </span>
-                                  ) : null}
-                                </>
-                              )}
-                            </Listbox.Option>
-                          ))}
-                        </Listbox.Options>
-                      </div>
-                    </Listbox>
+                        </div>
+                      </Listbox>
+                    </div>
+                    
+                    <div className="flex-1">
+                      <Listbox value={selectedOAsContenido} onChange={setSelectedOAsContenido} multiple>
+                        <div className="relative mt-1">
+                          <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">OAs de Contenido</Listbox.Label>
+                          <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <span className="block truncate">
+                              {selectedOAsContenido.length === 0 ? 'Selecciona OAs de contenido' : `${selectedOAsContenido.length} OAs de contenido seleccionados`}
+                            </span>
+                            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                              <ChevronsUpDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                            </span>
+                          </Listbox.Button>
+                          {selectedOAsContenido.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {selectedOAsContenido.map(oa => (
+                                <span key={oa.id} className="flex items-center bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
+                                  {oa.oas_id}
+                                  <button
+                                    type="button"
+                                    onClick={() => setSelectedOAsContenido(selectedOAsContenido.filter(o => o.id !== oa.id))}
+                                    className="ml-1 text-blue-400 hover:text-blue-700 focus:outline-none"
+                                    aria-label={`Eliminar ${oa.oas_id}`}
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          <div className="relative">
+                            <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                              {oasDelEjeContenido.map(oa => (
+                                <Listbox.Option key={oa.id} value={oa} className={({ active }) => `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-blue-100 text-blue-900' : 'text-gray-900'}` }>
+                                  {({ selected }) => (
+                                    <>
+                                      <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>{oa.oas_id} - {oa.descripcion_oas.substring(0, 50)}...</span>
+                                      {selected ? (
+                                        <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
+                                          <Check className="h-5 w-5" aria-hidden="true" />
+                                        </span>
+                                      ) : null}
+                                    </>
+                                  )}
+                                </Listbox.Option>
+                              ))}
+                            </Listbox.Options>
+                          </div>
+                        </div>
+                      </Listbox>
+                    </div>
                   </div>
+
+                  {/* Fila 2: Eje de Habilidad + OAs de Habilidad (solo si existen) */}
+                  {ejesHabilidad.length > 0 && (
+                    <div className="flex flex-col md:flex-row gap-4">
+                      <div className="flex-1">
+                        <Listbox value={selectedEjeHabilidad} onChange={setSelectedEjeHabilidad}>
+                          <div className="relative mt-1">
+                            <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">Eje de Habilidad</Listbox.Label>
+                            <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                              <span className="block truncate">
+                                {selectedEjeHabilidad ? ejesHabilidad.find(e => e.id === selectedEjeHabilidad)?.descripcion : 'Selecciona un eje de habilidad'}
+                              </span>
+                              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                <ChevronsUpDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                              </span>
+                            </Listbox.Button>
+                            <div className="relative">
+                              <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                {ejesHabilidad.map(eje => (
+                                  <Listbox.Option key={eje.id} value={eje.id} className={({ active }) => `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'}` }>
+                                    {({ selected }) => (
+                                      <>
+                                        <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>{eje.descripcion}</span>
+                                        {selected ? (
+                                          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
+                                            <Check className="h-5 w-5" aria-hidden="true" />
+                                          </span>
+                                        ) : null}
+                                      </>
+                                    )}
+                                  </Listbox.Option>
+                                ))}
+                              </Listbox.Options>
+                            </div>
+                          </div>
+                        </Listbox>
+                      </div>
+                      
+                      <div className="flex-1">
+                        <Listbox value={selectedOAsHabilidad} onChange={setSelectedOAsHabilidad} multiple>
+                          <div className="relative mt-1">
+                            <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">OAs de Habilidad</Listbox.Label>
+                            <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                              <span className="block truncate">
+                                {selectedOAsHabilidad.length === 0 ? 'Selecciona OAs de habilidad' : `${selectedOAsHabilidad.length} OAs de habilidad seleccionados`}
+                              </span>
+                              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                <ChevronsUpDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                              </span>
+                            </Listbox.Button>
+                            {selectedOAsHabilidad.length > 0 && (
+                              <div className="flex flex-wrap gap-2 mt-2">
+                                {selectedOAsHabilidad.map(oa => (
+                                  <span key={oa.id} className="flex items-center bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                                    {oa.oas_id}
+                                    <button
+                                      type="button"
+                                      onClick={() => setSelectedOAsHabilidad(selectedOAsHabilidad.filter(o => o.id !== oa.id))}
+                                      className="ml-1 text-green-400 hover:text-green-700 focus:outline-none"
+                                      aria-label={`Eliminar ${oa.oas_id}`}
+                                    >
+                                      <X className="w-4 h-4" />
+                                    </button>
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            <div className="relative">
+                              <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                {oasDelEjeHabilidad.map(oa => (
+                                  <Listbox.Option key={oa.id} value={oa} className={({ active }) => `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-green-100 text-green-900' : 'text-gray-900'}` }>
+                                    {({ selected }) => (
+                                      <>
+                                        <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>{oa.oas_id} - {oa.descripcion_oas.substring(0, 50)}...</span>
+                                        {selected ? (
+                                          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-green-600">
+                                            <Check className="h-5 w-5" aria-hidden="true" />
+                                          </span>
+                                        ) : null}
+                                      </>
+                                    )}
+                                  </Listbox.Option>
+                                ))}
+                              </Listbox.Options>
+                            </div>
+                          </div>
+                        </Listbox>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="flex justify-end gap-4 mt-4">
                   <SecondaryButton onClick={() => setStep(1)}>Atrás</SecondaryButton>
                   <PrimaryButton
                     onClick={() => setStep(3)}
-                    disabled={selectedOAs.length === 0 || oasDeAsignaturaNivel.length === 0}
+                    disabled={selectedOAsContenido.length === 0 && selectedOAsHabilidad.length === 0}
                   >Confirmar OAs</PrimaryButton>
                 </div>
                 {/* Modal de confirmación para cambio de OAs */}
@@ -621,7 +840,12 @@ export default function CrearMatrizPage() {
                         <button
                           className="px-6 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-400 text-white font-semibold hover:from-indigo-600 hover:to-purple-500"
                           onClick={() => {
-                            setSelectedOAs(pendingOAs);
+                            // Separar OAs por tipo
+                            const oasContenido = pendingOAs.filter(oa => oa.tipo_eje === 'Contenido');
+                            const oasHabilidad = pendingOAs.filter(oa => oa.tipo_eje === 'Habilidad');
+                            
+                            setSelectedOAsContenido(oasContenido);
+                            setSelectedOAsHabilidad(oasHabilidad);
                             setOAIndicadores({});
                             setShowOaChangeModal(false);
                           }}
@@ -637,100 +861,243 @@ export default function CrearMatrizPage() {
 
         {/* Sección 3: Indicadores */}
         {step === 3 && (
-          <div className="space-y-6 mb-8">
-            {selectedOAs.map((oa, index) => (
-              <div key={oa.id} className="bg-white rounded-2xl shadow border border-gray-100 overflow-hidden">
-                {/* Header sobrio */}
-                <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br ${getGradient(index)}`}>
-                      <Target className="w-5 h-5 text-white" />
+          <div className="space-y-8 mb-8">
+            {/* OAs de Contenido */}
+            {selectedOAsContenido.length > 0 && (
+              <div className="space-y-6">
+                {/* Header de Contenido */}
+                <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl p-6 text-white">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                        <BookOpen className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-bold">Indicadores de Contenido</h2>
+                        <p className="text-blue-100">Define los indicadores para los OAs de contenido</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-800">Indicadores para {oa.oas_id}</h3>
-                      {oa.descripcion_oas && (
-                        <p className="text-gray-500 text-sm mt-1">{oa.descripcion_oas.substring(0, 60)}...</p>
-                      )}
+                    <div className="text-right">
+                      <div className={`text-lg font-bold ${(totalPreguntasContenido === totalPreguntas && allOAsContenidoHaveIndicators) ? 'text-emerald-200' : 'text-gray-200'}`}>
+                        {totalPreguntasContenido} / {totalPreguntas}
+                      </div>
+                      <div className="text-sm text-blue-100">
+                        {(totalPreguntasContenido === totalPreguntas && allOAsContenidoHaveIndicators) ? '✓ Válido' : '✗ Incompleto'}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {oa.basal && (
-                      <span className="bg-gray-100 text-gray-700 rounded-full px-3 py-1 text-xs font-semibold">Basal</span>
-                    )}
-                    <span className="flex items-center text-gray-400 text-sm">
-                      <Clock className="w-4 h-4 mr-1" /> Min: 10
-                    </span>
-                  </div>
                 </div>
-                {/* Contenido */}
-                <div className="p-6 space-y-4">
-                  {/* Indicadores */}
-                  {(oaIndicadores[oa.id] || []).map((indicador, idx) => (
-                    <div key={idx} className="flex gap-4 items-center">
-                      <input
-                        type="text"
-                        value={indicador.descripcion}
-                        onChange={e => {
-                          setOAIndicadores(prev => ({
-                            ...prev,
-                            [oa.id]: prev[oa.id].map((ind, i) => i === idx ? { ...ind, descripcion: e.target.value } : ind)
-                          }));
-                        }}
-                        className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm transition-all duration-200"
-                        placeholder="Descripción del indicador"
-                      />
-                      <input
-                        type="number"
-                        value={indicador.preguntas}
-                        onChange={e => {
-                          setOAIndicadores(prev => ({
-                            ...prev,
-                            [oa.id]: prev[oa.id].map((ind, i) => i === idx ? { ...ind, preguntas: Number(e.target.value) } : ind)
-                          }));
-                        }}
-                        className="w-24 px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm text-center transition-all duration-200"
-                        min={0}
-                        placeholder="0"
-                      />
-                      {/* Botón eliminar indicador */}
-                      {(oaIndicadores[oa.id] || []).length > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => setOAIndicadores(prev => ({
-                            ...prev,
-                            [oa.id]: prev[oa.id].filter((_, i) => i !== idx)
-                          }))}
-                          className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-red-400 text-white shadow-lg hover:from-pink-600 hover:to-red-500 transition-all duration-300 transform hover:scale-105"
-                          title="Eliminar indicador"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                      )}
+
+                {/* OAs de Contenido */}
+                {selectedOAsContenido.map((oa, index) => (
+                  <div key={oa.id} className="bg-white rounded-2xl shadow border border-gray-100 overflow-hidden">
+                    {/* Header sobrio */}
+                    <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br ${getGradient(index)}`}>
+                          <Target className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-800">Indicadores para {oa.oas_id}</h3>
+                          {oa.descripcion_oas && (
+                            <p className="text-gray-500 text-sm mt-1">{oa.descripcion_oas.substring(0, 60)}...</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {oa.basal && (
+                          <span className="bg-gray-100 text-gray-700 rounded-full px-3 py-1 text-xs font-semibold">Basal</span>
+                        )}
+                      </div>
                     </div>
-                  ))}
-                  
-                  {/* Botón agregar indicador */}
-                  <button
-                    type="button"
-                    onClick={() => setOAIndicadores(prev => ({
-                      ...prev,
-                      [oa.id]: [...(prev[oa.id] || []), { descripcion: '', preguntas: 0 }]
-                    }))}
-                    className="w-12 h-12 flex items-center justify-center rounded-full bg-white border border-gray-300 text-gray-500 shadow hover:bg-gray-100 transition-all duration-200"
-                    title="Agregar indicador"
-                  >
-                    <Plus size={24} />
-                  </button>
-                </div>
+                    {/* Contenido */}
+                    <div className="p-6 space-y-4">
+                      {/* Indicadores */}
+                      {(oaIndicadores[oa.id] || []).map((indicador, idx) => (
+                        <div key={idx} className="flex gap-4 items-center">
+                          <input
+                            type="text"
+                            value={indicador.descripcion}
+                            onChange={e => {
+                              setOAIndicadores(prev => ({
+                                ...prev,
+                                [oa.id]: prev[oa.id].map((ind, i) => i === idx ? { ...ind, descripcion: e.target.value } : ind)
+                              }));
+                            }}
+                            className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm transition-all duration-200"
+                            placeholder="Descripción del indicador"
+                          />
+                          <input
+                            type="number"
+                            value={indicador.preguntas}
+                            onChange={e => {
+                              setOAIndicadores(prev => ({
+                                ...prev,
+                                [oa.id]: prev[oa.id].map((ind, i) => i === idx ? { ...ind, preguntas: Number(e.target.value) } : ind)
+                              }));
+                            }}
+                            className="w-24 px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm text-center transition-all duration-200"
+                            min={0}
+                            placeholder="0"
+                          />
+                          {/* Botón eliminar indicador */}
+                          {(oaIndicadores[oa.id] || []).length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => setOAIndicadores(prev => ({
+                                ...prev,
+                                [oa.id]: prev[oa.id].filter((_, i) => i !== idx)
+                              }))}
+                              className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-red-400 text-white shadow-lg hover:from-pink-600 hover:to-red-500 transition-all duration-300 transform hover:scale-105"
+                              title="Eliminar indicador"
+                            >
+                              <X className="w-5 h-5" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      
+                      {/* Botón agregar indicador */}
+                      <button
+                        type="button"
+                        onClick={() => setOAIndicadores(prev => ({
+                          ...prev,
+                          [oa.id]: [...(prev[oa.id] || []), { descripcion: '', preguntas: 0 }]
+                        }))}
+                        className="w-12 h-12 flex items-center justify-center rounded-full bg-white border border-gray-300 text-gray-500 shadow hover:bg-gray-100 transition-all duration-200"
+                        title="Agregar indicador"
+                      >
+                        <Plus size={24} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-            {/* Resumen de preguntas */}
-            
+            )}
+
+            {/* OAs de Habilidad */}
+            {selectedOAsHabilidad.length > 0 && (
+              <div className="space-y-6">
+                {/* Header de Habilidad */}
+                <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-6 text-white">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                        <Zap className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-bold">Indicadores de Habilidad</h2>
+                        <p className="text-green-100">Define los indicadores para los OAs de habilidad</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className={`text-lg font-bold ${(totalPreguntasHabilidad === totalPreguntas && allOAsHabilidadHaveIndicators) ? 'text-emerald-200' : 'text-gray-200'}`}>
+                        {totalPreguntasHabilidad} / {totalPreguntas}
+                      </div>
+                      <div className="text-sm text-green-100">
+                        {(totalPreguntasHabilidad === totalPreguntas && allOAsHabilidadHaveIndicators) ? '✓ Válido' : '✗ Incompleto'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* OAs de Habilidad */}
+                {selectedOAsHabilidad.map((oa, index) => (
+                  <div key={oa.id} className="bg-white rounded-2xl shadow border border-gray-100 overflow-hidden">
+                    {/* Header sobrio */}
+                    <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br ${getGradient(index)}`}>
+                          <Target className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-800">Indicadores para {oa.oas_id}</h3>
+                          {oa.descripcion_oas && (
+                            <p className="text-gray-500 text-sm mt-1">{oa.descripcion_oas.substring(0, 60)}...</p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {oa.basal && (
+                          <span className="bg-gray-100 text-gray-700 rounded-full px-3 py-1 text-xs font-semibold">Basal</span>
+                        )}
+                      </div>
+                    </div>
+                    {/* Contenido */}
+                    <div className="p-6 space-y-4">
+                      {/* Indicadores */}
+                      {(oaIndicadores[oa.id] || []).map((indicador, idx) => (
+                        <div key={idx} className="flex gap-4 items-center">
+                          <input
+                            type="text"
+                            value={indicador.descripcion}
+                            onChange={e => {
+                              setOAIndicadores(prev => ({
+                                ...prev,
+                                [oa.id]: prev[oa.id].map((ind, i) => i === idx ? { ...ind, descripcion: e.target.value } : ind)
+                              }));
+                            }}
+                            className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm transition-all duration-200"
+                            placeholder="Descripción del indicador"
+                          />
+                          <input
+                            type="number"
+                            value={indicador.preguntas}
+                            onChange={e => {
+                              setOAIndicadores(prev => ({
+                                ...prev,
+                                [oa.id]: prev[oa.id].map((ind, i) => i === idx ? { ...ind, preguntas: Number(e.target.value) } : ind)
+                              }));
+                            }}
+                            className="w-24 px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm text-center transition-all duration-200"
+                            min={0}
+                            placeholder="0"
+                          />
+                          {/* Botón eliminar indicador */}
+                          {(oaIndicadores[oa.id] || []).length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => setOAIndicadores(prev => ({
+                                ...prev,
+                                [oa.id]: prev[oa.id].filter((_, i) => i !== idx)
+                              }))}
+                              className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-red-400 text-white shadow-lg hover:from-pink-600 hover:to-red-500 transition-all duration-300 transform hover:scale-105"
+                              title="Eliminar indicador"
+                            >
+                              <X className="w-5 h-5" />
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                      
+                      {/* Botón agregar indicador */}
+                      <button
+                        type="button"
+                        onClick={() => setOAIndicadores(prev => ({
+                          ...prev,
+                          [oa.id]: [...(prev[oa.id] || []), { descripcion: '', preguntas: 0 }]
+                        }))}
+                        className="w-12 h-12 flex items-center justify-center rounded-full bg-white border border-gray-300 text-gray-500 shadow hover:bg-gray-100 transition-all duration-200"
+                        title="Agregar indicador"
+                      >
+                        <Plus size={24} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Resumen de preguntas */}
+        {step === 3 && (
+          <>
             <div className="flex justify-end gap-4 mt-8">
               <SecondaryButton onClick={() => setStep(2)}>Atrás</SecondaryButton>
               <PrimaryButton
                 onClick={handleCreateMatriz}
-                disabled={!isValid || loading || totalPreguntasIndicadores !== totalPreguntas}
+                disabled={!isStep3Valid || loading}
               >
                 {loading ? 'Creando...' : 'Continuar'}
               </PrimaryButton>
@@ -738,12 +1105,12 @@ export default function CrearMatrizPage() {
             <div className="flex justify-end items-center mb-2">
               <span className={
                 `text-base font-semibold ${
-                  totalPreguntasIndicadores === totalPreguntas
+                  isStep3Valid
                     ? 'text-green-500'
                     : 'text-gray-500'
                 }`
               }>
-                Total preguntas: {totalPreguntasIndicadores} / {totalPreguntas}
+                Total preguntas: {totalPreguntasToShow} / {totalPreguntas}
               </span>
             </div>
             {errors.submit && (
@@ -760,7 +1127,7 @@ export default function CrearMatrizPage() {
                 </div>
               </Dialog>
             )}
-          </div>
+          </>
         )}
       </div>
     </>

@@ -7,9 +7,11 @@ import CargarResultadosModal from '@/components/correccion/CargarResultadosModal
 
 interface Evaluacion {
   id: number;
+  titulo: string;
   matrizNombre: string;
   preguntasCount: number;
   createdAt: string;
+  estado: string;
 }
 
 export default function CorreccionEvaluacionesPage() {
@@ -27,7 +29,9 @@ export default function CorreccionEvaluacionesPage() {
       const response = await fetch('/api/evaluaciones');
       if (response.ok) {
         const data = await response.json();
-        setEvaluaciones(data);
+        // Filtrar solo evaluaciones completas
+        const evaluacionesCompletas = data.filter((evaluacion: Evaluacion) => evaluacion.estado === 'completa');
+        setEvaluaciones(evaluacionesCompletas);
       }
     } catch (error) {
       console.error('Error cargando evaluaciones:', error);
@@ -72,7 +76,7 @@ export default function CorreccionEvaluacionesPage() {
             <div>
               <h1 className="text-2xl font-bold">Cargar Resultados</h1>
               <p className="text-indigo-100 text-sm">
-                Sube archivos CSV con los resultados de las evaluaciones para su procesamiento
+                Sube archivos CSV con los resultados de las evaluaciones completas para su procesamiento
               </p>
             </div>
           </div>
@@ -84,7 +88,7 @@ export default function CorreccionEvaluacionesPage() {
             <div className="flex items-center gap-2">
               <FileText className="h-4 w-4 text-indigo-200" />
               <div>
-                <p className="text-indigo-200 text-xs">Evaluaciones</p>
+                <p className="text-indigo-200 text-xs">Evaluaciones Completas</p>
                 <p className="text-lg font-bold">{evaluaciones.length}</p>
               </div>
             </div>
@@ -124,26 +128,26 @@ export default function CorreccionEvaluacionesPage() {
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900">Seleccionar Evaluación</h2>
-            <p className="text-gray-600 text-sm">Elige una evaluación para cargar sus resultados desde un archivo CSV</p>
+            <p className="text-gray-600 text-sm">Elige una evaluación completa para cargar sus resultados desde un archivo CSV</p>
           </div>
         </div>
         
         <div className="flex gap-4 items-end">
           <div className="flex-1">
             <label className="text-sm font-semibold text-gray-700 mb-2 block">
-              Evaluación
+              Evaluación Completa
             </label>
             <GlobalDropdown
               value={evaluacionSeleccionada?.id.toString() || ""}
               onChange={handleEvaluacionChange}
               options={[
-                { value: "", label: "Selecciona una evaluación para corregir" },
+                { value: "", label: "Selecciona una evaluación completa para cargar resultados" },
                 ...evaluaciones.map((evaluacion) => ({
                   value: evaluacion.id.toString(),
-                  label: `${evaluacion.matrizNombre} (${evaluacion.preguntasCount} preguntas)`
+                  label: `${evaluacion.titulo} - ${evaluacion.matrizNombre} (${evaluacion.preguntasCount} preguntas)`
                 }))
               ]}
-              placeholder="Selecciona una evaluación para corregir"
+              placeholder="Selecciona una evaluación completa para cargar resultados"
               className="h-12"
             />
           </div>
@@ -167,7 +171,7 @@ export default function CorreccionEvaluacionesPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-emerald-700">Evaluación</p>
-                  <p className="text-lg font-bold text-emerald-900">{evaluacionSeleccionada.matrizNombre}</p>
+                  <p className="text-lg font-bold text-emerald-900">{evaluacionSeleccionada.titulo}</p>
                 </div>
               </div>
               
@@ -199,9 +203,9 @@ export default function CorreccionEvaluacionesPage() {
             <div className="text-center py-12">
               <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8 border-2 border-dashed border-indigo-200">
                 <FileText className="h-16 w-16 text-indigo-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-indigo-900 mb-2">No hay evaluaciones disponibles</h3>
+                <h3 className="text-xl font-semibold text-indigo-900 mb-2">No hay evaluaciones completas disponibles</h3>
                 <p className="text-indigo-600 mb-4">
-                  Primero necesitas crear evaluaciones en la sección de Evaluaciones
+                  Solo se pueden cargar resultados de evaluaciones que estén completas (con todas las preguntas, respuestas correctas e indicadores asignados)
                 </p>
                 <button 
                   onClick={() => window.location.href = '/evaluaciones'}
@@ -219,7 +223,7 @@ export default function CorreccionEvaluacionesPage() {
         isOpen={showCargarModal}
         onClose={() => setShowCargarModal(false)}
         evaluacionId={evaluacionSeleccionada?.id}
-        evaluacionNombre={evaluacionSeleccionada?.matrizNombre}
+        evaluacionNombre={evaluacionSeleccionada?.titulo}
         onResultadosCargados={handleResultadosCargados}
       />
     </div>

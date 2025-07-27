@@ -1,20 +1,7 @@
 import { Listbox, Popover } from '@headlessui/react'
 import { ChevronsUpDown, Check, ChevronDown, ChevronRight, Eye } from 'lucide-react'
 import { useState } from 'react'
-
-interface MatrizEspecificacion {
-  id: number
-  nombre: string
-  total_preguntas: number
-  oas: Array<{
-    oa: {
-      oas_id: string
-      descripcion_oas: string
-      nivel: { nombre: string }
-      asignatura: { nombre: string }
-    }
-  }>
-}
+import { MatrizEspecificacion } from '@/types/evaluacion'
 
 interface MatrizSelectorProps {
   matrices: MatrizEspecificacion[]

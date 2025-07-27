@@ -1,6 +1,54 @@
-import { Check, AlertCircle, FileText, Edit2, X, MoreVertical, Trash2, Plus } from 'lucide-react'
+import { Check, AlertCircle, FileText, Edit2, X, MoreVertical, Trash2, Plus, Target, ChevronDown, ChevronRight } from 'lucide-react'
 import { PreguntaExtraida } from '@/lib/extract-evaluacion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { Indicador, MatrizOA, MatrizEspecificacion } from '@/types/evaluacion'
+import Dropdown from '@/components/entrevista/Dropdown'
+import { createPortal } from 'react-dom'
+
+// Componente de Tooltip personalizado usando Portal
+const Tooltip = ({ children, content }: { children: React.ReactNode; content: string }) => {
+  const [isVisible, setIsVisible] = useState(false)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+
+  const handleMouseEnter = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    setPosition({
+      x: rect.left + rect.width / 2,
+      y: rect.top - 10
+    })
+    setIsVisible(true)
+  }
+
+  const handleMouseLeave = () => {
+    setIsVisible(false)
+  }
+
+  return (
+    <>
+      <div 
+        className="relative inline-block w-full"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {children}
+      </div>
+      {isVisible && createPortal(
+        <div 
+          className="fixed z-[9999] px-3 py-2 text-sm text-white bg-gray-900 rounded-lg shadow-lg whitespace-normal max-w-xs pointer-events-none"
+          style={{
+            left: position.x,
+            top: position.y,
+            transform: 'translateX(-50%) translateY(-100%)'
+          }}
+        >
+          {content}
+          <div className="absolute top-full left-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 transform -translate-x-1/2"></div>
+        </div>,
+        document.body
+      )}
+    </>
+  )
+}
 
 interface PreguntasSidebarContentProps {
   preguntasExtraidas: PreguntaExtraida[]
@@ -10,6 +58,9 @@ interface PreguntasSidebarContentProps {
   onFormDataChange: (data: any) => void
   formData: any
   error?: string
+  selectedMatriz?: MatrizEspecificacion | null
+  indicadoresAsignados: { [preguntaNumero: number]: { contenido?: number; habilidad?: number } }
+  onIndicadorChange: (preguntaNumero: number, tipo: 'contenido' | 'habilidad', indicadorId: number | null) => void
 }
 
 export default function PreguntasSidebarContent({
@@ -19,7 +70,10 @@ export default function PreguntasSidebarContent({
   onPreguntasChange,
   onFormDataChange,
   formData,
-  error
+  error,
+  selectedMatriz,
+  indicadoresAsignados,
+  onIndicadorChange
 }: PreguntasSidebarContentProps) {
   const [editingPregunta, setEditingPregunta] = useState<{ 
     numero: number, 
@@ -32,6 +86,7 @@ export default function PreguntasSidebarContent({
     numero: number, 
     alternativaIndex?: number 
   } | null>(null)
+  const [indicadoresAccordionOpen, setIndicadoresAccordionOpen] = useState(false)
 
   const handleStartEdit = (preguntaNumero: number, field: 'texto' | 'alternativa', alternativaIndex?: number) => {
     setEditingPregunta({ numero: preguntaNumero, field, alternativaIndex })
@@ -216,13 +271,102 @@ export default function PreguntasSidebarContent({
     setOpenDropdown(null)
   }
 
+  // Funciones para manejar indicadores
+  const getIndicadoresPorTipo = (tipo: 'Contenido' | 'Habilidad') => {
+    if (!selectedMatriz) return []
+    
+    return selectedMatriz.oas
+      .filter(matrizOA => matrizOA.oa.tipo_eje === tipo)
+      .flatMap(matrizOA => matrizOA.indicadores)
+  }
+
+  const getIndicadoresContenido = () => getIndicadoresPorTipo('Contenido')
+  const getIndicadoresHabilidad = () => getIndicadoresPorTipo('Habilidad')
+
+  const hasIndicadoresHabilidad = () => getIndicadoresHabilidad().length > 0
+
+  const getIndicadorAsignado = (preguntaNumero: number, tipo: 'contenido' | 'habilidad') => {
+    const asignacion = indicadoresAsignados[preguntaNumero]
+    if (!asignacion) return null
+    
+    const indicadorId = tipo === 'contenido' ? asignacion.contenido : asignacion.habilidad
+    if (!indicadorId) return null
+
+    const indicadores = tipo === 'contenido' ? getIndicadoresContenido() : getIndicadoresHabilidad()
+    return indicadores.find(ind => ind.id === indicadorId) || null
+  }
+
+  const getIndicadorDescripcion = (indicadorId: number, tipo: 'contenido' | 'habilidad') => {
+    const indicadores = tipo === 'contenido' ? getIndicadoresContenido() : getIndicadoresHabilidad()
+    return indicadores.find(ind => ind.id === indicadorId)?.descripcion || ''
+  }
+
+  // Función para calcular cuántas preguntas faltan por asignar para cada indicador
+  const getPreguntasFaltantesPorIndicador = () => {
+    if (!selectedMatriz) return { contenido: {}, habilidad: {} }
+
+    const faltantesContenido: { [indicadorId: number]: number } = {}
+    const faltantesHabilidad: { [indicadorId: number]: number } = {}
+
+    // Inicializar contadores con el total de preguntas que debe tener cada indicador
+    selectedMatriz.oas.forEach(matrizOA => {
+      matrizOA.indicadores.forEach(indicador => {
+        if (matrizOA.oa.tipo_eje === 'Contenido') {
+          faltantesContenido[indicador.id] = indicador.preguntas
+        } else if (matrizOA.oa.tipo_eje === 'Habilidad') {
+          faltantesHabilidad[indicador.id] = indicador.preguntas
+        }
+      })
+    })
+
+    // Restar las preguntas ya asignadas
+    Object.values(indicadoresAsignados).forEach(asignacion => {
+      if (asignacion.contenido && faltantesContenido[asignacion.contenido] !== undefined) {
+        faltantesContenido[asignacion.contenido]--
+      }
+      if (asignacion.habilidad && faltantesHabilidad[asignacion.habilidad] !== undefined) {
+        faltantesHabilidad[asignacion.habilidad]--
+      }
+    })
+
+    return { contenido: faltantesContenido, habilidad: faltantesHabilidad }
+  }
+
+  // Función para obtener el estado visual del indicador (completo, incompleto, sin asignar)
+  const getEstadoIndicador = (indicadorId: number, tipo: 'contenido' | 'habilidad') => {
+    const faltantes = getPreguntasFaltantesPorIndicador()
+    const faltantesTipo = tipo === 'contenido' ? faltantes.contenido : faltantes.habilidad
+    const faltante = faltantesTipo[indicadorId] || 0
+
+    if (faltante === 0) return 'completo'
+    if (faltante < 0) return 'exceso'
+    return 'incompleto'
+  }
+
+  // Función para obtener el OA correspondiente a un indicador
+  const getOAForIndicador = (indicadorId: number, tipo: 'contenido' | 'habilidad') => {
+    if (!selectedMatriz) return null
+    
+    const tipoEje = tipo === 'contenido' ? 'Contenido' : 'Habilidad'
+    
+    for (const matrizOA of selectedMatriz.oas) {
+      if (matrizOA.oa.tipo_eje === tipoEje) {
+        const indicador = matrizOA.indicadores.find(ind => ind.id === indicadorId)
+        if (indicador) {
+          return matrizOA.oa
+        }
+      }
+    }
+    return null
+  }
+
   return (
     <div className="flex h-full flex-col overflow-y-auto p-6">
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
             <Check size={20} className="text-green-600" />
-            Respuestas Correctas
+            Respuestas e Indicadores
             {preguntasExtraidas.length > 0 && (
               <span className="ml-auto text-sm font-normal text-gray-500">
                 {Object.keys(respuestasCorrectas).length}/{preguntasExtraidas.length}
@@ -230,8 +374,160 @@ export default function PreguntasSidebarContent({
             )}
           </h3>
           <p className="text-sm text-gray-600 mb-4">
-            Marca la respuesta correcta para cada pregunta
+            Marca las respuestas correctas y asigna indicadores de la matriz
           </p>
+          
+          {/* Información de indicadores asignados */}
+          {selectedMatriz && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Target size={16} className="text-blue-600" />
+                <span className="text-sm font-medium text-blue-800">Matriz: {selectedMatriz.nombre}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-xs">
+                <div>
+                  <span className="text-blue-600 font-medium">Contenido:</span>
+                  <span className="text-blue-700 ml-1">{getIndicadoresContenido().length} indicadores</span>
+                </div>
+                {hasIndicadoresHabilidad() && (
+                  <div>
+                    <span className="text-green-600 font-medium">Habilidad:</span>
+                    <span className="text-green-700 ml-1">{getIndicadoresHabilidad().length} indicadores</span>
+                  </div>
+                )}
+              </div>
+              
+              {/* Estado de indicadores */}
+              <div className="mt-4">
+                <button
+                  onClick={() => setIndicadoresAccordionOpen(!indicadoresAccordionOpen)}
+                  className="w-full flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm font-semibold text-gray-800">Estado de Indicadores</span>
+                  </div>
+                  {indicadoresAccordionOpen ? (
+                    <ChevronDown size={16} className="text-gray-600" />
+                  ) : (
+                    <ChevronRight size={16} className="text-gray-600" />
+                  )}
+                </button>
+                
+                {indicadoresAccordionOpen && (
+                  <div className="mt-2 space-y-3 p-3 bg-white border border-gray-200 rounded-lg">
+                    {/* Indicadores de Contenido */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                        <span className="text-xs font-medium text-blue-700 uppercase tracking-wide">Contenido</span>
+                      </div>
+                      <div className="space-y-1.5">
+                        {getIndicadoresContenido().map(indicador => {
+                          const faltantes = getPreguntasFaltantesPorIndicador().contenido[indicador.id] || 0
+                          const estado = getEstadoIndicador(indicador.id, 'contenido')
+                          const oa = getOAForIndicador(indicador.id, 'contenido')
+                          return (
+                            <div key={indicador.id} className="flex items-center justify-between bg-gray-50 rounded-md px-3 py-2">
+                              <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
+                                {oa && (
+                                  <div className="flex-shrink-0">
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                      {oa.oas_id}
+                                    </span>
+                                  </div>
+                                )}
+                                <Tooltip content={indicador.descripcion}>
+                                  <div className="min-w-0 ml-1 flex-1 max-w-[350px]">
+                                    <span className="text-xs text-gray-700 truncate cursor-help block">
+                                      {indicador.descripcion}
+                                    </span>
+                                  </div>
+                                </Tooltip>
+                              </div>
+                              <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                                {estado === 'completo' && (
+                                  <div className="flex items-center gap-1 px-2 py-1 bg-green-50 border border-green-200 rounded-full">
+                                    <Check size={10} className="text-green-600" />
+                                    <span className="text-xs font-medium text-green-700">Completo</span>
+                                  </div>
+                                )}
+                                {estado === 'exceso' && (
+                                  <div className="flex items-center gap-1 px-2 py-1 bg-red-50 border border-red-200 rounded-full">
+                                    <span className="text-xs font-bold text-red-700">+{Math.abs(faltantes)}</span>
+                                  </div>
+                                )}
+                                {estado === 'incompleto' && (
+                                  <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 border border-amber-200 rounded-full">
+                                    <span className="text-xs font-bold text-amber-700">{faltantes}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Indicadores de Habilidad */}
+                    {hasIndicadoresHabilidad() && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                          <span className="text-xs font-medium text-green-700 uppercase tracking-wide">Habilidad</span>
+                        </div>
+                        <div className="space-y-1.5">
+                          {getIndicadoresHabilidad().map(indicador => {
+                            const faltantes = getPreguntasFaltantesPorIndicador().habilidad[indicador.id] || 0
+                            const estado = getEstadoIndicador(indicador.id, 'habilidad')
+                            const oa = getOAForIndicador(indicador.id, 'habilidad')
+                            return (
+                              <div key={indicador.id} className="flex items-center justify-between bg-gray-50 rounded-md px-3 py-2">
+                                <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
+                                  {oa && (
+                                    <div className="flex-shrink-0">
+                                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                        {oa.oas_id}
+                                      </span>
+                                    </div>
+                                  )}
+                                  <Tooltip content={indicador.descripcion}>
+                                    <div className="min-w-0 flex-1 max-w-[200px]">
+                                      <span className="text-xs text-gray-700 truncate cursor-help block">
+                                        {indicador.descripcion}
+                                      </span>
+                                    </div>
+                                  </Tooltip>
+                                </div>
+                                <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                                  {estado === 'completo' && (
+                                    <div className="flex items-center gap-1 px-2 py-1 bg-green-50 border border-green-200 rounded-full">
+                                      <Check size={10} className="text-green-600" />
+                                      <span className="text-xs font-medium text-green-700">Completo</span>
+                                    </div>
+                                  )}
+                                  {estado === 'exceso' && (
+                                    <div className="flex items-center gap-1 px-2 py-1 bg-red-50 border border-red-200 rounded-full">
+                                      <span className="text-xs font-bold text-red-700">+{Math.abs(faltantes)}</span>
+                                    </div>
+                                  )}
+                                  {estado === 'incompleto' && (
+                                    <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 border border-amber-200 rounded-full">
+                                      <span className="text-xs font-bold text-amber-700">{faltantes}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
           {error && (
             <div className="p-3 bg-red-100 border border-red-200 rounded-lg flex items-center gap-2 mb-4">
               <AlertCircle size={16} className="text-red-600" />
@@ -329,6 +625,78 @@ export default function PreguntasSidebarContent({
                 </div>
               ) : (
                 <p className="text-gray-900 mb-3 text-sm">{pregunta.texto}</p>
+              )}
+
+              {/* Asignación de Indicadores */}
+              {selectedMatriz && (
+                <div className="mb-4 space-y-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Target size={16} className="text-indigo-600" />
+                    <span className="text-sm font-medium text-gray-700">Indicadores Asignados</span>
+                  </div>
+                  
+                  {/* Indicador de Contenido */}
+                  <div className="space-y-2">
+                    <label className="block text-xs font-medium text-blue-700">
+                      Indicador de Contenido *
+                    </label>
+                    <Dropdown
+                      value={getIndicadorAsignado(pregunta.numero, 'contenido')?.id?.toString() || ''}
+                      onChange={(value) => onIndicadorChange(pregunta.numero, 'contenido', value ? Number(value) : null)}
+                      options={getIndicadoresContenido().map(ind => {
+                        const faltantes = getPreguntasFaltantesPorIndicador().contenido[ind.id] || 0
+                        const estado = getEstadoIndicador(ind.id, 'contenido')
+                        const isDisabled = estado === 'completo' && getIndicadorAsignado(pregunta.numero, 'contenido')?.id !== ind.id
+                        
+                        return { 
+                          value: ind.id.toString(), 
+                          label: ind.descripcion,
+                          disabled: isDisabled
+                        }
+                      })}
+                      placeholder="Seleccionar indicador de contenido..."
+                      className="text-sm"
+                    />
+                    {getIndicadorAsignado(pregunta.numero, 'contenido') && (
+                      <div className="flex items-center gap-2 text-xs text-blue-600">
+                        <Check size={12} />
+                        <span>Indicador de contenido asignado</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Indicador de Habilidad (solo si existe) */}
+                  {hasIndicadoresHabilidad() && (
+                    <div className="space-y-2">
+                      <label className="block text-xs font-medium text-green-700">
+                        Indicador de Habilidad *
+                      </label>
+                      <Dropdown
+                        value={getIndicadorAsignado(pregunta.numero, 'habilidad')?.id?.toString() || ''}
+                        onChange={(value) => onIndicadorChange(pregunta.numero, 'habilidad', value ? Number(value) : null)}
+                        options={getIndicadoresHabilidad().map(ind => {
+                          const faltantes = getPreguntasFaltantesPorIndicador().habilidad[ind.id] || 0
+                          const estado = getEstadoIndicador(ind.id, 'habilidad')
+                          const isDisabled = estado === 'completo' && getIndicadorAsignado(pregunta.numero, 'habilidad')?.id !== ind.id
+                          
+                          return { 
+                            value: ind.id.toString(), 
+                            label: ind.descripcion,
+                            disabled: isDisabled
+                          }
+                        })}
+                        placeholder="Seleccionar indicador de habilidad..."
+                        className="text-sm"
+                      />
+                      {getIndicadorAsignado(pregunta.numero, 'habilidad') && (
+                        <div className="flex items-center gap-2 text-xs text-green-600">
+                          <Check size={12} />
+                          <span>Indicador de habilidad asignado</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               )}
 
               {/* Alternativas */}

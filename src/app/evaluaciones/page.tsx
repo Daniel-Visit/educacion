@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { Trash2, Edit, Plus, FileText, CheckCircle2, BarChart3, Calendar, Target, Users, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import SecondaryButton from '@/components/ui/SecondaryButton';
+import EstadoEvaluacion from '@/components/evaluacion/EstadoEvaluacion';
 import { useRouter } from 'next/navigation';
 import { Dialog } from '@headlessui/react';
+import type { EstadoEvaluacion as EstadoEvaluacionType } from '@/lib/evaluacion-utils';
 
 interface Evaluacion {
   id: number;
@@ -13,6 +15,7 @@ interface Evaluacion {
   matrizNombre?: string;
   preguntasCount?: number;
   createdAt?: string;
+  estado?: EstadoEvaluacionType;
 }
 
 export default function EvaluacionesPage() {
@@ -314,6 +317,19 @@ export default function EvaluacionesPage() {
                         </div>
                         <span className="text-gray-900 font-semibold text-sm block pl-4 truncate">{evaluacion.matrizNombre || 'Sin matriz asignada'}</span>
                       </div>
+                      
+                      {/* Estado de la evaluación */}
+                      {evaluacion.estado && (
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              <span className="text-gray-600 font-medium text-sm">Estado</span>
+                            </div>
+                            <EstadoEvaluacion estado={evaluacion.estado} className="text-xs" />
+                          </div>
+                        </div>
+                      )}
                       
                       {/* Total de preguntas */}
                       <div className="space-y-1">

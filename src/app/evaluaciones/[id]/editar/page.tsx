@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import EvaluacionForm from '@/components/evaluacion/EvaluacionForm';
+import EstadoEvaluacion from '@/components/evaluacion/EstadoEvaluacion';
 
 export default function EditarEvaluacionPage() {
   const router = useRouter();
@@ -23,6 +24,24 @@ export default function EditarEvaluacionPage() {
         setError('Error al cargar la evaluación');
         setLoading(false);
       });
+  }, [id]);
+
+  // Escuchar cambios en el estado de la evaluación
+  useEffect(() => {
+    const handleEstadoActualizado = (event: CustomEvent) => {
+      if (event.detail.evaluacionId === parseInt(id as string)) {
+        setEvaluacion((prev: any) => ({
+          ...prev,
+          estado: event.detail.estado
+        }));
+      }
+    };
+
+    window.addEventListener('evaluacionEstadoActualizado', handleEstadoActualizado as EventListener);
+    
+    return () => {
+      window.removeEventListener('evaluacionEstadoActualizado', handleEstadoActualizado as EventListener);
+    };
   }, [id]);
 
   if (loading) {
@@ -53,9 +72,18 @@ export default function EditarEvaluacionPage() {
   }
 
   return (
-    <EvaluacionForm
-      modoEdicion={true}
-      evaluacionInicial={evaluacion}
-    />
+    <div>
+      {evaluacion.estado && (
+        <div className="bg-white border-b border-gray-200 px-6 py-4">
+          <div className="max-w-7xl mx-auto">
+            <EstadoEvaluacion estado={evaluacion.estado} />
+          </div>
+        </div>
+      )}
+      <EvaluacionForm
+        modoEdicion={true}
+        evaluacionInicial={evaluacion}
+      />
+    </div>
   );
 } 

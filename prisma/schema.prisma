@@ -100,6 +100,7 @@ model Indicador {
   descripcion String
   preguntas   Int
   matrizOA    MatrizOA @relation(fields: [matrizOAId], references: [id])
+  preguntaIndicadores PreguntaIndicador[]
 }
 
 model Archivo {
@@ -274,6 +275,7 @@ model Evaluacion {
   id         Int                   @id @default(autoincrement())
   archivoId  Int
   matrizId   Int
+  estado     String                @default("borrador") // "borrador", "preguntas_incompletas", "indicadores_incompletos", "cantidad_incorrecta", "completa"
   createdAt  DateTime              @default(now())
   updatedAt  DateTime
   matriz     MatrizEspecificacion  @relation(fields: [matrizId], references: [id])
@@ -290,6 +292,19 @@ model Pregunta {
   alternativas Alternativa[]
   evaluacion   Evaluacion        @relation(fields: [evaluacionId], references: [id])
   respuestas   RespuestaAlumno[]
+  indicadores  PreguntaIndicador[]
+}
+
+model PreguntaIndicador {
+  id           Int       @id @default(autoincrement())
+  preguntaId   Int
+  indicadorId  Int
+  tipo         String    // "Contenido" o "Habilidad"
+  pregunta     Pregunta  @relation(fields: [preguntaId], references: [id], onDelete: Cascade)
+  indicador    Indicador @relation(fields: [indicadorId], references: [id], onDelete: Cascade)
+
+  @@unique([preguntaId, indicadorId, tipo]) // Evitar duplicados
+  @@map("pregunta_indicador")
 }
 
 model ResultadoEvaluacion {

@@ -1,26 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Editor } from '@tiptap/react'
 import { extraerPreguntasAlternativas, PreguntaExtraida } from '@/lib/extract-evaluacion'
-
-interface MatrizEspecificacion {
-  id: number
-  nombre: string
-  total_preguntas: number
-  oas: Array<{
-    oa: {
-      oas_id: string
-      descripcion_oas: string
-      nivel: { nombre: string }
-      asignatura: { nombre: string }
-    }
-  }>
-}
-
-interface EvaluacionFormData {
-  matrizId: number | null
-  contenido: any
-  respuestasCorrectas: { [preguntaNumero: number]: string }
-}
+import { MatrizEspecificacion, EvaluacionFormData } from '@/types/evaluacion'
 
 interface FormErrors {
   [key: string]: string
@@ -36,7 +17,8 @@ export function useEvaluacionForm() {
   const [formData, setFormData] = useState<EvaluacionFormData>({
     matrizId: null,
     contenido: null,
-    respuestasCorrectas: {}
+    respuestasCorrectas: {},
+    indicadoresAsignados: {}
   })
   const [showSaveModal, setShowSaveModal] = useState(false)
   const [titulo, setTitulo] = useState('')
@@ -136,38 +118,128 @@ export function useEvaluacionForm() {
     }))
   }
 
+  const handleIndicadorChange = (preguntaNumero: number, tipo: 'contenido' | 'habilidad', indicadorId: number | null) => {
+    setFormData(prev => ({
+      ...prev,
+      indicadoresAsignados: {
+        ...prev.indicadoresAsignados,
+        [preguntaNumero]: {
+          ...prev.indicadoresAsignados[preguntaNumero],
+          [tipo]: indicadorId || undefined
+        }
+      }
+    }))
+  }
+
   const validateForm = () => {
+    console.log('[useEvaluacionForm] validateForm llamado', {
+      evaluacionId,
+      titulo,
+      tituloTrim: titulo.trim(),
+      tituloLength: titulo.length,
+      selectedMatriz: !!selectedMatriz,
+      contenido: !!formData.contenido,
+      preguntasExtraidas: preguntasExtraidas.length,
+      respuestasCorrectas: Object.keys(formData.respuestasCorrectas).length,
+      indicadoresAsignados: Object.keys(formData.indicadoresAsignados).length
+    })
+
+    // Solo validar lo esencial para permitir el guardado
     const newErrors: FormErrors = {}
 
-    if (!evaluacionId && !titulo.trim()) {
-      newErrors.titulo = 'El título es requerido'
-    }
-
+    // Validar matriz seleccionada (esencial)
     if (!selectedMatriz) {
       newErrors.matriz = 'Debe seleccionar una matriz de especificación'
     }
 
+    // Validar contenido (esencial)
     if (!formData.contenido) {
-      newErrors.contenido = 'Debe crear el contenido de la evaluación'
+      newErrors.contenido = 'El contenido es requerido'
     }
 
-    if (preguntasExtraidas.length === 0) {
-      newErrors.preguntas = 'No se detectaron preguntas en el contenido'
-    }
-
-    // Verificar que todas las preguntas tengan respuesta correcta
-    const preguntasSinRespuesta = preguntasExtraidas.filter(
-      pregunta => !formData.respuestasCorrectas[pregunta.numero]
-    )
-    if (preguntasSinRespuesta.length > 0) {
-      newErrors.respuestas = `Faltan respuestas correctas para ${preguntasSinRespuesta.length} pregunta(s)`
-    }
+    console.log('[useEvaluacionForm] Errores de validación:', newErrors)
+    console.log('[useEvaluacionForm] validateForm retorna:', Object.keys(newErrors).length === 0)
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
+  const handleSaveWithPreguntas = async (preguntas: any[]) => {
+    setSaving(true)
+    try {
+      console.log('Guardando evaluación con preguntas forzadas, evaluacionId:', evaluacionId)
+      const requestBody = {
+        contenido: JSON.stringify(formData.contenido),
+        preguntas: preguntas,
+        respuestasCorrectas: formData.respuestasCorrectas,
+        matrizId: selectedMatriz?.id || null,
+        indicadoresAsignados: formData.indicadoresAsignados
+      }
+      console.log('Datos a enviar con preguntas forzadas:', requestBody)
+      
+      const evaluacionResponse = await fetch(`/api/evaluaciones/${evaluacionId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      })
+      if (evaluacionResponse.ok) {
+        const evaluacionActualizada = await evaluacionResponse.json()
+        console.log('Evaluación actualizada:', evaluacionActualizada)
+        
+        // Actualizar el estado en la interfaz
+        if (evaluacionActualizada.estado) {
+          // Disparar un evento personalizado para notificar el cambio de estado
+          window.dispatchEvent(new CustomEvent('evaluacionEstadoActualizado', {
+            detail: { evaluacionId, estado: evaluacionActualizada.estado }
+          }))
+        }
+        
+        setShowSaveModal(false)
+        setShowSuccess(true)
+        setTimeout(() => setShowSuccess(false), 3000)
+      } else {
+        const errorData = await evaluacionResponse.json()
+        setErrors({ submit: errorData.error || 'Error al actualizar la evaluación' })
+      }
+    } catch (error) {
+      console.error('Error al guardar evaluación con preguntas forzadas:', error)
+      setErrors({ submit: 'Error al guardar la evaluación' })
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const handleSave = async () => {
+    console.log('[useEvaluacionForm] handleSave llamado', {
+      evaluacionId,
+      preguntasExtraidas: preguntasExtraidas.length,
+      selectedMatriz: !!selectedMatriz,
+      formData: {
+        contenido: !!formData.contenido,
+        respuestasCorrectas: Object.keys(formData.respuestasCorrectas).length,
+        indicadoresAsignados: Object.keys(formData.indicadoresAsignados).length
+      }
+    });
+    
+    console.log('[useEvaluacionForm] preguntasExtraidas detalle:', preguntasExtraidas);
+    
+    // Si estamos en modo edición y no hay preguntas extraídas, extraerlas del contenido
+    if (evaluacionId && preguntasExtraidas.length === 0 && formData.contenido) {
+      console.log('[useEvaluacionForm] Forzando extracción de preguntas del contenido');
+      try {
+        const preguntasExtraidas = extraerPreguntasAlternativas(formData.contenido);
+        console.log('[useEvaluacionForm] Preguntas extraídas forzadamente:', preguntasExtraidas.length);
+        
+        // Usar las preguntas recién extraídas para el guardado
+        if (preguntasExtraidas.length > 0) {
+          await handleSaveWithPreguntas(preguntasExtraidas);
+          return;
+        }
+      } catch (error) {
+        console.error('Error al extraer preguntas forzadamente:', error);
+      }
+    }
+    
     if (!validateForm()) return
     setSaving(true)
     try {
@@ -175,19 +247,43 @@ export function useEvaluacionForm() {
       if (evaluacionId) {
         // Modo edición: PUT
         console.log('Actualizando evaluación existente con ID:', evaluacionId)
+        
+        // Asegurar que las preguntas se envíen correctamente
+        const preguntasParaEnviar = preguntasExtraidas.length > 0 ? preguntasExtraidas : [];
+        console.log('Preguntas para enviar:', preguntasParaEnviar.length);
+        
         const requestBody = {
           contenido: JSON.stringify(formData.contenido),
-          preguntas: preguntasExtraidas,
+          preguntas: preguntasParaEnviar,
           respuestasCorrectas: formData.respuestasCorrectas,
-          matrizId: selectedMatriz?.id || null
+          matrizId: selectedMatriz?.id || null,
+          indicadoresAsignados: formData.indicadoresAsignados
         }
         console.log('Datos a enviar:', requestBody)
+        console.log('preguntasExtraidas tipo:', typeof preguntasExtraidas)
+        console.log('preguntasExtraidas length:', preguntasExtraidas.length)
+        console.log('preguntasExtraidas primer elemento:', preguntasExtraidas[0])
+        
+        const requestBodyString = JSON.stringify(requestBody)
+        console.log('JSON stringificado:', requestBodyString)
+        
         const evaluacionResponse = await fetch(`/api/evaluaciones/${evaluacionId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody)
+          body: requestBodyString
         })
         if (evaluacionResponse.ok) {
+          const evaluacionActualizada = await evaluacionResponse.json()
+          console.log('Evaluación actualizada:', evaluacionActualizada)
+          
+          // Actualizar el estado en la interfaz
+          if (evaluacionActualizada.estado) {
+            // Disparar un evento personalizado para notificar el cambio de estado
+            window.dispatchEvent(new CustomEvent('evaluacionEstadoActualizado', {
+              detail: { evaluacionId, estado: evaluacionActualizada.estado }
+            }))
+          }
+          
           setShowSaveModal(false)
           setShowSuccess(true)
           setTimeout(() => setShowSuccess(false), 3000)
@@ -221,7 +317,8 @@ export function useEvaluacionForm() {
             matrizId: selectedMatriz!.id,
             contenido: JSON.stringify(formData.contenido),
             preguntas: preguntasExtraidas,
-            respuestasCorrectas: formData.respuestasCorrectas
+            respuestasCorrectas: formData.respuestasCorrectas,
+            indicadoresAsignados: formData.indicadoresAsignados
           })
         })
         if (evaluacionResponse.ok) {
@@ -261,6 +358,24 @@ export function useEvaluacionForm() {
           respuestasCorrectas[pregunta.numero] = correcta.letra
         }
       })
+
+      // Reconstruir indicadoresAsignados
+      const indicadoresAsignados: { [key: number]: { contenido?: number; habilidad?: number } } = {}
+      content.preguntas.forEach((pregunta: any) => {
+        if (pregunta.indicadores && pregunta.indicadores.length > 0) {
+          const asignacion: { contenido?: number; habilidad?: number } = {}
+          pregunta.indicadores.forEach((indicador: any) => {
+            if (indicador.tipo === 'Contenido') {
+              asignacion.contenido = indicador.indicadorId
+            } else if (indicador.tipo === 'Habilidad') {
+              asignacion.habilidad = indicador.indicadorId
+            }
+          })
+          if (Object.keys(asignacion).length > 0) {
+            indicadoresAsignados[pregunta.numero] = asignacion
+          }
+        }
+      })
       let parsedContent = null
       try {
         parsedContent = JSON.parse(content.archivo.contenido)
@@ -279,9 +394,21 @@ export function useEvaluacionForm() {
       setFormData(prev => ({
         ...prev,
         contenido: parsedContent,
-        respuestasCorrectas
+        respuestasCorrectas,
+        indicadoresAsignados
       }))
       setTitulo(content.archivo.titulo || '')
+      
+      // Extraer preguntas del contenido cargado para mantener sincronización
+      try {
+        const preguntasExtraidas = extraerPreguntasAlternativas(parsedContent)
+        console.log('[handleLoadContent] Preguntas extraídas del contenido:', preguntasExtraidas.length);
+        setPreguntasExtraidas(preguntasExtraidas)
+      } catch (error) {
+        console.error('Error al extraer preguntas del contenido cargado:', error)
+        // Mantener las preguntas de la base de datos si no se pueden extraer del contenido
+      }
+      
       return
     }
     
@@ -303,7 +430,8 @@ export function useEvaluacionForm() {
       setFormData(prev => ({
         ...prev,
         contenido: parsedContent,
-        respuestasCorrectas: content.respuestasCorrectas || {}
+        respuestasCorrectas: content.respuestasCorrectas || {},
+        indicadoresAsignados: content.indicadoresAsignados || {}
       }))
       
       try {
@@ -359,6 +487,7 @@ export function useEvaluacionForm() {
     handleEditorReady,
     handleMatrizSelect,
     handleRespuestaCorrectaChange,
+    handleIndicadorChange,
     handleSave,
     handleLoadContent,
     clearErrors,

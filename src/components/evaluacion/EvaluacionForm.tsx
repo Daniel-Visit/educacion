@@ -78,6 +78,7 @@ export default function EvaluacionForm({
     handleEditorReady,
     handleMatrizSelect,
     handleRespuestaCorrectaChange,
+    handleIndicadorChange,
     handleSave,
     handleLoadContent,
     clearErrors,
@@ -151,7 +152,36 @@ export default function EvaluacionForm({
   useEffect(() => {
     if (editorReady && modoEdicion && evaluacionInicial?.archivo?.contenido && dataPreloaded) {
       try {
-        const parsedContent = JSON.parse(evaluacionInicial.archivo.contenido);
+        // Verificar que el contenido no esté vacío y sea un string válido
+        const contenido = evaluacionInicial.archivo.contenido.trim();
+        if (!contenido) {
+          console.log('[EvaluacionForm] Contenido vacío, saltando carga inicial');
+          return;
+        }
+
+        // Intentar parsear como JSON primero
+        let parsedContent;
+        try {
+          parsedContent = JSON.parse(contenido);
+        } catch (jsonError) {
+          console.warn('[EvaluacionForm] Contenido no es JSON válido, intentando como texto plano:', jsonError);
+          // Si no es JSON válido, crear un contenido básico de TipTap
+          parsedContent = {
+            type: 'doc',
+            content: [
+              {
+                type: 'paragraph',
+                content: [
+                  {
+                    type: 'text',
+                    text: contenido
+                  }
+                ]
+              }
+            ]
+          };
+        }
+
         // Usar el editor directamente para establecer el contenido
         if (currentEditor) {
           currentEditor.commands.setContent(parsedContent);
@@ -159,9 +189,39 @@ export default function EvaluacionForm({
           updateFormData({
             contenido: parsedContent
           });
+          console.log('[EvaluacionForm] Contenido cargado exitosamente en modo edición');
         }
       } catch (error) {
         console.error('Error al establecer contenido en el editor:', error);
+        console.log('Contenido que causó el error:', evaluacionInicial.archivo.contenido);
+        
+        // Crear un contenido básico como fallback
+        const fallbackContent = {
+          type: 'doc',
+          content: [
+            {
+              type: 'paragraph',
+              content: [
+                {
+                  type: 'text',
+                  text: 'Error al cargar el contenido original. Por favor, edita manualmente.'
+                }
+              ]
+            }
+          ]
+        };
+        
+        if (currentEditor) {
+          try {
+            currentEditor.commands.setContent(fallbackContent);
+            updateFormData({
+              contenido: fallbackContent
+            });
+            console.log('[EvaluacionForm] Contenido fallback cargado');
+          } catch (fallbackError) {
+            console.error('Error al cargar contenido fallback:', fallbackError);
+          }
+        }
       }
     }
   }, [editorReady, modoEdicion, evaluacionInicial, dataPreloaded]);
@@ -210,7 +270,15 @@ export default function EvaluacionForm({
   }
 
   const handleSaveWithValidation = () => {
+    console.log('[EvaluacionForm] handleSaveWithValidation llamado', {
+      modoEdicion,
+      evaluacionId,
+      selectedMatriz: !!selectedMatriz,
+      preguntasExtraidas: preguntasExtraidas.length
+    });
+    
     if (modoEdicion || evaluacionId) {
+      console.log('[EvaluacionForm] Llamando handleSave()');
       handleSave();
     } else {
       if (validateForm()) {
@@ -265,6 +333,27 @@ export default function EvaluacionForm({
             onMouseEnter={() => setIsSaveHovered(true)}
             onMouseLeave={() => setIsSaveHovered(false)}
             onClick={() => {
+              console.log('[EvaluacionForm] Botón clickeado', {
+                modoEdicion,
+                evaluacionId,
+                saving,
+                selectedMatriz: !!selectedMatriz,
+                preguntasExtraidas: preguntasExtraidas.length,
+                respuestasCorrectas: Object.keys(formData.respuestasCorrectas).length
+              });
+              
+              const isDisabled = saving ||
+                !selectedMatriz ||
+                preguntasExtraidas.length === 0 ||
+                preguntasExtraidas.some(p => !formData.respuestasCorrectas[p.numero]);
+              
+              console.log('[EvaluacionForm] Botón disabled:', isDisabled, {
+                saving,
+                noSelectedMatriz: !selectedMatriz,
+                noPreguntas: preguntasExtraidas.length === 0,
+                preguntasSinRespuesta: preguntasExtraidas.some(p => !formData.respuestasCorrectas[p.numero])
+              });
+              
               if (!modoEdicion && !evaluacionId) setShowSaveModal(true);
               else handleSaveWithValidation();
             }}
@@ -384,7 +473,7 @@ export default function EvaluacionForm({
           </div>
         </main>
         {/* Drawer animado para Respuestas Correctas */}
-        <Drawer isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)}>
+        <Drawer isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} width={600}>
           <PreguntasSidebarContent
             preguntasExtraidas={preguntasExtraidas}
             respuestasCorrectas={formData.respuestasCorrectas}
@@ -392,7 +481,10 @@ export default function EvaluacionForm({
             onPreguntasChange={setPreguntasExtraidas}
             onFormDataChange={updateFormData}
             formData={formData}
-            error={errors.respuestas}
+            error={errors.respuestas || errors.indicadores}
+            selectedMatriz={selectedMatriz}
+            indicadoresAsignados={formData.indicadoresAsignados}
+            onIndicadorChange={handleIndicadorChange}
           />
         </Drawer>
         {/* Oreja siempre visible y animada */}

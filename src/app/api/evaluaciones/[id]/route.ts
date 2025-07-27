@@ -1,14 +1,16 @@
 // NOTA: Los modelos Prisma se acceden en minúscula y singular: prisma.evaluacion, prisma.pregunta, prisma.alternativa
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { calcularEstadoEvaluacion } from '@/lib/evaluacion-utils'
 
 // GET /api/evaluaciones/[id] - obtener una evaluación específica con todos sus datos
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id)
+    const { id: idParam } = await params
+    const id = parseInt(idParam)
     if (isNaN(id)) {
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
     }
@@ -18,10 +20,20 @@ export async function GET(
       where: { id },
       include: {
         archivo: true,
-        matriz: true,
+        matriz: {
+          include: {
+            oas: {
+              include: {
+                indicadores: true
+              }
+            }
+          }
+        },
         preguntas: {
           include: {
-            alternativas: true
+            alternativas: true,
+            // @ts-ignore - Prisma client sync issue
+            indicadores: true
           }
         }
       }
@@ -41,18 +53,19 @@ export async function GET(
 // PUT /api/evaluaciones/[id] - actualizar una evaluación
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     console.log('PUT /api/evaluaciones/[id] - Iniciando actualización')
-    const id = parseInt(params.id)
+    const { id: idParam } = await params
+    const id = parseInt(idParam)
     if (isNaN(id)) {
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
     }
 
     const body = await request.json()
-    const { contenido, preguntas, respuestasCorrectas, matrizId } = body
-    console.log('Datos recibidos:', { id, contenido: !!contenido, preguntas: preguntas?.length, respuestasCorrectas: !!respuestasCorrectas, matrizId })
+    const { contenido, preguntas, respuestasCorrectas, matrizId, indicadoresAsignados } = body
+    console.log('Datos recibidos:', { id, contenido: !!contenido, preguntas: preguntas?.length, respuestasCorrectas: !!respuestasCorrectas, matrizId, indicadoresAsignados: !!indicadoresAsignados })
 
     // Verificar que la evaluación existe
     // @ts-ignore - Prisma client sync issue
@@ -166,16 +179,126 @@ export async function PUT(
       }
     }
 
+    // Actualizar indicadores asignados si se proporcionan
+    if (indicadoresAsignados) {
+      console.log('Actualizando indicadores asignados...')
+      
+      // Eliminar indicadores existentes
+      // @ts-ignore - Prisma client sync issue
+      await prisma.preguntaIndicador.deleteMany({
+        where: {
+          pregunta: {
+            evaluacionId: id
+          }
+        }
+      })
+
+      // Obtener las preguntas actuales para mapear números a IDs
+      // @ts-ignore - Prisma client sync issue
+      const preguntasActuales = await prisma.pregunta.findMany({
+        where: { evaluacionId: id },
+        select: { id: true, numero: true }
+      })
+
+      // Crear nuevos indicadores asignados
+      const indicadoresToCreate: any[] = []
+      
+      for (const [preguntaNumero, asignacion] of Object.entries(indicadoresAsignados)) {
+        const pregunta = preguntasActuales.find(p => p.numero === parseInt(preguntaNumero))
+        if (pregunta) {
+          const asignacionTyped = asignacion as { contenido?: number; habilidad?: number }
+          if (asignacionTyped.contenido) {
+            indicadoresToCreate.push({
+              preguntaId: pregunta.id,
+              indicadorId: asignacionTyped.contenido,
+              tipo: 'Contenido'
+            })
+          }
+          if (asignacionTyped.habilidad) {
+            indicadoresToCreate.push({
+              preguntaId: pregunta.id,
+              indicadorId: asignacionTyped.habilidad,
+              tipo: 'Habilidad'
+            })
+          }
+        }
+      }
+
+      if (indicadoresToCreate.length > 0) {
+        // @ts-ignore - Prisma client sync issue
+        await prisma.preguntaIndicador.createMany({
+          data: indicadoresToCreate
+        })
+      }
+      
+      console.log('Indicadores asignados actualizados')
+    }
+
+    // Calcular y actualizar el estado de la evaluación
+    console.log('Calculando estado de la evaluación...')
+    
+    // Obtener la evaluación con todos los datos necesarios para calcular el estado
+    // @ts-ignore - Prisma client sync issue
+    const evaluacionParaEstado = await prisma.evaluacion.findUnique({
+      where: { id },
+      include: {
+        matriz: {
+          include: {
+            oas: {
+              include: {
+                indicadores: true
+              }
+            }
+          }
+        },
+        preguntas: {
+          include: {
+            alternativas: true,
+            // @ts-ignore - Prisma client sync issue
+            indicadores: true
+          }
+        }
+      }
+    })
+
+    if (evaluacionParaEstado) {
+      const estadoCalculado = calcularEstadoEvaluacion({
+        // @ts-ignore - Prisma client sync issue
+        preguntas: evaluacionParaEstado.preguntas,
+        // @ts-ignore - Prisma client sync issue
+        matriz: evaluacionParaEstado.matriz
+      })
+
+      // @ts-ignore - Prisma client sync issue
+      await prisma.evaluacion.update({
+        where: { id },
+        // @ts-ignore - Prisma client sync issue
+        data: { estado: estadoCalculado }
+      })
+
+      console.log('Estado de evaluación actualizado:', estadoCalculado)
+    }
+
     // Obtener la evaluación actualizada
     // @ts-ignore - Prisma client sync issue
     const evaluacionActualizada = await prisma.evaluacion.findUnique({
       where: { id },
       include: {
         archivo: true,
-        matriz: true,
+        matriz: {
+          include: {
+            oas: {
+              include: {
+                indicadores: true
+              }
+            }
+          }
+        },
         preguntas: {
           include: {
-            alternativas: true
+            alternativas: true,
+            // @ts-ignore - Prisma client sync issue
+            indicadores: true
           }
         }
       }
@@ -193,10 +316,11 @@ export async function PUT(
 // DELETE /api/evaluaciones/[id] - eliminar una evaluación
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id)
+    const { id: idParam } = await params
+    const id = parseInt(idParam)
     if (isNaN(id)) {
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
     }
