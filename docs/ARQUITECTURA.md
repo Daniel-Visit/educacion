@@ -223,6 +223,15 @@ src/
 │   ├── editor/                   # Componentes del editor
 │   ├── evaluacion/               # Componentes de evaluaciones
 │   ├── entrevista/               # Componentes de entrevista
+│   ├── matrices/                 # Componentes de matrices (refactorizados)
+│   │   ├── MatrizBasicForm.tsx   # Formulario básico reutilizable
+│   │   ├── MatrizOASelector.tsx  # Selector de OAs (Paso 2)
+│   │   ├── MatrizIndicadoresSection.tsx # Gestión de indicadores (Paso 3)
+│   │   ├── OASelector.tsx        # Componente base para selección de OAs
+│   │   ├── IndicadoresSection.tsx # Componente base para indicadores
+│   │   ├── MatrizStepIndicator.tsx # Indicador de pasos
+│   │   ├── MatrizHeader.tsx      # Encabezado con estadísticas
+│   │   └── ImportarMatrizModal.tsx # Modal de importación CSV
 │   ├── resultados/               # Componentes reutilizables de resultados
 │   │   ├── ResultadosHeader.tsx  # Header consistente para páginas
 │   │   ├── LoadingState.tsx      # Estado de carga uniforme
@@ -236,12 +245,18 @@ src/
 │   ├── use-evaluacion-form.ts    # Hook principal de evaluaciones
 │   ├── use-preguntas-editor.ts   # Hook de edición de preguntas
 │   ├── use-content-save.ts       # Hook de guardado
+│   ├── useMatrices.ts            # Hook para gestión de matrices (refactorizado)
 │   └── use-*.ts                  # Otros hooks
 ├── lib/                          # Utilidades y configuraciones
 │   ├── prisma.ts                 # Cliente de Prisma
 │   ├── extract-evaluacion.ts     # Extractor de preguntas
 │   ├── resultados-utils.ts       # Utilidades para resultados y estadísticas
 │   └── tiptap-utils.ts           # Utilidades de TipTap
+├── types/                        # Tipos TypeScript centralizados
+│   ├── matrices.ts               # Tipos para módulo de matrices
+│   └── evaluacion.ts             # Tipos para evaluaciones
+├── utils/                        # Utilidades compartidas
+│   └── matrices.ts               # Funciones utilitarias para matrices
 └── styles/                       # Estilos globales
     ├── _variables.scss           # Variables CSS
     └── _keyframe-animations.scss # Animaciones

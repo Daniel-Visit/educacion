@@ -37,7 +37,7 @@ Matriz de Especificación
 src/app/matrices/
 ├── page.tsx                    # Lista de matrices
 ├── crear/
-│   └── page.tsx               # Crear nueva matriz
+│   └── page.tsx               # Crear nueva matriz (refactorizado)
 └── [id]/
     ├── page.tsx               # Ver matriz específica
     └── editar/
@@ -46,10 +46,27 @@ src/app/matrices/
 src/app/api/
 └── matrices/
     ├── route.ts               # CRUD de matrices
-    └── [id]/route.ts          # Operaciones por ID
+    ├── [id]/route.ts          # Operaciones por ID
+    └── import-csv/route.ts    # Importación desde CSV
 
-src/components/
-└── matrices/                  # Componentes específicos (si existen)
+src/components/matrices/        # Componentes refactorizados
+├── MatrizBasicForm.tsx        # Formulario básico reutilizable
+├── MatrizOASelector.tsx       # Selector de OAs (Paso 2)
+├── MatrizIndicadoresSection.tsx # Gestión de indicadores (Paso 3)
+├── OASelector.tsx             # Componente base para selección de OAs
+├── IndicadoresSection.tsx     # Componente base para indicadores
+├── MatrizStepIndicator.tsx    # Indicador de pasos
+├── MatrizHeader.tsx           # Encabezado con estadísticas
+└── ImportarMatrizModal.tsx    # Modal de importación CSV
+
+src/hooks/
+└── useMatrices.ts             # Hook para gestión de matrices
+
+src/types/
+└── matrices.ts                # Tipos centralizados
+
+src/utils/
+└── matrices.ts                # Funciones utilitarias
 ```
 
 ## Uso del Módulo
@@ -78,6 +95,40 @@ http://localhost:3000/matrices
 1. Selecciona una matriz de la lista
 2. Revisa la estructura completa
 3. Verifica la distribución de preguntas
+
+### 5. Importar Matriz desde CSV
+1. En el Paso 2 de creación, haz clic en "Importar OAs desde CSV"
+2. Descarga el template de ejemplo
+3. Completa el archivo CSV con los OAs e indicadores
+4. Sube el archivo y revisa la previsualización
+5. Confirma la importación para continuar al Paso 3
+
+## 🏗️ Refactorización Reciente
+
+### Componentes Modulares
+La página de creación de matrices ha sido refactorizada para mejorar la mantenibilidad y reutilización:
+
+#### Componentes Principales
+- **`MatrizBasicForm`**: Maneja el formulario básico (nombre, asignatura, nivel, total preguntas)
+- **`MatrizOASelector`**: Gestiona la selección de OAs con validaciones automáticas
+- **`MatrizIndicadoresSection`**: Controla la definición de indicadores y distribución de preguntas
+
+#### Componentes Base
+- **`OASelector`**: Componente reutilizable para selección de OAs
+- **`IndicadoresSection`**: Componente reutilizable para gestión de indicadores
+- **`MatrizStepIndicator`**: Indicador visual de progreso
+- **`MatrizHeader`**: Encabezado con estadísticas de la matriz
+
+#### Utilidades y Hooks
+- **`useMatrices`**: Hook personalizado para gestión de datos de matrices
+- **`src/types/matrices.ts`**: Tipos TypeScript centralizados
+- **`src/utils/matrices.ts`**: Funciones utilitarias compartidas
+
+### Beneficios de la Refactorización
+- **Mantenibilidad**: Código más modular y fácil de mantener
+- **Reutilización**: Componentes que pueden usarse en otras páginas
+- **Legibilidad**: Separación clara de responsabilidades
+- **Escalabilidad**: Arquitectura preparada para futuras expansiones
 
 ## APIs de Matrices
 

@@ -6,6 +6,7 @@ Esta documentación describe todos los hooks personalizados utilizados en la pla
 
 - [Hooks del Editor](#hooks-del-editor)
 - [Hooks de Evaluaciones](#hooks-de-evaluaciones)
+- [Hooks de Matrices](#hooks-de-matrices)
 - [Hooks de Entrevista](#hooks-de-entrevista)
 - [Hooks de Utilidades](#hooks-de-utilidades)
 - [Patrones de Uso](#patrones-de-uso)
@@ -96,6 +97,95 @@ const {
 **Ubicación:** `src/hooks/use-evaluacion-form.ts`
 
 Hook principal para el formulario de evaluaciones.
+
+## 🎯 Hooks de Matrices
+
+### useMatrices
+**Ubicación:** `src/hooks/useMatrices.ts`
+
+Hook principal para la gestión de matrices de especificación, refactorizado para mejorar la modularidad y reutilización.
+
+```tsx
+const {
+  // Datos
+  oas,
+  ejes,
+  asignaturas,
+  niveles,
+  dataLoading,
+  
+  // Funciones de carga
+  fetchOAs,
+  fetchEjes,
+  fetchAsignaturas,
+  fetchNiveles,
+  
+  // Estado del formulario
+  formState,
+  updateFormState,
+  validateForm,
+  
+  // Validaciones
+  errors,
+  updateErrors,
+  clearErrors
+} = useMatrices()
+```
+
+**Funcionalidades:**
+- **Gestión de datos**: Carga y manejo de OAs, ejes, asignaturas y niveles
+- **Estado del formulario**: Control centralizado del estado de creación/edición
+- **Validaciones**: Validación automática de formularios con mensajes de error
+- **Manejo de errores**: Gestión robusta de errores de API y validación
+- **Carga asíncrona**: Estados de carga y manejo de respuestas API
+
+**Características técnicas:**
+- Manejo robusto de respuestas API (soporte para `{ data: [...] }` y arrays directos)
+- Fallbacks automáticos a arrays vacíos en caso de error
+- Validación centralizada con todos los parámetros requeridos
+- Estados de carga para mejor UX
+
+**Ejemplo de uso:**
+```tsx
+function CrearMatrizPage() {
+  const {
+    oas,
+    asignaturas,
+    niveles,
+    dataLoading,
+    formState,
+    updateFormState,
+    validateForm,
+    errors
+  } = useMatrices()
+
+  useEffect(() => {
+    // Cargar datos iniciales
+    fetchOAs()
+    fetchAsignaturas()
+    fetchNiveles()
+  }, [])
+
+  const handleSave = async () => {
+    const validation = validateForm()
+    if (validation.isValid) {
+      // Guardar matriz
+    }
+  }
+
+  return (
+    <div>
+      <MatrizBasicForm
+        asignaturas={asignaturas}
+        niveles={niveles}
+        formState={formState}
+        onUpdate={updateFormState}
+        errors={errors}
+      />
+    </div>
+  )
+}
+```
 
 ```tsx
 const {
