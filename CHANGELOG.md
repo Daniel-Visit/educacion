@@ -265,3 +265,89 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - **🏗️ Arquitectura** para cambios en la estructura del proyecto
 - **🎨 Interfaz de Usuario** para cambios en la UI/UX
 - **🔗 Integración** para cambios en integraciones externas 
+
+## [2025-01-XX] - Refactorización de Página Crear Matrices
+
+### 🏗️ Refactorización y Mejoras de Arquitectura
+
+#### Nuevos Componentes Creados
+- **`MatrizBasicForm`**: Componente reutilizable para el formulario básico de matrices (nombre, asignatura, nivel, total preguntas)
+  - Soporta modo de solo lectura para edición
+  - Maneja validaciones y navegación entre pasos
+  - Dropdowns consistentes con el diseño original
+
+- **`MatrizOASelector`**: Componente para la selección de OAs (Paso 2)
+  - Separación visual de OAs de Contenido y Habilidad
+  - Validaciones automáticas por tipo de OA
+  - Renderizado condicional de sección de Habilidad (solo si existen OAs de habilidad)
+  - Integración con modal de importación CSV
+
+- **`MatrizIndicadoresSection`**: Componente para la definición de indicadores (Paso 3)
+  - Gestión de indicadores por OA seleccionado
+  - Validaciones de completitud y totales
+  - Interfaz intuitiva para agregar/remover indicadores
+
+- **`MatrizStepIndicator`**: Componente para mostrar el progreso de pasos
+- **`MatrizHeader`**: Componente para el encabezado con estadísticas
+
+#### Nuevos Archivos de Utilidades
+- **`src/types/matrices.ts`**: Tipos centralizados para el módulo de matrices
+  - Interfaces: `MatrizEspecificacion`, `MatrizFormState`, `ValidationResult`, `CSVRow`, `ImportedOA`, `Step`, `GradientConfig`
+
+- **`src/utils/matrices.ts`**: Funciones utilitarias compartidas
+  - `validateMatrizForm`: Validación centralizada de formularios
+  - `getGradient`, `getHoverGradient`: Configuraciones de gradientes
+  - `MATRIZ_STEPS`: Constantes de pasos
+  - Funciones auxiliares para filtrado y transformación de datos
+
+#### Mejoras en Hooks Personalizados
+- **`src/hooks/useMatrices.ts`**: Hooks mejorados para gestión de datos
+  - `useMatricesData`: Manejo robusto de respuestas API con fallbacks
+  - `useMatrizForm`: Validación mejorada con todos los parámetros requeridos
+  - Manejo de errores y estados de carga
+
+#### Mejoras en Componentes Existentes
+- **`ImportarMatrizModal`**: Modal de importación CSV mejorado
+  - Formato CSV simplificado y más intuitivo
+  - Validaciones automáticas condicionales
+  - Mejor manejo de errores y UX
+
+#### Correcciones de Bugs
+- **Dropdowns**: Altura consistente al abrir/cerrar
+- **Validaciones**: Verificación condicional de OAs de habilidad
+- **Navegación**: Botones "Anterior" y "Siguiente" consistentes
+- **Estados**: Manejo robusto de arrays y respuestas API
+
+#### Mejoras de UX/UI
+- **Consistencia**: Uso de `SecondaryButton` en todos los botones secundarios
+- **Responsividad**: Layout mejorado para diferentes tamaños de pantalla
+- **Feedback Visual**: Indicadores de estado y validación más claros
+- **Accesibilidad**: Mejor estructura semántica y navegación
+
+### 📁 Archivos Modificados
+- `src/app/matrices/crear/page.tsx` - Refactorizado de 1220 líneas a ~400 líneas
+- `src/components/matrices/MatrizBasicForm.tsx` - Nuevo
+- `src/components/matrices/MatrizOASelector.tsx` - Nuevo  
+- `src/components/matrices/MatrizIndicadoresSection.tsx` - Nuevo
+- `src/components/matrices/MatrizStepIndicator.tsx` - Nuevo
+- `src/components/matrices/MatrizHeader.tsx` - Nuevo
+- `src/types/matrices.ts` - Nuevo
+- `src/utils/matrices.ts` - Nuevo
+- `src/hooks/useMatrices.ts` - Mejorado
+- `src/components/matrices/ImportarMatrizModal.tsx` - Mejorado
+
+### 🎯 Beneficios Logrados
+- **Mantenibilidad**: Código más modular y fácil de mantener
+- **Reutilización**: Componentes reutilizables para otras páginas
+- **Legibilidad**: Separación clara de responsabilidades
+- **Escalabilidad**: Arquitectura preparada para futuras expansiones
+- **Consistencia**: UI/UX uniforme en toda la aplicación
+
+### 🔧 Detalles Técnicos
+- Uso de TypeScript para mejor tipado y detección de errores
+- Implementación de patrones de diseño React modernos
+- Manejo robusto de estados y efectos secundarios
+- Validaciones centralizadas y reutilizables
+- Integración con sistema de diseño existente
+
+--- 

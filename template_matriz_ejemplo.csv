@@ -1,0 +1,29 @@
+oa_identificador,tipo_oa,indicador,preguntas_por_indicador
+"OA 01","Contenido","Leer textos significativos que incluyan palabras con hiatos y diptongos",10
+"OA 01","Contenido","Comprender textos aplicando estrategias de comprensión lectora",5
+"OA 02","Contenido","Leer en voz alta para adquirir fluidez",8
+"OAH A","Habilidad","Demostrar interés y una actitud activa frente a la lectura",5
+
+# INSTRUCCIONES PARA IMPORTAR MATRIZ COMPLETA:
+# 
+# ESTRUCTURA DEL CSV:
+# - oa_identificador: Identificador del OA (ej: "OA 01", "OAH A", "OA 02")
+# - tipo_oa: Tipo del OA ("Contenido" o "Habilidad")
+# - indicador: Descripción del indicador (ej: "Leer textos significativos que incluyan palabras con hiatos")
+# - preguntas_por_indicador: Número de preguntas para este indicador
+#
+# REGLAS IMPORTANTES:
+# 1. Todos los campos son obligatorios en cada fila
+# 2. Todos los OAs deben pertenecer a la asignatura y nivel seleccionados
+# 3. Cada indicador debe ir en una fila separada
+# 4. Puedes importar OAs parcialmente y completar el resto en el paso 3
+#
+# EJEMPLO DE VALIDACIÓN:
+# - Debe haber al menos una fila con tipo_oa = "Contenido" (siempre existen OAs de contenido disponibles)
+# - Debe haber al menos una fila con tipo_oa = "Habilidad" (si hay OAs de habilidad disponibles)
+#
+# NOTAS:
+# - El archivo debe usar comas como separador
+# - Los valores con espacios deben ir entre comillas dobles
+# - Cada OA debe estar en una fila separada
+# - Puedes importar solo algunos OAs y completar el resto manualmente 
