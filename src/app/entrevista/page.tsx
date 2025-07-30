@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   InterviewCard,
@@ -12,7 +12,7 @@ import {
   preguntaToStep
 } from "@/components/entrevista";
 
-export default function Entrevista() {
+function EntrevistaContent() {
   const searchParams = useSearchParams();
   const stepParam = searchParams.get('step');
   const initialStep = stepParam ? parseInt(stepParam) : 0;
@@ -103,5 +103,13 @@ export default function Entrevista() {
         )}
       </div>
     </>
+  );
+}
+
+export default function Entrevista() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <EntrevistaContent />
+    </Suspense>
   );
 } 

@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { 
   Home, 
   FileText, 
@@ -74,7 +74,7 @@ const navigation = [
   },
 ]
 
-export default function Sidebar() {
+function SidebarContent() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [expandedMenus, setExpandedMenus] = useState<string[]>([])
@@ -281,4 +281,12 @@ export default function Sidebar() {
       </div>
     </aside>
   )
+}
+
+export default function Sidebar() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <SidebarContent />
+    </Suspense>
+  );
 } 

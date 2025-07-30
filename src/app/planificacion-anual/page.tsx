@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { EventCalendar } from "@/components/event-calendar";
 import "@/styles/calendar.css";
 import Drawer from "@/components/ui/Drawer";
@@ -13,7 +13,7 @@ import { useSearchParams } from "next/navigation";
 import { CloudUpload, Save, Calendar, FileText, Clock } from "lucide-react";
 import PrimaryButton from "@/components/ui/PrimaryButton";
 
-export default function PlanificacionAnualPage() {
+function PlanificacionAnualContent() {
   const [oaDrawerOpen, setOaDrawerOpen] = useState(false);
   const [horarioId, setHorarioId] = useState<string>("");
   const [showHorarioMsg, setShowHorarioMsg] = useState(false);
@@ -460,5 +460,13 @@ export default function PlanificacionAnualPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function PlanificacionAnualPage() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <PlanificacionAnualContent />
+    </Suspense>
   );
 }

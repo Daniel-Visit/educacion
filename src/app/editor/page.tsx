@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor'
 import ModalIA from '@/components/editor/ModalIA'
@@ -12,7 +12,7 @@ import { Save, Sparkles, FileText, BookOpen, Edit3, Clock } from 'lucide-react'
 import Fab from '@/components/ui/Fab'
 import { useContentSave } from '@/hooks/use-content-save'
 
-export default function EditorPage() {
+function EditorPageContent() {
   const searchParams = useSearchParams()
   const [openModalIA, setOpenModalIA] = useState(false)
   const [openSaveModal, setOpenSaveModal] = useState(false)
@@ -247,4 +247,12 @@ export default function EditorPage() {
       )}
     </>
   )
+}
+
+export default function EditorPage() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <EditorPageContent />
+    </Suspense>
+  );
 } 
