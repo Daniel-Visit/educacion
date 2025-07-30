@@ -20,6 +20,8 @@ export default function OACard({
   prevOA,
   nextOA,
 }: OACardProps) {
+  // Debug logs removidos para evitar spam en consola
+  
   const prevOk = !prevOA || (oaClases[prevOA.id] || 0) >= prevOA.minimo_clases;
   const isSkipped = skippedOAs.has(oa.id);
   const canAdd = prevOk || isSkipped || oa.eje_descripcion.toLowerCase() === 'actitud';
@@ -72,12 +74,12 @@ export default function OACard({
         </span>
         <button
           className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-2xl transition-all shadow ${
-            currentClases > 0 && !nextHasClases
+            currentClases > 0
               ? "bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600"
               : "bg-gray-200 cursor-not-allowed"
           }`}
           onClick={() => onRemoveClase(oa, nextOA)}
-          disabled={currentClases === 0 || !!nextHasClases}
+          disabled={currentClases === 0}
           tabIndex={0}
         >
           -

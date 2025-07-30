@@ -287,6 +287,8 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
   - Validaciones de completitud y totales
   - Interfaz intuitiva para agregar/remover indicadores
 
+- **`OASelector`**: Componente base para selección de OAs (reutilizable)
+- **`IndicadoresSection`**: Componente base para gestión de indicadores (reutilizable)
 - **`MatrizStepIndicator`**: Componente para mostrar el progreso de pasos
 - **`MatrizHeader`**: Componente para el encabezado con estadísticas
 
@@ -329,12 +331,15 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - `src/components/matrices/MatrizBasicForm.tsx` - Nuevo
 - `src/components/matrices/MatrizOASelector.tsx` - Nuevo  
 - `src/components/matrices/MatrizIndicadoresSection.tsx` - Nuevo
+- `src/components/matrices/OASelector.tsx` - Nuevo
+- `src/components/matrices/IndicadoresSection.tsx` - Nuevo
 - `src/components/matrices/MatrizStepIndicator.tsx` - Nuevo
 - `src/components/matrices/MatrizHeader.tsx` - Nuevo
 - `src/types/matrices.ts` - Nuevo
 - `src/utils/matrices.ts` - Nuevo
 - `src/hooks/useMatrices.ts` - Mejorado
 - `src/components/matrices/ImportarMatrizModal.tsx` - Mejorado
+- `src/app/api/matrices/import-csv/route.ts` - Nuevo
 
 ### 🎯 Beneficios Logrados
 - **Mantenibilidad**: Código más modular y fácil de mantener

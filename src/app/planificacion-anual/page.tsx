@@ -24,6 +24,7 @@ export default function PlanificacionAnualPage() {
   const [planificacionNombre, setPlanificacionNombre] = useState("");
   const [importing, setImporting] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const initialHorarioId = useRef<string | null>(null);
   const { horarios, loadHorarios } = useHorarios();
   const searchParams = useSearchParams();
@@ -88,11 +89,17 @@ export default function PlanificacionAnualPage() {
       setShowImportModal(false);
       
       // Mostrar mensaje de éxito
-      alert(`Importación completada exitosamente.\n${resultado.eventosCreados} eventos creados.`);
+      setNotification({
+        type: 'success',
+        message: `Importación completada exitosamente. ${resultado.eventosCreados} eventos creados.`
+      });
       
     } catch (error) {
       console.error("Error al importar:", error);
-      alert("Error al importar el CSV. Por favor, verifica el formato del archivo.");
+      setNotification({
+        type: 'error',
+        message: "Error al importar el CSV. Por favor, verifica el formato del archivo."
+      });
     } finally {
       setImporting(false);
     }
@@ -112,7 +119,10 @@ export default function PlanificacionAnualPage() {
       setPlanificacionNombre("");
     } catch (error) {
       console.error("Error al guardar planificación:", error);
-      alert("Error al guardar la planificación");
+      setNotification({
+        type: 'error',
+        message: "Error al guardar la planificación"
+      });
     } finally {
       setSaving(false);
     }
@@ -216,7 +226,7 @@ export default function PlanificacionAnualPage() {
         </div>
         
         {/* Stats y información */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white/10 rounded-lg p-3">
             <div className="flex items-center gap-2">
               <FileText className="h-4 w-4 text-indigo-200" />
@@ -224,18 +234,6 @@ export default function PlanificacionAnualPage() {
                 <p className="text-indigo-200 text-xs">Horario Seleccionado</p>
                 <p className="text-lg font-bold">
                   {horarioSeleccionado ? horarioSeleccionado.nombre : 'Ninguno'}
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-indigo-200" />
-              <div>
-                <p className="text-indigo-200 text-xs">Estado</p>
-                <p className="text-lg font-bold">
-                  {planificacionActual ? 'Editando' : 'Nueva'}
                 </p>
               </div>
             </div>
@@ -254,17 +252,7 @@ export default function PlanificacionAnualPage() {
           </div>
         </div>
         
-        {/* Información de edición */}
-        {planificacionActual && (
-          <div className="mt-4 p-3 bg-white/10 rounded-lg border border-white/20">
-            <p className="text-indigo-100 text-sm">
-              <strong>Editando:</strong> {planificacionActual.nombre}
-              <span className="ml-2 text-indigo-200">
-                (Creada: {new Date(planificacionActual.createdAt).toLocaleDateString()})
-              </span>
-            </p>
-          </div>
-                )}
+
       </div>
       
       <div className="mb-6">
@@ -434,6 +422,40 @@ export default function PlanificacionAnualPage() {
                   : "Guardar"}
               </PrimaryButton>
             </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Notificaciones */}
+      {notification && (
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-md ${
+          notification.type === 'success' 
+            ? 'bg-green-500 text-white' 
+            : 'bg-red-500 text-white'
+        }`}>
+          <div className="flex items-center gap-3">
+            <div className="flex-shrink-0">
+              {notification.type === 'success' ? (
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              )}
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium">{notification.message}</p>
+            </div>
+            <button
+              onClick={() => setNotification(null)}
+              className="flex-shrink-0 text-white/80 hover:text-white"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         </div>
       )}

@@ -1,8 +1,22 @@
 "use client";
 import { useState, useRef } from "react";
-import { CloudUpload } from "lucide-react";
-import PrimaryButton from "@/components/ui/PrimaryButton";
-import SecondaryButton from "@/components/ui/SecondaryButton";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { LoadingState, ErrorState, ModalHeader, SuccessState } from '@/components/resultados';
+import PrimaryButton from '@/components/ui/PrimaryButton';
+import SecondaryButton from '@/components/ui/SecondaryButton';
+import { 
+  CloudUpload, 
+  FileText, 
+  CheckCircle2, 
+  AlertTriangle, 
+  X,
+  Download,
+  Info,
+  Calendar,
+  BarChart3
+} from 'lucide-react';
 
 interface ImportarCSVModalProps {
   isOpen: boolean;
@@ -74,16 +88,26 @@ export default function ImportarCSVModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-800">Importar Planificación CSV</h2>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full p-2 transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-2xl p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-white/20 p-2 rounded-lg">
+                <CloudUpload className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">Importar Planificación CSV</h2>
+                <p className="text-indigo-100 text-sm">Carga tu planificación desde un archivo CSV</p>
+              </div>
+            </div>
+            <button
+              onClick={handleClose}
+              className="text-white/80 hover:text-white hover:bg-white/20 rounded-full p-2 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
@@ -114,7 +138,7 @@ export default function ImportarCSVModal({
             >
               <CloudUpload className="w-8 h-8 mx-auto mb-2 text-indigo-500 hover:text-indigo-600 transition-colors" />
               {file ? (
-                <div className="space-y-1">
+                <div className="flex flex-col items-center space-y-1">
                   <span className="text-gray-700 font-medium">{file.name}</span>
                   <span className="text-gray-500 text-sm">Haz clic para cambiar archivo</span>
                 </div>

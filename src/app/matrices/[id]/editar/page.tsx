@@ -55,6 +55,8 @@ export default function EditarMatrizPage() {
   const [saving, setSaving] = useState(false);
   const [oas, setOAs] = useState<OA[]>([]);
   const [ejes, setEjes] = useState<Eje[]>([]);
+  const [asignaturas, setAsignaturas] = useState<{id: number, nombre: string}[]>([]);
+  const [niveles, setNiveles] = useState<{id: number, nombre: string}[]>([]);
   const [selectedEje, setSelectedEje] = useState<number | null>(null);
   const [selectedOAs, setSelectedOAs] = useState<OA[]>([]);
   const [selectedEjeContenido, setSelectedEjeContenido] = useState<number | null>(null);
@@ -107,7 +109,33 @@ export default function EditarMatrizPage() {
     if (params.id) {
       fetchMatrizAndOAs(Number(params.id));
     }
+    fetchAsignaturas();
+    fetchNiveles();
   }, [params.id]);
+
+  const fetchAsignaturas = async () => {
+    try {
+      const response = await fetch('/api/asignaturas');
+      if (response.ok) {
+        const data = await response.json();
+        setAsignaturas(data.data || data);
+      }
+    } catch (error) {
+      console.error('Error al obtener asignaturas:', error);
+    }
+  };
+
+  const fetchNiveles = async () => {
+    try {
+      const response = await fetch('/api/niveles');
+      if (response.ok) {
+        const data = await response.json();
+        setNiveles(data);
+      }
+    } catch (error) {
+      console.error('Error al obtener niveles:', error);
+    }
+  };
 
   const fetchMatrizAndOAs = async (matrizId: number) => {
     try {
@@ -556,6 +584,26 @@ export default function EditarMatrizPage() {
                   placeholder="0"
                   min={0}
                 />
+              </div>
+            </div>
+            
+            {/* Campos de solo lectura para asignatura y nivel */}
+            <div className="flex flex-col md:flex-row gap-6">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Asignatura
+                </label>
+                <div className="w-full px-4 py-2 border rounded-xl text-base bg-gray-50 border-gray-300 text-gray-600">
+                  {selectedAsignatura ? asignaturas.find(a => a.id === selectedAsignatura)?.nombre : 'Cargando...'}
+                </div>
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nivel
+                </label>
+                <div className="w-full px-4 py-2 border rounded-xl text-base bg-gray-50 border-gray-300 text-gray-600">
+                  {selectedNivel ? niveles.find(n => n.id === selectedNivel)?.nombre : 'Cargando...'}
+                </div>
               </div>
             </div>
             <div className="flex justify-end gap-4 mt-4">

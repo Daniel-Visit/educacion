@@ -23,6 +23,9 @@ export default function PlanificacionesList() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [planificacionToDelete, setPlanificacionToDelete] = useState<any>(null);
+  const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [pagina, setPagina] = useState(1);
   const porPagina = 6;
@@ -63,22 +66,46 @@ export default function PlanificacionesList() {
     };
   }, [openMenuId]);
 
-  const handleEliminar = async (id: number) => {
-    if (!confirm("¿Estás seguro de que quieres eliminar esta planificación?")) return;
-    setDeletingId(id);
+  const handleEliminar = (planificacion: any) => {
+    setPlanificacionToDelete(planificacion);
+    setShowDeleteConfirm(true);
+    setOpenMenuId(null);
+  };
+
+  const confirmarEliminacion = async () => {
+    if (!planificacionToDelete) return;
+    
+    setDeletingId(planificacionToDelete.id);
     try {
-      const response = await fetch(`/api/planificaciones/${id}`, { method: "DELETE" });
+      const response = await fetch(`/api/planificaciones/${planificacionToDelete.id}`, { method: "DELETE" });
       if (response.ok) {
-        setPlanificaciones(prev => prev.filter(p => p.id !== id));
+        setPlanificaciones(prev => prev.filter(p => p.id !== planificacionToDelete.id));
+        setNotification({
+          type: 'success',
+          message: `Planificación "${planificacionToDelete.nombre}" eliminada exitosamente`
+        });
       } else {
-        alert("Error al eliminar la planificación");
+        setNotification({
+          type: 'error',
+          message: "Error al eliminar la planificación"
+        });
       }
     } catch (error) {
       console.error("Error al eliminar:", error);
-      alert("Error al eliminar la planificación");
+      setNotification({
+        type: 'error',
+        message: "Error al eliminar la planificación"
+      });
     } finally {
       setDeletingId(null);
+      setShowDeleteConfirm(false);
+      setPlanificacionToDelete(null);
     }
+  };
+
+  const cancelarEliminacion = () => {
+    setShowDeleteConfirm(false);
+    setPlanificacionToDelete(null);
   };
 
   const totalClases = (asignaciones: any[]) => {
@@ -195,7 +222,7 @@ export default function PlanificacionesList() {
                         <Edit3 size={16} /> Ver/Editar
                       </button>
                       <button
-                        onClick={() => handleEliminar(planificacion.id)}
+                        onClick={() => handleEliminar(planificacion)}
                         disabled={deletingId === planificacion.id}
                         className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 rounded-lg transition-colors disabled:opacity-50"
                       >
@@ -323,6 +350,93 @@ export default function PlanificacionesList() {
             </nav>
           </div>
         </>
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {showDeleteConfirm && planificacionToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+            <div className="bg-gradient-to-r from-red-600 to-pink-600 rounded-t-2xl p-6 text-white">
+              <div className="flex items-center gap-4">
+                <div className="bg-white/20 p-2 rounded-lg">
+                  <Trash2 className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">Confirmar Eliminación</h2>
+                  <p className="text-red-100 text-sm">Esta acción no se puede deshacer</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <p className="text-gray-700 mb-6">
+                ¿Estás seguro de que quieres eliminar la planificación{" "}
+                <strong className="text-gray-900">"{planificacionToDelete.nombre}"</strong>?
+              </p>
+              
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={cancelarEliminacion}
+                  disabled={deletingId === planificacionToDelete.id}
+                  className="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmarEliminacion}
+                  disabled={deletingId === planificacionToDelete.id}
+                  className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
+                >
+                  {deletingId === planificacionToDelete.id ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Eliminando...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4" />
+                      Eliminar
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notificaciones */}
+      {notification && (
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-md ${
+          notification.type === 'success' 
+            ? 'bg-green-500 text-white' 
+            : 'bg-red-500 text-white'
+        }`}>
+          <div className="flex items-center gap-3">
+            <div className="flex-shrink-0">
+              {notification.type === 'success' ? (
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              )}
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium">{notification.message}</p>
+            </div>
+            <button
+              onClick={() => setNotification(null)}
+              className="flex-shrink-0 text-white/80 hover:text-white"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
       )}
     </>
   );

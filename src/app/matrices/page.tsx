@@ -1,71 +1,31 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, FileText, Trash2, Edit, Eye, BarChart3, Calendar, Target, Users, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Dialog } from '@headlessui/react';
+import { useMatricesList } from '@/hooks/useMatrices';
+import { formatDate, getGradient, getPageNumbers } from '@/utils/matrices';
+import { MatrizEspecificacion } from '@/types/matrices';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import SecondaryButton from '@/components/ui/SecondaryButton';
-import { Dialog } from '@headlessui/react';
-
-interface OA {
-  id: number;
-  oas_id: string;
-  descripcion_oas: string;
-  nivel: { nombre: string };
-  asignatura: { nombre: string };
-}
-
-interface Indicador {
-  id: number;
-  descripcion: string;
-  preguntas: number;
-}
-
-interface MatrizOA {
-  id: number;
-  oaId: number;
-  oa: OA;
-  indicadores: Indicador[];
-}
-
-interface MatrizEspecificacion {
-  id: number;
-  nombre: string;
-  total_preguntas: number;
-  createdAt: string;
-  oas: MatrizOA[];
-}
 
 export default function MatricesPage() {
   const router = useRouter();
-  const [matrices, setMatrices] = useState<MatrizEspecificacion[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
   const [alert, setAlert] = useState<{ type: 'error' | 'success', message: string } | null>(null);
   
-  // Estado de paginación
-  const [currentPage, setCurrentPage] = useState(1);
+  const {
+    matrices,
+    loading,
+    currentPage,
+    setCurrentPage,
+    deletingId,
+    deleteMatriz
+  } = useMatricesList();
+  
   const matricesPerPage = 6;
-
-  useEffect(() => {
-    fetchMatrices();
-  }, []);
-
-  const fetchMatrices = async () => {
-    try {
-      const response = await fetch('/api/matrices');
-      if (response.ok) {
-        const data = await response.json();
-        setMatrices(data);
-      }
-    } catch {
-      console.error('Error al obtener matrices');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleCreateMatriz = () => {
     router.push('/matrices/crear');
@@ -86,69 +46,18 @@ export default function MatricesPage() {
 
   const confirmDeleteMatriz = async () => {
     if (!pendingDeleteId) return;
-    setDeletingId(pendingDeleteId);
     setShowDeleteModal(false);
-    try {
-      const response = await fetch(`/api/matrices/${pendingDeleteId}`, {
-        method: 'DELETE',
-      });
-      if (response.ok) {
-        setMatrices(prev => prev.filter(matriz => matriz.id !== pendingDeleteId));
-        setAlert({ type: 'success', message: 'Matriz eliminada correctamente.' });
-      } else {
-        setAlert({ type: 'error', message: 'Error al eliminar la matriz.' });
-      }
-    } catch {
-      setAlert({ type: 'error', message: 'Error al eliminar la matriz.' });
-    } finally {
-      setDeletingId(null);
-      setPendingDeleteId(null);
+    
+    const result = await deleteMatriz(pendingDeleteId);
+    if (result.success) {
+      setAlert({ type: 'success', message: 'Matriz eliminada correctamente.' });
+    } else {
+      setAlert({ type: 'error', message: result.error || 'Error al eliminar la matriz.' });
     }
+    setPendingDeleteId(null);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
 
-  const getGradient = (index: number) => {
-    const gradients = [
-      'from-emerald-500 to-teal-600',    // 1. Verde
-      'from-amber-500 to-orange-600',    // 2. Naranja
-      'from-indigo-500 to-purple-600',   // 3. Índigo
-      'from-cyan-500 to-blue-600',       // 4. Azul
-      'from-rose-500 to-pink-600',       // 5. Rosa
-      'from-violet-500 to-fuchsia-600'     // 6. Violet
-    ];
-    return gradients[index % gradients.length];
-  };
-
-  const getTextColor = (index: number) => {
-    const textColors = [
-      'text-emerald-200', // 1. Verde
-      'text-amber-200',   // 2. Naranja
-      'text-indigo-200',    // 3. Rosa
-      'text-cyan-200',    // 4. Azul
-      'text-rose-200',  // 5. Índigo
-      'text-violet-200'     // 6. Teal
-    ];
-    return textColors[index % textColors.length];
-  };
-
-  const getHoverGradient = (index: number) => {
-    const hoverGradients = [
-      'hover:from-emerald-600 hover:to-teal-700',  // 1. Verde
-      'hover:from-amber-600 hover:to-orange-700',  // 2. Naranja
-      'hover:from-indigo-600 hover:to-purple-700', // 3. Índigo
-      'hover:from-cyan-600 hover:to-blue-700',     // 4. Azul
-      'hover:from-rose-600 hover:to-pink-700',     // 5. Rosa
-      'hover:from-violet-600 hover:to-fuchsia-700' // 6. Violet
-    ];
-    return hoverGradients[index % hoverGradients.length];
-  };
 
   // Funciones de paginación
   const totalPages = Math.ceil(matrices.length / matricesPerPage);
@@ -280,7 +189,7 @@ export default function MatricesPage() {
               <div>
                 <p className="text-indigo-200 text-xs">Última Creada</p>
                 <p className="text-lg font-bold">
-                  {matrices.length > 0 ? formatDate(matrices[0].createdAt) : '-'}
+                  {matrices.length > 0 ? formatDate(matrices[0].createdAt || '') : '-'}
                 </p>
               </div>
             </div>
@@ -387,7 +296,7 @@ export default function MatricesPage() {
                       <div className="flex items-center gap-2 text-sm">
                         <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                         <span className="text-gray-600 font-medium">Creada:</span>
-                        <span className="text-gray-900 font-semibold">{formatDate(matriz.createdAt)}</span>
+                        <span className="text-gray-900 font-semibold">{formatDate(matriz.createdAt || '')}</span>
                       </div>
                     </div>
                     
@@ -395,7 +304,7 @@ export default function MatricesPage() {
                     <div className="mt-6 pt-4 border-t border-gray-100">
                       <button
                         onClick={() => handleViewMatriz(matriz.id)}
-                        className={`w-full bg-gradient-to-r ${getGradient(index)} ${getHoverGradient(index)} text-white py-2.5 px-4 rounded-xl font-medium text-sm transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 group/btn`}
+                        className={`w-full bg-gradient-to-r ${getGradient(index)} hover:from-emerald-600 hover:to-teal-700 text-white py-2.5 px-4 rounded-xl font-medium text-sm transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 group/btn`}
                       >
                         <Eye size={16} className="group-hover/btn:scale-110 transition-transform" />
                         Ver Matriz

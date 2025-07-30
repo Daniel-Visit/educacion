@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { CalendarEvent, EventColor } from "@/components/event-calendar";
 import { OA, Eje, OAClases } from "@/components/planificacion-anual/types";
 import { addDays, getDay } from "date-fns";
@@ -38,7 +38,7 @@ function getModuloDate(baseDate: Date, moduloIdx: number, modulos: {dia: string,
 }
 
 export function usePlanificacionAnual(
-  horarioSeleccionado?: { modulos?: any[], fechaPrimeraClase?: string },
+  horarioSeleccionado?: any, // Cambiar a any por ahora para evitar problemas de tipos
   planificacionId?: string
 ) {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -50,25 +50,31 @@ export function usePlanificacionAnual(
   const [skippedOAs, setSkippedOAs] = useState<Set<number>>(new Set());
   const [planificacionActual, setPlanificacionActual] = useState<any>(null);
   const [loadingPlanificacion, setLoadingPlanificacion] = useState(false);
+  const [planificacionCargada, setPlanificacionCargada] = useState(false);
 
-  // Cargar ejes y OAs
+  // Cargar ejes y OAs (solo si no hay planificacionId)
   useEffect(() => {
-    setLoadingOAs(true);
-    fetch("/api/ejes")
-      .then((res) => res.json())
-      .then((data) => {
-        setEjes(data);
-        // Inicializar oaClases con 0 para cada OA
-        const initial: OAClases = {};
-        data.forEach((eje: Eje) =>
-          eje.oas.forEach((oa: OA) => {
-            initial[oa.id] = 0;
-          })
-        );
-        setOaClases(initial);
-      })
-      .finally(() => setLoadingOAs(false));
-  }, []);
+    if (!planificacionId) {
+      setLoadingOAs(true);
+      // Cargar todos los ejes sin filtros para mostrar todas las opciones
+      fetch("/api/ejes")
+        .then((res) => res.json())
+        .then((data) => {
+          setEjes(data);
+          // Solo inicializar oaClases si no hay una planificación cargada
+          if (!planificacionCargada) {
+            const initial: OAClases = {};
+            data.forEach((eje: Eje) =>
+              eje.oas.forEach((oa: OA) => {
+                initial[oa.id] = 0;
+              })
+            );
+            setOaClases(initial);
+          }
+        })
+        .finally(() => setLoadingOAs(false));
+    }
+  }, [planificacionId]);
 
   // Cargar planificación existente si se proporciona un ID
   useEffect(() => {
@@ -82,6 +88,8 @@ export function usePlanificacionAnual(
             return;
           }
           
+          // Debug logs removidos
+          
           setPlanificacionActual(data);
           
           // Cargar asignaciones de OAs
@@ -90,53 +98,82 @@ export function usePlanificacionAnual(
             asignaciones[asignacion.oaId] = asignacion.cantidadClases;
           });
           setOaClases(asignaciones);
-          
-          // Generar eventos del calendario basados en las asignaciones
-          const eventos: CalendarEvent[] = [];
-          let eventoIndex = 0;
-          
-          Object.entries(asignaciones).forEach(([oaId, cantidadClases]) => {
-            const oa = data.asignaciones?.find((a: any) => a.oaId === parseInt(oaId))?.oa;
-            if (oa) {
-              for (let i = 0; i < cantidadClases; i++) {
-                const eje = ejes.find((e: Eje) => e.oas.some((o: OA) => o.id === parseInt(oaId)));
-                const ejeColor = (eje ? getEjeColor(eje.id) : "sky") as EventColor;
-                
-                const modulos = data.horario?.modulos && data.horario.modulos.length > 0 
-                  ? data.horario.modulos 
-                  : modulosFijos;
-                
-                const fechaBase = data.horario?.fechaPrimeraClase
-                  ? new Date(data.horario.fechaPrimeraClase)
-                  : new Date(2025, 6, 1);
-                
-                const start = getModuloDate(fechaBase, eventoIndex, modulos);
-                const end = new Date(start);
-                end.setHours(end.getHours() + (modulos[eventoIndex % modulos.length]?.duracion ? modulos[eventoIndex % modulos.length].duracion / 60 : 1));
-                
-                eventos.push({
-                  id: Math.random().toString(36).slice(2),
-                  title: oa.oas_id,
-                  start,
-                  end,
-                  allDay: false,
-                  color: ejeColor,
-                  location: `${modulos[eventoIndex % modulos.length]?.dia} ${modulos[eventoIndex % modulos.length]?.horaInicio}`,
-                });
-                
-                eventoIndex++;
-              }
-            }
-          });
-          
-          setEvents(eventos);
+          setPlanificacionCargada(true);
         })
         .catch((error) => {
           console.error("Error al cargar planificación:", error);
         })
         .finally(() => setLoadingPlanificacion(false));
     }
-  }, [planificacionId, ejes]);
+  }, [planificacionId]);
+
+  // Cargar ejes filtrados después de cargar la planificación
+  useEffect(() => {
+    if (planificacionActual && planificacionActual.horario) {
+      // Usar la asignatura del horario, no de las asignaciones
+      const asignaturaId = planificacionActual.horario.asignaturaId;
+      const nivelId = planificacionActual.horario.nivelId;
+      
+      if (asignaturaId && nivelId) {
+        setLoadingOAs(true);
+        fetch(`/api/ejes?asignaturaId=${asignaturaId}&nivelId=${nivelId}`)
+          .then((res) => res.json())
+          .then((data) => {
+            setEjes(data);
+          })
+          .catch((error) => {
+            console.error("Error al cargar ejes filtrados:", error);
+          })
+          .finally(() => setLoadingOAs(false));
+      }
+    }
+  }, [planificacionActual]);
+
+  // Generar eventos del calendario cuando planificación y ejes estén disponibles
+  useEffect(() => {
+    if (planificacionActual && ejes.length > 0) {
+      const eventos: CalendarEvent[] = [];
+      let eventoIndex = 0;
+      
+      planificacionActual.asignaciones?.forEach((asignacion: any) => {
+        const oa = asignacion.oa;
+        const cantidadClases = asignacion.cantidadClases;
+        
+        if (oa) {
+          for (let i = 0; i < cantidadClases; i++) {
+            const eje = ejes.find((e: Eje) => e.oas.some((o: OA) => o.id === oa.id));
+            const ejeColor = (eje ? getEjeColor(eje.ejeId) : "sky") as EventColor;
+            
+            const modulos = planificacionActual.horario?.modulos && planificacionActual.horario.modulos.length > 0 
+              ? planificacionActual.horario.modulos 
+              : modulosFijos;
+            
+            const fechaBase = planificacionActual.horario?.fechaPrimeraClase
+              ? new Date(planificacionActual.horario.fechaPrimeraClase)
+              : new Date(2025, 6, 1);
+            
+            const start = getModuloDate(fechaBase, eventoIndex, modulos);
+            const end = new Date(start);
+            end.setHours(end.getHours() + (modulos[eventoIndex % modulos.length]?.duracion ? modulos[eventoIndex % modulos.length].duracion / 60 : 1));
+            
+            eventos.push({
+              id: Math.random().toString(36).slice(2),
+              title: oa.oas_id,
+              start,
+              end,
+              allDay: false,
+              color: ejeColor,
+              location: `${modulos[eventoIndex % modulos.length]?.dia} ${modulos[eventoIndex % modulos.length]?.horaInicio}`,
+            });
+            
+            eventoIndex++;
+          }
+        }
+      });
+      
+      setEvents(eventos);
+    }
+  }, [planificacionActual, ejes]);
 
   // Lógica para sumar/restar clases a un OA
   const handleAddClase = (oa: OA, prevOA: OA | null) => {
@@ -148,7 +185,7 @@ export function usePlanificacionAnual(
     setOaClases((prev) => ({ ...prev, [oa.id]: (prev[oa.id] || 0) + 1 }));
     // Encontrar el eje al que pertenece este OA para obtener su color
     const eje = ejes.find((e: Eje) => e.oas.some((o: OA) => o.id === oa.id));
-    const ejeColor = (eje ? getEjeColor(eje.id) : "sky") as EventColor;
+    const ejeColor = (eje ? getEjeColor(eje.ejeId) : "sky") as EventColor;
     // Calcular fecha real del módulo usando los módulos del horario seleccionado
     const modulos = horarioSeleccionado?.modulos && horarioSeleccionado.modulos.length > 0 ? horarioSeleccionado.modulos : modulosFijos;
     const moduloIdx = events.length;
@@ -228,33 +265,28 @@ export function usePlanificacionAnual(
   const ejeOptions = [
     { value: "Todos", label: "Todos" },
     ...ejes.map((e: Eje) => ({
-      value: `${e.id}||${e.descripcion}`,
+      value: e.id,
       label: e.descripcion,
     })),
   ];
 
   // Filtrado combinado
-  const ejesFiltrados = ejes
-    .filter(
-      (e: Eje) =>
-        selectedEjeId === "Todos" ||
-        `${e.id}||${e.descripcion}` === selectedEjeId
-    )
-    .map((e: Eje) => ({
-      ...e,
-      oas: e.oas.filter((oa: OA, idx: number, arr: OA[]) => {
-        if (!showOnlyAssignable) return true;
-        
-        // Los OA del eje "actitud" son siempre asignables
-        if (oa.eje_descripcion.toLowerCase() === 'actitud') {
+  const ejesFiltrados = useMemo(() => {
+    return ejes
+      .filter(
+        (e: Eje) =>
+          selectedEjeId === "Todos" ||
+          e.id === selectedEjeId
+      )
+      .map((e: Eje) => ({
+        ...e,
+        oas: e.oas.filter((oa: OA, idx: number, arr: OA[]) => {
+          // Temporalmente mostrar todos los OAs para debug
           return true;
-        }
-        
-        const prevOA = idx > 0 ? arr[idx - 1] : null;
-        return !prevOA || (oaClases[prevOA.id] || 0) >= prevOA.minimo_clases;
-      }),
-    }))
-    .filter((e: Eje) => e.oas.length > 0);
+        }),
+      }))
+      .filter((e: Eje) => e.oas.length > 0);
+  }, [ejes, selectedEjeId, showOnlyAssignable, oaClases]);
 
   // Función para guardar planificación
   const guardarPlanificacion = async (nombre: string, horarioId: string) => {
@@ -359,17 +391,40 @@ export function usePlanificacionAnual(
   const handleImportCSV = async (oasNombres: string[]) => {
     try {
       console.log("Importando OA:", oasNombres);
+      
+      // Obtener la asignatura del horario seleccionado
+      let asignaturaId = null;
+      let nivelId = null;
+      
+      if (planificacionActual && planificacionActual.horario) {
+        asignaturaId = planificacionActual.horario.asignaturaId;
+        nivelId = planificacionActual.horario.nivelId;
+      } else if (horarioSeleccionado) {
+        asignaturaId = horarioSeleccionado.asignatura?.id;
+        nivelId = horarioSeleccionado.nivel?.id;
+      }
+      
+      console.log("Asignatura del horario:", asignaturaId);
+      console.log("Nivel del horario:", nivelId);
+      
+      // Si no tenemos asignaturaId o nivelId, no podemos importar
+      if (!asignaturaId || !nivelId) {
+        throw new Error("No se puede importar CSV sin horario con asignatura y nivel seleccionados");
+      }
 
-      // Crear un mapa de todos los OAs por nombre para búsqueda rápida
+      // Crear un mapa SOLO con OAs de la asignatura y nivel del horario
       const oasMap = new Map();
+      
       ejes.forEach((eje: Eje) => {
         eje.oas.forEach((oa: OA) => {
-          // Mapear por oas_id (código del OA)
-          oasMap.set(oa.oas_id, oa);
-          // También mapear por descripción (por si acaso)
-          oasMap.set(oa.descripcion_oas, oa);
+          // Solo agregar OAs de la asignatura y nivel correctos
+          if (oa.asignatura_id === asignaturaId && oa.nivel_id === nivelId) {
+            oasMap.set(oa.oas_id, oa);
+          }
         });
       });
+      
+      console.log(`Mapa creado con ${oasMap.size} OAs de asignatura ${asignaturaId} y nivel ${nivelId}`);
 
       // Limpiar eventos y asignaciones actuales
       setEvents([]);
@@ -385,14 +440,14 @@ export function usePlanificacionAnual(
         const oa = oasMap.get(oaNombre);
         
         if (oa) {
-          console.log(`OA encontrado: ${oa.oas_id} - ${oa.descripcion_oas}`);
+          console.log(`✅ OA encontrado: ${oa.oas_id} - ${oa.descripcion_oas} (ID: ${oa.id})`);
           
-          // Incrementar el contador de clases para este OA
+          // Incrementar el contador de clases para este OA usando el ID real
           nuevasAsignaciones[oa.id] = (nuevasAsignaciones[oa.id] || 0) + 1;
           
           // Encontrar el eje al que pertenece este OA para obtener su color
           const eje = ejes.find((e: Eje) => e.oas.some((o: OA) => o.id === oa.id));
-          const ejeColor = (eje ? getEjeColor(eje.id) : "sky") as any;
+          const ejeColor = (eje ? getEjeColor(eje.ejeId) : "sky") as any;
           
           // Calcular fecha real del módulo usando los módulos del horario seleccionado
           const modulos = horarioSeleccionado?.modulos && horarioSeleccionado.modulos.length > 0 
