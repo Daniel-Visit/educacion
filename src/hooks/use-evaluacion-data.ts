@@ -38,7 +38,7 @@ interface Pregunta {
   texto: string;
 }
 
-export function useEvaluacionData(evaluacionId: string | null) {
+export function useEvaluacionData(resultadoId: string | null) {
   const [resultadoData, setResultadoData] = useState<EvaluacionData | null>(null);
   const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
   const [loading, setLoading] = useState(true);
@@ -46,8 +46,11 @@ export function useEvaluacionData(evaluacionId: string | null) {
 
   useEffect(() => {
     const loadData = async () => {
-      if (!evaluacionId) {
-        setError('No se encontró evaluacionId en la URL');
+      console.log('DEBUG: Iniciando carga de datos con resultadoId:', resultadoId);
+      
+      if (!resultadoId) {
+        console.log('DEBUG: No hay resultadoId, estableciendo error');
+        setError('No se encontró resultadoId en la URL');
         setLoading(false);
         return;
       }
@@ -56,31 +59,47 @@ export function useEvaluacionData(evaluacionId: string | null) {
         setLoading(true);
         setError(null);
         
-        // Cargar datos reales desde la API
+        console.log('DEBUG: Obteniendo información del resultado...');
+        // Primero obtener el resultado para obtener el evaluacionId
+        const resultadoResponse = await fetch(`/api/resultados-evaluaciones/${resultadoId}`);
+        if (!resultadoResponse.ok) {
+          throw new Error('Error al cargar el resultado');
+        }
+        const resultadoInfo = await resultadoResponse.json();
+        console.log('DEBUG: Información del resultado obtenida:', resultadoInfo);
+        
+        const evaluacionId = resultadoInfo.evaluacionId;
+        console.log('DEBUG: EvaluacionId obtenido:', evaluacionId);
+        
+        console.log('DEBUG: Cargando resultados de la evaluación...');
+        // Cargar datos reales desde la API usando el evaluacionId correcto
         const response = await fetch(`/api/evaluaciones/${evaluacionId}/resultados`);
         if (!response.ok) {
           throw new Error('Error al cargar resultados');
         }
         const resultadosData = await response.json();
+        console.log('DEBUG: Resultados cargados, cantidad:', resultadosData.length);
         
-        // Cargar preguntas desde la API
+        console.log('DEBUG: Cargando preguntas...');
+        // Cargar preguntas desde la API usando el evaluacionId correcto
         const preguntasResponse = await fetch(`/api/evaluaciones/${evaluacionId}/preguntas`);
         if (!preguntasResponse.ok) {
           throw new Error('Error al cargar preguntas');
         }
         const preguntasData = await preguntasResponse.json();
+        console.log('DEBUG: Preguntas cargadas, cantidad:', preguntasData.length);
         
         // Transformar datos al formato esperado
         const resultadoTransformado: EvaluacionData = {
-          id: evaluacionId,
-          nombre: `Evaluación ${evaluacionId}`,
-          fecha: new Date().toISOString(),
+          id: resultadoId,
+          nombre: resultadoInfo.nombre || `Resultado ${resultadoId}`,
+          fecha: resultadoInfo.fechaCarga || new Date().toISOString(),
           evaluacion: {
-            id: evaluacionId,
-            nombre: `Evaluación ${evaluacionId}`,
+            id: evaluacionId.toString(),
+            nombre: resultadoInfo.evaluacion?.titulo || `Evaluación ${evaluacionId}`,
             matriz: {
               id: "1",
-              nombre: "Matriz de Especificación",
+              nombre: resultadoInfo.evaluacion?.matrizNombre || "Matriz de Especificación",
               nivelExigencia: 60
             }
           },
@@ -99,18 +118,21 @@ export function useEvaluacionData(evaluacionId: string | null) {
           }))
         };
         
+        console.log('DEBUG: Datos transformados, estableciendo estado...');
         setResultadoData(resultadoTransformado);
         setPreguntas(preguntasData);
+        console.log('DEBUG: Estado establecido, finalizando carga');
       } catch (error) {
         console.error('Error al cargar datos:', error);
         setError('Error al cargar los datos');
       } finally {
         setLoading(false);
+        console.log('DEBUG: Loading establecido en false');
       }
     };
 
     loadData();
-  }, [evaluacionId]);
+  }, [resultadoId]);
 
   return { resultadoData, preguntas, loading, error };
 } 

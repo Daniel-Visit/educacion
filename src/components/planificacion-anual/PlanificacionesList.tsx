@@ -190,11 +190,11 @@ export default function PlanificacionesList() {
         </div>
       </div>
       {planificaciones.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24">
-          <Layers size={80} className="text-gray-300 mb-6" />
-          <h3 className="text-3xl font-bold text-gray-900 mb-2">No hay planificaciones creadas</h3>
-          <p className="text-xl text-gray-500 mb-8">Crea tu primera planificación anual para comenzar</p>
-          <PrimaryButton onClick={() => router.push('/planificacion-anual')} className="text-lg px-10 py-4">Nueva Planificación</PrimaryButton>
+        <div className="flex flex-col items-center justify-center py-16">
+          <Layers size={48} className="text-gray-300 mb-4" />
+          <h3 className="text-xl font-bold text-gray-900 mb-2">No hay planificaciones creadas</h3>
+          <p className="text-base text-gray-500 mb-6 text-center">Crea tu primera planificación anual para comenzar</p>
+          <PrimaryButton onClick={() => router.push('/planificacion-anual')} className="text-sm px-6 py-2">Nueva Planificación</PrimaryButton>
         </div>
       ) : (
         <>

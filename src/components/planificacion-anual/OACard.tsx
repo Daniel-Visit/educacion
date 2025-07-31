@@ -20,13 +20,11 @@ export default function OACard({
   prevOA,
   nextOA,
 }: OACardProps) {
-  // Debug logs removidos para evitar spam en consola
-  
-  const prevOk = !prevOA || (oaClases[prevOA.id] || 0) >= prevOA.minimo_clases;
+  const prevOk = !prevOA || (oaClases[prevOA.oas_id] || 0) >= prevOA.minimo_clases;
   const isSkipped = skippedOAs.has(oa.id);
   const canAdd = prevOk || isSkipped || oa.eje_descripcion.toLowerCase() === 'actitud';
-  const nextHasClases = nextOA && (oaClases[nextOA.id] || 0) > 0;
-  const currentClases = oaClases[oa.id] || 0;
+  const nextHasClases = nextOA && (oaClases[nextOA.oas_id] || 0) > 0;
+  const currentClases = oaClases[oa.oas_id] || 0;
 
   return (
     <div

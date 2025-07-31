@@ -6,7 +6,7 @@ import {
   Home, 
   FileText, 
   CheckSquare, 
-  Edit3, 
+  Puzzle, 
   MessageSquare,
   BookOpen,
   ChevronDown,
@@ -28,6 +28,25 @@ import { steps, preguntaToStep } from '@/components/entrevista/constants'
 
 const navigation = [
   { name: 'Inicio', href: '/', icon: Home },
+  { 
+    name: 'Planificación', 
+    href: '/planificacion-anual', 
+    icon: Calendar,
+    submenu: [
+      { name: 'Horarios', href: '/horarios' },
+      { name: 'Planificación Anual', href: '/planificacion-anual' },
+      { name: 'Planificaciones', href: '/planificacion-anual/listado' }
+    ]
+  },
+  { 
+    name: 'Clase a Clase', 
+    href: '/editor', 
+    icon: Puzzle,
+    submenu: [
+      { name: 'Planificación de Clase', href: '/editor?tipo=planificacion' },
+      { name: 'Material de Apoyo', href: '/editor?tipo=material' }
+    ]
+  },
 
   { 
     name: 'Evaluación', 
@@ -47,25 +66,8 @@ const navigation = [
       { name: 'Cargar Resultados', href: '/correccion-evaluaciones' }
     ]
   },
-  { 
-    name: 'Planificación', 
-    href: '/planificacion-anual', 
-    icon: Calendar,
-    submenu: [
-      { name: 'Horarios', href: '/horarios' },
-      { name: 'Planificación Anual', href: '/planificacion-anual' },
-      { name: 'Planificaciones', href: '/planificacion-anual/listado' }
-    ]
-  },
-  { 
-    name: 'Editor', 
-    href: '/editor', 
-    icon: Edit3,
-    submenu: [
-      { name: 'Planificación de Clase', href: '/editor?tipo=planificacion' },
-      { name: 'Material de Apoyo', href: '/editor?tipo=material' }
-    ]
-  },
+  
+  
   { 
     name: 'Entrevista', 
     href: '/entrevista', 

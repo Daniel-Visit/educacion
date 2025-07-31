@@ -251,7 +251,7 @@ model AsignacionOA {
 
 model Alumno {
   id         Int               @id @default(autoincrement())
-  rut        String            @unique(map: "sqlite_autoindex_alumno_1")
+  rut        String            @unique
   nombre     String
   apellido   String
   curso      String?

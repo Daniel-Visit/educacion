@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { CalendarEvent, EventColor } from "@/components/event-calendar";
 import { OA, Eje, OAClases } from "@/components/planificacion-anual/types";
 import { addDays, getDay } from "date-fns";
@@ -51,6 +51,14 @@ export function usePlanificacionAnual(
   const [planificacionActual, setPlanificacionActual] = useState<any>(null);
   const [loadingPlanificacion, setLoadingPlanificacion] = useState(false);
   const [planificacionCargada, setPlanificacionCargada] = useState(false);
+  
+  // Usar useRef para preservar las asignaciones durante la carga de ejes
+  const asignacionesRef = useRef<OAClases>({});
+
+  // Mantener sincronizado el ref con oaClases
+  useEffect(() => {
+    asignacionesRef.current = oaClases;
+  }, [oaClases]);
 
   // Cargar ejes y OAs (solo si no hay planificacionId)
   useEffect(() => {
@@ -88,8 +96,6 @@ export function usePlanificacionAnual(
             return;
           }
           
-          // Debug logs removidos
-          
           setPlanificacionActual(data);
           
           // Cargar asignaciones de OAs
@@ -97,7 +103,9 @@ export function usePlanificacionAnual(
           data.asignaciones?.forEach((asignacion: any) => {
             asignaciones[asignacion.oaId] = asignacion.cantidadClases;
           });
+          
           setOaClases(asignaciones);
+          asignacionesRef.current = asignaciones; // Guardar en ref
           setPlanificacionCargada(true);
         })
         .catch((error) => {
@@ -119,7 +127,37 @@ export function usePlanificacionAnual(
         fetch(`/api/ejes?asignaturaId=${asignaturaId}&nivelId=${nivelId}`)
           .then((res) => res.json())
           .then((data) => {
+            console.log('DEBUG: Ejes cargados:', data.length, 'ejes');
+            
+            // Crear un mapa de oas_id a ID para mapear las asignaciones
+            const oasIdMap = new Map();
+            data.forEach((eje: Eje) => {
+              eje.oas.forEach((oa: OA) => {
+                oasIdMap.set(oa.oas_id, oa.id);
+              });
+            });
+            
+            // Mapear las asignaciones existentes usando oas_id
+            const asignacionesMapeadas: OAClases = {};
+            
+            // Primero, obtener los OAs de las asignaciones originales para obtener sus oas_id
+            if (planificacionActual && planificacionActual.asignaciones) {
+              planificacionActual.asignaciones.forEach((asignacion: any) => {
+                const oaOriginal = asignacion.oa;
+                if (oaOriginal && oasIdMap.has(oaOriginal.oas_id)) {
+                  const nuevoId = oasIdMap.get(oaOriginal.oas_id);
+                  asignacionesMapeadas[oaOriginal.oas_id] = asignacion.cantidadClases;
+                }
+              });
+            }
+            
             setEjes(data);
+            
+            // Usar las asignaciones mapeadas
+            if (Object.keys(asignacionesMapeadas).length > 0) {
+              setOaClases(asignacionesMapeadas);
+              asignacionesRef.current = asignacionesMapeadas;
+            }
           })
           .catch((error) => {
             console.error("Error al cargar ejes filtrados:", error);
@@ -181,8 +219,8 @@ export function usePlanificacionAnual(
     if (oa.eje_descripcion.toLowerCase() !== 'actitud' && 
         !skippedOAs.has(oa.id) && 
         prevOA && 
-        oaClases[prevOA.id] < prevOA.minimo_clases) return;
-    setOaClases((prev) => ({ ...prev, [oa.id]: (prev[oa.id] || 0) + 1 }));
+        oaClases[prevOA.oas_id] < prevOA.minimo_clases) return;
+    setOaClases((prev) => ({ ...prev, [oa.oas_id]: (prev[oa.oas_id] || 0) + 1 }));
     // Encontrar el eje al que pertenece este OA para obtener su color
     const eje = ejes.find((e: Eje) => e.oas.some((o: OA) => o.id === oa.id));
     const ejeColor = (eje ? getEjeColor(eje.ejeId) : "sky") as EventColor;
@@ -211,14 +249,14 @@ export function usePlanificacionAnual(
   };
 
   const handleRemoveClase = (oa: OA, nextOA: OA | null) => {
-    if ((oaClases[oa.id] || 0) === 0) return;
+    if ((oaClases[oa.oas_id] || 0) === 0) return;
     if (
       nextOA &&
-      (oaClases[nextOA.id] || 0) > 0 &&
-      oaClases[oa.id] === oa.minimo_clases
+      (oaClases[nextOA.oas_id] || 0) > 0 &&
+      oaClases[oa.oas_id] === oa.minimo_clases
     )
       return;
-    setOaClases((prev) => ({ ...prev, [oa.id]: (prev[oa.id] || 0) - 1 }));
+    setOaClases((prev) => ({ ...prev, [oa.oas_id]: (prev[oa.oas_id] || 0) - 1 }));
     setEvents((prev) => {
       const idx = prev.map((e) => e.title).lastIndexOf(oa.oas_id);
       if (idx === -1) return prev;
@@ -272,7 +310,7 @@ export function usePlanificacionAnual(
 
   // Filtrado combinado
   const ejesFiltrados = useMemo(() => {
-    return ejes
+    const filtrados = ejes
       .filter(
         (e: Eje) =>
           selectedEjeId === "Todos" ||
@@ -286,17 +324,35 @@ export function usePlanificacionAnual(
         }),
       }))
       .filter((e: Eje) => e.oas.length > 0);
+    
+    return filtrados;
   }, [ejes, selectedEjeId, showOnlyAssignable, oaClases]);
 
   // Función para guardar planificación
   const guardarPlanificacion = async (nombre: string, horarioId: string) => {
     try {
+      // Crear un mapa de oas_id a oaId para mapear las asignaciones
+      const oasIdToOaIdMap = new Map();
+      ejes.forEach((eje: Eje) => {
+        eje.oas.forEach((oa: OA) => {
+          oasIdToOaIdMap.set(oa.oas_id, oa.id);
+        });
+      });
+
       const asignaciones = Object.entries(oaClases)
         .filter(([_, cantidad]) => cantidad > 0)
-        .map(([oaId, cantidad]) => ({
-          oaId: parseInt(oaId),
-          cantidadClases: cantidad,
-        }));
+        .map(([oasId, cantidad]) => {
+          const oaId = oasIdToOaIdMap.get(oasId);
+          if (!oaId) {
+            console.warn(`No se encontró oaId para oas_id: ${oasId}`);
+            return null;
+          }
+          return {
+            oaId: oaId,
+            cantidadClases: cantidad,
+          };
+        })
+        .filter(Boolean); // Remover asignaciones null
 
       const response = await fetch("/api/planificaciones", {
         method: "POST",
@@ -331,12 +387,28 @@ export function usePlanificacionAnual(
     }
 
     try {
+      // Crear un mapa de oas_id a oaId para mapear las asignaciones
+      const oasIdToOaIdMap = new Map();
+      ejes.forEach((eje: Eje) => {
+        eje.oas.forEach((oa: OA) => {
+          oasIdToOaIdMap.set(oa.oas_id, oa.id);
+        });
+      });
+
       const asignaciones = Object.entries(oaClases)
         .filter(([_, cantidad]) => cantidad > 0)
-        .map(([oaId, cantidad]) => ({
-          oaId: parseInt(oaId),
-          cantidadClases: cantidad,
-        }));
+        .map(([oasId, cantidad]) => {
+          const oaId = oasIdToOaIdMap.get(oasId);
+          if (!oaId) {
+            console.warn(`No se encontró oaId para oas_id: ${oasId}`);
+            return null;
+          }
+          return {
+            oaId: oaId,
+            cantidadClases: cantidad,
+          };
+        })
+        .filter(Boolean); // Remover asignaciones null
 
       const response = await fetch(`/api/planificaciones/${planificacionActual.id}`, {
         method: "PUT",
@@ -390,8 +462,6 @@ export function usePlanificacionAnual(
   // Función para importar CSV
   const handleImportCSV = async (oasNombres: string[]) => {
     try {
-      console.log("Importando OA:", oasNombres);
-      
       // Obtener la asignatura del horario seleccionado
       let asignaturaId = null;
       let nivelId = null;
@@ -403,9 +473,6 @@ export function usePlanificacionAnual(
         asignaturaId = horarioSeleccionado.asignatura?.id;
         nivelId = horarioSeleccionado.nivel?.id;
       }
-      
-      console.log("Asignatura del horario:", asignaturaId);
-      console.log("Nivel del horario:", nivelId);
       
       // Si no tenemos asignaturaId o nivelId, no podemos importar
       if (!asignaturaId || !nivelId) {
@@ -423,8 +490,6 @@ export function usePlanificacionAnual(
           }
         });
       });
-      
-      console.log(`Mapa creado con ${oasMap.size} OAs de asignatura ${asignaturaId} y nivel ${nivelId}`);
 
       // Limpiar eventos y asignaciones actuales
       setEvents([]);
@@ -440,10 +505,8 @@ export function usePlanificacionAnual(
         const oa = oasMap.get(oaNombre);
         
         if (oa) {
-          console.log(`✅ OA encontrado: ${oa.oas_id} - ${oa.descripcion_oas} (ID: ${oa.id})`);
-          
-          // Incrementar el contador de clases para este OA usando el ID real
-          nuevasAsignaciones[oa.id] = (nuevasAsignaciones[oa.id] || 0) + 1;
+          // Incrementar el contador de clases para este OA usando el oas_id como clave
+          nuevasAsignaciones[oa.oas_id] = (nuevasAsignaciones[oa.oas_id] || 0) + 1;
           
           // Encontrar el eje al que pertenece este OA para obtener su color
           const eje = ejes.find((e: Eje) => e.oas.some((o: OA) => o.id === oa.id));
@@ -473,8 +536,6 @@ export function usePlanificacionAnual(
           });
           
           eventoIndex++;
-        } else {
-          console.warn(`OA no encontrado: ${oaNombre}`);
         }
       }
 
@@ -482,7 +543,6 @@ export function usePlanificacionAnual(
       setEvents(nuevosEventos);
       setOaClases(nuevasAsignaciones);
 
-      console.log(`Importación completada: ${nuevosEventos.length} eventos creados`);
       return { success: true, eventosCreados: nuevosEventos.length };
       
     } catch (error) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -40,6 +40,7 @@ export default function ImportarMatrizModal({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [preview, setPreview] = useState<any[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -209,49 +210,31 @@ export default function ImportarMatrizModal({
           </Card>
 
           {/* Área de carga */}
-          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm rounded-t-xl">
-            <CardHeader className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-100 rounded-t-xl">
-              <CardTitle className="flex items-center gap-3 text-indigo-900">
-                <FileText className="h-6 w-6 text-indigo-600" />
-                Seleccionar Archivo
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div className="border-2 border-dashed border-indigo-300 rounded-xl p-8 text-center hover:border-indigo-400 transition-colors">
-                  <CloudUpload className="h-12 w-12 text-indigo-600 mx-auto mb-4" />
-                  <div className="space-y-2">
-                    <p className="text-lg font-semibold text-indigo-900">
-                      {file ? file.name : 'Arrastra tu archivo CSV aquí'}
-                    </p>
-                    <p className="text-indigo-600">
-                      o haz clic para seleccionar
-                    </p>
-                  </div>
-                  <input
-                    type="file"
-                    accept=".csv"
-                    onChange={handleFileChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  />
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-indigo-400 transition-colors min-h-[120px] flex items-center justify-center">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full text-indigo-400 hover:text-indigo-700 font-medium"
+            >
+              <CloudUpload className="w-8 h-8 mx-auto mb-2 text-indigo-500 hover:text-indigo-600 transition-colors" />
+              {file ? (
+                <div className="flex flex-col items-center space-y-1">
+                  <span className="text-gray-700 font-medium">{file.name}</span>
+                  <span className="text-gray-500 text-sm">Haz clic para cambiar archivo</span>
                 </div>
-
-                {file && (
-                  <div className="bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-xl p-4 border border-emerald-200">
-                    <div className="flex items-center gap-3">
-                      <CheckCircle2 className="h-6 w-6 text-emerald-600" />
-                      <div>
-                        <p className="font-semibold text-emerald-900">Archivo seleccionado</p>
-                        <p className="text-sm text-emerald-700">
-                          {file.name} ({(file.size / 1024).toFixed(1)} KB)
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+              ) : (
+                <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent font-semibold">
+                  Haz clic para seleccionar archivo CSV
+                </span>
+              )}
+            </button>
+          </div>
 
           {/* Preview de datos */}
           {preview.length > 0 && (

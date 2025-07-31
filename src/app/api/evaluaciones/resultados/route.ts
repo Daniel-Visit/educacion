@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma } from '../../../../lib/prisma';
+
+export async function GET(request: NextRequest) {
+  return NextResponse.json(
+    { error: 'Método GET no soportado. Use POST para cargar resultados.' },
+    { status: 405 }
+  );
+}
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const evaluacionId = parseInt(formData.get('evaluacionId') as string);
+
+    console.log('DEBUG: evaluacionId recibido:', evaluacionId);
+    console.log('DEBUG: file recibido:', file?.name);
 
     if (!file || !evaluacionId) {
       return NextResponse.json(
@@ -15,6 +25,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar que la evaluación existe
+    console.log('DEBUG: Buscando evaluación con ID:', evaluacionId);
+    
     const evaluacion = await prisma.evaluacion.findUnique({
       where: { id: evaluacionId },
       include: {
@@ -30,6 +42,11 @@ export async function POST(request: NextRequest) {
         }
       }
     });
+
+    console.log('DEBUG: Evaluación encontrada:', evaluacion ? 'SÍ' : 'NO');
+    if (evaluacion) {
+      console.log('DEBUG: Evaluación tiene', evaluacion.preguntas.length, 'preguntas');
+    }
 
     if (!evaluacion) {
       return NextResponse.json(
@@ -57,16 +74,14 @@ export async function POST(request: NextRequest) {
     console.log('Headers detectados:', headers);
     console.log('Separador usado:', separator);
     
-    // Detectar formato del archivo
-    const isFormatoReal = headers.includes('id') && headers.includes('nombre') && headers.includes('respuesta') && headers.includes('pregunta');
-    const isFormatoEsperado = headers.includes('rut') && headers.includes('nombre') && headers.includes('apellido') && headers.includes('pregunta_id') && headers.includes('alternativa_dada');
+    // Verificar formato del archivo (solo formato estándar con RUT)
+    const isFormatoValido = headers.includes('rut') && headers.includes('pregunta_id') && headers.includes('alternativa_dada');
     
-    console.log('Formato real detectado:', isFormatoReal);
-    console.log('Formato esperado detectado:', isFormatoEsperado);
+    console.log('Formato válido detectado:', isFormatoValido);
     
-    if (!isFormatoReal && !isFormatoEsperado) {
+    if (!isFormatoValido) {
       return NextResponse.json(
-        { error: `Formato de archivo no reconocido. Headers encontrados: ${headers.join(', ')}. Se esperan columnas: ID, NOMBRE, RESPUESTA, PREGUNTA o rut, nombre, apellido, pregunta_id, alternativa_dada` },
+        { error: `Formato de archivo no válido. Headers encontrados: ${headers.join(', ')}. Se requieren las columnas: rut, pregunta_id, alternativa_dada` },
         { status: 400 }
       );
     }
@@ -79,11 +94,7 @@ export async function POST(request: NextRequest) {
         return obj;
       }, {} as any);
     }).filter(row => {
-      if (isFormatoReal) {
-        return row.id && row.nombre && row.respuesta && row.pregunta;
-      } else {
-        return row.rut && row.nombre && row.apellido && row.pregunta_id && row.alternativa_dada;
-      }
+      return row.rut && row.pregunta_id && row.alternativa_dada;
     });
 
     if (data.length === 0) {
@@ -95,66 +106,69 @@ export async function POST(request: NextRequest) {
 
     // Crear mapa de preguntas y alternativas correctas
     const preguntaMap = new Map();
-    evaluacion.preguntas.forEach(pregunta => {
-      const alternativaCorrecta = pregunta.alternativas.find(alt => alt.esCorrecta);
+    evaluacion.preguntas.forEach((pregunta: any) => {
+      const alternativaCorrecta = pregunta.alternativas.find((alt: any) => alt.esCorrecta);
       preguntaMap.set(pregunta.numero, {
         id: pregunta.id,
         alternativaCorrecta: alternativaCorrecta?.letra || 'A'
       });
     });
 
-    // Procesar datos y crear/actualizar alumnos
-    const alumnosMap = new Map();
-    const respuestasPorAlumno = new Map();
+    console.log('DEBUG: Mapa de preguntas creado:', Array.from(preguntaMap.entries()));
 
-    for (const row of data) {
-      let alumnoId, preguntaId, alternativaDada, nombreCompleto;
-      
-      if (isFormatoReal) {
-        // Formato real: ID;NOMBRE;RESPUESTA;PREGUNTA
-        alumnoId = row.id;
-        nombreCompleto = row.nombre;
-        alternativaDada = row.respuesta.toUpperCase();
-        preguntaId = parseInt(row.pregunta);
-      } else {
-        // Formato esperado: rut,nombre,apellido,pregunta_id,alternativa_dada
-        alumnoId = row.rut;
-        nombreCompleto = `${row.nombre} ${row.apellido}`;
-        alternativaDada = row.alternativa_dada.toUpperCase();
-        preguntaId = parseInt(row.pregunta_id);
+    // Extraer todos los RUTs únicos del CSV
+    const rutsUnicos = Array.from(new Set(data.map(row => row.rut)));
+    console.log('DEBUG: Total de RUTs únicos encontrados:', rutsUnicos.length);
+
+    // Buscar todos los alumnos en una sola consulta
+    const alumnos = await prisma.alumno.findMany({
+      where: {
+        rut: {
+          in: rutsUnicos
+        }
       }
+    });
+
+    console.log('DEBUG: Alumnos encontrados en BD:', alumnos.length);
+
+    // Crear mapa de alumnos por RUT para acceso rápido
+    const alumnosMap = new Map();
+    alumnos.forEach((alumno: any) => {
+      alumnosMap.set(alumno.rut, alumno);
+    });
+
+    // Verificar alumnos no encontrados
+    const alumnosNoEncontrados = rutsUnicos.filter(rut => !alumnosMap.has(rut));
+    if (alumnosNoEncontrados.length > 0) {
+      const alumnosNoEncontradosList = alumnosNoEncontrados.map(rut => `RUT: ${rut}`).join(', ');
+      return NextResponse.json(
+        { 
+          error: `Los siguientes alumnos no existen en la base de datos: ${alumnosNoEncontradosList}. Por favor, asegúrate de que todos los alumnos estén registrados antes de cargar resultados.` 
+        },
+        { status: 400 }
+      );
+    }
+
+    // Procesar datos y agrupar respuestas por alumno
+    const respuestasPorAlumno = new Map();
+    
+    for (const row of data) {
+      const alumnoId = row.rut;
+      const alternativaDada = row.alternativa_dada.toUpperCase();
+      const preguntaNumero = parseInt(row.pregunta_id);
       
-      // Verificar que la pregunta existe
-      const preguntaInfo = preguntaMap.get(preguntaId);
-      if (!preguntaId || !preguntaInfo) {
+      // Verificar que la pregunta existe usando el número de pregunta
+      const preguntaInfo = preguntaMap.get(preguntaNumero);
+      if (!preguntaNumero || !preguntaInfo) {
+        console.log('DEBUG: Pregunta no encontrada:', preguntaNumero);
         continue; // Saltar preguntas que no existen
       }
 
-      // Crear o obtener alumno
-      let alumno = alumnosMap.get(alumnoId);
-      if (!alumno) {
-        // Generar RUT único basado en ID si no existe
-        const rut = isFormatoReal ? `${alumnoId}-${Date.now()}` : alumnoId;
-        
-        // Separar nombre y apellido del nombre completo
-        const nombrePartes = nombreCompleto.split(' ');
-        const nombre = nombrePartes[0] || '';
-        const apellido = nombrePartes.slice(1).join(' ') || '';
-        
-        alumno = await prisma.alumno.upsert({
-          where: { rut },
-          update: {},
-          create: {
-            rut,
-            nombre,
-            apellido
-          }
-        });
-        alumnosMap.set(alumnoId, alumno);
+      // Agregar respuesta al alumno
+      if (!respuestasPorAlumno.has(alumnoId)) {
         respuestasPorAlumno.set(alumnoId, []);
       }
 
-      // Agregar respuesta
       respuestasPorAlumno.get(alumnoId).push({
         preguntaId: preguntaInfo.id,
         alternativaDada,
@@ -163,61 +177,83 @@ export async function POST(request: NextRequest) {
       });
     }
 
-         // Crear resultado de evaluación
-     const resultadoEvaluacion = await prisma.resultadoEvaluacion.create({
-       data: {
-         nombre: `Resultado ${evaluacion.matriz.nombre} - ${new Date().toLocaleDateString()}`,
-         evaluacionId,
-         totalAlumnos: alumnosMap.size,
-         escalaNota: 7.0
-       }
-     });
+    // Verificar que al menos hay un alumno válido
+    if (respuestasPorAlumno.size === 0) {
+      return NextResponse.json(
+        { error: 'No se encontraron alumnos válidos en el CSV. Todos los alumnos deben existir previamente en la base de datos.' },
+        { status: 400 }
+      );
+    }
 
-    // Crear resultados por alumno
-    const resultadosAlumnos = [];
-    for (const [rut, alumno] of alumnosMap) {
-      const respuestas = respuestasPorAlumno.get(rut);
-      const puntajeTotal = respuestas.reduce((sum: number, r: any) => sum + r.puntajeObtenido, 0);
-      const puntajeMaximo = respuestas.length;
-      const porcentaje = puntajeMaximo > 0 ? (puntajeTotal / puntajeMaximo) * 100 : 0;
-      const nota = (porcentaje / 100) * 7.0; // Escala de 1-7
+    // Crear resultado de evaluación
+    const resultadoEvaluacion = await prisma.resultadoEvaluacion.create({
+      data: {
+        nombre: `Resultado ${evaluacion.matriz.nombre} - ${new Date().toLocaleDateString()}`,
+        evaluacionId,
+        totalAlumnos: respuestasPorAlumno.size,
+        escalaNota: 7.0
+      }
+    });
 
-      const resultadoAlumno = await prisma.resultadoAlumno.create({
-        data: {
-          resultadoEvaluacionId: resultadoEvaluacion.id,
-          alumnoId: alumno.id,
-          puntajeTotal,
-          puntajeMaximo,
-          porcentaje,
-          nota
-        }
-      });
+    console.log('DEBUG: Procesando', respuestasPorAlumno.size, 'alumnos con', data.length, 'respuestas totales');
+    
+    // Procesar todos los alumnos y sus respuestas en una sola transacción
+    const resultadosAlumnos = await prisma.$transaction(async (tx: any) => {
+      const resultados = [];
+      const todasLasRespuestas = [];
+      
+      for (const [alumnoId, respuestas] of Array.from(respuestasPorAlumno.entries())) {
+        const alumno = alumnosMap.get(alumnoId);
+        const puntajeTotal = respuestas.reduce((sum: number, r: any) => sum + r.puntajeObtenido, 0);
+        const puntajeMaximo = respuestas.length;
+        const porcentaje = puntajeMaximo > 0 ? (puntajeTotal / puntajeMaximo) * 100 : 0;
+        const nota = (porcentaje / 100) * 7.0; // Escala de 1-7
 
-      // Crear respuestas individuales
-      for (const respuesta of respuestas) {
-        await prisma.respuestaAlumno.create({
+        const resultadoAlumno = await tx.resultadoAlumno.create({
           data: {
-            resultadoAlumnoId: resultadoAlumno.id,
-            preguntaId: respuesta.preguntaId,
-            alternativaDada: respuesta.alternativaDada,
-            esCorrecta: respuesta.esCorrecta,
-            puntajeObtenido: respuesta.puntajeObtenido
+            resultadoEvaluacionId: resultadoEvaluacion.id,
+            alumnoId: alumno.id,
+            puntajeTotal,
+            puntajeMaximo,
+            porcentaje,
+            nota
           }
         });
-      }
 
-      resultadosAlumnos.push(resultadoAlumno);
-    }
+        // Preparar respuestas para inserción en lote
+        const respuestasData = respuestas.map((respuesta: any) => ({
+          resultadoAlumnoId: resultadoAlumno.id,
+          preguntaId: respuesta.preguntaId,
+          alternativaDada: respuesta.alternativaDada,
+          esCorrecta: respuesta.esCorrecta,
+          puntajeObtenido: respuesta.puntajeObtenido
+        }));
+
+        todasLasRespuestas.push(...respuestasData);
+        resultados.push(resultadoAlumno);
+      }
+      
+      // Insertar todas las respuestas en un solo lote
+      if (todasLasRespuestas.length > 0) {
+        await tx.respuestaAlumno.createMany({
+          data: todasLasRespuestas
+        });
+      }
+      
+      return resultados;
+    }, {
+      timeout: 30000 // 30 segundos de timeout
+    });
 
     return NextResponse.json({
       success: true,
       message: `Resultados cargados exitosamente`,
-             data: {
-         resultadoId: resultadoEvaluacion.id,
-         totalAlumnos: alumnosMap.size,
-         totalRespuestas: data.length,
-         evaluacion: evaluacion.matriz.nombre
-       }
+      data: {
+        resultadoId: resultadoEvaluacion.id,
+        totalAlumnos: respuestasPorAlumno.size,
+        totalRespuestas: data.length,
+        evaluacion: evaluacion.matriz.nombre
+      }
     });
 
   } catch (error) {

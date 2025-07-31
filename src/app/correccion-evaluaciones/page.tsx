@@ -155,7 +155,7 @@ export default function CorreccionEvaluacionesPage() {
           {evaluacionSeleccionada && (
             <button 
               onClick={() => setShowCargarModal(true)}
-              className="h-12 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+              className="h-12 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold text-sm rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
             >
               <Upload className="h-5 w-5" />
               Cargar Resultados
@@ -164,34 +164,34 @@ export default function CorreccionEvaluacionesPage() {
         </div>
 
           {evaluacionSeleccionada && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-xl border border-emerald-200">
-                <div className="bg-emerald-600 p-3 rounded-lg">
-                  <FileText className="h-6 w-6 text-white" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+              <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-lg border border-emerald-200">
+                <div className="bg-emerald-600 p-2 rounded-lg">
+                  <FileText className="h-4 w-4 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-emerald-700">Evaluación</p>
-                  <p className="text-lg font-bold text-emerald-900">{evaluacionSeleccionada.titulo}</p>
+                  <p className="text-xs font-medium text-emerald-700">Evaluación</p>
+                  <p className="text-sm font-bold text-emerald-900">{evaluacionSeleccionada.titulo}</p>
                 </div>
               </div>
               
-              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-pink-50 to-pink-100 rounded-xl border border-pink-200">
-                <div className="bg-pink-600 p-3 rounded-lg">
-                  <BarChart3 className="h-6 w-6 text-white" />
+              <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-pink-50 to-pink-100 rounded-lg border border-pink-200">
+                <div className="bg-pink-600 p-2 rounded-lg">
+                  <BarChart3 className="h-4 w-4 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-pink-700">Matriz</p>
-                  <p className="text-lg font-bold text-pink-900">{evaluacionSeleccionada.matrizNombre}</p>
+                  <p className="text-xs font-medium text-pink-700">Matriz</p>
+                  <p className="text-sm font-bold text-pink-900">{evaluacionSeleccionada.matrizNombre}</p>
                 </div>
               </div>
               
-              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl border border-orange-200">
-                <div className="bg-orange-600 p-3 rounded-lg">
-                  <Users className="h-6 w-6 text-white" />
+              <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg border border-orange-200">
+                <div className="bg-orange-600 p-2 rounded-lg">
+                  <Users className="h-4 w-4 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-orange-700">Preguntas</p>
-                  <p className="text-lg font-bold text-orange-900">
+                  <p className="text-xs font-medium text-orange-700">Preguntas</p>
+                  <p className="text-sm font-bold text-orange-900">
                     {evaluacionSeleccionada.preguntasCount} pregunta{evaluacionSeleccionada.preguntasCount !== 1 ? 's' : ''}
                   </p>
                 </div>

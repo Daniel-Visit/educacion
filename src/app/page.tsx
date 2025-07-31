@@ -1,29 +1,37 @@
 "use client";
 import Link from "next/link";
-import { BookOpen, Sparkles, FileText, Edit3, CheckSquare, MessageSquare, ArrowRight, Users, Brain, Zap, Calendar, School } from "lucide-react";
+import { BookOpen, Sparkles, FileText, Edit3, CheckSquare, MessageSquare, ArrowRight, Users, Brain, Zap, Calendar, School, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
+  const [currentDateTime] = useState(new Date());
+
+  const formatDateTime = (date: Date) => {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'America/Santiago'
+    };
+    
+    return date.toLocaleDateString('es-CL', options);
+  };
+
   const sections = [
-    {
-      title: "Entrevista Pedagógica",
-      description: "Comienza una conversación inteligente con tu tutora virtual para explorar tus necesidades educativas",
-      icon: MessageSquare,
-      gradient: "from-emerald-500 to-teal-600",
-      bgGradient: "from-emerald-50 to-teal-50",
-      borderColor: "border-emerald-200",
-      href: "/entrevista",
-      features: ["IA Conversacional", "Análisis Personalizado", "Recomendaciones"],
-      isPrimary: true
-    },
+    
     {
       title: "Planificación Anual de Clases",
       description: "Gestiona la planificación anual de clases con calendario interactivo y asignación de objetivos de aprendizaje",
       icon: Calendar,
-      gradient: "from-orange-500 to-red-500",
-      bgGradient: "from-orange-50 to-red-50",
-      borderColor: "border-orange-200",
+      gradient: "from-emerald-500 to-teal-600",
+      bgGradient: "from-emerald-50 to-teal-50",
+      borderColor: "border-emerald-200",
       href: "/planificacion-anual",
-      features: ["Calendario Interactivo", "OAs por Eje", "Distribución Temporal"]
+      features: ["Calendario Interactivo", "OAs por Eje", "Distribución Temporal"],
+      isPrimary: true
     },
     {
       title: "Planificaciones Clase a Clase",
@@ -57,6 +65,7 @@ export default function Home() {
       href: "/resultado-evaluaciones",
       features: ["Carga de Resultados", "Análisis de Desempeño", "Informes Detallados"]
     },
+    
   ];
 
   return (
@@ -65,11 +74,12 @@ export default function Home() {
       <div className="flex items-center justify-between pb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-1">
-            ¡Hola, Francisca! 
+            Dashboard
           </h1>
-          <p className="text-gray-600 text-base">
-            Tu plataforma educativa inteligente está lista para ayudarte
-          </p>
+          <div className="flex items-center gap-2 text-gray-600 text-base">
+            <Clock className="w-4 h-4 text-indigo-500" />
+            <span className="font-medium">{formatDateTime(currentDateTime)}</span>
+          </div>
         </div>
         <div className="hidden md:flex items-center gap-2 bg-gradient-to-r from-indigo-50 to-purple-50 px-3 py-1.5 rounded-full border border-indigo-200">
           <Zap className="w-4 h-4 text-indigo-600" />

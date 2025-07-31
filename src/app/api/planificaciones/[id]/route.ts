@@ -5,12 +5,13 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(await params.id);
+    const { id } = await params;
+    const planificacionId = parseInt(id);
     
-    if (isNaN(id)) {
+    if (isNaN(planificacionId)) {
       return NextResponse.json(
         { error: "ID de planificación inválido" },
         { status: 400 }
@@ -18,7 +19,7 @@ export async function GET(
     }
 
     const planificacion = await prisma.planificacionAnual.findUnique({
-      where: { id },
+      where: { id: planificacionId },
       include: {
         horario: {
           include: {
@@ -60,12 +61,13 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(await params.id);
+    const { id } = await params;
+    const planificacionId = parseInt(id);
     
-    if (isNaN(id)) {
+    if (isNaN(planificacionId)) {
       return NextResponse.json(
         { error: "ID de planificación inválido" },
         { status: 400 }
@@ -77,7 +79,7 @@ export async function PUT(
 
     // Verificar que la planificación existe
     const planificacionExistente = await prisma.planificacionAnual.findUnique({
-      where: { id },
+      where: { id: planificacionId },
     });
 
     if (!planificacionExistente) {
@@ -89,7 +91,7 @@ export async function PUT(
 
     // Actualizar la planificación
     const planificacionActualizada = await prisma.planificacionAnual.update({
-      where: { id },
+      where: { id: planificacionId },
       data: {
         nombre,
         updatedAt: new Date(),
@@ -120,14 +122,14 @@ export async function PUT(
     if (asignaciones && Array.isArray(asignaciones)) {
       // Eliminar asignaciones existentes
       await prisma.asignacionOA.deleteMany({
-        where: { planificacionId: id },
+        where: { planificacionId },
       });
 
       // Crear nuevas asignaciones
       if (asignaciones.length > 0) {
         await prisma.asignacionOA.createMany({
           data: asignaciones.map((asignacion: any) => ({
-            planificacionId: id,
+            planificacionId: planificacionId,
             oaId: asignacion.oaId,
             cantidadClases: asignacion.cantidadClases,
           })),
@@ -147,12 +149,13 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(await params.id);
+    const { id } = await params;
+    const planificacionId = parseInt(id);
     
-    if (isNaN(id)) {
+    if (isNaN(planificacionId)) {
       return NextResponse.json(
         { error: "ID de planificación inválido" },
         { status: 400 }
@@ -161,7 +164,7 @@ export async function DELETE(
 
     // Verificar que la planificación existe
     const planificacionExistente = await prisma.planificacionAnual.findUnique({
-      where: { id },
+      where: { id: planificacionId },
     });
 
     if (!planificacionExistente) {
@@ -171,9 +174,14 @@ export async function DELETE(
       );
     }
 
-    // Eliminar la planificación (las asignaciones se eliminan automáticamente por CASCADE)
+    // Eliminar las asignaciones primero
+    await prisma.asignacionOA.deleteMany({
+      where: { planificacionId: planificacionId },
+    });
+
+    // Luego eliminar la planificación
     await prisma.planificacionAnual.delete({
-      where: { id },
+      where: { id: planificacionId },
     });
 
     return NextResponse.json({ message: "Planificación eliminada exitosamente" });
