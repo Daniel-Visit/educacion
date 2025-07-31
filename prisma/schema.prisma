@@ -244,7 +244,7 @@ model AsignacionOA {
   updatedAt       DateTime            @updatedAt
   moduloHorario   ModuloHorario?      @relation(fields: [moduloHorarioId], references: [id])
   oa              oa                  @relation(fields: [oaId], references: [id])
-  planificacion   PlanificacionAnual? @relation(fields: [planificacionId], references: [id])
+  planificacion   PlanificacionAnual? @relation(fields: [planificacionId], references: [id], onDelete: Cascade)
 
   @@map("asignacion_oa")
 }
