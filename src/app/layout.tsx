@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import AppShell from '@/components/ui/AppShell'
+import { SessionProvider } from 'next-auth/react'
+import { auth } from '@/lib/auth'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -10,17 +11,19 @@ export const metadata: Metadata = {
   description: 'Plataforma docente para gestión de evaluaciones y contenido educativo',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const session = await auth()
+
   return (
     <html lang="es">
       <body className={inter.className}>
-        <AppShell>
+        <SessionProvider session={session}>
           {children}
-        </AppShell>
+        </SessionProvider>
       </body>
     </html>
   )

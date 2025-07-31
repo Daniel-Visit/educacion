@@ -1,77 +1,163 @@
-# 🔐 Plan de Implementación de Autenticación
+# 🚀 Plan de Implementación - Sistema de Autenticación
 
-## 📋 **Resumen Ejecutivo**
+## 📋 Estado Actual
 
-Implementar sistema de autenticación usando **NextAuth.js** con proveedores **Google OAuth** y **Email/Password** para la aplicación educativa.
+### ✅ Ya implementado:
+- NextAuth.js configurado en `src/lib/auth.ts`
+- Proveedores: Google, GitHub, Credentials
+- Configuración básica de callbacks y sesiones
+- Rutas configuradas: `/auth/signin`, `/auth/signup`
 
-**Tiempo estimado:** 2-3 días
-**Prioridad:** Alta (seguridad en producción)
+### 🔄 Pendiente por implementar:
+- Tablas de usuarios en Prisma
+- Páginas de autenticación
+- Componentes de UI
+- Middleware de protección
+- Integración con funcionalidades existentes
 
-## 🎯 **Objetivos**
+## 🗄️ Base de Datos - Prisma Schema
 
-1. **Proteger todas las rutas** de la aplicación
-2. **Implementar login/registro** con Google y Email/Password
-3. **Sistema de roles** (Admin, Profesor, Estudiante)
-4. **Asociar datos existentes** con usuarios
-5. **UI intuitiva** para autenticación
+### Tablas necesarias (agregar a `prisma/schema.prisma`):
 
-## 🏗️ **Arquitectura**
+```prisma
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          String    @default("user") // "admin", "profesor", "user"
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  accounts      Account[]
+  sessions      Session[]
+  planificaciones PlanificacionAnual[] // Relación con planificaciones existentes
+  
+  @@map("users")
+}
 
-### **Proveedores de Autenticación**
-- ✅ **Google OAuth** - Para usuarios con cuenta Google
-- ✅ **Email/Password** - Para usuarios tradicionales
-- 🔄 **Futuro:** GitHub, Microsoft, Magic Links
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
-### **Sistema de Roles**
-- **Admin** - Acceso total, gestión de usuarios
-- **Profesor** - Crear/editar planificaciones, matrices, evaluaciones
-- **Estudiante** - Solo lectura de contenido asignado
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-### **Base de Datos**
-- **Tabla `users`** - Información de usuarios
-- **Tabla `accounts`** - Cuentas OAuth
-- **Tabla `sessions`** - Sesiones activas
-- **Relaciones** - Asociar datos existentes con usuarios
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
 
-## 📅 **Cronograma Detallado**
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-### **Día 1: Configuración Base**
-- [ ] Instalar NextAuth.js y dependencias
-- [ ] Configurar proveedores (Google + Email/Password)
-- [ ] Crear API routes para autenticación
-- [ ] Configurar variables de entorno
-- [ ] Crear páginas básicas de login/registro
+  @@map("sessions")
+}
 
-### **Día 2: UI y Protección**
-- [ ] Diseñar componentes de autenticación
-- [ ] Implementar middleware de protección
-- [ ] Crear contexto de usuario
-- [ ] Proteger todas las rutas existentes
-- [ ] Implementar logout y navegación
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-### **Día 3: Integración y Roles**
-- [ ] Crear sistema de roles en base de datos
-- [ ] Asociar datos existentes con usuarios
-- [ ] Implementar permisos por página
-- [ ] Crear dashboard personalizado
-- [ ] Testing y ajustes finales
-
-## 🔧 **Implementación Técnica**
-
-### **Dependencias a Instalar**
-```bash
-npm install next-auth@beta @auth/prisma-adapter
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
 ```
 
-### **Archivos a Crear/Modificar**
-- `src/lib/auth.ts` - Configuración NextAuth
-- `src/app/api/auth/[...nextauth]/route.ts` - API routes
-- `src/app/auth/signin/page.tsx` - Página de login
-- `src/app/auth/signup/page.tsx` - Página de registro
-- `src/middleware.ts` - Protección de rutas
-- `src/contexts/AuthContext.tsx` - Contexto de usuario
+### Modificaciones a tablas existentes:
+```prisma
+model PlanificacionAnual {
+  // ... campos existentes ...
+  userId    String? // Agregar este campo
+  user      User?   @relation(fields: [userId], references: [id]) // Agregar esta relación
+}
+```
 
-### **Variables de Entorno**
+## 📱 Pantallas a Crear
+
+### 1. Autenticación (`/src/app/auth/`)
+```
+/auth/
+├── signin/
+│   └── page.tsx          # Página de login
+├── signup/
+│   └── page.tsx          # Página de registro
+├── forgot-password/
+│   └── page.tsx          # Recuperación de contraseña
+├── reset-password/
+│   └── page.tsx          # Reset de contraseña
+└── verify-email/
+    └── page.tsx          # Verificación de email
+```
+
+### 2. Perfil de Usuario (`/src/app/profile/`)
+```
+/profile/
+├── page.tsx              # Perfil principal
+├── edit/
+│   └── page.tsx          # Editar perfil
+└── change-password/
+    └── page.tsx          # Cambiar contraseña
+```
+
+### 3. Administración (`/src/app/admin/`)
+```
+/admin/
+├── users/
+│   └── page.tsx          # Gestión de usuarios
+├── roles/
+│   └── page.tsx          # Gestión de roles
+└── analytics/
+    └── page.tsx          # Analytics del sistema
+```
+
+## 🧩 Componentes a Crear
+
+### 1. Componentes de Autenticación (`/src/components/auth/`)
+```
+auth/
+├── LoginForm.tsx         # Formulario de login
+├── RegisterForm.tsx      # Formulario de registro
+├── ForgotPasswordForm.tsx # Formulario de recuperación
+├── ResetPasswordForm.tsx # Formulario de reset
+├── VerifyEmailForm.tsx   # Formulario de verificación
+└── AuthGuard.tsx         # Componente para proteger rutas
+```
+
+### 2. Componentes de Usuario (`/src/components/user/`)
+```
+user/
+├── UserMenu.tsx          # Menú desplegable del usuario
+├── ProfileForm.tsx       # Formulario de perfil
+├── ChangePasswordForm.tsx # Formulario de cambio de contraseña
+└── UserAvatar.tsx        # Avatar del usuario
+```
+
+### 3. Componentes de Administración (`/src/components/admin/`)
+```
+admin/
+├── UsersTable.tsx        # Tabla de usuarios
+├── UserForm.tsx          # Formulario de usuario
+├── RolesTable.tsx        # Tabla de roles
+└── Analytics.tsx         # Componente de analytics
+```
+
+## 🔧 Configuración Técnica
+
+### 1. Variables de Entorno (`.env`)
 ```env
 # NextAuth
 NEXTAUTH_URL=http://localhost:3000
@@ -81,122 +167,170 @@ NEXTAUTH_SECRET=your-secret-key
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 
-# Email (opcional para verificación)
-EMAIL_SERVER=smtp://username:password@smtp.example.com:587
-EMAIL_FROM=noreply@example.com
+# GitHub OAuth
+GITHUB_ID=your-github-id
+GITHUB_SECRET=your-github-secret
+
+# Email (para recuperación de contraseña)
+EMAIL_SERVER_HOST=smtp.gmail.com
+EMAIL_SERVER_PORT=587
+EMAIL_SERVER_USER=your-email@gmail.com
+EMAIL_SERVER_PASSWORD=your-app-password
+EMAIL_FROM=noreply@yourdomain.com
 ```
 
-## 🎨 **Diseño de UI**
+### 2. Middleware (`/src/middleware.ts`)
+```typescript
+import { withAuth } from "next-auth/middleware"
 
-### **Páginas de Autenticación**
-- **Login** - Formulario con Google + Email/Password
-- **Registro** - Formulario de registro con verificación
-- **Recuperar Contraseña** - Formulario de reset
-- **Verificar Email** - Página de confirmación
+export default withAuth(
+  function middleware(req) {
+    // Lógica de middleware
+  },
+  {
+    callbacks: {
+      authorized: ({ token }) => !!token
+    },
+  }
+)
 
-### **Componentes**
-- **AuthButton** - Botón de login/logout
-- **UserMenu** - Menú desplegable de usuario
-- **ProtectedRoute** - Wrapper para rutas protegidas
-- **RoleGuard** - Verificación de permisos
+export const config = {
+  matcher: [
+    "/planificacion-anual/:path*",
+    "/matrices/:path*",
+    "/evaluaciones/:path*",
+    "/admin/:path*",
+    "/profile/:path*"
+  ]
+}
+```
 
-## 🔒 **Seguridad**
+### 3. Tipos TypeScript (`/src/types/auth.ts`)
+```typescript
+import "next-auth"
 
-### **Protección de Rutas**
-- Middleware para verificar autenticación
-- Redirección automática a login
-- Protección de API routes
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string
+      name?: string | null
+      email?: string | null
+      image?: string | null
+      role: string
+    }
+  }
 
-### **Manejo de Sesiones**
-- JWT tokens seguros
-- Expiración de sesiones
-- Logout automático
+  interface User {
+    id: string
+    name?: string | null
+    email?: string | null
+    image?: string | null
+    role: string
+  }
+}
 
-### **Validación de Datos**
-- Sanitización de inputs
-- Validación de roles
-- Prevención de CSRF
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string
+    role: string
+  }
+}
+```
 
-## 📊 **Migración de Datos**
+## 📋 Checklist de Implementación
 
-### **Estrategia**
-1. **Crear tabla de usuarios** con NextAuth
-2. **Asociar datos existentes** con usuario admin
-3. **Migrar gradualmente** a usuarios específicos
-4. **Mantener compatibilidad** durante transición
+### Día 1: Base de Datos y Configuración
+- [ ] Agregar tablas de usuarios al schema de Prisma
+- [ ] Ejecutar `prisma db push`
+- [ ] Configurar variables de entorno
+- [ ] Crear middleware de protección
+- [ ] Configurar tipos TypeScript
 
-### **Tablas a Modificar**
-- `planificaciones` - Agregar `user_id`
-- `matrices` - Agregar `user_id`
-- `evaluaciones` - Agregar `user_id`
-- `horarios` - Agregar `user_id`
+### Día 2: Páginas de Autenticación
+- [ ] Crear página `/auth/signin`
+- [ ] Crear página `/auth/signup`
+- [ ] Crear página `/auth/forgot-password`
+- [ ] Crear página `/auth/reset-password`
+- [ ] Crear página `/auth/verify-email`
 
-## 🧪 **Testing**
+### Día 3: Componentes de UI
+- [ ] Crear `LoginForm.tsx`
+- [ ] Crear `RegisterForm.tsx`
+- [ ] Crear `ForgotPasswordForm.tsx`
+- [ ] Crear `UserMenu.tsx`
+- [ ] Crear `AuthGuard.tsx`
 
-### **Casos de Prueba**
-- [ ] Login con Google
-- [ ] Login con Email/Password
-- [ ] Registro de nuevos usuarios
-- [ ] Protección de rutas
-- [ ] Verificación de roles
-- [ ] Logout y limpieza de sesión
+### Día 4: Integración
+- [ ] Integrar autenticación en dashboard
+- [ ] Modificar sidebar para mostrar usuario
+- [ ] Proteger rutas sensibles
+- [ ] Asociar planificaciones con usuarios
+- [ ] Testing básico
 
-### **Escenarios de Error**
-- [ ] Credenciales inválidas
-- [ ] Email no verificado
-- [ ] Acceso sin autenticación
-- [ ] Acceso sin permisos
+### Día 5: Funcionalidades Avanzadas
+- [ ] Implementar recuperación de contraseña
+- [ ] Implementar verificación de email
+- [ ] Crear página de perfil
+- [ ] Implementar cambio de contraseña
+- [ ] Testing completo
 
-## 🚀 **Despliegue**
+### Día 6: Administración
+- [ ] Crear panel de administración
+- [ ] Implementar gestión de usuarios
+- [ ] Implementar roles y permisos
+- [ ] Crear analytics básicos
+- [ ] Testing de administración
 
-### **Vercel**
-- Configurar variables de entorno
-- Verificar build con autenticación
-- Testing en producción
+### Día 7: Pulido y Deploy
+- [ ] Testing final completo
+- [ ] Optimización de performance
+- [ ] Documentación de uso
+- [ ] Deploy a producción
+- [ ] Configuración de monitoreo
 
-### **Base de Datos**
-- Ejecutar migraciones de usuarios
-- Configurar RLS si es necesario
-- Backup antes de cambios
+## 🎯 Prioridades
 
-## 📈 **Futuras Mejoras**
+### Alta Prioridad (Días 1-3)
+1. Base de datos y configuración
+2. Páginas básicas de autenticación
+3. Componentes esenciales de UI
 
-### **Fase 2 (Opcional)**
-- [ ] Invitaciones por email
-- [ ] Gestión de usuarios (admin)
-- [ ] Perfiles de usuario
-- [ ] Notificaciones
+### Media Prioridad (Días 4-5)
+1. Integración con funcionalidades existentes
+2. Funcionalidades de recuperación de contraseña
+3. Perfil de usuario
 
-### **Fase 3 (Avanzado)**
-- [ ] SSO con sistemas institucionales
-- [ ] Auditoría de accesos
-- [ ] Autenticación de dos factores
-- [ ] Integración con LMS
+### Baja Prioridad (Días 6-7)
+1. Panel de administración
+2. Analytics
+3. Optimizaciones avanzadas
 
-## ✅ **Criterios de Éxito**
+## 🚨 Consideraciones Importantes
 
-- [ ] Todos los usuarios pueden autenticarse
-- [ ] Las rutas están protegidas
-- [ ] Los roles funcionan correctamente
-- [ ] La UI es intuitiva
-- [ ] No hay regresiones en funcionalidad existente
-- [ ] La aplicación funciona en producción
+### Seguridad
+- Usar HTTPS en producción
+- Implementar rate limiting
+- Validar todas las entradas de usuario
+- Usar tokens seguros para reset de contraseña
 
-## 🆘 **Riesgos y Mitigación**
+### UX/UI
+- Mantener consistencia con el diseño actual
+- Implementar loading states
+- Manejar errores de forma amigable
+- Hacer responsive design
 
-### **Riesgos**
-- **Pérdida de datos** durante migración
-- **Interrupción del servicio** durante implementación
-- **Problemas de compatibilidad** con datos existentes
+### Performance
+- Lazy loading de componentes
+- Optimizar queries de base de datos
+- Implementar caching donde sea apropiado
 
-### **Mitigación**
-- **Backup completo** antes de cambios
-- **Implementación gradual** por módulos
-- **Testing exhaustivo** en staging
-- **Rollback plan** en caso de problemas
+## 📞 Recursos y Referencias
+
+- [NextAuth.js Documentation](https://next-auth.js.org/)
+- [Prisma Documentation](https://www.prisma.io/docs/)
+- [Next.js Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware)
+- [Tailwind CSS](https://tailwindcss.com/docs)
 
 ---
 
-**Última actualización:** $(date)
-**Responsable:** Equipo de desarrollo
-**Estado:** Planificado 
+**Nota**: Este plan es flexible y puede ajustarse según las necesidades y prioridades del proyecto. 
