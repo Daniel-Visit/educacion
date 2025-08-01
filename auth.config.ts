@@ -1,5 +1,4 @@
 import type { NextAuthConfig } from "next-auth"
-import type { JWT } from "next-auth/jwt"
 import Google from "next-auth/providers/google"
 import { prisma } from "./src/lib/prisma"
 
@@ -23,18 +22,11 @@ declare module "next-auth" {
   }
 }
 
-declare module "next-auth/jwt" {
-  interface JWT {
-    id?: string
-    role?: string
-  }
-}
-
 export default {
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.AUTH_GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.AUTH_GOOGLE_CLIENT_SECRET!,
     }),
   ],
   pages: {
@@ -72,24 +64,15 @@ export default {
         return "/auth/login?error=AccessDenied"
       }
     },
-    async session({ session, token }) {
-      if (token.sub && session.user) {
-        session.user.id = token.sub
-      }
-      if (token.role && session.user) {
-        session.user.role = token.role as string
-      }
-      return session
-    },
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id
-        // Solo asignar role si existe en el usuario
+    async session({ session, user }) {
+      // Para estrategia database, user viene directamente
+      if (user && session.user) {
+        session.user.id = user.id
         if ('role' in user && user.role) {
-          token.role = user.role as string
+          session.user.role = user.role as string
         }
       }
-      return token
+      return session
     },
   },
 } satisfies NextAuthConfig 
