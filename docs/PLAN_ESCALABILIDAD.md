@@ -11,6 +11,7 @@
 ## 🎯 Metas de Escalabilidad
 
 ### **Capacidad Objetivo**
+
 - **Usuarios concurrentes:** 200+
 - **Usuarios totales:** 2,000+
 - **Planificaciones:** 20,000+
@@ -18,6 +19,7 @@
 - **Uptime:** 99.9%
 
 ### **Métricas de Éxito**
+
 - ⚡ Lighthouse score > 95
 - 🔄 Cache hit rate > 85%
 - 📊 0 errores críticos en producción
@@ -28,6 +30,7 @@
 ### **Día 1: Infraestructura Base (PostgreSQL + Auth)**
 
 #### **Mañana (09:00-13:00)**
+
 ```bash
 # 1. Migración a PostgreSQL
 npm install pg @types/pg
@@ -40,6 +43,7 @@ npm install next-auth @auth/prisma-adapter
 ```
 
 **Tareas:**
+
 - [ ] Configurar PostgreSQL en Vercel (15 min)
 - [ ] Migrar schema y datos existentes (30 min)
 - [ ] Configurar NextAuth con Google OAuth (1 hora)
@@ -47,6 +51,7 @@ npm install next-auth @auth/prisma-adapter
 - [ ] Validar migración (15 min)
 
 #### **Tarde (14:00-18:00)**
+
 ```typescript
 // Implementar sistema de autenticación completo
 // - Middleware de autenticación
@@ -56,6 +61,7 @@ npm install next-auth @auth/prisma-adapter
 ```
 
 **Tareas:**
+
 - [ ] Middleware de autenticación (1 hora)
 - [ ] Componentes de login/logout (1 hora)
 - [ ] Protección de APIs existentes (1 hora)
@@ -64,6 +70,7 @@ npm install next-auth @auth/prisma-adapter
 ### **Día 2: Caching y Optimización**
 
 #### **Mañana (09:00-13:00)**
+
 ```bash
 # 1. Implementar Redis
 npm install ioredis
@@ -76,12 +83,14 @@ npm install swr
 ```
 
 **Tareas:**
+
 - [ ] Configurar Redis en Upstash (15 min)
 - [ ] Implementar cache para APIs (1 hora)
 - [ ] SWR para cache de frontend (1 hora)
 - [ ] Optimización de componentes (1 hora)
 
 #### **Tarde (14:00-18:00)**
+
 ```typescript
 // Optimización de rendimiento
 // - Lazy loading de componentes
@@ -91,6 +100,7 @@ npm install swr
 ```
 
 **Tareas:**
+
 - [ ] Lazy loading de componentes (1 hora)
 - [ ] Optimización de imágenes (30 min)
 - [ ] Bundle analyzer y optimización (1 hora)
@@ -99,6 +109,7 @@ npm install swr
 ### **Día 3: Monitoreo y Despliegue**
 
 #### **Mañana (09:00-13:00)**
+
 ```bash
 # 1. Error tracking y analytics
 npm install @sentry/nextjs
@@ -111,12 +122,14 @@ npm install @vercel/analytics
 ```
 
 **Tareas:**
+
 - [ ] Configurar Sentry (30 min)
 - [ ] Implementar error boundaries (1 hora)
 - [ ] Vercel Analytics setup (30 min)
 - [ ] Métricas personalizadas (1 hora)
 
 #### **Tarde (14:00-18:00)**
+
 ```bash
 # 1. CI/CD y despliegue
 # - GitHub Actions
@@ -126,6 +139,7 @@ npm install @vercel/analytics
 ```
 
 **Tareas:**
+
 - [ ] Configurar CI/CD básico (1 hora)
 - [ ] Health checks y monitoreo (1 hora)
 - [ ] Deploy a producción (30 min)
@@ -134,6 +148,7 @@ npm install @vercel/analytics
 ## 🛠️ Stack Tecnológico Final
 
 ### **Frontend**
+
 ```typescript
 - Next.js 14 + App Router
 - React 18 + TypeScript
@@ -143,6 +158,7 @@ npm install @vercel/analytics
 ```
 
 ### **Backend**
+
 ```typescript
 - Next.js API Routes
 - PostgreSQL (Vercel Postgres)
@@ -152,6 +168,7 @@ npm install @vercel/analytics
 ```
 
 ### **Infraestructura**
+
 ```typescript
 - Vercel (hosting + edge functions)
 - Sentry (error tracking)
@@ -160,6 +177,7 @@ npm install @vercel/analytics
 ```
 
 ### **Monitoreo**
+
 ```typescript
 - Sentry (errores en tiempo real)
 - Vercel Analytics (métricas de uso)
@@ -170,6 +188,7 @@ npm install @vercel/analytics
 ## 💰 Análisis de Costos
 
 ### **Infraestructura Mensual**
+
 ```bash
 Vercel Pro:           $20/mes
 Vercel Postgres:      $20/mes
@@ -179,6 +198,7 @@ Total:                $81/mes
 ```
 
 ### **ROI Esperado**
+
 - **Capacidad:** 2,000+ usuarios
 - **Precio sugerido:** $5-10/mes por docente
 - **Ingresos potenciales:** $10,000-20,000/mes
@@ -187,6 +207,7 @@ Total:                $81/mes
 ## 🔧 Comandos de Implementación
 
 ### **Día 1 - Setup Inicial**
+
 ```bash
 # 1. Instalar dependencias
 npm install pg @types/pg next-auth @auth/prisma-adapter
@@ -203,6 +224,7 @@ npx prisma generate
 ```
 
 ### **Día 2 - Cache Setup**
+
 ```bash
 # 1. Instalar cache
 npm install ioredis swr
@@ -216,6 +238,7 @@ npm run analyze
 ```
 
 ### **Día 3 - Monitoreo**
+
 ```bash
 # 1. Instalar monitoreo
 npm install @sentry/nextjs @vercel/analytics
@@ -232,18 +255,21 @@ git push origin main
 ## 🎯 Casos de Uso Escalados
 
 ### **Escenario 1: Institución Pequeña (100 docentes)**
+
 - **Uso:** Planificación anual por asignatura
 - **Carga:** 20 usuarios simultáneos
 - **Datos:** 1,000 planificaciones
 - **Rendimiento:** < 1 segundo
 
 ### **Escenario 2: Institución Mediana (500 docentes)**
+
 - **Uso:** Planificación + evaluaciones + matrices
 - **Carga:** 80 usuarios simultáneos
 - **Datos:** 5,000 planificaciones
 - **Rendimiento:** < 1.5 segundos
 
 ### **Escenario 3: Institución Grande (2,000 docentes)**
+
 - **Uso:** Plataforma completa + analytics
 - **Carga:** 200 usuarios simultáneos
 - **Datos:** 20,000 planificaciones
@@ -252,18 +278,21 @@ git push origin main
 ## 🚀 Roadmap Post-Escalabilidad
 
 ### **Fase 2: Funcionalidades Avanzadas (2-3 semanas)**
+
 - [ ] Testing E2E completo con Playwright
 - [ ] Múltiples instituciones (multi-tenancy)
 - [ ] API pública para integraciones
 - [ ] Mobile app con React Native
 
 ### **Fase 3: Monetización (1 mes)**
+
 - [ ] Sistema de suscripciones
 - [ ] Planes freemium/premium
 - [ ] Analytics avanzados
 - [ ] Marketplace de recursos
 
 ### **Fase 4: Expansión (2-3 meses)**
+
 - [ ] Múltiples países
 - [ ] IA para recomendaciones
 - [ ] Colaboración en tiempo real
@@ -272,6 +301,7 @@ git push origin main
 ## 📊 Métricas de Seguimiento
 
 ### **Técnicas**
+
 - Tiempo de respuesta promedio
 - Cache hit rate
 - Error rate
@@ -279,6 +309,7 @@ git push origin main
 - Bundle size
 
 ### **Negocio**
+
 - Usuarios activos mensuales
 - Retención de usuarios
 - Tiempo en la aplicación
@@ -303,4 +334,4 @@ Este plan de escalabilidad transformará la aplicación educativa en una platafo
 **Estado:** 📋 Planificado  
 **Prioridad:** 🔥 Alta  
 **Timeline:** 3 días  
-**Responsable:** Equipo de desarrollo 
+**Responsable:** Equipo de desarrollo

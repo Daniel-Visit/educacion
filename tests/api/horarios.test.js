@@ -37,7 +37,7 @@ jest.mock('../../src/lib/prisma', () => ({
 
 // Mock de NextResponse
 global.NextResponse = {
-  json: jest.fn((data) => ({ json: () => data })),
+  json: jest.fn(data => ({ json: () => data })),
 };
 
 describe('API Horarios', () => {
@@ -54,9 +54,9 @@ describe('API Horarios', () => {
       {
         dia: 'Lunes',
         horaInicio: '08:00',
-        duracion: 60
-      }
-    ]
+        duracion: 60,
+      },
+    ],
   };
 
   const horarioResponse = {
@@ -81,17 +81,17 @@ describe('API Horarios', () => {
           {
             id: 1,
             profesor: { id: 1, nombre: 'Juan Pérez' },
-            rol: 'titular'
-          }
-        ]
-      }
-    ]
+            rol: 'titular',
+          },
+        ],
+      },
+    ],
   };
 
   describe('GET /api/horarios', () => {
     it('debería retornar lista de horarios', async () => {
       const { GET } = require('../../src/app/api/horarios/route');
-      
+
       mockPrisma.horario.findMany.mockResolvedValue([horarioResponse]);
 
       const request = new NextRequest('http://localhost:3000/api/horarios');
@@ -106,22 +106,22 @@ describe('API Horarios', () => {
             include: {
               profesores: {
                 include: {
-                  profesor: true
-                }
-              }
+                  profesor: true,
+                },
+              },
             },
             orderBy: {
-              orden: 'asc'
-            }
-          }
+              orden: 'asc',
+            },
+          },
         },
         orderBy: {
-          createdAt: 'desc'
-        }
+          createdAt: 'desc',
+        },
       });
       expect(await response.json()).toEqual({
         data: [horarioResponse],
-        message: 'Horarios obtenidos correctamente'
+        message: 'Horarios obtenidos correctamente',
       });
     });
   });
@@ -129,10 +129,19 @@ describe('API Horarios', () => {
   describe('POST /api/horarios', () => {
     it('debería crear un horario exitosamente', async () => {
       const { POST } = require('../../src/app/api/horarios/route');
-      
-      mockPrisma.profesor.findUnique.mockResolvedValue({ id: 1, nombre: 'Juan Pérez' });
-      mockPrisma.asignatura.findUnique.mockResolvedValue({ id: 1, nombre: 'Matemáticas' });
-      mockPrisma.nivel.findUnique.mockResolvedValue({ id: 1, nombre: '4° Básico' });
+
+      mockPrisma.profesor.findUnique.mockResolvedValue({
+        id: 1,
+        nombre: 'Juan Pérez',
+      });
+      mockPrisma.asignatura.findUnique.mockResolvedValue({
+        id: 1,
+        nombre: 'Matemáticas',
+      });
+      mockPrisma.nivel.findUnique.mockResolvedValue({
+        id: 1,
+        nombre: '4° Básico',
+      });
       mockPrisma.$transaction.mockResolvedValue(horarioResponse);
 
       const request = new NextRequest('http://localhost:3000/api/horarios', {
@@ -143,24 +152,24 @@ describe('API Horarios', () => {
       const response = await POST(request);
 
       expect(mockPrisma.profesor.findUnique).toHaveBeenCalledWith({
-        where: { id: parseInt(horarioData.docenteId.toString()) }
+        where: { id: parseInt(horarioData.docenteId.toString()) },
       });
       expect(mockPrisma.asignatura.findUnique).toHaveBeenCalledWith({
-        where: { id: parseInt(horarioData.asignaturaId.toString()) }
+        where: { id: parseInt(horarioData.asignaturaId.toString()) },
       });
       expect(mockPrisma.nivel.findUnique).toHaveBeenCalledWith({
-        where: { id: parseInt(horarioData.nivelId.toString()) }
+        where: { id: parseInt(horarioData.nivelId.toString()) },
       });
       expect(mockPrisma.$transaction).toHaveBeenCalled();
       expect(await response.json()).toEqual({
         data: horarioResponse,
-        message: 'Horario creado correctamente'
+        message: 'Horario creado correctamente',
       });
     });
 
     it('debería validar datos requeridos', async () => {
       const { POST } = require('../../src/app/api/horarios/route');
-      
+
       const invalidData = { nombre: '', docenteId: '' };
       const request = new NextRequest('http://localhost:3000/api/horarios', {
         method: 'POST',
@@ -170,13 +179,15 @@ describe('API Horarios', () => {
       const response = await POST(request);
       const result = await response.json();
 
-      expect(result.error).toBe('Nombre, docente, asignatura y nivel son obligatorios');
+      expect(result.error).toBe(
+        'Nombre, docente, asignatura y nivel son obligatorios'
+      );
       expect(response.status).toBe(400);
     });
 
     it('debería validar que existan módulos', async () => {
       const { POST } = require('../../src/app/api/horarios/route');
-      
+
       const invalidData = { ...horarioData, modulos: [] };
       const request = new NextRequest('http://localhost:3000/api/horarios', {
         method: 'POST',
@@ -192,7 +203,7 @@ describe('API Horarios', () => {
 
     it('debería validar que el docente existe', async () => {
       const { POST } = require('../../src/app/api/horarios/route');
-      
+
       mockPrisma.profesor.findUnique.mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost:3000/api/horarios', {
@@ -209,8 +220,11 @@ describe('API Horarios', () => {
 
     it('debería validar que la asignatura existe', async () => {
       const { POST } = require('../../src/app/api/horarios/route');
-      
-      mockPrisma.profesor.findUnique.mockResolvedValue({ id: 1, nombre: 'Juan Pérez' });
+
+      mockPrisma.profesor.findUnique.mockResolvedValue({
+        id: 1,
+        nombre: 'Juan Pérez',
+      });
       mockPrisma.asignatura.findUnique.mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost:3000/api/horarios', {
@@ -227,9 +241,15 @@ describe('API Horarios', () => {
 
     it('debería validar que el nivel existe', async () => {
       const { POST } = require('../../src/app/api/horarios/route');
-      
-      mockPrisma.profesor.findUnique.mockResolvedValue({ id: 1, nombre: 'Juan Pérez' });
-      mockPrisma.asignatura.findUnique.mockResolvedValue({ id: 1, nombre: 'Matemáticas' });
+
+      mockPrisma.profesor.findUnique.mockResolvedValue({
+        id: 1,
+        nombre: 'Juan Pérez',
+      });
+      mockPrisma.asignatura.findUnique.mockResolvedValue({
+        id: 1,
+        nombre: 'Matemáticas',
+      });
       mockPrisma.nivel.findUnique.mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost:3000/api/horarios', {
@@ -248,7 +268,7 @@ describe('API Horarios', () => {
   describe('GET /api/horarios/[id]', () => {
     it('debería retornar un horario específico', async () => {
       const { GET } = require('../../src/app/api/horarios/[id]/route');
-      
+
       mockPrisma.horario.findUnique.mockResolvedValue(horarioResponse);
 
       const request = new NextRequest('http://localhost:3000/api/horarios/1');
@@ -264,25 +284,25 @@ describe('API Horarios', () => {
             include: {
               profesores: {
                 include: {
-                  profesor: true
-                }
-              }
+                  profesor: true,
+                },
+              },
             },
             orderBy: {
-              orden: 'asc'
-            }
-          }
-        }
+              orden: 'asc',
+            },
+          },
+        },
       });
       expect(await response.json()).toEqual({
         data: horarioResponse,
-        message: 'Horario obtenido correctamente'
+        message: 'Horario obtenido correctamente',
       });
     });
 
     it('debería retornar 404 si el horario no existe', async () => {
       const { GET } = require('../../src/app/api/horarios/[id]/route');
-      
+
       mockPrisma.horario.findUnique.mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost:3000/api/horarios/999');
@@ -297,14 +317,26 @@ describe('API Horarios', () => {
   describe('PUT /api/horarios/[id]', () => {
     it('debería actualizar un horario exitosamente', async () => {
       const { PUT } = require('../../src/app/api/horarios/[id]/route');
-      
+
       const updateData = { ...horarioData, nombre: 'Horario Actualizado' };
-      const updatedHorario = { ...horarioResponse, nombre: 'Horario Actualizado' };
+      const updatedHorario = {
+        ...horarioResponse,
+        nombre: 'Horario Actualizado',
+      };
 
       mockPrisma.horario.findUnique.mockResolvedValue({ id: 1 });
-      mockPrisma.profesor.findUnique.mockResolvedValue({ id: 1, nombre: 'Juan Pérez' });
-      mockPrisma.asignatura.findUnique.mockResolvedValue({ id: 1, nombre: 'Matemáticas' });
-      mockPrisma.nivel.findUnique.mockResolvedValue({ id: 1, nombre: '4° Básico' });
+      mockPrisma.profesor.findUnique.mockResolvedValue({
+        id: 1,
+        nombre: 'Juan Pérez',
+      });
+      mockPrisma.asignatura.findUnique.mockResolvedValue({
+        id: 1,
+        nombre: 'Matemáticas',
+      });
+      mockPrisma.nivel.findUnique.mockResolvedValue({
+        id: 1,
+        nombre: '4° Básico',
+      });
       mockPrisma.$transaction.mockResolvedValue(updatedHorario);
 
       const request = new NextRequest('http://localhost:3000/api/horarios/1', {
@@ -315,24 +347,27 @@ describe('API Horarios', () => {
       const response = await PUT(request, { params: { id: '1' } });
 
       expect(mockPrisma.horario.findUnique).toHaveBeenCalledWith({
-        where: { id: 1 }
+        where: { id: 1 },
       });
       expect(mockPrisma.$transaction).toHaveBeenCalled();
       expect(await response.json()).toEqual({
         data: updatedHorario,
-        message: 'Horario actualizado correctamente'
+        message: 'Horario actualizado correctamente',
       });
     });
 
     it('debería validar que el horario existe', async () => {
       const { PUT } = require('../../src/app/api/horarios/[id]/route');
-      
+
       mockPrisma.horario.findUnique.mockResolvedValue(null);
 
-      const request = new NextRequest('http://localhost:3000/api/horarios/999', {
-        method: 'PUT',
-        body: JSON.stringify(horarioData),
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/horarios/999',
+        {
+          method: 'PUT',
+          body: JSON.stringify(horarioData),
+        }
+      );
 
       const response = await PUT(request, { params: { id: '999' } });
       const result = await response.json();
@@ -345,7 +380,7 @@ describe('API Horarios', () => {
   describe('DELETE /api/horarios/[id]', () => {
     it('debería eliminar un horario exitosamente', async () => {
       const { DELETE } = require('../../src/app/api/horarios/[id]/route');
-      
+
       mockPrisma.horario.findUnique.mockResolvedValue({ id: 1 });
       mockPrisma.$transaction.mockResolvedValue(undefined);
 
@@ -353,17 +388,17 @@ describe('API Horarios', () => {
       const response = await DELETE(request, { params: { id: '1' } });
 
       expect(mockPrisma.horario.findUnique).toHaveBeenCalledWith({
-        where: { id: 1 }
+        where: { id: 1 },
       });
       expect(mockPrisma.$transaction).toHaveBeenCalled();
       expect(await response.json()).toEqual({
-        message: 'Horario eliminado correctamente'
+        message: 'Horario eliminado correctamente',
       });
     });
 
     it('debería validar que el horario existe', async () => {
       const { DELETE } = require('../../src/app/api/horarios/[id]/route');
-      
+
       mockPrisma.horario.findUnique.mockResolvedValue(null);
 
       const request = new NextRequest('http://localhost:3000/api/horarios/999');
@@ -374,4 +409,4 @@ describe('API Horarios', () => {
       expect(response.status).toBe(404);
     });
   });
-}); 
+});

@@ -5,15 +5,15 @@ const prisma = new PrismaClient();
 async function verificarMetodologia() {
   try {
     console.log('🔍 VERIFICANDO TODOS LOS CAMPOS DE METODOLOGIA EN SQLITE');
-    console.log('=' .repeat(50));
+    console.log('='.repeat(50));
 
     const metodologias = await prisma.metodologia.findMany({
-      orderBy: { id: 'asc' }
+      orderBy: { id: 'asc' },
     });
 
     console.log(`Total registros: ${metodologias.length}`);
     console.log('\n📋 DATOS COMPLETOS:');
-    
+
     metodologias.forEach(metodologia => {
       console.log(`\nID: ${metodologia.id}`);
       console.log(`  Nombre: "${metodologia.nombre_metodologia}"`);
@@ -24,7 +24,6 @@ async function verificarMetodologia() {
     });
 
     console.log('\n✅ Verificación completada');
-
   } catch (error) {
     console.error('❌ Error:', error);
   } finally {
@@ -32,4 +31,4 @@ async function verificarMetodologia() {
   }
 }
 
-verificarMetodologia(); 
+verificarMetodologia();

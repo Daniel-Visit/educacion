@@ -27,7 +27,7 @@ jest.mock('../../src/lib/prisma', () => ({
 
 // Mock de NextResponse
 global.NextResponse = {
-  json: jest.fn((data) => ({ json: () => data })),
+  json: jest.fn(data => ({ json: () => data })),
 };
 
 describe('API Profesores', () => {
@@ -70,8 +70,11 @@ describe('API Profesores', () => {
   describe('GET /api/profesores', () => {
     it('debería retornar lista de profesores', async () => {
       const { GET } = require('../../src/app/api/profesores/route');
-      
-      mockPrisma.profesor.findMany.mockResolvedValue([profesorResponse, profesorResponse2]);
+
+      mockPrisma.profesor.findMany.mockResolvedValue([
+        profesorResponse,
+        profesorResponse2,
+      ]);
 
       const request = new NextRequest('http://localhost:3000/api/profesores');
       const response = await GET(request);
@@ -89,7 +92,7 @@ describe('API Profesores', () => {
   describe('POST /api/profesores', () => {
     it('debería crear un profesor exitosamente', async () => {
       const { POST } = require('../../src/app/api/profesores/route');
-      
+
       mockPrisma.profesor.findFirst.mockResolvedValue(null);
       mockPrisma.profesor.create.mockResolvedValue(profesorResponse);
 
@@ -117,7 +120,7 @@ describe('API Profesores', () => {
 
     it('debería validar datos requeridos', async () => {
       const { POST } = require('../../src/app/api/profesores/route');
-      
+
       const invalidData = { rut: '', nombre: '' };
       const request = new NextRequest('http://localhost:3000/api/profesores', {
         method: 'POST',
@@ -133,7 +136,7 @@ describe('API Profesores', () => {
 
     it('debería validar formato de RUT', async () => {
       const { POST } = require('../../src/app/api/profesores/route');
-      
+
       const invalidData = { ...profesorData, rut: 'invalid-rut' };
       const request = new NextRequest('http://localhost:3000/api/profesores', {
         method: 'POST',
@@ -149,8 +152,11 @@ describe('API Profesores', () => {
 
     it('debería validar RUT único', async () => {
       const { POST } = require('../../src/app/api/profesores/route');
-      
-      mockPrisma.profesor.findFirst.mockResolvedValue({ id: 1, rut: profesorData.rut });
+
+      mockPrisma.profesor.findFirst.mockResolvedValue({
+        id: 1,
+        rut: profesorData.rut,
+      });
 
       const request = new NextRequest('http://localhost:3000/api/profesores', {
         method: 'POST',
@@ -168,7 +174,7 @@ describe('API Profesores', () => {
   describe('PUT /api/profesores/[id]', () => {
     it('debería actualizar un profesor exitosamente', async () => {
       const { PUT } = require('../../src/app/api/profesores/[id]/route');
-      
+
       const updateData = { ...profesorData, nombre: 'Juan Pérez Actualizado' };
       const updatedProfesor = { ...profesorResponse, ...updateData };
 
@@ -176,10 +182,13 @@ describe('API Profesores', () => {
       mockPrisma.profesor.findFirst.mockResolvedValue(null);
       mockPrisma.profesor.update.mockResolvedValue(updatedProfesor);
 
-      const request = new NextRequest('http://localhost:3000/api/profesores/1', {
-        method: 'PUT',
-        body: JSON.stringify(updateData),
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/profesores/1',
+        {
+          method: 'PUT',
+          body: JSON.stringify(updateData),
+        }
+      );
 
       const response = await PUT(request, { params: { id: '1' } });
 
@@ -204,13 +213,16 @@ describe('API Profesores', () => {
 
     it('debería validar que el profesor existe', async () => {
       const { PUT } = require('../../src/app/api/profesores/[id]/route');
-      
+
       mockPrisma.profesor.findUnique.mockResolvedValue(null);
 
-      const request = new NextRequest('http://localhost:3000/api/profesores/999', {
-        method: 'PUT',
-        body: JSON.stringify(profesorData),
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/profesores/999',
+        {
+          method: 'PUT',
+          body: JSON.stringify(profesorData),
+        }
+      );
 
       const response = await PUT(request, { params: { id: '999' } });
       const result = await response.json();
@@ -221,14 +233,20 @@ describe('API Profesores', () => {
 
     it('debería validar RUT único en actualización', async () => {
       const { PUT } = require('../../src/app/api/profesores/[id]/route');
-      
-      mockPrisma.profesor.findUnique.mockResolvedValue({ id: 1 });
-      mockPrisma.profesor.findFirst.mockResolvedValue({ id: 2, rut: profesorData.rut });
 
-      const request = new NextRequest('http://localhost:3000/api/profesores/1', {
-        method: 'PUT',
-        body: JSON.stringify(profesorData),
+      mockPrisma.profesor.findUnique.mockResolvedValue({ id: 1 });
+      mockPrisma.profesor.findFirst.mockResolvedValue({
+        id: 2,
+        rut: profesorData.rut,
       });
+
+      const request = new NextRequest(
+        'http://localhost:3000/api/profesores/1',
+        {
+          method: 'PUT',
+          body: JSON.stringify(profesorData),
+        }
+      );
 
       const response = await PUT(request, { params: { id: '1' } });
       const result = await response.json();
@@ -241,7 +259,7 @@ describe('API Profesores', () => {
   describe('DELETE /api/profesores/[id]', () => {
     it('debería eliminar un profesor exitosamente', async () => {
       const { DELETE } = require('../../src/app/api/profesores/[id]/route');
-      
+
       const profesorConRelaciones = {
         id: 1,
         horario: [{ id: 1 }],
@@ -266,10 +284,12 @@ describe('API Profesores', () => {
 
     it('debería validar que el profesor existe', async () => {
       const { DELETE } = require('../../src/app/api/profesores/[id]/route');
-      
+
       mockPrisma.profesor.findUnique.mockResolvedValue(null);
 
-      const request = new NextRequest('http://localhost:3000/api/profesores/999');
+      const request = new NextRequest(
+        'http://localhost:3000/api/profesores/999'
+      );
       const response = await DELETE(request, { params: { id: '999' } });
       const result = await response.json();
 
@@ -279,7 +299,7 @@ describe('API Profesores', () => {
 
     it('debería validar que no tenga horarios asignados', async () => {
       const { DELETE } = require('../../src/app/api/profesores/[id]/route');
-      
+
       const profesorConHorarios = {
         id: 1,
         horario: [{ id: 1 }],
@@ -292,13 +312,15 @@ describe('API Profesores', () => {
       const response = await DELETE(request, { params: { id: '1' } });
       const result = await response.json();
 
-      expect(result.error).toBe('No se puede eliminar un profesor con horarios asignados');
+      expect(result.error).toBe(
+        'No se puede eliminar un profesor con horarios asignados'
+      );
       expect(result.status).toBe(400);
     });
 
     it('debería validar que no tenga módulos asignados', async () => {
       const { DELETE } = require('../../src/app/api/profesores/[id]/route');
-      
+
       const profesorConModulos = {
         id: 1,
         horario: [],
@@ -311,7 +333,9 @@ describe('API Profesores', () => {
       const response = await DELETE(request, { params: { id: '1' } });
       const result = await response.json();
 
-      expect(result.error).toBe('No se puede eliminar un profesor con módulos asignados');
+      expect(result.error).toBe(
+        'No se puede eliminar un profesor con módulos asignados'
+      );
       expect(result.status).toBe(400);
     });
   });
@@ -319,7 +343,7 @@ describe('API Profesores', () => {
   describe('GET /api/profesores/[id]', () => {
     it('debería retornar un profesor específico', async () => {
       const { GET } = require('../../src/app/api/profesores/[id]/route');
-      
+
       mockPrisma.profesor.findUnique.mockResolvedValue(profesorResponse);
 
       const request = new NextRequest('http://localhost:3000/api/profesores/1');
@@ -337,10 +361,12 @@ describe('API Profesores', () => {
 
     it('debería retornar 404 si el profesor no existe', async () => {
       const { GET } = require('../../src/app/api/profesores/[id]/route');
-      
+
       mockPrisma.profesor.findUnique.mockResolvedValue(null);
 
-      const request = new NextRequest('http://localhost:3000/api/profesores/999');
+      const request = new NextRequest(
+        'http://localhost:3000/api/profesores/999'
+      );
       const response = await GET(request, { params: { id: '999' } });
       const result = await response.json();
 
@@ -352,7 +378,7 @@ describe('API Profesores', () => {
   describe('Validaciones de relaciones', () => {
     it('debería manejar transacciones para crear profesor con asignaturas y niveles', async () => {
       const { POST } = require('../../src/app/api/profesores/route');
-      
+
       mockPrisma.profesor.findFirst.mockResolvedValue(null);
       mockPrisma.$transaction.mockResolvedValue(profesorResponse);
 
@@ -368,14 +394,18 @@ describe('API Profesores', () => {
 
     it('debería manejar transacciones para actualizar profesor con asignaturas y niveles', async () => {
       const { PUT } = require('../../src/app/api/profesores/[id]/route');
-      
+
       const updateData = { ...profesorData, nombre: 'Actualizado' };
       const updatedProfesor = {
         id: 1,
         rut: updateData.rut,
         nombre: updateData.nombre,
         asignaturas: [
-          { id: 1, asignaturaId: 1, asignatura: { id: 1, nombre: 'Matemáticas' } },
+          {
+            id: 1,
+            asignaturaId: 1,
+            asignatura: { id: 1, nombre: 'Matemáticas' },
+          },
           { id: 2, asignaturaId: 2, asignatura: { id: 2, nombre: 'Lenguaje' } },
         ],
         niveles: [
@@ -389,10 +419,13 @@ describe('API Profesores', () => {
       mockPrisma.profesorNivel.deleteMany.mockResolvedValue({ count: 1 });
       mockPrisma.$transaction.mockResolvedValue(updatedProfesor);
 
-      const request = new NextRequest('http://localhost:3000/api/profesores/1', {
-        method: 'PUT',
-        body: JSON.stringify(updateData),
-      });
+      const request = new NextRequest(
+        'http://localhost:3000/api/profesores/1',
+        {
+          method: 'PUT',
+          body: JSON.stringify(updateData),
+        }
+      );
 
       await PUT(request, { params: { id: '1' } });
 
@@ -405,4 +438,4 @@ describe('API Profesores', () => {
       expect(mockPrisma.$transaction).toHaveBeenCalled();
     });
   });
-}); 
+});

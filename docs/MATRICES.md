@@ -7,6 +7,7 @@ El módulo de matrices de especificación permite a los docentes crear, editar y
 ## Características Principales
 
 ### ✨ Funcionalidades de Matrices
+
 - **Creación de matrices** con nombre y número total de preguntas
 - **Gestión de OAs** asociados a cada matriz
 - **Indicadores específicos** para cada OA
@@ -15,6 +16,7 @@ El módulo de matrices de especificación permite a los docentes crear, editar y
 - **Validación automática** de datos
 
 ### 📊 Estructura de una Matriz
+
 ```
 Matriz de Especificación
 ├── Información General
@@ -72,12 +74,14 @@ src/utils/
 ## Uso del Módulo
 
 ### 1. Ver Todas las Matrices
+
 ```bash
 # Navegar a la página de matrices
 http://localhost:3000/matrices
 ```
 
 ### 2. Crear Nueva Matriz
+
 1. Haz clic en "Crear Nueva Matriz"
 2. Completa el nombre y total de preguntas
 3. Asocia OAs relevantes
@@ -86,17 +90,20 @@ http://localhost:3000/matrices
 6. Guarda la matriz
 
 ### 3. Editar Matriz Existente
+
 1. Selecciona una matriz de la lista
 2. Haz clic en "Editar"
 3. Modifica la información necesaria
 4. Guarda los cambios
 
 ### 4. Ver Detalles de Matriz
+
 1. Selecciona una matriz de la lista
 2. Revisa la estructura completa
 3. Verifica la distribución de preguntas
 
 ### 5. Importar Matriz desde CSV
+
 1. En el Paso 2 de creación, haz clic en "Importar OAs desde CSV"
 2. Descarga el template de ejemplo
 3. Completa el archivo CSV con los OAs e indicadores
@@ -106,25 +113,30 @@ http://localhost:3000/matrices
 ## 🏗️ Refactorización Reciente
 
 ### Componentes Modulares
+
 La página de creación de matrices ha sido refactorizada para mejorar la mantenibilidad y reutilización:
 
 #### Componentes Principales
+
 - **`MatrizBasicForm`**: Maneja el formulario básico (nombre, asignatura, nivel, total preguntas)
 - **`MatrizOASelector`**: Gestiona la selección de OAs con validaciones automáticas
 - **`MatrizIndicadoresSection`**: Controla la definición de indicadores y distribución de preguntas
 
 #### Componentes Base
+
 - **`OASelector`**: Componente reutilizable para selección de OAs
 - **`IndicadoresSection`**: Componente reutilizable para gestión de indicadores
 - **`MatrizStepIndicator`**: Indicador visual de progreso
 - **`MatrizHeader`**: Encabezado con estadísticas de la matriz
 
 #### Utilidades y Hooks
+
 - **`useMatrices`**: Hook personalizado para gestión de datos de matrices
 - **`src/types/matrices.ts`**: Tipos TypeScript centralizados
 - **`src/utils/matrices.ts`**: Funciones utilitarias compartidas
 
 ### Beneficios de la Refactorización
+
 - **Mantenibilidad**: Código más modular y fácil de mantener
 - **Reutilización**: Componentes que pueden usarse en otras páginas
 - **Legibilidad**: Separación clara de responsabilidades
@@ -135,7 +147,9 @@ La página de creación de matrices ha sido refactorizada para mejorar la manten
 ### Matrices (`/api/matrices`)
 
 #### GET `/api/matrices`
+
 Obtiene todas las matrices con sus OAs asociados.
+
 ```typescript
 // Response
 {
@@ -148,23 +162,29 @@ Obtiene todas las matrices con sus OAs asociados.
 ```
 
 #### POST `/api/matrices`
+
 Crea una nueva matriz.
+
 ```typescript
 {
-  nombre: string
-  total_preguntas: number
+  nombre: string;
+  total_preguntas: number;
   oas: {
-    oaId: number
+    oaId: number;
     indicadores: {
-      descripcion: string
-      preguntas: number
-    }[]
-  }[]
+      descripcion: string;
+      preguntas: number;
+    }
+    [];
+  }
+  [];
 }
 ```
 
 #### PUT `/api/matrices/[id]`
+
 Actualiza una matriz existente.
+
 ```typescript
 {
   nombre?: string
@@ -174,11 +194,13 @@ Actualiza una matriz existente.
 ```
 
 #### DELETE `/api/matrices/[id]`
+
 Elimina una matriz y todos sus datos asociados.
 
 ## Base de Datos
 
 ### Tabla `MatrizEspecificacion`
+
 ```sql
 CREATE TABLE MatrizEspecificacion (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -189,6 +211,7 @@ CREATE TABLE MatrizEspecificacion (
 ```
 
 ### Tabla `MatrizOA`
+
 ```sql
 CREATE TABLE MatrizOA (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -200,6 +223,7 @@ CREATE TABLE MatrizOA (
 ```
 
 ### Tabla `Indicador`
+
 ```sql
 CREATE TABLE Indicador (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -213,6 +237,7 @@ CREATE TABLE Indicador (
 ## Flujo de Creación de Matriz
 
 ### 1. Información Básica
+
 ```typescript
 {
   nombre: "Evaluación Sumativa - Lenguaje 2° Básico",
@@ -221,11 +246,13 @@ CREATE TABLE Indicador (
 ```
 
 ### 2. Selección de OAs
+
 - Filtrar por nivel y asignatura
 - Seleccionar OAs relevantes para la evaluación
 - Cada OA puede tener múltiples indicadores
 
 ### 3. Definición de Indicadores
+
 ```typescript
 {
   oaId: 1,
@@ -243,6 +270,7 @@ CREATE TABLE Indicador (
 ```
 
 ### 4. Validación
+
 - Total de preguntas debe coincidir con la suma de indicadores
 - Cada OA debe tener al menos un indicador
 - Descripciones no pueden estar vacías
@@ -250,17 +278,20 @@ CREATE TABLE Indicador (
 ## Componentes de Interfaz
 
 ### Lista de Matrices
+
 - Tabla con nombre, total de preguntas y fecha de creación
 - Botones de acción (Ver, Editar, Eliminar)
 - Filtros por asignatura y nivel
 
 ### Formulario de Creación/Edición
+
 - Campos para información básica
 - Selector de OAs con filtros
 - Gestión dinámica de indicadores
 - Validación en tiempo real
 
 ### Vista de Matriz
+
 - Estructura jerárquica clara
 - Distribución visual de preguntas
 - Información detallada de cada OA
@@ -268,38 +299,43 @@ CREATE TABLE Indicador (
 ## Validaciones
 
 ### Reglas de Negocio
+
 1. **Total de preguntas:** Debe ser igual a la suma de preguntas de todos los indicadores
 2. **Indicadores:** Cada OA debe tener al menos un indicador
 3. **Descripciones:** No pueden estar vacías
 4. **Preguntas por indicador:** Debe ser un número positivo
 
 ### Validaciones de Frontend
+
 ```typescript
 const validations = {
   nombre: (value: string) => value.length > 0,
   total_preguntas: (value: number) => value > 0,
   indicadores: (indicadores: Indicador[]) => {
-    return indicadores.every(ind => 
-      ind.descripcion.length > 0 && ind.preguntas > 0
-    )
-  }
-}
+    return indicadores.every(
+      ind => ind.descripcion.length > 0 && ind.preguntas > 0
+    );
+  },
+};
 ```
 
 ## Integración con OAs
 
 ### Objetivos de Aprendizaje Disponibles
+
 - **13 asignaturas** del currículum chileno
 - **12 niveles** educativos (1° Básico a 4° Medio)
 - **37 OAs** con descripciones detalladas
 
 ### Filtrado de OAs
+
 ```typescript
 // Filtrar OAs por nivel y asignatura
-const oasFiltrados = oas.filter(oa => 
-  oa.nivel_id === nivelSeleccionado && 
-  oa.asignatura_id === asignaturaSeleccionada
-)
+const oasFiltrados = oas.filter(
+  oa =>
+    oa.nivel_id === nivelSeleccionado &&
+    oa.asignatura_id === asignaturaSeleccionada
+);
 ```
 
 ## Troubleshooting
@@ -319,6 +355,7 @@ const oasFiltrados = oas.filter(oa =>
    - Verificar que las preguntas sean números positivos
 
 ### Logs de Debug
+
 ```bash
 # Ver matrices en la base de datos
 sqlite3 prisma/dev.db 'SELECT * FROM MatrizEspecificacion;'
@@ -335,4 +372,4 @@ sqlite3 prisma/dev.db 'SELECT * FROM MatrizOA;'
 - [ ] Estadísticas de uso de OAs
 - [ ] Colaboración entre docentes
 - [ ] Historial de versiones
-- [ ] Búsqueda avanzada en matrices 
+- [ ] Búsqueda avanzada en matrices

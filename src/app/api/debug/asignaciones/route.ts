@@ -8,19 +8,19 @@ export async function GET() {
     // Obtener todas las asignaciones de la planificación 2
     const asignaciones = await prisma.asignacionOA.findMany({
       where: {
-        planificacionId: 2
+        planificacionId: 2,
       },
       include: {
         oa: {
           include: {
             asignatura: true,
-            nivel: true
-          }
-        }
+            nivel: true,
+          },
+        },
       },
       orderBy: {
-        oaId: 'asc'
-      }
+        oaId: 'asc',
+      },
     });
 
     return NextResponse.json({
@@ -33,12 +33,12 @@ export async function GET() {
           oas_id: asignacion.oa.oas_id,
           descripcion: asignacion.oa.descripcion_oas,
           asignatura: asignacion.oa.asignatura.nombre,
-          nivel: asignacion.oa.nivel.nombre
-        }
-      }))
+          nivel: asignacion.oa.nivel.nombre,
+        },
+      })),
     });
   } catch (error) {
     console.error('Error:', error);
     return NextResponse.json({ error: 'Error interno' }, { status: 500 });
   }
-} 
+}

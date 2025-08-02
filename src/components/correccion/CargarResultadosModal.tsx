@@ -4,17 +4,22 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { LoadingState, ErrorState, ModalHeader, SuccessState } from '@/components/resultados';
-import { 
-  Upload, 
-  FileText, 
-  CheckCircle2, 
-  AlertTriangle, 
+import {
+  LoadingState,
+  ErrorState,
+  ModalHeader,
+  SuccessState,
+} from '@/components/resultados';
+import {
+  Upload,
+  FileText,
+  CheckCircle2,
+  AlertTriangle,
   X,
   Download,
   Info,
   Users,
-  BarChart3
+  BarChart3,
 } from 'lucide-react';
 
 interface CargarResultadosModalProps {
@@ -30,7 +35,7 @@ export default function CargarResultadosModal({
   onClose,
   evaluacionId,
   evaluacionNombre,
-  onResultadosCargados
+  onResultadosCargados,
 }: CargarResultadosModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,28 +49,31 @@ export default function CargarResultadosModal({
       setFile(selectedFile);
       setError(null);
       setSuccess(false);
-      
+
       // Preview del archivo
       const reader = new FileReader();
-      reader.onload = (event) => {
+      reader.onload = event => {
         const csv = event.target?.result as string;
         const lines = csv.split('\n').filter(line => line.trim());
-        
+
         if (lines.length === 0) return;
-        
+
         // Detectar separador automáticamente
         const firstLine = lines[0];
         const separator = firstLine.includes(';') ? ';' : ',';
         const headers = firstLine.split(separator).map(h => h.trim());
-        
-        const previewData = lines.slice(1, 6).map(line => {
-          const values = line.split(separator).map(v => v.trim());
-          return headers.reduce((obj, header, index) => {
-            obj[header] = values[index] || '';
-            return obj;
-          }, {} as any);
-        }).filter(row => Object.values(row).some(val => val !== ''));
-        
+
+        const previewData = lines
+          .slice(1, 6)
+          .map(line => {
+            const values = line.split(separator).map(v => v.trim());
+            return headers.reduce((obj, header, index) => {
+              obj[header] = values[index] || '';
+              return obj;
+            }, {} as any);
+          })
+          .filter(row => Object.values(row).some(val => val !== ''));
+
         setPreview(previewData);
       };
       reader.readAsText(selectedFile);
@@ -109,9 +117,10 @@ export default function CargarResultadosModal({
   };
 
   const downloadTemplate = () => {
-    const csvContent = 'rut,pregunta_id,alternativa_dada\n2-1752861555116,1,A\n7-1752861555131,1,B\n2-1752861555116,2,C\n';
+    const csvContent =
+      'rut,pregunta_id,alternativa_dada\n2-1752861555116,1,A\n7-1752861555131,1,B\n2-1752861555116,2,C\n';
     const filename = 'template_resultados.csv';
-    
+
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -146,28 +155,43 @@ export default function CargarResultadosModal({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
-                <h4 className="font-semibold text-blue-800">Formato Requerido:</h4>
+                <h4 className="font-semibold text-blue-800">
+                  Formato Requerido:
+                </h4>
                 <ul className="text-sm text-blue-700 space-y-1">
-                  <li>• <strong>rut:</strong> RUT del alumno (debe existir en la base de datos)</li>
-                  <li>• <strong>pregunta_id:</strong> ID de la pregunta</li>
-                  <li>• <strong>alternativa_dada:</strong> Alternativa marcada (A, B, C, D)</li>
+                  <li>
+                    • <strong>rut:</strong> RUT del alumno (debe existir en la
+                    base de datos)
+                  </li>
+                  <li>
+                    • <strong>pregunta_id:</strong> ID de la pregunta
+                  </li>
+                  <li>
+                    • <strong>alternativa_dada:</strong> Alternativa marcada (A,
+                    B, C, D)
+                  </li>
                 </ul>
                 <div className="bg-white p-3 rounded-lg border border-blue-200 text-xs font-mono text-blue-800">
-                  rut,pregunta_id,alternativa_dada<br/>
-                  2-1752861555116,1,A<br/>
-                  7-1752861555131,1,B<br/>
+                  rut,pregunta_id,alternativa_dada
+                  <br />
+                  2-1752861555116,1,A
+                  <br />
+                  7-1752861555131,1,B
+                  <br />
                   2-1752861555116,2,C
                 </div>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                   <p className="text-sm text-yellow-800">
-                    <strong>Importante:</strong> Todos los alumnos deben estar registrados previamente en la base de datos. 
-                    El sistema validará que cada RUT exista antes de procesar los resultados.
+                    <strong>Importante:</strong> Todos los alumnos deben estar
+                    registrados previamente en la base de datos. El sistema
+                    validará que cada RUT exista antes de procesar los
+                    resultados.
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex gap-3">
-                <Button 
+                <Button
                   onClick={downloadTemplate}
                   variant="outline"
                   size="sm"
@@ -189,14 +213,18 @@ export default function CargarResultadosModal({
               className="hidden"
             />
             <button
-              onClick={() => document.querySelector('input[type="file"]')?.click()}
+              onClick={() =>
+                document.querySelector('input[type="file"]')?.click()
+              }
               className="w-full text-indigo-400 hover:text-indigo-700 font-medium"
             >
               <Upload className="w-8 h-8 mx-auto mb-2 text-indigo-500 hover:text-indigo-600 transition-colors" />
               {file ? (
                 <div className="flex flex-col items-center space-y-1">
                   <span className="text-gray-700 font-medium">{file.name}</span>
-                  <span className="text-gray-500 text-sm">Haz clic para cambiar archivo</span>
+                  <span className="text-gray-500 text-sm">
+                    Haz clic para cambiar archivo
+                  </span>
                 </div>
               ) : (
                 <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent font-semibold">
@@ -220,8 +248,11 @@ export default function CargarResultadosModal({
                   <table className="w-full text-xs">
                     <thead className="bg-gradient-to-r from-purple-50 to-pink-50">
                       <tr>
-                        {Object.keys(preview[0] || {}).map((header) => (
-                          <th key={header} className="text-left p-2 font-semibold text-purple-900">
+                        {Object.keys(preview[0] || {}).map(header => (
+                          <th
+                            key={header}
+                            className="text-left p-2 font-semibold text-purple-900"
+                          >
                             {header}
                           </th>
                         ))}
@@ -229,7 +260,10 @@ export default function CargarResultadosModal({
                     </thead>
                     <tbody>
                       {preview.map((row, index) => (
-                        <tr key={index} className={`border-b border-gray-100 ${index % 2 === 0 ? 'bg-white/50' : 'bg-gray-50/50'}`}>
+                        <tr
+                          key={index}
+                          className={`border-b border-gray-100 ${index % 2 === 0 ? 'bg-white/50' : 'bg-gray-50/50'}`}
+                        >
                           {Object.values(row).map((value, cellIndex) => (
                             <td key={cellIndex} className="p-2 text-gray-700">
                               {String(value)}
@@ -250,9 +284,7 @@ export default function CargarResultadosModal({
           )}
 
           {/* Mensajes de error/éxito */}
-          {error && (
-            <ErrorState message={error} />
-          )}
+          {error && <ErrorState message={error} />}
 
           {success && (
             <SuccessState message="¡Resultados cargados exitosamente!" />
@@ -260,14 +292,14 @@ export default function CargarResultadosModal({
 
           {/* Botones de acción */}
           <div className="flex justify-end gap-3 pt-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={onClose}
               className="border-gray-300 text-gray-700 hover:bg-gray-50"
             >
               Cancelar
             </Button>
-            <Button 
+            <Button
               onClick={handleSubmit}
               disabled={!file || isLoading}
               className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium text-sm px-4 py-2 shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -289,4 +321,4 @@ export default function CargarResultadosModal({
       </div>
     </div>
   );
-} 
+}

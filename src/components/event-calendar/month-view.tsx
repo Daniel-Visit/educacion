@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   addDays,
   eachDayOfInterval,
@@ -12,13 +12,13 @@ import {
   isToday,
   startOfMonth,
   startOfWeek,
-} from "date-fns"
-import { es } from "date-fns/locale"
+} from 'date-fns';
+import { es } from 'date-fns/locale';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui-calendar/popover"
+} from '@/components/ui-calendar/popover';
 import {
   DraggableEvent,
   DroppableCell,
@@ -31,14 +31,14 @@ import {
   sortEvents,
   useEventVisibility,
   type CalendarEvent,
-} from "@/components/event-calendar"
-import { DefaultStartHour } from "@/components/event-calendar/constants"
+} from '@/components/event-calendar';
+import { DefaultStartHour } from '@/components/event-calendar/constants';
 
 interface MonthViewProps {
-  currentDate: Date
-  events: CalendarEvent[]
-  onEventSelect: (event: CalendarEvent) => void
-  onEventCreate: (startTime: Date) => void
+  currentDate: Date;
+  events: CalendarEvent[];
+  onEventSelect: (event: CalendarEvent) => void;
+  onEventCreate: (startTime: Date) => void;
 }
 
 export function MonthView({
@@ -48,55 +48,55 @@ export function MonthView({
   onEventCreate,
 }: MonthViewProps) {
   const days = useMemo(() => {
-    const monthStart = startOfMonth(currentDate)
-    const monthEnd = endOfMonth(monthStart)
-    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 })
-    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 })
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(monthStart);
+    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 0 });
+    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 0 });
 
-    return eachDayOfInterval({ start: calendarStart, end: calendarEnd })
-  }, [currentDate])
+    return eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+  }, [currentDate]);
 
   const weekdays = useMemo(() => {
     return Array.from({ length: 7 }).map((_, i) => {
-      const date = addDays(startOfWeek(new Date()), i)
-      return format(date, "EEE", { locale: es })
-    })
-  }, [])
+      const date = addDays(startOfWeek(new Date()), i);
+      return format(date, 'EEE', { locale: es });
+    });
+  }, []);
 
   const weeks = useMemo(() => {
-    const result = []
-    let week = []
+    const result = [];
+    let week = [];
 
     for (let i = 0; i < days.length; i++) {
-      week.push(days[i])
+      week.push(days[i]);
       if (week.length === 7 || i === days.length - 1) {
-        result.push(week)
-        week = []
+        result.push(week);
+        week = [];
       }
     }
 
-    return result
-  }, [days])
+    return result;
+  }, [days]);
 
   const handleEventClick = (event: CalendarEvent, e: React.MouseEvent) => {
-    e.stopPropagation()
-    onEventSelect(event)
-  }
+    e.stopPropagation();
+    onEventSelect(event);
+  };
 
-  const [isMounted, setIsMounted] = useState(false)
+  const [isMounted, setIsMounted] = useState(false);
   const { contentRef, getVisibleEventCount } = useEventVisibility({
     eventHeight: EventHeight,
     eventGap: EventGap,
-  })
+  });
 
   useEffect(() => {
-    setIsMounted(true)
-  }, [])
+    setIsMounted(true);
+  }, []);
 
   return (
     <div data-slot="month-view" className="contents">
       <div className="border-border/70 grid grid-cols-7 border-b">
-        {weekdays.map((day) => (
+        {weekdays.map(day => (
           <div
             key={day}
             className="text-muted-foreground/70 py-2 text-center text-sm"
@@ -112,24 +112,25 @@ export function MonthView({
             className="grid grid-cols-7 [&:last-child>*]:border-b-0"
           >
             {week.map((day, dayIndex) => {
-              if (!day) return null // Skip if day is undefined
+              if (!day) return null; // Skip if day is undefined
 
-              const dayEvents = getEventsForDay(events, day)
-              const spanningEvents = getSpanningEventsForDay(events, day)
-              const isCurrentMonth = isSameMonth(day, currentDate)
-              const cellId = `month-cell-${day.toISOString()}`
-              const allDayEvents = [...spanningEvents, ...dayEvents]
-              const allEvents = getAllEventsForDay(events, day)
+              const dayEvents = getEventsForDay(events, day);
+              const spanningEvents = getSpanningEventsForDay(events, day);
+              const isCurrentMonth = isSameMonth(day, currentDate);
+              const cellId = `month-cell-${day.toISOString()}`;
+              const allDayEvents = [...spanningEvents, ...dayEvents];
+              const allEvents = getAllEventsForDay(events, day);
 
-              const isReferenceCell = weekIndex === 0 && dayIndex === 0
+              const isReferenceCell = weekIndex === 0 && dayIndex === 0;
               const visibleCount = isMounted
                 ? getVisibleEventCount(allDayEvents.length)
-                : undefined
+                : undefined;
               const hasMore =
-                visibleCount !== undefined && allDayEvents.length > visibleCount
+                visibleCount !== undefined &&
+                allDayEvents.length > visibleCount;
               const remainingCount = hasMore
                 ? allDayEvents.length - visibleCount
-                : 0
+                : 0;
 
               return (
                 <div
@@ -142,38 +143,38 @@ export function MonthView({
                     id={cellId}
                     date={day}
                     onClick={() => {
-                      const startTime = new Date(day)
-                      startTime.setHours(DefaultStartHour, 0, 0)
-                      onEventCreate(startTime)
+                      const startTime = new Date(day);
+                      startTime.setHours(DefaultStartHour, 0, 0);
+                      onEventCreate(startTime);
                     }}
                   >
                     <div className="group-data-today:bg-gradient-to-r from-indigo-600 to-purple-500 group-data-today:text-primary-foreground mt-1 inline-flex size-6 items-center justify-center rounded-full text-sm">
-                      {format(day, "d", { locale: es })}
+                      {format(day, 'd', { locale: es })}
                     </div>
                     <div
                       ref={isReferenceCell ? contentRef : null}
                       className="min-h-[calc((var(--event-height)+var(--event-gap))*2)] sm:min-h-[calc((var(--event-height)+var(--event-gap))*3)] lg:min-h-[calc((var(--event-height)+var(--event-gap))*2)]"
                     >
                       {sortEvents(allDayEvents).map((event, index) => {
-                        const eventStart = new Date(event.start)
-                        const eventEnd = new Date(event.end)
-                        const isFirstDay = isSameDay(day, eventStart)
-                        const isLastDay = isSameDay(day, eventEnd)
+                        const eventStart = new Date(event.start);
+                        const eventEnd = new Date(event.end);
+                        const isFirstDay = isSameDay(day, eventStart);
+                        const isLastDay = isSameDay(day, eventEnd);
 
                         const isHidden =
-                          isMounted && visibleCount && index >= visibleCount
+                          isMounted && visibleCount && index >= visibleCount;
 
-                        if (!visibleCount) return null
+                        if (!visibleCount) return null;
 
                         if (!isFirstDay) {
                           return (
                             <div
                               key={`spanning-${event.id}-${day.toISOString().slice(0, 10)}`}
                               className="aria-hidden:hidden"
-                              aria-hidden={isHidden ? "true" : undefined}
+                              aria-hidden={isHidden ? 'true' : undefined}
                             >
                               <EventItem
-                                onClick={(e) => handleEventClick(event, e)}
+                                onClick={e => handleEventClick(event, e)}
                                 event={event}
                                 view="month"
                                 isFirstDay={isFirstDay}
@@ -182,35 +183,33 @@ export function MonthView({
                                 <div className="invisible" aria-hidden={true}>
                                   {!event.allDay && (
                                     <span>
-                                      {format(
-                                        new Date(event.start),
-                                        "h:mm",
-                                        { locale: es }
-                                      )}{" "}
+                                      {format(new Date(event.start), 'h:mm', {
+                                        locale: es,
+                                      })}{' '}
                                     </span>
                                   )}
                                   {event.title}
                                 </div>
                               </EventItem>
                             </div>
-                          )
+                          );
                         }
 
                         return (
                           <div
                             key={event.id}
                             className="aria-hidden:hidden"
-                            aria-hidden={isHidden ? "true" : undefined}
+                            aria-hidden={isHidden ? 'true' : undefined}
                           >
                             <DraggableEvent
                               event={event}
                               view="month"
-                              onClick={(e) => handleEventClick(event, e)}
+                              onClick={e => handleEventClick(event, e)}
                               isFirstDay={isFirstDay}
                               isLastDay={isLastDay}
                             />
                           </div>
-                        )
+                        );
                       })}
 
                       {hasMore && (
@@ -218,10 +217,10 @@ export function MonthView({
                           <PopoverTrigger asChild>
                             <button
                               className="focus-visible:border-ring focus-visible:ring-ring/50 text-muted-foreground hover:text-foreground hover:bg-muted/50 mt-[var(--event-gap)] flex h-[var(--event-height)] w-full items-center overflow-hidden px-1 text-left text-[10px] backdrop-blur-md transition outline-none select-none focus-visible:ring-[3px] sm:px-2 sm:text-xs"
-                              onClick={(e) => e.stopPropagation()}
+                              onClick={e => e.stopPropagation()}
                             >
                               <span>
-                                + {remainingCount}{" "}
+                                + {remainingCount}{' '}
                                 <span className="max-sm:sr-only">más</span>
                               </span>
                             </button>
@@ -231,33 +230,31 @@ export function MonthView({
                             className="max-w-52 p-3"
                             style={
                               {
-                                "--event-height": `${EventHeight}px`,
+                                '--event-height': `${EventHeight}px`,
                               } as React.CSSProperties
                             }
                           >
                             <div className="space-y-2">
                               <div className="text-sm font-medium">
-                                {format(day, "EEE d", { locale: es })}
+                                {format(day, 'EEE d', { locale: es })}
                               </div>
                               <div className="space-y-1">
-                                {sortEvents(allEvents).map((event) => {
-                                  const eventStart = new Date(event.start)
-                                  const eventEnd = new Date(event.end)
-                                  const isFirstDay = isSameDay(day, eventStart)
-                                  const isLastDay = isSameDay(day, eventEnd)
+                                {sortEvents(allEvents).map(event => {
+                                  const eventStart = new Date(event.start);
+                                  const eventEnd = new Date(event.end);
+                                  const isFirstDay = isSameDay(day, eventStart);
+                                  const isLastDay = isSameDay(day, eventEnd);
 
                                   return (
                                     <EventItem
                                       key={event.id}
-                                      onClick={(e) =>
-                                        handleEventClick(event, e)
-                                      }
+                                      onClick={e => handleEventClick(event, e)}
                                       event={event}
                                       view="month"
                                       isFirstDay={isFirstDay}
                                       isLastDay={isLastDay}
                                     />
-                                  )
+                                  );
                                 })}
                               </div>
                             </div>
@@ -267,11 +264,11 @@ export function MonthView({
                     </div>
                   </DroppableCell>
                 </div>
-              )
+              );
             })}
           </div>
         ))}
       </div>
     </div>
-  )
+  );
 }

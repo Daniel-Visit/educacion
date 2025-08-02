@@ -1,0 +1,45 @@
+{
+  "timestamp": "2025-08-02T23:31:54.356Z",
+  "user": {
+    "id": "cmdutcv2c0000543btrwqo6oz",
+    "email": "daniel.hernandez@hyh.cl",
+    "name": "Daniel Hernández",
+    "role": "user",
+    "forcePasswordChange": false,
+    "password": null,
+    "createdAt": "2025-08-02T22:17:54.756Z",
+    "updatedAt": "2025-08-02T22:17:54.756Z"
+  },
+  "accounts": [
+    {
+      "id": "cmdutn2qg000154zhp6dlb60s",
+      "provider": "google",
+      "providerAccountId": "111718536956929922325",
+      "type": "oidc"
+    }
+  ],
+  "tokens": [
+    {
+      "token": "a263049b8055b7c58084062d69829d4cdae64c561b93d61cfa8db13d657f9dbc",
+      "expires": "2025-08-03T00:24:03.742Z"
+    }
+  ],
+  "sessions": [
+    {
+      "id": "cmduu4aie000354zhmlxm6px4",
+      "sessionToken": "2d52775e-4cc4-45ac-945f-85ca314a8ccf",
+      "expires": "2025-09-01T22:39:14.483Z"
+    },
+    {
+      "id": "cmduvrabp000554zhaeyf1lq9",
+      "sessionToken": "f93b4b40-4713-456d-9ab0-02db52bdf190",
+      "expires": "2025-09-01T23:25:06.945Z"
+    }
+  ],
+  "summary": {
+    "userExists": true,
+    "oauthAccounts": 1,
+    "tokens": 1,
+    "sessions": 2
+  }
+}

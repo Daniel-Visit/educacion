@@ -13,6 +13,7 @@
 ## 📊 Costos Actuales (Desarrollo)
 
 ### **Infraestructura de Desarrollo**
+
 ```bash
 # Actual (SQLite local)
 - Vercel Hobby:        $0/mes
@@ -22,6 +23,7 @@ Total Desarrollo:      $0/mes
 ```
 
 ### **Limitaciones Actuales**
+
 - ❌ **Máximo 100 usuarios** simultáneos
 - ❌ **Sin autenticación** de usuarios
 - ❌ **Sin monitoreo** de errores
@@ -33,6 +35,7 @@ Total Desarrollo:      $0/mes
 ## 🚀 Costos Post-Escalabilidad (Producción)
 
 ### **Infraestructura Mensual Básica**
+
 ```bash
 # Vercel Pro (Hosting + Edge Functions)
 Vercel Pro:           $20/mes
@@ -70,6 +73,7 @@ Sentry:               $26/mes
 ```
 
 ### **Servicios Adicionales (Opcionales)**
+
 ```bash
 # Analytics Avanzado
 Vercel Analytics:     $20/mes
@@ -106,6 +110,7 @@ Backupify:            $30/mes
 ## 📈 Análisis de ROI por Escenarios
 
 ### **Escenario 1: Institución Pequeña (100 docentes)**
+
 ```bash
 # Ingresos
 100 docentes × $5/mes = $500/mes
@@ -123,6 +128,7 @@ ROI: 281%
 ```
 
 ### **Escenario 2: Institución Mediana (500 docentes)**
+
 ```bash
 # Ingresos
 500 docentes × $7/mes = $3,500/mes
@@ -140,6 +146,7 @@ ROI: 1,063%
 ```
 
 ### **Escenario 3: Institución Grande (2,000 docentes)**
+
 ```bash
 # Ingresos
 2,000 docentes × $10/mes = $20,000/mes
@@ -162,6 +169,7 @@ ROI: 525%
 ## 🔄 Costos por Fases de Implementación
 
 ### **Fase 1: Escalabilidad Básica (Mes 1)**
+
 ```bash
 # Infraestructura Mínima
 Vercel Pro:           $20/mes
@@ -175,6 +183,7 @@ Costo desarrollo:     $1,500 (amortizado)
 ```
 
 ### **Fase 2: Optimización (Mes 2-3)**
+
 ```bash
 # Infraestructura Optimizada
 Vercel Pro:           $20/mes
@@ -189,6 +198,7 @@ Costo optimización:   $500/mes
 ```
 
 ### **Fase 3: Enterprise (Mes 4+)**
+
 ```bash
 # Infraestructura Enterprise
 Vercel Enterprise:    $100/mes
@@ -208,6 +218,7 @@ Soporte técnico:      $1,000/mes
 ## 💰 Modelo de Precios Sugerido
 
 ### **Plan Freemium**
+
 ```bash
 # Plan Gratuito
 - 1 docente
@@ -239,6 +250,7 @@ Soporte técnico:      $1,000/mes
 ## 📊 Análisis de Break-Even
 
 ### **Punto de Equilibrio por Plan**
+
 ```bash
 # Plan Básico ($5/mes)
 Costos mensuales: $81
@@ -254,6 +266,7 @@ Break-even: 14 docentes
 ```
 
 ### **Proyección de Ingresos**
+
 ```bash
 # Mes 1: Lanzamiento
 50 docentes × $7 = $350/mes
@@ -277,6 +290,7 @@ ROI: 6,833%
 ## 🛡️ Costos de Seguridad y Compliance
 
 ### **Seguridad Básica (Incluida)**
+
 ```bash
 # Vercel Security
 - SSL automático: $0
@@ -290,6 +304,7 @@ ROI: 6,833%
 ```
 
 ### **Seguridad Avanzada (Opcional)**
+
 ```bash
 # Cloudflare Security
 Cloudflare Pro:       $20/mes
@@ -309,6 +324,7 @@ ISO 27001:            $10,000/año
 ## 📈 Costos de Marketing y Adquisición
 
 ### **Marketing Digital**
+
 ```bash
 # Google Ads
 Presupuesto mensual:  $1,000
@@ -332,6 +348,7 @@ Total:                $650/mes
 ```
 
 ### **Métricas de Adquisición**
+
 ```bash
 # CAC (Customer Acquisition Cost)
 Objetivo: < $50 por docente
@@ -351,6 +368,7 @@ Estrategia: Soporte proactivo + mejoras continuas
 ## 💡 Estrategias de Optimización de Costos
 
 ### **Optimización de Infraestructura**
+
 ```bash
 # Auto-scaling
 - Redis: Escala automáticamente
@@ -370,6 +388,7 @@ Estrategia: Soporte proactivo + mejoras continuas
 ```
 
 ### **Optimización de Adquisición**
+
 ```bash
 # Marketing de contenido
 - Blog educativo: $200/mes
@@ -388,6 +407,7 @@ Total: $600/mes
 ## 🎯 Recomendaciones de Costos
 
 ### **Fase Inicial (Mes 1-3)**
+
 ```bash
 # Infraestructura Mínima
 Total: $81/mes
@@ -403,6 +423,7 @@ ROI: 764%
 ```
 
 ### **Fase de Crecimiento (Mes 4-6)**
+
 ```bash
 # Infraestructura Optimizada
 Total: $136/mes
@@ -418,6 +439,7 @@ ROI: 2,474%
 ```
 
 ### **Fase Enterprise (Mes 7+)**
+
 ```bash
 # Infraestructura Enterprise
 Total: $619/mes
@@ -437,6 +459,7 @@ ROI: 3,129%
 ## 📋 Cronograma de Inversión
 
 ### **Mes 1: Lanzamiento**
+
 ```bash
 # Inversión inicial
 Desarrollo: $1,500
@@ -450,6 +473,7 @@ ROI: -83% (inversión inicial)
 ```
 
 ### **Mes 2: Validación**
+
 ```bash
 # Costos mensuales
 Infraestructura: $81
@@ -462,6 +486,7 @@ ROI: -26%
 ```
 
 ### **Mes 3: Crecimiento**
+
 ```bash
 # Costos mensuales
 Infraestructura: $101
@@ -474,6 +499,7 @@ ROI: 27%
 ```
 
 ### **Mes 6: Escala**
+
 ```bash
 # Costos mensuales
 Infraestructura: $136
@@ -487,6 +513,7 @@ ROI: 64%
 ```
 
 ### **Mes 12: Enterprise**
+
 ```bash
 # Costos mensuales
 Infraestructura: $619
@@ -504,6 +531,7 @@ ROI: 93%
 ## 🚨 Riesgos y Mitigación
 
 ### **Riesgos Técnicos**
+
 ```bash
 # Alto tráfico
 Riesgo: Infraestructura no aguanta
@@ -519,6 +547,7 @@ Mitigación: Health checks + alertas
 ```
 
 ### **Riesgos de Negocio**
+
 ```bash
 # Baja adopción
 Riesgo: Pocos usuarios pagan
@@ -538,6 +567,7 @@ Mitigación: Soporte proactivo + mejoras continuas
 ## 📊 Métricas de Seguimiento
 
 ### **Métricas Financieras**
+
 ```bash
 # Ingresos
 MRR (Monthly Recurring Revenue)
@@ -556,6 +586,7 @@ ROI por canal
 ```
 
 ### **Métricas de Producto**
+
 ```bash
 # Uso
 DAU (Daily Active Users)
@@ -578,20 +609,24 @@ Uptime percentage
 ## 🎯 Conclusión
 
 ### **Inversión Inicial**
+
 - **Desarrollo:** 3 días de trabajo ($1,500)
 - **Infraestructura:** $81/mes
 - **Marketing:** $500/mes inicial
 - **Total primer mes:** ~$2,081
 
 ### **ROI Esperado**
+
 - **Mes 3:** 27% ROI (break-even)
 - **Mes 6:** 64% ROI
 - **Mes 12:** 93% ROI
 
 ### **Recomendación Final**
+
 **Empezar con infraestructura mínima ($81/mes)** y escalar según el crecimiento real. El ROI es extremadamente favorable desde el tercer mes con solo 200 docentes.
 
 **Estrategia recomendada:**
+
 1. **Mes 1-2:** Enfoque en producto y validación
 2. **Mes 3-6:** Crecimiento orgánico y marketing de contenido
 3. **Mes 7+:** Expansión enterprise y optimización de costos
@@ -601,4 +636,4 @@ Uptime percentage
 **Estado:** 📋 Documentado  
 **Prioridad:** 🔥 Alta  
 **Timeline:** Implementación inmediata  
-**Responsable:** Equipo de desarrollo + marketing 
+**Responsable:** Equipo de desarrollo + marketing

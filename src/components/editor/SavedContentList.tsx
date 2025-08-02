@@ -1,81 +1,95 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { FileText, BookOpen, ClipboardCheck, Trash2, Edit, Calendar, Clock } from 'lucide-react'
-import { useContentSave, SavedContent } from '@/hooks/use-content-save'
+import { useState, useEffect } from 'react';
+import {
+  FileText,
+  BookOpen,
+  ClipboardCheck,
+  Trash2,
+  Edit,
+  Calendar,
+  Clock,
+} from 'lucide-react';
+import { useContentSave, SavedContent } from '@/hooks/use-content-save';
 
 interface SavedContentListProps {
-  onLoadContent?: (content: SavedContent) => void
-  onEditContent?: (content: SavedContent) => void
+  onLoadContent?: (content: SavedContent) => void;
+  onEditContent?: (content: SavedContent) => void;
 }
 
-export default function SavedContentList({ onLoadContent, onEditContent }: SavedContentListProps) {
-  const { savedContents, loadSavedContents, deleteContent, isLoading } = useContentSave()
-  const [filterType, setFilterType] = useState<'all' | 'planificacion' | 'material' | 'evaluacion'>('all')
+export default function SavedContentList({
+  onLoadContent,
+  onEditContent,
+}: SavedContentListProps) {
+  const { savedContents, loadSavedContents, deleteContent, isLoading } =
+    useContentSave();
+  const [filterType, setFilterType] = useState<
+    'all' | 'planificacion' | 'material' | 'evaluacion'
+  >('all');
 
   useEffect(() => {
-    loadSavedContents()
-  }, [loadSavedContents])
+    loadSavedContents();
+  }, [loadSavedContents]);
 
-  const filteredContents = savedContents.filter(content => 
-    filterType === 'all' || content.tipo === filterType
-  )
+  const filteredContents = savedContents.filter(
+    content => filterType === 'all' || content.tipo === filterType
+  );
 
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'planificacion':
-        return <FileText className="w-4 h-4" />
+        return <FileText className="w-4 h-4" />;
       case 'material':
-        return <BookOpen className="w-4 h-4" />
+        return <BookOpen className="w-4 h-4" />;
       case 'evaluacion':
-        return <ClipboardCheck className="w-4 h-4" />
+        return <ClipboardCheck className="w-4 h-4" />;
       default:
-        return <FileText className="w-4 h-4" />
+        return <FileText className="w-4 h-4" />;
     }
-  }
+  };
 
   const getTypeLabel = (type: string) => {
     switch (type) {
       case 'planificacion':
-        return 'Planificación'
+        return 'Planificación';
       case 'material':
-        return 'Material'
+        return 'Material';
       case 'evaluacion':
-        return 'Evaluación'
+        return 'Evaluación';
       default:
-        return 'Documento'
+        return 'Documento';
     }
-  }
+  };
 
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'planificacion':
-        return 'bg-blue-100 text-blue-700 border-blue-200'
+        return 'bg-blue-100 text-blue-700 border-blue-200';
       case 'material':
-        return 'bg-green-100 text-green-700 border-green-200'
+        return 'bg-green-100 text-green-700 border-green-200';
       case 'evaluacion':
-        return 'bg-purple-100 text-purple-700 border-purple-200'
+        return 'bg-purple-100 text-purple-700 border-purple-200';
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-200'
+        return 'bg-gray-100 text-gray-700 border-gray-200';
     }
-  }
+  };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return new Intl.DateTimeFormat('es-ES', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
-    }).format(date)
-  }
+      minute: '2-digit',
+    }).format(date);
+  };
 
   const handleDelete = async (id: number) => {
     if (confirm('¿Estás seguro de que quieres eliminar este documento?')) {
-      await deleteContent(id)
+      await deleteContent(id);
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -83,17 +97,21 @@ export default function SavedContentList({ onLoadContent, onEditContent }: Saved
         <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
         <p className="text-gray-500">Cargando documentos...</p>
       </div>
-    )
+    );
   }
 
   if (savedContents.length === 0) {
     return (
       <div className="text-center py-12">
         <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">No hay documentos guardados</h3>
-        <p className="text-gray-500">Guarda tu primer documento para verlo aquí</p>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          No hay documentos guardados
+        </h3>
+        <p className="text-gray-500">
+          Guarda tu primer documento para verlo aquí
+        </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -118,7 +136,8 @@ export default function SavedContentList({ onLoadContent, onEditContent }: Saved
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
-          Planificaciones ({savedContents.filter(c => c.tipo === 'planificacion').length})
+          Planificaciones (
+          {savedContents.filter(c => c.tipo === 'planificacion').length})
         </button>
         <button
           onClick={() => setFilterType('material')}
@@ -138,13 +157,14 @@ export default function SavedContentList({ onLoadContent, onEditContent }: Saved
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
-          Evaluaciones ({savedContents.filter(c => c.tipo === 'evaluacion').length})
+          Evaluaciones (
+          {savedContents.filter(c => c.tipo === 'evaluacion').length})
         </button>
       </div>
 
       {/* Lista de documentos */}
       <div className="space-y-3">
-        {filteredContents.map((content) => (
+        {filteredContents.map(content => (
           <div
             key={content.id}
             className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
@@ -155,29 +175,34 @@ export default function SavedContentList({ onLoadContent, onEditContent }: Saved
                   <div className={`p-1 rounded ${getTypeColor(content.tipo)}`}>
                     {getTypeIcon(content.tipo)}
                   </div>
-                  <span className={`text-xs font-medium px-2 py-1 rounded-full border ${getTypeColor(content.tipo)}`}>
+                  <span
+                    className={`text-xs font-medium px-2 py-1 rounded-full border ${getTypeColor(content.tipo)}`}
+                  >
                     {getTypeLabel(content.tipo)}
                   </span>
                 </div>
-                
+
                 <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">
                   {content.titulo}
                 </h3>
-                
+
                 <div className="flex items-center gap-4 text-sm text-gray-500">
                   <div className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
                     <span>{formatDate(content.createdAt || '')}</span>
                   </div>
-                  {content.updatedAt && content.updatedAt !== content.createdAt && (
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      <span>Actualizado: {formatDate(content.updatedAt)}</span>
-                    </div>
-                  )}
+                  {content.updatedAt &&
+                    content.updatedAt !== content.createdAt && (
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        <span>
+                          Actualizado: {formatDate(content.updatedAt)}
+                        </span>
+                      </div>
+                    )}
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-2 ml-4">
                 {onLoadContent && (
                   <button
@@ -212,9 +237,11 @@ export default function SavedContentList({ onLoadContent, onEditContent }: Saved
 
       {filteredContents.length === 0 && savedContents.length > 0 && (
         <div className="text-center py-8">
-          <p className="text-gray-500">No hay documentos del tipo seleccionado</p>
+          <p className="text-gray-500">
+            No hay documentos del tipo seleccionado
+          </p>
         </div>
       )}
     </div>
-  )
-} 
+  );
+}

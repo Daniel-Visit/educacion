@@ -3,14 +3,20 @@ import { FileText, Clock, X } from 'lucide-react';
 import { useContentSave, SavedContent } from '@/hooks/use-content-save';
 
 interface FabPlanificacionesProps {
-  onLoadContent?: (content: SavedContent) => void
-  tipoActual: 'planificacion' | 'material' | 'evaluacion'
-  matrizId?: number | null
-  disabled?: boolean
-  className?: string
+  onLoadContent?: (content: SavedContent) => void;
+  tipoActual: 'planificacion' | 'material' | 'evaluacion';
+  matrizId?: number | null;
+  disabled?: boolean;
+  className?: string;
 }
 
-export default function FabPlanificaciones({ onLoadContent, tipoActual, matrizId, disabled, className }: FabPlanificacionesProps) {
+export default function FabPlanificaciones({
+  onLoadContent,
+  tipoActual,
+  matrizId,
+  disabled,
+  className,
+}: FabPlanificacionesProps) {
   const [open, setOpen] = useState(false);
   const { savedContents, isLoading } = useContentSave();
   const [evaluaciones, setEvaluaciones] = useState<any[]>([]);
@@ -18,17 +24,21 @@ export default function FabPlanificaciones({ onLoadContent, tipoActual, matrizId
 
   useEffect(() => {
     if (tipoActual === 'evaluacion' && matrizId && open) {
-      setLoadingEvals(true)
+      setLoadingEvals(true);
       fetch(`/api/evaluaciones`)
         .then(res => res.json())
         .then(data => {
-          setEvaluaciones(Array.isArray(data) ? data.filter(e => e.matrizId === matrizId) : [])
+          setEvaluaciones(
+            Array.isArray(data) ? data.filter(e => e.matrizId === matrizId) : []
+          );
         })
-        .finally(() => setLoadingEvals(false))
+        .finally(() => setLoadingEvals(false));
     }
-  }, [tipoActual, matrizId, open])
+  }, [tipoActual, matrizId, open]);
 
-  let filteredContents = savedContents.filter(content => content.tipo === tipoActual);
+  let filteredContents = savedContents.filter(
+    content => content.tipo === tipoActual
+  );
   if (tipoActual === 'evaluacion' && matrizId) {
     filteredContents = evaluaciones;
   }
@@ -36,54 +46,54 @@ export default function FabPlanificaciones({ onLoadContent, tipoActual, matrizId
   const getTypeLabel = (type: string) => {
     switch (type) {
       case 'planificacion':
-        return 'Planificaciones'
+        return 'Planificaciones';
       case 'material':
-        return 'Materiales'
+        return 'Materiales';
       case 'evaluacion':
-        return 'Evaluaciones'
+        return 'Evaluaciones';
       default:
-        return 'Documentos'
+        return 'Documentos';
     }
-  }
+  };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffTime = Math.abs(now.getTime() - date.getTime())
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    
-    if (diffDays === 1) return 'hoy'
-    if (diffDays === 2) return 'hace 1 día'
-    if (diffDays <= 7) return `hace ${diffDays - 1} días`
-    if (diffDays <= 30) return `hace ${Math.floor(diffDays / 7)} semanas`
-    if (diffDays <= 365) return `hace ${Math.floor(diffDays / 30)} meses`
-    return `hace ${Math.floor(diffDays / 365)} años`
-  }
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 1) return 'hoy';
+    if (diffDays === 2) return 'hace 1 día';
+    if (diffDays <= 7) return `hace ${diffDays - 1} días`;
+    if (diffDays <= 30) return `hace ${Math.floor(diffDays / 7)} semanas`;
+    if (diffDays <= 365) return `hace ${Math.floor(diffDays / 30)} meses`;
+    return `hace ${Math.floor(diffDays / 365)} años`;
+  };
 
   const handleLoadContent = async (content: any) => {
     if (tipoActual === 'evaluacion' && content.id) {
       // Para evaluaciones, obtener datos completos desde la API
       try {
-        const response = await fetch(`/api/evaluaciones/${content.id}`)
+        const response = await fetch(`/api/evaluaciones/${content.id}`);
         if (response.ok) {
-          const evaluacionCompleta = await response.json()
+          const evaluacionCompleta = await response.json();
           if (onLoadContent) {
-            onLoadContent(evaluacionCompleta)
+            onLoadContent(evaluacionCompleta);
           }
         } else {
-          console.error('Error al cargar evaluación completa')
+          console.error('Error al cargar evaluación completa');
         }
       } catch (error) {
-        console.error('Error al cargar evaluación:', error)
+        console.error('Error al cargar evaluación:', error);
       }
     } else {
       // Para otros tipos, usar el contenido directamente
       if (onLoadContent) {
-        onLoadContent(content)
+        onLoadContent(content);
       }
     }
-    setOpen(false)
-  }
+    setOpen(false);
+  };
 
   return (
     <>
@@ -91,20 +101,30 @@ export default function FabPlanificaciones({ onLoadContent, tipoActual, matrizId
       <button
         className={`fixed bottom-8 right-22 w-16 h-16 rounded-full bg-gradient-to-br from-indigo-600 to-purple-500 text-white text-4xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 focus:outline-none ${disabled ? 'opacity-50 pointer-events-none' : ''} ${className || ''}`}
         onClick={() => !disabled && setOpen(!open)}
-        aria-label={open ? "Cerrar archivos" : `Abrir ${getTypeLabel(tipoActual).toLowerCase()}`}
+        aria-label={
+          open
+            ? 'Cerrar archivos'
+            : `Abrir ${getTypeLabel(tipoActual).toLowerCase()}`
+        }
         disabled={disabled}
       >
-        {open ? <X size={36} className="text-white" /> : <FileText size={32} className="text-white" />}
+        {open ? (
+          <X size={36} className="text-white" />
+        ) : (
+          <FileText size={32} className="text-white" />
+        )}
       </button>
-      
+
       {/* Panel flotante */}
       {open && (
         <div
           className="fixed top-24 right-22 w-[380px] bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] border border-gray-100 z-40 px-8 pt-8 pb-4 flex flex-col gap-4 animate-fade-in"
           style={{ minWidth: 340, maxHeight: 'calc(100vh - 120px)' }}
         >
-          <h2 className="text-lg font-bold text-indigo-700 mb-4">{getTypeLabel(tipoActual)} Guardados</h2>
-          
+          <h2 className="text-lg font-bold text-indigo-700 mb-4">
+            {getTypeLabel(tipoActual)} Guardados
+          </h2>
+
           {tipoActual === 'evaluacion' && loadingEvals ? (
             <div className="text-center py-8">
               <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
@@ -113,7 +133,9 @@ export default function FabPlanificaciones({ onLoadContent, tipoActual, matrizId
           ) : filteredContents.length === 0 ? (
             <div className="text-center py-8">
               <FileText className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm text-gray-500">No hay {getTypeLabel(tipoActual).toLowerCase()} guardados</p>
+              <p className="text-sm text-gray-500">
+                No hay {getTypeLabel(tipoActual).toLowerCase()} guardados
+              </p>
             </div>
           ) : (
             <div className="flex flex-col gap-2 overflow-y-auto max-h-96">
@@ -132,7 +154,9 @@ export default function FabPlanificaciones({ onLoadContent, tipoActual, matrizId
                     </div>
                     <div className="text-xs text-gray-400 mt-1 flex items-center gap-1">
                       <Clock size={12} className="text-gray-300 mr-1" />
-                      {formatDate(content.createdAt || content.archivo?.createdAt || '')}
+                      {formatDate(
+                        content.createdAt || content.archivo?.createdAt || ''
+                      )}
                     </div>
                   </div>
                 </div>
@@ -143,4 +167,4 @@ export default function FabPlanificaciones({ onLoadContent, tipoActual, matrizId
       )}
     </>
   );
-} 
+}

@@ -17,7 +17,7 @@ jest.mock('../../src/lib/prisma', () => ({
 
 // Mock de NextResponse
 global.NextResponse = {
-  json: jest.fn((data) => ({ json: () => data })),
+  json: jest.fn(data => ({ json: () => data })),
 };
 
 describe('API Niveles', () => {
@@ -39,7 +39,7 @@ describe('API Niveles', () => {
   describe('GET /api/niveles', () => {
     it('debería retornar lista de niveles', async () => {
       const { GET } = require('../../src/app/api/niveles/route');
-      
+
       mockPrisma.nivel.findMany.mockResolvedValue([nivelResponse]);
 
       const request = new NextRequest('http://localhost:3000/api/niveles');
@@ -55,7 +55,7 @@ describe('API Niveles', () => {
   describe('POST /api/niveles', () => {
     it('debería crear un nivel exitosamente', async () => {
       const { POST } = require('../../src/app/api/niveles/route');
-      
+
       mockPrisma.nivel.create.mockResolvedValue(nivelResponse);
 
       const request = new NextRequest('http://localhost:3000/api/niveles', {
@@ -73,7 +73,7 @@ describe('API Niveles', () => {
 
     it('debería validar datos requeridos', async () => {
       const { POST } = require('../../src/app/api/niveles/route');
-      
+
       const invalidData = { nombre: '' };
       const request = new NextRequest('http://localhost:3000/api/niveles', {
         method: 'POST',
@@ -89,7 +89,7 @@ describe('API Niveles', () => {
 
     it('debería validar nombre con espacios en blanco', async () => {
       const { POST } = require('../../src/app/api/niveles/route');
-      
+
       const invalidData = { nombre: '   ' };
       const request = new NextRequest('http://localhost:3000/api/niveles', {
         method: 'POST',
@@ -105,7 +105,7 @@ describe('API Niveles', () => {
 
     it('debería validar longitud del nombre', async () => {
       const { POST } = require('../../src/app/api/niveles/route');
-      
+
       const longNombre = 'A'.repeat(101);
       const invalidData = { nombre: longNombre };
       const request = new NextRequest('http://localhost:3000/api/niveles', {
@@ -120,4 +120,4 @@ describe('API Niveles', () => {
       expect(result.status).toBe(400);
     });
   });
-}); 
+});

@@ -2,7 +2,16 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft, ChevronsUpDown, Check, X, Plus, Clock, BarChart3, Target } from 'lucide-react';
+import {
+  ArrowLeft,
+  ChevronsUpDown,
+  Check,
+  X,
+  Plus,
+  Clock,
+  BarChart3,
+  Target,
+} from 'lucide-react';
 import { Listbox } from '@headlessui/react';
 import { Dialog } from '@headlessui/react';
 import PrimaryButton from '@/components/ui/PrimaryButton';
@@ -55,52 +64,63 @@ export default function EditarMatrizPage() {
   const [saving, setSaving] = useState(false);
   const [oas, setOAs] = useState<OA[]>([]);
   const [ejes, setEjes] = useState<Eje[]>([]);
-  const [asignaturas, setAsignaturas] = useState<{id: number, nombre: string}[]>([]);
-  const [niveles, setNiveles] = useState<{id: number, nombre: string}[]>([]);
+  const [asignaturas, setAsignaturas] = useState<
+    { id: number; nombre: string }[]
+  >([]);
+  const [niveles, setNiveles] = useState<{ id: number; nombre: string }[]>([]);
   const [selectedEje, setSelectedEje] = useState<number | null>(null);
   const [selectedOAs, setSelectedOAs] = useState<OA[]>([]);
-  const [selectedEjeContenido, setSelectedEjeContenido] = useState<number | null>(null);
+  const [selectedEjeContenido, setSelectedEjeContenido] = useState<
+    number | null
+  >(null);
   const [selectedOAsContenido, setSelectedOAsContenido] = useState<OA[]>([]);
-  const [selectedEjeHabilidad, setSelectedEjeHabilidad] = useState<number | null>(null);
+  const [selectedEjeHabilidad, setSelectedEjeHabilidad] = useState<
+    number | null
+  >(null);
   const [selectedOAsHabilidad, setSelectedOAsHabilidad] = useState<OA[]>([]);
-  const [selectedAsignatura, setSelectedAsignatura] = useState<number | null>(null);
+  const [selectedAsignatura, setSelectedAsignatura] = useState<number | null>(
+    null
+  );
   const [selectedNivel, setSelectedNivel] = useState<number | null>(null);
   const [totalPreguntas, setTotalPreguntas] = useState(0);
-  const [oaIndicadores, setOAIndicadores] = useState<{[oaId:number]: Indicador[]}>({});
+  const [oaIndicadores, setOAIndicadores] = useState<{
+    [oaId: number]: Indicador[];
+  }>({});
   const [matrizName, setMatrizName] = useState('');
-  const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [step, setStep] = useState(1);
   const [showOaChangeModal, setShowOaChangeModal] = useState(false);
   const [pendingOAs, setPendingOAs] = useState<OA[]>([]);
-  const [matrizOriginal, setMatrizOriginal] = useState<MatrizEspecificacion | null>(null);
+  const [matrizOriginal, setMatrizOriginal] =
+    useState<MatrizEspecificacion | null>(null);
 
   const steps = [
     { n: 1, label: 'Datos básicos' },
     { n: 2, label: 'Seleccionar OA' },
-    { n: 3, label: 'Indicadores' }
+    { n: 3, label: 'Indicadores' },
   ];
 
   // Funciones de gradientes ordenados
   const getGradient = (index: number) => {
     const gradients = [
-      'from-emerald-500 to-teal-600',    // 1. Verde
-      'from-amber-500 to-orange-600',    // 2. Naranja
-      'from-indigo-500 to-purple-600',   // 3. Índigo
-      'from-cyan-500 to-blue-600',       // 4. Cyan
-      'from-rose-500 to-pink-600',       // 5. Rose
-      'from-violet-500 to-fuchsia-600'   // 6. Violet
+      'from-emerald-500 to-teal-600', // 1. Verde
+      'from-amber-500 to-orange-600', // 2. Naranja
+      'from-indigo-500 to-purple-600', // 3. Índigo
+      'from-cyan-500 to-blue-600', // 4. Cyan
+      'from-rose-500 to-pink-600', // 5. Rose
+      'from-violet-500 to-fuchsia-600', // 6. Violet
     ];
     return gradients[index % gradients.length];
   };
 
   const getHoverGradient = (index: number) => {
     const hoverGradients = [
-      'hover:from-emerald-600 hover:to-teal-700',  // 1. Verde
-      'hover:from-amber-600 hover:to-orange-700',  // 2. Naranja
+      'hover:from-emerald-600 hover:to-teal-700', // 1. Verde
+      'hover:from-amber-600 hover:to-orange-700', // 2. Naranja
       'hover:from-indigo-600 hover:to-purple-700', // 3. Índigo
-      'hover:from-cyan-600 hover:to-blue-700',     // 4. Cyan
-      'hover:from-rose-600 hover:to-pink-700',     // 5. Rose
-      'hover:from-violet-600 hover:to-fuchsia-700' // 6. Violet
+      'hover:from-cyan-600 hover:to-blue-700', // 4. Cyan
+      'hover:from-rose-600 hover:to-pink-700', // 5. Rose
+      'hover:from-violet-600 hover:to-fuchsia-700', // 6. Violet
     ];
     return hoverGradients[index % hoverGradients.length];
   };
@@ -144,14 +164,14 @@ export default function EditarMatrizPage() {
       if (oasResponse.ok) {
         const oasData = await oasResponse.json();
         setOAs(oasData);
-        
+
         // Extraer ejes únicos
         const ejesUnicos = oasData.reduce((acc: Eje[], oa: OA) => {
           const ejeExistente = acc.find(e => e.id === oa.eje_id);
           if (!ejeExistente) {
             acc.push({
               id: oa.eje_id,
-              descripcion: oa.eje_descripcion
+              descripcion: oa.eje_descripcion,
             });
           }
           return acc;
@@ -164,28 +184,34 @@ export default function EditarMatrizPage() {
       if (matrizResponse.ok) {
         const matrizData = await matrizResponse.json();
         setMatrizOriginal(matrizData);
-        
+
         // Pre-cargar datos de la matriz
         setMatrizName(matrizData.nombre);
         setTotalPreguntas(matrizData.total_preguntas);
-        
+
         // Pre-cargar OAs seleccionados
-        const oasSeleccionados = matrizData.oas.map((matrizOA: MatrizOA) => matrizOA.oa);
+        const oasSeleccionados = matrizData.oas.map(
+          (matrizOA: MatrizOA) => matrizOA.oa
+        );
         setSelectedOAs(oasSeleccionados);
-        
+
         // Establecer asignatura y nivel de la matriz existente
         if (oasSeleccionados.length > 0) {
           setSelectedAsignatura(oasSeleccionados[0].asignatura_id);
           setSelectedNivel(oasSeleccionados[0].nivel_id);
         }
-        
+
         // Separar OAs por tipo
-        const oasContenido = oasSeleccionados.filter((oa: OA) => oa.tipo_eje === 'Contenido');
-        const oasHabilidad = oasSeleccionados.filter((oa: OA) => oa.tipo_eje === 'Habilidad');
-        
+        const oasContenido = oasSeleccionados.filter(
+          (oa: OA) => oa.tipo_eje === 'Contenido'
+        );
+        const oasHabilidad = oasSeleccionados.filter(
+          (oa: OA) => oa.tipo_eje === 'Habilidad'
+        );
+
         setSelectedOAsContenido(oasContenido);
         setSelectedOAsHabilidad(oasHabilidad);
-        
+
         // Establecer ejes seleccionados
         if (oasContenido.length > 0) {
           setSelectedEjeContenido(oasContenido[0].eje_id);
@@ -193,14 +219,14 @@ export default function EditarMatrizPage() {
         if (oasHabilidad.length > 0) {
           setSelectedEjeHabilidad(oasHabilidad[0].eje_id);
         }
-        
+
         // Pre-cargar indicadores
-        const indicadoresPreCargados: {[oaId:number]: Indicador[]} = {};
+        const indicadoresPreCargados: { [oaId: number]: Indicador[] } = {};
         matrizData.oas.forEach((matrizOA: MatrizOA) => {
           indicadoresPreCargados[matrizOA.oaId] = matrizOA.indicadores;
         });
         setOAIndicadores(indicadoresPreCargados);
-        
+
         // Establecer eje seleccionado (usar el primer OA como referencia)
         if (oasSeleccionados.length > 0) {
           setSelectedEje(oasSeleccionados[0].eje_id);
@@ -217,12 +243,19 @@ export default function EditarMatrizPage() {
   // Filtrar OAs por asignatura y nivel seleccionados usando useMemo
   const oasDeAsignaturaNivel = useMemo(() => {
     if (!selectedAsignatura || !selectedNivel) return [];
-    return oas.filter(oa => oa.asignatura_id === selectedAsignatura && oa.nivel_id === selectedNivel);
+    return oas.filter(
+      oa =>
+        oa.asignatura_id === selectedAsignatura && oa.nivel_id === selectedNivel
+    );
   }, [oas, selectedAsignatura, selectedNivel]);
 
   // Separar OAs por tipo_eje
-  const oasContenido = oasDeAsignaturaNivel.filter((oa: OA) => oa.tipo_eje === 'Contenido');
-  const oasHabilidad = oasDeAsignaturaNivel.filter((oa: OA) => oa.tipo_eje === 'Habilidad');
+  const oasContenido = oasDeAsignaturaNivel.filter(
+    (oa: OA) => oa.tipo_eje === 'Contenido'
+  );
+  const oasHabilidad = oasDeAsignaturaNivel.filter(
+    (oa: OA) => oa.tipo_eje === 'Habilidad'
+  );
 
   // Extraer ejes únicos de contenido
   const ejesContenido = oasContenido.reduce((acc: Eje[], oa) => {
@@ -230,7 +263,7 @@ export default function EditarMatrizPage() {
     if (!ejeExistente) {
       acc.push({
         id: oa.eje_id,
-        descripcion: oa.eje_descripcion
+        descripcion: oa.eje_descripcion,
       });
     }
     return acc;
@@ -242,19 +275,19 @@ export default function EditarMatrizPage() {
     if (!ejeExistente) {
       acc.push({
         id: oa.eje_id,
-        descripcion: oa.eje_descripcion
+        descripcion: oa.eje_descripcion,
       });
     }
     return acc;
   }, []);
 
   // Filtrar OAs por eje de contenido seleccionado
-  const oasDelEjeContenido = selectedEjeContenido 
+  const oasDelEjeContenido = selectedEjeContenido
     ? oasContenido.filter(oa => oa.eje_id === selectedEjeContenido)
     : [];
 
   // Filtrar OAs por eje de habilidad seleccionado
-  const oasDelEjeHabilidad = selectedEjeHabilidad 
+  const oasDelEjeHabilidad = selectedEjeHabilidad
     ? oasHabilidad.filter(oa => oa.eje_id === selectedEjeHabilidad)
     : [];
 
@@ -265,14 +298,17 @@ export default function EditarMatrizPage() {
   }, [selectedOAsContenido, selectedOAsHabilidad]);
 
   // Filtrar OAs por eje seleccionado
-  const oasDelEje = selectedEje 
+  const oasDelEje = selectedEje
     ? oas.filter(oa => oa.eje_id === selectedEje)
     : [];
 
   const validateForm = () => {
-    const newErrors: {[key: string]: string} = {};
+    const newErrors: { [key: string]: string } = {};
 
-    if (selectedOAsContenido.length === 0 && selectedOAsHabilidad.length === 0) {
+    if (
+      selectedOAsContenido.length === 0 &&
+      selectedOAsHabilidad.length === 0
+    ) {
       newErrors.oa = 'Debe seleccionar al menos un OA';
     }
 
@@ -285,23 +321,35 @@ export default function EditarMatrizPage() {
     }
 
     // Validar que cada OA tenga al menos un indicador con al menos 1 pregunta
-    const allOAsHaveIndicators = [...selectedOAsContenido, ...selectedOAsHabilidad].every(oa => {
+    const allOAsHaveIndicators = [
+      ...selectedOAsContenido,
+      ...selectedOAsHabilidad,
+    ].every(oa => {
       const indicadores = oaIndicadores[oa.id] || [];
-      return indicadores.length > 0 && indicadores.some(ind => ind.preguntas > 0);
+      return (
+        indicadores.length > 0 && indicadores.some(ind => ind.preguntas > 0)
+      );
     });
 
     if (!allOAsHaveIndicators) {
       // Encontrar OAs específicos que no tienen indicadores
-      const oasWithoutIndicators = [...selectedOAsContenido, ...selectedOAsHabilidad].filter(oa => {
+      const oasWithoutIndicators = [
+        ...selectedOAsContenido,
+        ...selectedOAsHabilidad,
+      ].filter(oa => {
         const indicadores = oaIndicadores[oa.id] || [];
-        return indicadores.length === 0 || !indicadores.some(ind => ind.preguntas > 0);
+        return (
+          indicadores.length === 0 ||
+          !indicadores.some(ind => ind.preguntas > 0)
+        );
       });
-      
+
       if (oasWithoutIndicators.length > 0) {
         const oaNames = oasWithoutIndicators.map(oa => oa.oas_id).join(', ');
         newErrors.indicadores = `Los siguientes OAs deben tener al menos un indicador con al menos 1 pregunta: ${oaNames}`;
       } else {
-        newErrors.indicadores = 'Cada OA debe tener al menos un indicador con al menos 1 pregunta';
+        newErrors.indicadores =
+          'Cada OA debe tener al menos un indicador con al menos 1 pregunta';
       }
     }
 
@@ -339,9 +387,9 @@ export default function EditarMatrizPage() {
           oaId: oa.id,
           indicadores: (oaIndicadores[oa.id] || []).map(ind => ({
             descripcion: ind.descripcion,
-            preguntas: ind.preguntas
-          }))
-        }))
+            preguntas: ind.preguntas,
+          })),
+        })),
       };
 
       const response = await fetch(`/api/matrices/${matrizOriginal.id}`, {
@@ -356,7 +404,9 @@ export default function EditarMatrizPage() {
         router.push(`/matrices/${matrizOriginal.id}`);
       } else {
         const errorData = await response.json();
-        setErrors({ submit: errorData.error || 'Error al actualizar la matriz' });
+        setErrors({
+          submit: errorData.error || 'Error al actualizar la matriz',
+        });
       }
     } catch (error) {
       console.error('Error al actualizar matriz:', error);
@@ -366,24 +416,35 @@ export default function EditarMatrizPage() {
     }
   };
 
-  const isValid = (selectedOAsContenido.length > 0 || selectedOAsHabilidad.length > 0) && matrizName.trim() && totalPreguntas > 0;
+  const isValid =
+    (selectedOAsContenido.length > 0 || selectedOAsHabilidad.length > 0) &&
+    matrizName.trim() &&
+    totalPreguntas > 0;
 
   const handleOaChange = (oas: OA[], tipo?: 'contenido' | 'habilidad') => {
-    const hayIndicadores = Object.values(oaIndicadores).some(arr => arr && arr.length > 0 && arr.some(ind => ind.descripcion.trim() || ind.preguntas > 0));
-    
+    const hayIndicadores = Object.values(oaIndicadores).some(
+      arr =>
+        arr &&
+        arr.length > 0 &&
+        arr.some(ind => ind.descripcion.trim() || ind.preguntas > 0)
+    );
+
     if (step === 3 && hayIndicadores) {
       // Determinar qué tipo de OA se está cambiando
       const oasContenido = tipo === 'contenido' ? oas : selectedOAsContenido;
       const oasHabilidad = tipo === 'habilidad' ? oas : selectedOAsHabilidad;
       const oasCombinados = [...oasContenido, ...oasHabilidad];
-      
-      if (JSON.stringify(oasCombinados.map(o => o.id)) !== JSON.stringify(selectedOAs.map(o => o.id))) {
+
+      if (
+        JSON.stringify(oasCombinados.map(o => o.id)) !==
+        JSON.stringify(selectedOAs.map(o => o.id))
+      ) {
         setPendingOAs(oasCombinados);
         setShowOaChangeModal(true);
         return;
       }
     }
-    
+
     // Actualizar el tipo correspondiente
     if (tipo === 'contenido') {
       setSelectedOAsContenido(oas);
@@ -393,21 +454,32 @@ export default function EditarMatrizPage() {
   };
 
   // Calcula el total de preguntas de los indicadores
-  const totalPreguntasIndicadores = Object.values(oaIndicadores).flat().reduce((sum, ind) => sum + (ind.preguntas || 0), 0);
+  const totalPreguntasIndicadores = Object.values(oaIndicadores)
+    .flat()
+    .reduce((sum, ind) => sum + (ind.preguntas || 0), 0);
 
   // Calcular totales separados por tipo de eje
   const totalPreguntasContenido = selectedOAsContenido.reduce((sum, oa) => {
     const indicadores = oaIndicadores[oa.id] || [];
-    return sum + indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0);
+    return (
+      sum +
+      indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0)
+    );
   }, 0);
-  
+
   const totalPreguntasHabilidad = selectedOAsHabilidad.reduce((sum, oa) => {
     const indicadores = oaIndicadores[oa.id] || [];
-    return sum + indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0);
+    return (
+      sum +
+      indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0)
+    );
   }, 0);
-  
+
   // Validar que cada OA tenga al menos un indicador con al menos 1 pregunta
-  const allOAsHaveIndicators = [...selectedOAsContenido, ...selectedOAsHabilidad].every(oa => {
+  const allOAsHaveIndicators = [
+    ...selectedOAsContenido,
+    ...selectedOAsHabilidad,
+  ].every(oa => {
     const indicadores = oaIndicadores[oa.id] || [];
     return indicadores.length > 0 && indicadores.some(ind => ind.preguntas > 0);
   });
@@ -423,19 +495,24 @@ export default function EditarMatrizPage() {
     const indicadores = oaIndicadores[oa.id] || [];
     return indicadores.length > 0 && indicadores.some(ind => ind.preguntas > 0);
   });
-  
+
   // Determinar si hay ambos tipos de eje
-  const hasBothTypes = selectedOAsContenido.length > 0 && selectedOAsHabilidad.length > 0;
-  
-  // Validación final: 
+  const hasBothTypes =
+    selectedOAsContenido.length > 0 && selectedOAsHabilidad.length > 0;
+
+  // Validación final:
   // - Si hay ambos tipos: ambos deben sumar el total Y cada OA debe tener indicadores
   // - Si solo hay un tipo: el total debe ser correcto Y cada OA debe tener indicadores
-  const isStep3Valid = hasBothTypes 
-    ? (totalPreguntasContenido === totalPreguntas && totalPreguntasHabilidad === totalPreguntas && allOAsHaveIndicators)
-    : (totalPreguntasIndicadores === totalPreguntas && allOAsHaveIndicators);
-  
+  const isStep3Valid = hasBothTypes
+    ? totalPreguntasContenido === totalPreguntas &&
+      totalPreguntasHabilidad === totalPreguntas &&
+      allOAsHaveIndicators
+    : totalPreguntasIndicadores === totalPreguntas && allOAsHaveIndicators;
+
   // Para mostrar el total correcto en el contador
-  const totalPreguntasToShow = hasBothTypes ? totalPreguntasContenido : totalPreguntasIndicadores;
+  const totalPreguntasToShow = hasBothTypes
+    ? totalPreguntasContenido
+    : totalPreguntasIndicadores;
 
   if (loading) {
     return (
@@ -472,7 +549,7 @@ export default function EditarMatrizPage() {
               </p>
             </div>
           </div>
-          
+
           {/* Información de la matriz */}
           {matrizOriginal && (
             <div className="bg-white/10 rounded-lg p-3">
@@ -486,7 +563,7 @@ export default function EditarMatrizPage() {
             </div>
           )}
         </div>
-        
+
         {/* Stats de la matriz */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white/10 rounded-lg p-3">
@@ -498,7 +575,7 @@ export default function EditarMatrizPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white/10 rounded-lg p-3">
             <div className="flex items-center gap-2">
               <Target className="h-4 w-4 text-indigo-200" />
@@ -508,13 +585,15 @@ export default function EditarMatrizPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white/10 rounded-lg p-3">
             <div className="flex items-center gap-2">
               <Check className="h-4 w-4 text-indigo-200" />
               <div>
                 <p className="text-indigo-200 text-xs">Paso Actual</p>
-                <p className="text-lg font-bold">{step} de {steps.length}</p>
+                <p className="text-lg font-bold">
+                  {step} de {steps.length}
+                </p>
               </div>
             </div>
           </div>
@@ -523,7 +602,6 @@ export default function EditarMatrizPage() {
 
       {/* Form */}
       <div className="max-w-6xl mx-auto space-y-8">
-        
         {/* Stepper tipo wizard moderno */}
         <div className="flex justify-center items-center gap-0 mb-12 mt-8">
           {steps.map((stepObj, idx) => (
@@ -545,12 +623,18 @@ export default function EditarMatrizPage() {
                   </div>
                 )}
                 {/* Texto del paso */}
-                <span className={`mt-3 text-sm font-medium text-center ${step === stepObj.n ? 'text-indigo-700 font-bold' : step > stepObj.n ? 'text-emerald-600' : 'text-gray-500'}`}>{stepObj.label}</span>
+                <span
+                  className={`mt-3 text-sm font-medium text-center ${step === stepObj.n ? 'text-indigo-700 font-bold' : step > stepObj.n ? 'text-emerald-600' : 'text-gray-500'}`}
+                >
+                  {stepObj.label}
+                </span>
               </div>
-              
+
               {/* Línea entre pasos */}
               {idx < steps.length - 1 && (
-                <div className={`h-px w-32 mb-8 rounded-full ${step > stepObj.n ? 'bg-gradient-to-r from-emerald-400 to-teal-500' : 'bg-gray-200'} mx-8 transition-all duration-300`}></div>
+                <div
+                  className={`h-px w-32 mb-8 rounded-full ${step > stepObj.n ? 'bg-gradient-to-r from-emerald-400 to-teal-500' : 'bg-gray-200'} mx-8 transition-all duration-300`}
+                ></div>
               )}
             </div>
           ))}
@@ -586,7 +670,7 @@ export default function EditarMatrizPage() {
                 />
               </div>
             </div>
-            
+
             {/* Campos de solo lectura para asignatura y nivel */}
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
@@ -594,7 +678,9 @@ export default function EditarMatrizPage() {
                   Asignatura
                 </label>
                 <div className="w-full px-4 py-2 border rounded-xl text-base bg-gray-50 border-gray-300 text-gray-600">
-                  {selectedAsignatura ? asignaturas.find(a => a.id === selectedAsignatura)?.nombre : 'Cargando...'}
+                  {selectedAsignatura
+                    ? asignaturas.find(a => a.id === selectedAsignatura)?.nombre
+                    : 'Cargando...'}
                 </div>
               </div>
               <div className="flex-1">
@@ -602,16 +688,22 @@ export default function EditarMatrizPage() {
                   Nivel
                 </label>
                 <div className="w-full px-4 py-2 border rounded-xl text-base bg-gray-50 border-gray-300 text-gray-600">
-                  {selectedNivel ? niveles.find(n => n.id === selectedNivel)?.nombre : 'Cargando...'}
+                  {selectedNivel
+                    ? niveles.find(n => n.id === selectedNivel)?.nombre
+                    : 'Cargando...'}
                 </div>
               </div>
             </div>
             <div className="flex justify-end gap-4 mt-4">
-              <SecondaryButton onClick={() => router.back()}>Cancelar</SecondaryButton>
+              <SecondaryButton onClick={() => router.back()}>
+                Cancelar
+              </SecondaryButton>
               <PrimaryButton
                 onClick={() => setStep(2)}
                 disabled={!matrizName.trim() || totalPreguntas <= 0}
-              >Siguiente</PrimaryButton>
+              >
+                Siguiente
+              </PrimaryButton>
             </div>
           </div>
         )}
@@ -621,24 +713,48 @@ export default function EditarMatrizPage() {
           <div className="space-y-6 mb-8">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
-                <Listbox value={selectedEjeContenido} onChange={setSelectedEjeContenido}>
+                <Listbox
+                  value={selectedEjeContenido}
+                  onChange={setSelectedEjeContenido}
+                >
                   <div className="relative mt-1">
-                    <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">Eje Contenido</Listbox.Label>
+                    <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">
+                      Eje Contenido
+                    </Listbox.Label>
                     <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                      {selectedEjeContenido ? ejesContenido.find(e => e.id === selectedEjeContenido)?.descripcion : 'Selecciona un eje'}
+                      {selectedEjeContenido
+                        ? ejesContenido.find(e => e.id === selectedEjeContenido)
+                            ?.descripcion
+                        : 'Selecciona un eje'}
                       <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <ChevronsUpDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                        <ChevronsUpDown
+                          className="h-5 w-5 text-gray-400"
+                          aria-hidden="true"
+                        />
                       </span>
                     </Listbox.Button>
                     <Listbox.Options className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       {ejesContenido.map(eje => (
-                        <Listbox.Option key={eje.id} value={eje.id} className={({ active }) => `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'}` }>
+                        <Listbox.Option
+                          key={eje.id}
+                          value={eje.id}
+                          className={({ active }) =>
+                            `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'}`
+                          }
+                        >
                           {({ selected }) => (
                             <>
-                              <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>{eje.descripcion}</span>
+                              <span
+                                className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}
+                              >
+                                {eje.descripcion}
+                              </span>
                               {selected ? (
                                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
-                                  <Check className="h-5 w-5" aria-hidden="true" />
+                                  <Check
+                                    className="h-5 w-5"
+                                    aria-hidden="true"
+                                  />
                                 </span>
                               ) : null}
                             </>
@@ -650,23 +766,44 @@ export default function EditarMatrizPage() {
                 </Listbox>
               </div>
               <div className="flex-1">
-                                 <Listbox value={selectedOAsContenido} onChange={(oas) => handleOaChange(oas, 'contenido')} multiple>
+                <Listbox
+                  value={selectedOAsContenido}
+                  onChange={oas => handleOaChange(oas, 'contenido')}
+                  multiple
+                >
                   <div className="relative mt-1">
-                    <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">OA (Contenido)</Listbox.Label>
+                    <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">
+                      OA (Contenido)
+                    </Listbox.Label>
                     <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                      {selectedOAsContenido.length === 0 ? 'Selecciona uno o más OA' : `${selectedOAsContenido.length} seleccionados`}
+                      {selectedOAsContenido.length === 0
+                        ? 'Selecciona uno o más OA'
+                        : `${selectedOAsContenido.length} seleccionados`}
                       <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <ChevronsUpDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                        <ChevronsUpDown
+                          className="h-5 w-5 text-gray-400"
+                          aria-hidden="true"
+                        />
                       </span>
                     </Listbox.Button>
                     {selectedOAsContenido.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-2">
                         {selectedOAsContenido.map(oa => (
-                          <span key={oa.id} className="flex items-center bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm">
+                          <span
+                            key={oa.id}
+                            className="flex items-center bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm"
+                          >
                             {oa.oas_id}
                             <button
                               type="button"
-                              onClick={() => handleOaChange(selectedOAsContenido.filter(o => o.id !== oa.id), 'contenido')}
+                              onClick={() =>
+                                handleOaChange(
+                                  selectedOAsContenido.filter(
+                                    o => o.id !== oa.id
+                                  ),
+                                  'contenido'
+                                )
+                              }
                               className="ml-1 text-indigo-400 hover:text-indigo-700 focus:outline-none"
                               aria-label={`Eliminar ${oa.oas_id}`}
                             >
@@ -678,13 +815,27 @@ export default function EditarMatrizPage() {
                     )}
                     <Listbox.Options className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       {oasDelEjeContenido.map(oa => (
-                        <Listbox.Option key={oa.id} value={oa} className={({ active }) => `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'}` }>
+                        <Listbox.Option
+                          key={oa.id}
+                          value={oa}
+                          className={({ active }) =>
+                            `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'}`
+                          }
+                        >
                           {({ selected }) => (
                             <>
-                              <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>{oa.oas_id} - {oa.descripcion_oas.substring(0, 50)}...</span>
+                              <span
+                                className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}
+                              >
+                                {oa.oas_id} -{' '}
+                                {oa.descripcion_oas.substring(0, 50)}...
+                              </span>
                               {selected ? (
                                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
-                                  <Check className="h-5 w-5" aria-hidden="true" />
+                                  <Check
+                                    className="h-5 w-5"
+                                    aria-hidden="true"
+                                  />
                                 </span>
                               ) : null}
                             </>
@@ -699,24 +850,49 @@ export default function EditarMatrizPage() {
             {ejesHabilidad.length > 0 && (
               <div className="flex flex-col md:flex-row gap-4 mt-4">
                 <div className="flex-1">
-                  <Listbox value={selectedEjeHabilidad} onChange={setSelectedEjeHabilidad}>
+                  <Listbox
+                    value={selectedEjeHabilidad}
+                    onChange={setSelectedEjeHabilidad}
+                  >
                     <div className="relative mt-1">
-                      <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">Eje Habilidad</Listbox.Label>
+                      <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">
+                        Eje Habilidad
+                      </Listbox.Label>
                       <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        {selectedEjeHabilidad ? ejesHabilidad.find(e => e.id === selectedEjeHabilidad)?.descripcion : 'Selecciona un eje'}
+                        {selectedEjeHabilidad
+                          ? ejesHabilidad.find(
+                              e => e.id === selectedEjeHabilidad
+                            )?.descripcion
+                          : 'Selecciona un eje'}
                         <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                          <ChevronsUpDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                          <ChevronsUpDown
+                            className="h-5 w-5 text-gray-400"
+                            aria-hidden="true"
+                          />
                         </span>
                       </Listbox.Button>
                       <Listbox.Options className="absolute z-20 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                         {ejesHabilidad.map(eje => (
-                          <Listbox.Option key={eje.id} value={eje.id} className={({ active }) => `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'}` }>
+                          <Listbox.Option
+                            key={eje.id}
+                            value={eje.id}
+                            className={({ active }) =>
+                              `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'}`
+                            }
+                          >
                             {({ selected }) => (
                               <>
-                                <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>{eje.descripcion}</span>
+                                <span
+                                  className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}
+                                >
+                                  {eje.descripcion}
+                                </span>
                                 {selected ? (
                                   <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
-                                    <Check className="h-5 w-5" aria-hidden="true" />
+                                    <Check
+                                      className="h-5 w-5"
+                                      aria-hidden="true"
+                                    />
                                   </span>
                                 ) : null}
                               </>
@@ -728,23 +904,44 @@ export default function EditarMatrizPage() {
                   </Listbox>
                 </div>
                 <div className="flex-1">
-                  <Listbox value={selectedOAsHabilidad} onChange={(oas) => handleOaChange(oas, 'habilidad')} multiple>
+                  <Listbox
+                    value={selectedOAsHabilidad}
+                    onChange={oas => handleOaChange(oas, 'habilidad')}
+                    multiple
+                  >
                     <div className="relative mt-1">
-                      <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">OA (Habilidad)</Listbox.Label>
+                      <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">
+                        OA (Habilidad)
+                      </Listbox.Label>
                       <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        {selectedOAsHabilidad.length === 0 ? 'Selecciona uno o más OA' : `${selectedOAsHabilidad.length} seleccionados`}
+                        {selectedOAsHabilidad.length === 0
+                          ? 'Selecciona uno o más OA'
+                          : `${selectedOAsHabilidad.length} seleccionados`}
                         <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                          <ChevronsUpDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                          <ChevronsUpDown
+                            className="h-5 w-5 text-gray-400"
+                            aria-hidden="true"
+                          />
                         </span>
                       </Listbox.Button>
                       {selectedOAsHabilidad.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-2">
                           {selectedOAsHabilidad.map(oa => (
-                            <span key={oa.id} className="flex items-center bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm">
+                            <span
+                              key={oa.id}
+                              className="flex items-center bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm"
+                            >
                               {oa.oas_id}
                               <button
                                 type="button"
-                                onClick={() => handleOaChange(selectedOAsHabilidad.filter(o => o.id !== oa.id), 'habilidad')}
+                                onClick={() =>
+                                  handleOaChange(
+                                    selectedOAsHabilidad.filter(
+                                      o => o.id !== oa.id
+                                    ),
+                                    'habilidad'
+                                  )
+                                }
                                 className="ml-1 text-indigo-400 hover:text-indigo-700 focus:outline-none"
                                 aria-label={`Eliminar ${oa.oas_id}`}
                               >
@@ -756,13 +953,27 @@ export default function EditarMatrizPage() {
                       )}
                       <Listbox.Options className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                         {oasDelEjeHabilidad.map(oa => (
-                          <Listbox.Option key={oa.id} value={oa} className={({ active }) => `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'}` }>
+                          <Listbox.Option
+                            key={oa.id}
+                            value={oa}
+                            className={({ active }) =>
+                              `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'}`
+                            }
+                          >
                             {({ selected }) => (
                               <>
-                                <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>{oa.oas_id} - {oa.descripcion_oas.substring(0, 50)}...</span>
+                                <span
+                                  className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}
+                                >
+                                  {oa.oas_id} -{' '}
+                                  {oa.descripcion_oas.substring(0, 50)}...
+                                </span>
                                 {selected ? (
                                   <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
-                                    <Check className="h-5 w-5" aria-hidden="true" />
+                                    <Check
+                                      className="h-5 w-5"
+                                      aria-hidden="true"
+                                    />
                                   </span>
                                 ) : null}
                               </>
@@ -776,27 +987,58 @@ export default function EditarMatrizPage() {
               </div>
             )}
             <div className="flex justify-end gap-4 mt-4">
-              <SecondaryButton onClick={() => setStep(1)}>Atrás</SecondaryButton>
+              <SecondaryButton onClick={() => setStep(1)}>
+                Atrás
+              </SecondaryButton>
               <PrimaryButton
                 onClick={() => setStep(3)}
-                disabled={selectedOAsContenido.length === 0 && selectedOAsHabilidad.length === 0}
-              >Confirmar OAs</PrimaryButton>
+                disabled={
+                  selectedOAsContenido.length === 0 &&
+                  selectedOAsHabilidad.length === 0
+                }
+              >
+                Confirmar OAs
+              </PrimaryButton>
             </div>
             {/* Modal de confirmación para cambio de OAs */}
-            <Dialog open={showOaChangeModal} onClose={() => setShowOaChangeModal(false)} className="fixed z-50 inset-0 overflow-y-auto">
+            <Dialog
+              open={showOaChangeModal}
+              onClose={() => setShowOaChangeModal(false)}
+              className="fixed z-50 inset-0 overflow-y-auto"
+            >
               <div className="flex items-center justify-center min-h-screen px-4">
-                <div className="fixed inset-0 bg-black opacity-30" aria-hidden="true" />
+                <div
+                  className="fixed inset-0 bg-black opacity-30"
+                  aria-hidden="true"
+                />
                 <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full mx-auto p-8 z-10">
-                  <Dialog.Title className="text-lg font-bold mb-4">¿Cambiar OAs seleccionados?</Dialog.Title>
-                  <Dialog.Description className="mb-6 text-gray-600">Si cambias los OAs seleccionados, se perderán los indicadores que hayas definido. ¿Deseas continuar?</Dialog.Description>
+                  <Dialog.Title className="text-lg font-bold mb-4">
+                    ¿Cambiar OAs seleccionados?
+                  </Dialog.Title>
+                  <Dialog.Description className="mb-6 text-gray-600">
+                    Si cambias los OAs seleccionados, se perderán los
+                    indicadores que hayas definido. ¿Deseas continuar?
+                  </Dialog.Description>
                   <div className="flex gap-4 justify-end">
-                    <SecondaryButton onClick={() => setShowOaChangeModal(false)}>Cancelar</SecondaryButton>
-                    <PrimaryButton onClick={() => {
-                      setSelectedOAsContenido(pendingOAs.filter(oa => oa.tipo_eje === 'Contenido'));
-                      setSelectedOAsHabilidad(pendingOAs.filter(oa => oa.tipo_eje === 'Habilidad'));
-                      setOAIndicadores({});
-                      setShowOaChangeModal(false);
-                    }}>Sí, cambiar</PrimaryButton>
+                    <SecondaryButton
+                      onClick={() => setShowOaChangeModal(false)}
+                    >
+                      Cancelar
+                    </SecondaryButton>
+                    <PrimaryButton
+                      onClick={() => {
+                        setSelectedOAsContenido(
+                          pendingOAs.filter(oa => oa.tipo_eje === 'Contenido')
+                        );
+                        setSelectedOAsHabilidad(
+                          pendingOAs.filter(oa => oa.tipo_eje === 'Habilidad')
+                        );
+                        setOAIndicadores({});
+                        setShowOaChangeModal(false);
+                      }}
+                    >
+                      Sí, cambiar
+                    </PrimaryButton>
                   </div>
                 </div>
               </div>
@@ -818,16 +1060,25 @@ export default function EditarMatrizPage() {
                         <Target className="w-6 h-6" />
                       </div>
                       <div>
-                        <h2 className="text-2xl font-bold">Indicadores de Contenido</h2>
-                        <p className="text-blue-100">Define los indicadores para los OAs de contenido</p>
+                        <h2 className="text-2xl font-bold">
+                          Indicadores de Contenido
+                        </h2>
+                        <p className="text-blue-100">
+                          Define los indicadores para los OAs de contenido
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className={`text-lg font-bold ${(totalPreguntasContenido === totalPreguntas && allOAsContenidoHaveIndicators) ? 'text-emerald-200' : 'text-gray-200'}`}>
+                      <div
+                        className={`text-lg font-bold ${totalPreguntasContenido === totalPreguntas && allOAsContenidoHaveIndicators ? 'text-emerald-200' : 'text-gray-200'}`}
+                      >
                         {totalPreguntasContenido} / {totalPreguntas}
                       </div>
                       <div className="text-sm text-blue-100">
-                        {(totalPreguntasContenido === totalPreguntas && allOAsContenidoHaveIndicators) ? '✓ Válido' : '✗ Incompleto'}
+                        {totalPreguntasContenido === totalPreguntas &&
+                        allOAsContenidoHaveIndicators
+                          ? '✓ Válido'
+                          : '✗ Incompleto'}
                       </div>
                     </div>
                   </div>
@@ -835,23 +1086,34 @@ export default function EditarMatrizPage() {
 
                 {/* OAs de Contenido */}
                 {selectedOAsContenido.map((oa, index) => (
-                  <div key={oa.id} className="bg-white rounded-2xl shadow border border-gray-100 overflow-hidden">
+                  <div
+                    key={oa.id}
+                    className="bg-white rounded-2xl shadow border border-gray-100 overflow-hidden"
+                  >
                     {/* Header sobrio */}
                     <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white">
                       <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br ${getGradient(index)}`}>
+                        <div
+                          className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br ${getGradient(index)}`}
+                        >
                           <Target className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-xl font-bold text-gray-800">Indicadores para {oa.oas_id}</h3>
+                          <h3 className="text-xl font-bold text-gray-800">
+                            Indicadores para {oa.oas_id}
+                          </h3>
                           {oa.descripcion_oas && (
-                            <p className="text-gray-500 text-sm mt-1">{oa.descripcion_oas.substring(0, 60)}...</p>
+                            <p className="text-gray-500 text-sm mt-1">
+                              {oa.descripcion_oas.substring(0, 60)}...
+                            </p>
                           )}
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         {oa.basal && (
-                          <span className="bg-gray-100 text-gray-700 rounded-full px-3 py-1 text-xs font-semibold">Basal</span>
+                          <span className="bg-gray-100 text-gray-700 rounded-full px-3 py-1 text-xs font-semibold">
+                            Basal
+                          </span>
                         )}
                       </div>
                     </div>
@@ -866,7 +1128,11 @@ export default function EditarMatrizPage() {
                             onChange={e => {
                               setOAIndicadores(prev => ({
                                 ...prev,
-                                [oa.id]: prev[oa.id].map((ind, i) => i === idx ? { ...ind, descripcion: e.target.value } : ind)
+                                [oa.id]: prev[oa.id].map((ind, i) =>
+                                  i === idx
+                                    ? { ...ind, descripcion: e.target.value }
+                                    : ind
+                                ),
                               }));
                             }}
                             className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm transition-all duration-200"
@@ -878,7 +1144,14 @@ export default function EditarMatrizPage() {
                             onChange={e => {
                               setOAIndicadores(prev => ({
                                 ...prev,
-                                [oa.id]: prev[oa.id].map((ind, i) => i === idx ? { ...ind, preguntas: Number(e.target.value) } : ind)
+                                [oa.id]: prev[oa.id].map((ind, i) =>
+                                  i === idx
+                                    ? {
+                                        ...ind,
+                                        preguntas: Number(e.target.value),
+                                      }
+                                    : ind
+                                ),
                               }));
                             }}
                             className="w-24 px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm text-center transition-all duration-200"
@@ -889,10 +1162,14 @@ export default function EditarMatrizPage() {
                           {(oaIndicadores[oa.id] || []).length > 0 && (
                             <button
                               type="button"
-                              onClick={() => setOAIndicadores(prev => ({
-                                ...prev,
-                                [oa.id]: prev[oa.id].filter((_, i) => i !== idx)
-                              }))}
+                              onClick={() =>
+                                setOAIndicadores(prev => ({
+                                  ...prev,
+                                  [oa.id]: prev[oa.id].filter(
+                                    (_, i) => i !== idx
+                                  ),
+                                }))
+                              }
                               className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-red-400 text-white shadow-lg hover:from-pink-600 hover:to-red-500 transition-all duration-300 transform hover:scale-105"
                               title="Eliminar indicador"
                             >
@@ -901,14 +1178,19 @@ export default function EditarMatrizPage() {
                           )}
                         </div>
                       ))}
-                      
+
                       {/* Botón agregar indicador */}
                       <button
                         type="button"
-                        onClick={() => setOAIndicadores(prev => ({
-                          ...prev,
-                          [oa.id]: [...(prev[oa.id] || []), { descripcion: '', preguntas: 0 }]
-                        }))}
+                        onClick={() =>
+                          setOAIndicadores(prev => ({
+                            ...prev,
+                            [oa.id]: [
+                              ...(prev[oa.id] || []),
+                              { descripcion: '', preguntas: 0 },
+                            ],
+                          }))
+                        }
                         className="w-12 h-12 flex items-center justify-center rounded-full bg-white border border-gray-300 text-gray-500 shadow hover:bg-gray-100 transition-all duration-200"
                         title="Agregar indicador"
                       >
@@ -931,16 +1213,25 @@ export default function EditarMatrizPage() {
                         <Target className="w-6 h-6" />
                       </div>
                       <div>
-                        <h2 className="text-2xl font-bold">Indicadores de Habilidad</h2>
-                        <p className="text-green-100">Define los indicadores para los OAs de habilidad</p>
+                        <h2 className="text-2xl font-bold">
+                          Indicadores de Habilidad
+                        </h2>
+                        <p className="text-green-100">
+                          Define los indicadores para los OAs de habilidad
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className={`text-lg font-bold ${(totalPreguntasHabilidad === totalPreguntas && allOAsHabilidadHaveIndicators) ? 'text-emerald-200' : 'text-gray-200'}`}>
+                      <div
+                        className={`text-lg font-bold ${totalPreguntasHabilidad === totalPreguntas && allOAsHabilidadHaveIndicators ? 'text-emerald-200' : 'text-gray-200'}`}
+                      >
                         {totalPreguntasHabilidad} / {totalPreguntas}
                       </div>
                       <div className="text-sm text-green-100">
-                        {(totalPreguntasHabilidad === totalPreguntas && allOAsHabilidadHaveIndicators) ? '✓ Válido' : '✗ Incompleto'}
+                        {totalPreguntasHabilidad === totalPreguntas &&
+                        allOAsHabilidadHaveIndicators
+                          ? '✓ Válido'
+                          : '✗ Incompleto'}
                       </div>
                     </div>
                   </div>
@@ -948,23 +1239,34 @@ export default function EditarMatrizPage() {
 
                 {/* OAs de Habilidad */}
                 {selectedOAsHabilidad.map((oa, index) => (
-                  <div key={oa.id} className="bg-white rounded-2xl shadow border border-gray-100 overflow-hidden">
+                  <div
+                    key={oa.id}
+                    className="bg-white rounded-2xl shadow border border-gray-100 overflow-hidden"
+                  >
                     {/* Header sobrio */}
                     <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white">
                       <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br ${getGradient(index)}`}>
+                        <div
+                          className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br ${getGradient(index)}`}
+                        >
                           <Target className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-xl font-bold text-gray-800">Indicadores para {oa.oas_id}</h3>
+                          <h3 className="text-xl font-bold text-gray-800">
+                            Indicadores para {oa.oas_id}
+                          </h3>
                           {oa.descripcion_oas && (
-                            <p className="text-gray-500 text-sm mt-1">{oa.descripcion_oas.substring(0, 60)}...</p>
+                            <p className="text-gray-500 text-sm mt-1">
+                              {oa.descripcion_oas.substring(0, 60)}...
+                            </p>
                           )}
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         {oa.basal && (
-                          <span className="bg-gray-100 text-gray-700 rounded-full px-3 py-1 text-xs font-semibold">Basal</span>
+                          <span className="bg-gray-100 text-gray-700 rounded-full px-3 py-1 text-xs font-semibold">
+                            Basal
+                          </span>
                         )}
                       </div>
                     </div>
@@ -979,7 +1281,11 @@ export default function EditarMatrizPage() {
                             onChange={e => {
                               setOAIndicadores(prev => ({
                                 ...prev,
-                                [oa.id]: prev[oa.id].map((ind, i) => i === idx ? { ...ind, descripcion: e.target.value } : ind)
+                                [oa.id]: prev[oa.id].map((ind, i) =>
+                                  i === idx
+                                    ? { ...ind, descripcion: e.target.value }
+                                    : ind
+                                ),
                               }));
                             }}
                             className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm transition-all duration-200"
@@ -991,7 +1297,14 @@ export default function EditarMatrizPage() {
                             onChange={e => {
                               setOAIndicadores(prev => ({
                                 ...prev,
-                                [oa.id]: prev[oa.id].map((ind, i) => i === idx ? { ...ind, preguntas: Number(e.target.value) } : ind)
+                                [oa.id]: prev[oa.id].map((ind, i) =>
+                                  i === idx
+                                    ? {
+                                        ...ind,
+                                        preguntas: Number(e.target.value),
+                                      }
+                                    : ind
+                                ),
                               }));
                             }}
                             className="w-24 px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm text-center transition-all duration-200"
@@ -1002,10 +1315,14 @@ export default function EditarMatrizPage() {
                           {(oaIndicadores[oa.id] || []).length > 0 && (
                             <button
                               type="button"
-                              onClick={() => setOAIndicadores(prev => ({
-                                ...prev,
-                                [oa.id]: prev[oa.id].filter((_, i) => i !== idx)
-                              }))}
+                              onClick={() =>
+                                setOAIndicadores(prev => ({
+                                  ...prev,
+                                  [oa.id]: prev[oa.id].filter(
+                                    (_, i) => i !== idx
+                                  ),
+                                }))
+                              }
                               className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-red-400 text-white shadow-lg hover:from-pink-600 hover:to-red-500 transition-all duration-300 transform hover:scale-105"
                               title="Eliminar indicador"
                             >
@@ -1014,14 +1331,19 @@ export default function EditarMatrizPage() {
                           )}
                         </div>
                       ))}
-                      
+
                       {/* Botón agregar indicador */}
                       <button
                         type="button"
-                        onClick={() => setOAIndicadores(prev => ({
-                          ...prev,
-                          [oa.id]: [...(prev[oa.id] || []), { descripcion: '', preguntas: 0 }]
-                        }))}
+                        onClick={() =>
+                          setOAIndicadores(prev => ({
+                            ...prev,
+                            [oa.id]: [
+                              ...(prev[oa.id] || []),
+                              { descripcion: '', preguntas: 0 },
+                            ],
+                          }))
+                        }
                         className="w-12 h-12 flex items-center justify-center rounded-full bg-white border border-gray-300 text-gray-500 shadow hover:bg-gray-100 transition-all duration-200"
                         title="Agregar indicador"
                       >
@@ -1039,7 +1361,9 @@ export default function EditarMatrizPage() {
         {step === 3 && (
           <>
             <div className="flex justify-end gap-4 mt-8">
-              <SecondaryButton onClick={() => setStep(2)}>Atrás</SecondaryButton>
+              <SecondaryButton onClick={() => setStep(2)}>
+                Atrás
+              </SecondaryButton>
               <PrimaryButton
                 onClick={handleUpdateMatriz}
                 disabled={!isStep3Valid || saving}
@@ -1048,25 +1372,38 @@ export default function EditarMatrizPage() {
               </PrimaryButton>
             </div>
             <div className="flex justify-end items-center mb-2">
-              <span className={
-                `text-base font-semibold ${
-                  isStep3Valid
-                    ? 'text-green-500'
-                    : 'text-gray-500'
-                }`
-              }>
+              <span
+                className={`text-base font-semibold ${
+                  isStep3Valid ? 'text-green-500' : 'text-gray-500'
+                }`}
+              >
                 Total preguntas: {totalPreguntasToShow} / {totalPreguntas}
               </span>
             </div>
             {errors.submit && (
-              <Dialog open={!!errors.submit} onClose={() => setErrors({ ...errors, submit: '' })} className="fixed z-50 inset-0 overflow-y-auto">
+              <Dialog
+                open={!!errors.submit}
+                onClose={() => setErrors({ ...errors, submit: '' })}
+                className="fixed z-50 inset-0 overflow-y-auto"
+              >
                 <div className="flex items-center justify-center min-h-screen px-4">
-                  <div className="fixed inset-0 bg-black opacity-30" aria-hidden="true" />
+                  <div
+                    className="fixed inset-0 bg-black opacity-30"
+                    aria-hidden="true"
+                  />
                   <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full mx-auto p-8 z-10">
-                    <Dialog.Title className="text-lg font-bold mb-4">Error</Dialog.Title>
-                    <Dialog.Description className="mb-6 text-gray-600">{errors.submit}</Dialog.Description>
+                    <Dialog.Title className="text-lg font-bold mb-4">
+                      Error
+                    </Dialog.Title>
+                    <Dialog.Description className="mb-6 text-gray-600">
+                      {errors.submit}
+                    </Dialog.Description>
                     <div className="flex gap-4 justify-end">
-                      <PrimaryButton onClick={() => setErrors({ ...errors, submit: '' })}>Cerrar</PrimaryButton>
+                      <PrimaryButton
+                        onClick={() => setErrors({ ...errors, submit: '' })}
+                      >
+                        Cerrar
+                      </PrimaryButton>
                     </div>
                   </div>
                 </div>
@@ -1077,4 +1414,4 @@ export default function EditarMatrizPage() {
       </div>
     </>
   );
-} 
+}

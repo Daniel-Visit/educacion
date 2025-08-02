@@ -91,4 +91,4 @@ export interface Step {
 export interface GradientConfig {
   gradient: string;
   hoverGradient: string;
-} 
+}

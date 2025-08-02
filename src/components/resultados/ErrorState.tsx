@@ -12,11 +12,11 @@ interface ErrorStateProps {
 }
 
 export default function ErrorState({
-  title = "Error",
+  title = 'Error',
   message,
   showBackButton = true,
-  backHref = "/resultados-evaluaciones",
-  backText = "Volver"
+  backHref = '/resultados-evaluaciones',
+  backText = 'Volver',
 }: ErrorStateProps) {
   return (
     <div className="flex items-center justify-center h-64">
@@ -37,4 +37,4 @@ export default function ErrorState({
       </div>
     </div>
   );
-} 
+}

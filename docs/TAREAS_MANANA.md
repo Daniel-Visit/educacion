@@ -1,9 +1,11 @@
 # 📅 Tareas para Mañana - Sistema de Autenticación
 
 ## 🎯 Objetivo del Día
+
 Implementar la base del sistema de autenticación: base de datos, configuración y páginas básicas.
 
 ## ⏰ Estimación de Tiempo
+
 **6-8 horas** (día completo)
 
 ## 📋 Checklist Detallado
@@ -11,6 +13,7 @@ Implementar la base del sistema de autenticación: base de datos, configuración
 ### 1. 🗄️ Base de Datos (2-3 horas)
 
 #### 1.1 Agregar tablas de usuarios al schema
+
 - [ ] Abrir `prisma/schema.prisma`
 - [ ] Agregar modelo `User` con campos:
   - `id` (String, @id, @default(cuid()))
@@ -28,10 +31,12 @@ Implementar la base del sistema de autenticación: base de datos, configuración
 - [ ] Agregar modelo `VerificationToken` para verificación
 
 #### 1.2 Modificar tabla PlanificacionAnual existente
+
 - [ ] Agregar campo `userId` (String?)
 - [ ] Agregar relación `user` con modelo `User`
 
 #### 1.3 Aplicar cambios a la base de datos
+
 - [ ] Ejecutar `npx prisma db push`
 - [ ] Verificar que no hay errores
 - [ ] Ejecutar `npx prisma generate`
@@ -39,6 +44,7 @@ Implementar la base del sistema de autenticación: base de datos, configuración
 ### 2. 🔧 Configuración Técnica (1-2 horas)
 
 #### 2.1 Variables de entorno
+
 - [ ] Crear/actualizar `.env.local` con:
   ```
   NEXTAUTH_URL=http://localhost:3000
@@ -50,11 +56,13 @@ Implementar la base del sistema de autenticación: base de datos, configuración
   ```
 
 #### 2.2 Configurar NextAuth
+
 - [ ] Verificar `src/lib/auth.ts` está correcto
 - [ ] Agregar `@auth/prisma-adapter` si no está
 - [ ] Configurar callbacks para roles
 
 #### 2.3 Crear tipos TypeScript
+
 - [ ] Crear `src/types/auth.ts`
 - [ ] Extender tipos de NextAuth para incluir roles
 - [ ] Verificar que no hay errores de TypeScript
@@ -62,6 +70,7 @@ Implementar la base del sistema de autenticación: base de datos, configuración
 ### 3. 🛡️ Middleware de Protección (1 hora)
 
 #### 3.1 Crear middleware
+
 - [ ] Crear `src/middleware.ts`
 - [ ] Configurar protección de rutas:
   - `/planificacion-anual/*`
@@ -71,12 +80,14 @@ Implementar la base del sistema de autenticación: base de datos, configuración
   - `/profile/*`
 
 #### 3.2 Testing del middleware
+
 - [ ] Verificar que rutas protegidas redirigen a login
 - [ ] Verificar que rutas públicas siguen funcionando
 
 ### 4. 📱 Páginas de Autenticación (2-3 horas)
 
 #### 4.1 Crear estructura de carpetas
+
 ```
 src/app/auth/
 ├── signin/
@@ -90,6 +101,7 @@ src/app/auth/
 ```
 
 #### 4.2 Página de Login (`/auth/signin`)
+
 - [ ] Crear página con diseño consistente
 - [ ] Implementar formulario de login
 - [ ] Agregar botones de OAuth (Google, GitHub)
@@ -97,12 +109,14 @@ src/app/auth/
 - [ ] Redirección después del login
 
 #### 4.3 Página de Registro (`/auth/signup`)
+
 - [ ] Crear formulario de registro
 - [ ] Validación de campos
 - [ ] Integración con NextAuth
 - [ ] Verificación de email (opcional)
 
 #### 4.4 Páginas de recuperación
+
 - [ ] Página de "olvidé contraseña"
 - [ ] Página de reset de contraseña
 - [ ] Formularios básicos (funcionalidad después)
@@ -110,6 +124,7 @@ src/app/auth/
 ### 5. 🧩 Componentes Básicos (1-2 horas)
 
 #### 5.1 Crear estructura de componentes
+
 ```
 src/components/auth/
 ├── LoginForm.tsx
@@ -122,12 +137,14 @@ src/components/user/
 ```
 
 #### 5.2 LoginForm.tsx
+
 - [ ] Formulario con email/password
 - [ ] Validación de campos
 - [ ] Manejo de errores
 - [ ] Loading states
 
 #### 5.3 UserMenu.tsx
+
 - [ ] Menú desplegable del usuario
 - [ ] Mostrar nombre y avatar
 - [ ] Opciones: Perfil, Logout
@@ -136,17 +153,20 @@ src/components/user/
 ### 6. 🧪 Testing Básico (1 hora)
 
 #### 6.1 Testing de autenticación
+
 - [ ] Probar login con Google
 - [ ] Probar login con GitHub
 - [ ] Probar login con email/password
 - [ ] Verificar logout funciona
 
 #### 6.2 Testing de protección
+
 - [ ] Verificar rutas protegidas
 - [ ] Verificar redirecciones
 - [ ] Verificar sesiones persisten
 
 #### 6.3 Testing de UI
+
 - [ ] Verificar responsive design
 - [ ] Verificar loading states
 - [ ] Verificar manejo de errores
@@ -154,15 +174,19 @@ src/components/user/
 ## 🚨 Problemas Potenciales y Soluciones
 
 ### Problema: Error en Prisma schema
+
 **Solución:** Verificar sintaxis, usar `prisma format` y `prisma validate`
 
 ### Problema: NextAuth no funciona
+
 **Solución:** Verificar variables de entorno y configuración de proveedores
 
 ### Problema: Middleware no protege rutas
+
 **Solución:** Verificar matcher patterns y configuración de NextAuth
 
 ### Problema: Errores de TypeScript
+
 **Solución:** Verificar tipos en `src/types/auth.ts` y configuración de NextAuth
 
 ## 📞 Recursos de Referencia
@@ -174,6 +198,7 @@ src/components/user/
 ## 🎯 Criterios de Éxito
 
 Al final del día deberíamos tener:
+
 - ✅ Base de datos con tablas de usuarios
 - ✅ NextAuth configurado y funcionando
 - ✅ Páginas de login/registro funcionando
@@ -191,4 +216,4 @@ Al final del día deberíamos tener:
 
 ---
 
-**¡Listo para mañana! 🚀** 
+**¡Listo para mañana! 🚀**

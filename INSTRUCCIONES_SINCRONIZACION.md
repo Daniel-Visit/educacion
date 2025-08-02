@@ -1,6 +1,7 @@
 # 🔄 Instrucciones de Sincronización - Educacion App
 
 ## 📋 Requisitos Previos
+
 - Git instalado
 - Node.js instalado
 - Acceso al repositorio: `https://github.com/Daniel-Visit/educacion.git`
@@ -57,12 +58,14 @@ npm run dev
 ## 🔧 Comandos Útiles
 
 ### Verificar el estado del repositorio
+
 ```bash
 git status
 git log --oneline -5
 ```
 
 ### Si hay conflictos
+
 ```bash
 # Ver conflictos
 git status
@@ -73,6 +76,7 @@ git commit -m "Resuelto conflicto"
 ```
 
 ### Backup manual de la base de datos actual
+
 ```bash
 # Crear backup antes de restaurar
 cp prisma/dev.db prisma/dev_backup_manual_$(date +%Y%m%d_%H%M%S).db
@@ -95,6 +99,7 @@ cp prisma/dev.db prisma/dev_backup_manual_$(date +%Y%m%d_%H%M%S).db
 ## 🆘 Solución de Problemas
 
 ### Error: "No se encontraron archivos de backup"
+
 ```bash
 # Verificar que el pull se ejecutó correctamente
 git status
@@ -102,23 +107,28 @@ git pull origin main
 ```
 
 ### Error: "Permission denied"
+
 ```bash
 # Dar permisos de ejecución al script
 chmod +x restore-database.js
 ```
 
 ### Error: "Database is locked"
+
 ```bash
 # Detener el servidor si está corriendo
 # Luego ejecutar el script de restauración
 ```
 
 ## 📞 Contacto
+
 Si tienes problemas, verifica:
+
 1. Que tienes acceso al repositorio
 2. Que Node.js está instalado correctamente
 3. Que todas las dependencias están instaladas
 
 ---
+
 **Última actualización**: $(date +%Y-%m-%d)
-**Versión del backup**: database_complete_backup_20250715_105227.db 
+**Versión del backup**: database_complete_backup_20250715_105227.db

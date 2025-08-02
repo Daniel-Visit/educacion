@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  OA, 
-  Eje, 
-  Asignatura, 
-  Nivel, 
+import {
+  OA,
+  Eje,
+  Asignatura,
+  Nivel,
   MatrizEspecificacion,
   MatrizFormState,
-  ValidationResult 
+  ValidationResult,
 } from '@/types/matrices';
 import { validateMatrizForm, calculateTotalPreguntas } from '@/utils/matrices';
 
@@ -81,7 +81,7 @@ export const useMatricesData = () => {
         fetchOAs(),
         fetchEjes(),
         fetchAsignaturas(),
-        fetchNiveles()
+        fetchNiveles(),
       ]);
       setLoading(false);
     };
@@ -98,8 +98,8 @@ export const useMatricesData = () => {
       fetchOAs,
       fetchEjes,
       fetchAsignaturas,
-      fetchNiveles
-    }
+      fetchNiveles,
+    },
   };
 };
 
@@ -114,7 +114,7 @@ export const useMatrizForm = (initialState?: Partial<MatrizFormState>) => {
     totalPreguntas: 0,
     oaIndicadores: {},
     errors: {},
-    ...initialState
+    ...initialState,
   });
 
   const updateFormState = useCallback((updates: Partial<MatrizFormState>) => {
@@ -131,16 +131,32 @@ export const useMatrizForm = (initialState?: Partial<MatrizFormState>) => {
 
   const validateForm = useCallback((): ValidationResult => {
     // Calcular valores necesarios para la validación
-    const totalPreguntasIndicadores = Object.values(formState.oaIndicadores).flat().reduce((sum, ind) => sum + (ind.preguntas || 0), 0);
-    const totalPreguntasContenido = formState.selectedOAsContenido.reduce((sum, oa) => {
-      const indicadores = formState.oaIndicadores[oa.id] || [];
-      return sum + indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0);
-    }, 0);
-    const totalPreguntasHabilidad = formState.selectedOAsHabilidad.reduce((sum, oa) => {
-      const indicadores = formState.oaIndicadores[oa.id] || [];
-      return sum + indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0);
-    }, 0);
-    const hasBothTypes = formState.selectedOAsContenido.length > 0 && formState.selectedOAsHabilidad.length > 0;
+    const totalPreguntasIndicadores = Object.values(formState.oaIndicadores)
+      .flat()
+      .reduce((sum, ind) => sum + (ind.preguntas || 0), 0);
+    const totalPreguntasContenido = formState.selectedOAsContenido.reduce(
+      (sum, oa) => {
+        const indicadores = formState.oaIndicadores[oa.id] || [];
+        return (
+          sum +
+          indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0)
+        );
+      },
+      0
+    );
+    const totalPreguntasHabilidad = formState.selectedOAsHabilidad.reduce(
+      (sum, oa) => {
+        const indicadores = formState.oaIndicadores[oa.id] || [];
+        return (
+          sum +
+          indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0)
+        );
+      },
+      0
+    );
+    const hasBothTypes =
+      formState.selectedOAsContenido.length > 0 &&
+      formState.selectedOAsHabilidad.length > 0;
 
     const errors = validateMatrizForm(
       formState.matrizName,
@@ -171,7 +187,7 @@ export const useMatrizForm = (initialState?: Partial<MatrizFormState>) => {
     updateErrors,
     clearErrors,
     validateForm,
-    updateTotalPreguntas
+    updateTotalPreguntas,
   };
 };
 
@@ -227,7 +243,7 @@ export const useMatricesList = () => {
     setCurrentPage,
     deletingId,
     fetchMatrices,
-    deleteMatriz
+    deleteMatriz,
   };
 };
 
@@ -260,6 +276,6 @@ export const useMatriz = (matrizId: number) => {
   return {
     matriz,
     loading,
-    fetchMatriz
+    fetchMatriz,
   };
-}; 
+};

@@ -26,14 +26,14 @@ export async function GET() {
 
     // Obtener los OAs relacionados manualmente
     const matricesWithOAs = await Promise.all(
-      matrices.map(async (matriz) => {
+      matrices.map(async matriz => {
         const oasWithDetails = await Promise.all(
-          matriz.oas.map(async (matrizOA) => {
+          matriz.oas.map(async matrizOA => {
             // @ts-ignore - Prisma client sync issue
             const oa = await prisma.oa.findUnique({
               where: { id: matrizOA.oaId },
             });
-            
+
             let nivel = null;
             let asignatura = null;
             if (oa) {
@@ -46,12 +46,10 @@ export async function GET() {
                 where: { id: oa.asignatura_id },
               });
             }
-            
+
             return {
               ...matrizOA,
-              oa: oa
-                ? { ...oa, nivel, asignatura }
-                : null,
+              oa: oa ? { ...oa, nivel, asignatura } : null,
             };
           })
         );
@@ -83,9 +81,19 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { nombre, total_preguntas, asignatura_id, nivel_id, oas } = body;
 
-    if (!nombre || !total_preguntas || !asignatura_id || !nivel_id || !oas || !Array.isArray(oas)) {
+    if (
+      !nombre ||
+      !total_preguntas ||
+      !asignatura_id ||
+      !nivel_id ||
+      !oas ||
+      !Array.isArray(oas)
+    ) {
       return NextResponse.json(
-        { error: 'Datos incompletos o inválidos. Se requiere nombre, total_preguntas, asignatura_id, nivel_id y oas' },
+        {
+          error:
+            'Datos incompletos o inválidos. Se requiere nombre, total_preguntas, asignatura_id, nivel_id y oas',
+        },
         { status: 400 }
       );
     }
@@ -101,7 +109,7 @@ export async function POST(request: NextRequest) {
           create: oas.map((oa: OAData) => ({
             oaId: oa.oaId,
             indicadores: {
-              create: oa.indicadores.map((indicador) => ({
+              create: oa.indicadores.map(indicador => ({
                 descripcion: indicador.descripcion,
                 preguntas: indicador.preguntas,
               })),
@@ -136,4 +144,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

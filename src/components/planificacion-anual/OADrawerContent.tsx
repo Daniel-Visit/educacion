@@ -1,6 +1,6 @@
-import FiltrosDrawer from "./FiltrosDrawer";
-import EjeSection from "./EjeSection";
-import { OA, Eje, OAClases } from "./types";
+import FiltrosDrawer from './FiltrosDrawer';
+import EjeSection from './EjeSection';
+import { OA, Eje, OAClases } from './types';
 
 interface OADrawerContentProps {
   loadingOAs: boolean;
@@ -43,9 +43,7 @@ export default function OADrawerContent({
         ejeOptions={ejeOptions}
       />
       {loadingOAs ? (
-        <div className="text-center py-8 text-gray-400">
-          Cargando OAs...
-        </div>
+        <div className="text-center py-8 text-gray-400">Cargando OAs...</div>
       ) : (
         <div className="flex flex-col gap-12">
           {ejesFiltrados.map((eje: Eje, ejeIdx: number) => (
@@ -65,4 +63,4 @@ export default function OADrawerContent({
       )}
     </div>
   );
-} 
+}

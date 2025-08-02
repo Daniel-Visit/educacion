@@ -10,7 +10,11 @@ async function main() {
   console.log('Poblando niveles desde Niveles.csv...');
   const nivelesPath = path.join(__dirname, '../Niveles.csv');
   const nivelesCSV = fs.readFileSync(nivelesPath, 'utf-8');
-  const niveles = parse(nivelesCSV, { columns: true, delimiter: ';', skip_empty_lines: true });
+  const niveles = parse(nivelesCSV, {
+    columns: true,
+    delimiter: ';',
+    skip_empty_lines: true,
+  });
   let nivelesProcesados = 0;
   for (const row of niveles) {
     if (!row['nombre']) continue;
@@ -31,7 +35,11 @@ async function main() {
   console.log('Poblando asignaturas desde Asignaturas.csv...');
   const asignaturasPath = path.join(__dirname, '../Asignaturas.csv');
   const asignaturasCSV = fs.readFileSync(asignaturasPath, 'utf-8');
-  const asignaturas = parse(asignaturasCSV, { columns: true, delimiter: ';', skip_empty_lines: true });
+  const asignaturas = parse(asignaturasCSV, {
+    columns: true,
+    delimiter: ';',
+    skip_empty_lines: true,
+  });
   let asignaturasProcesadas = 0;
   for (const row of asignaturas) {
     if (!row['nombre']) continue;
@@ -51,7 +59,11 @@ async function main() {
   console.log('Poblando solo OA desde OAS.csv...');
   const oasPath = path.join(__dirname, '../OAS.csv');
   const oasCSV = fs.readFileSync(oasPath, 'utf-8');
-  const oas = parse(oasCSV, { columns: true, delimiter: ';', skip_empty_lines: true });
+  const oas = parse(oasCSV, {
+    columns: true,
+    delimiter: ';',
+    skip_empty_lines: true,
+  });
 
   console.log('Columnas detectadas en OAS.csv:', Object.keys(oas[0] || {}));
   console.log('Total de filas en OAS.csv:', oas.length);
@@ -113,9 +125,16 @@ async function main() {
   console.log('Poblando metodologías desde metodologias.csv...');
   const metodologiasPath = path.join(__dirname, '../metodologias.csv');
   const metodologiasCSV = fs.readFileSync(metodologiasPath, 'utf-8');
-  const metodologias = parse(metodologiasCSV, { columns: true, delimiter: ';', skip_empty_lines: true });
+  const metodologias = parse(metodologiasCSV, {
+    columns: true,
+    delimiter: ';',
+    skip_empty_lines: true,
+  });
 
-  console.log('Columnas detectadas en metodologias.csv:', Object.keys(metodologias[0] || {}));
+  console.log(
+    'Columnas detectadas en metodologias.csv:',
+    Object.keys(metodologias[0] || {})
+  );
   console.log('Total de filas en metodologias.csv:', metodologias.length);
 
   let metodologiasProcessed = 0;
@@ -132,7 +151,7 @@ async function main() {
       metodologiasSkipped++;
       continue;
     }
-    
+
     try {
       await prisma.metodologia.upsert({
         where: { nombre_metodologia: row['nombre_metodologia'] },
@@ -155,47 +174,49 @@ async function main() {
       metodologiasSkipped++;
     }
   }
-  
-  console.log(`Metodologías procesadas: ${metodologiasProcessed}, saltadas: ${metodologiasSkipped}`);
+
+  console.log(
+    `Metodologías procesadas: ${metodologiasProcessed}, saltadas: ${metodologiasSkipped}`
+  );
   console.log('Seed completado.');
 
-  const contentPath = path.join(__dirname, '../src/components/tiptap-templates/simple/data/content.json');
+  const contentPath = path.join(
+    __dirname,
+    '../src/components/tiptap-templates/simple/data/content.json'
+  );
   const contentJson = fs.readFileSync(contentPath, 'utf-8');
 
   // Eliminar archivos previos de ejemplo para evitar duplicados
   await prisma.archivo.deleteMany({
     where: {
-      OR: [
-        { titulo: 'planificacion ejemplo' },
-        { titulo: 'material ejemplo' }
-      ]
-    }
+      OR: [{ titulo: 'planificacion ejemplo' }, { titulo: 'material ejemplo' }],
+    },
   });
 
   await prisma.archivo.create({
     data: {
       titulo: 'planificacion ejemplo',
       tipo: 'planificacion',
-      contenido: contentJson
-    }
+      contenido: contentJson,
+    },
   });
 
   await prisma.archivo.create({
     data: {
       titulo: 'material ejemplo',
       tipo: 'material',
-      contenido: contentJson
-    }
+      contenido: contentJson,
+    },
   });
 
   console.log('Archivos de ejemplo insertados');
 }
 
 main()
-  .catch((e) => {
+  .catch(e => {
     console.error('Error durante el seed:', e);
     process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
-  }); 
+  });

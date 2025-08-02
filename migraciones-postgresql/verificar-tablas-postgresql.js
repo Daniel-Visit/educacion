@@ -4,15 +4,15 @@ const { PrismaClient } = require('@prisma/client');
 const prismaPostgres = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.DATABASE_URL_POSTGRES
-    }
-  }
+      url: process.env.DATABASE_URL_POSTGRES,
+    },
+  },
 });
 
 async function verificarTablas() {
   try {
     console.log('🔍 VERIFICANDO TABLAS EN POSTGRESQL');
-    console.log('=' .repeat(50));
+    console.log('='.repeat(50));
 
     const tablas = await prismaPostgres.$queryRaw`
       SELECT tablename 
@@ -27,7 +27,6 @@ async function verificarTablas() {
     });
 
     console.log(`\n📊 Total tablas: ${tablas.length}`);
-
   } catch (error) {
     console.error('❌ Error:', error);
   } finally {
@@ -35,4 +34,4 @@ async function verificarTablas() {
   }
 }
 
-verificarTablas(); 
+verificarTablas();

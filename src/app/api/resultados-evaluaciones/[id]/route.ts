@@ -19,8 +19,8 @@ export async function DELETE(
     // Eliminar el resultado y todas sus relaciones (cascade)
     await prisma.resultadoEvaluacion.delete({
       where: {
-        id: resultadoId
-      }
+        id: resultadoId,
+      },
     });
 
     return NextResponse.json(
@@ -58,10 +58,10 @@ export async function GET(
         evaluacion: {
           include: {
             archivo: true,
-            matriz: true
-          }
-        }
-      }
+            matriz: true,
+          },
+        },
+      },
     });
 
     if (!resultado) {
@@ -82,12 +82,11 @@ export async function GET(
       evaluacion: {
         id: resultado.evaluacion.id,
         titulo: resultado.evaluacion.archivo.titulo,
-        matrizNombre: resultado.evaluacion.matriz.nombre
-      }
+        matrizNombre: resultado.evaluacion.matriz.nombre,
+      },
     };
 
     return NextResponse.json(resultadoFormateado);
-
   } catch (error) {
     console.error('Error fetching resultado:', error);
     return NextResponse.json(
@@ -95,4 +94,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}

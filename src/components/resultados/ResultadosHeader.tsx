@@ -20,12 +20,12 @@ export default function ResultadosHeader({
   subtitle,
   icon = <BarChart3 className="h-6 w-6 text-white" />,
   totalCount,
-  totalLabel = "Total",
+  totalLabel = 'Total',
   showBackButton = false,
-  backHref = "/resultados-evaluaciones",
+  backHref = '/resultados-evaluaciones',
   showExportButton = false,
   onExport,
-  children
+  children,
 }: ResultadosHeaderProps) {
   return (
     <div className="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl p-6 text-white shadow-lg mb-8">
@@ -38,9 +38,7 @@ export default function ResultadosHeader({
               </button>
             </Link>
           )}
-          <div className="bg-white/20 p-2 rounded-lg">
-            {icon}
-          </div>
+          <div className="bg-white/20 p-2 rounded-lg">{icon}</div>
           <div>
             <h1 className="text-2xl font-bold">{title}</h1>
             <p className="text-emerald-100 text-sm">{subtitle}</p>
@@ -59,7 +57,7 @@ export default function ResultadosHeader({
             </div>
           )}
           {showExportButton && onExport && (
-            <button 
+            <button
               onClick={onExport}
               className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 transition-colors"
             >
@@ -70,11 +68,7 @@ export default function ResultadosHeader({
         </div>
       </div>
 
-      {children && (
-        <div className="bg-white/10 rounded-lg p-4">
-          {children}
-        </div>
-      )}
+      {children && <div className="bg-white/10 rounded-lg p-4">{children}</div>}
     </div>
   );
-} 
+}

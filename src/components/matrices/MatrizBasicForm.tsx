@@ -36,9 +36,8 @@ export default function MatrizBasicForm({
   isReadOnly = false,
   className = '',
   onNext,
-  canProceed = false
+  canProceed = false,
 }: MatrizBasicFormProps) {
-
   const renderReadOnlyField = (label: string, value: string) => (
     <div className="mb-6">
       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -58,70 +57,74 @@ export default function MatrizBasicForm({
     errorKey: string
   ) => {
     const safeOptions = Array.isArray(options) ? options : [];
-    
+
     return (
-    <div className="mb-6 flex-1">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        {label}
-      </label>
-      <Listbox value={value} onChange={onChange} disabled={isReadOnly}>
-        <div className="relative min-h-[42px]">
-          <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50 disabled:cursor-not-allowed">
-            <span className="block truncate">
-              {value 
-                ? safeOptions.find(option => option.id === value)?.nombre || 'Seleccionar...'
-                : 'Seleccionar...'
-              }
-            </span>
-            <span className="absolute inset-y-0 right-0 flex items-center pr-2">
-              <ChevronsUpDown className="h-5 w-5 text-gray-400" />
-            </span>
-          </Listbox.Button>
-          {!isReadOnly && (
-            <Listbox.Options className="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-xl py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-              <Listbox.Option
-                value={null}
-                className={({ active }) =>
-                  `relative cursor-default select-none py-2 pl-3 pr-9 ${
-                    active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'
-                  }`
-                }
-              >
-                Seleccionar...
-              </Listbox.Option>
-              {safeOptions.map((option) => (
+      <div className="mb-6 flex-1">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          {label}
+        </label>
+        <Listbox value={value} onChange={onChange} disabled={isReadOnly}>
+          <div className="relative min-h-[42px]">
+            <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50 disabled:cursor-not-allowed">
+              <span className="block truncate">
+                {value
+                  ? safeOptions.find(option => option.id === value)?.nombre ||
+                    'Seleccionar...'
+                  : 'Seleccionar...'}
+              </span>
+              <span className="absolute inset-y-0 right-0 flex items-center pr-2">
+                <ChevronsUpDown className="h-5 w-5 text-gray-400" />
+              </span>
+            </Listbox.Button>
+            {!isReadOnly && (
+              <Listbox.Options className="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-xl py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
                 <Listbox.Option
-                  key={option.id}
-                  value={option.id}
+                  value={null}
                   className={({ active }) =>
                     `relative cursor-default select-none py-2 pl-3 pr-9 ${
                       active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'
                     }`
                   }
                 >
-                  {({ selected }) => (
-                    <>
-                      <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
-                        {option.nombre}
-                      </span>
-                      {selected && (
-                        <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600">
-                          <Check className="h-5 w-5" />
-                        </span>
-                      )}
-                    </>
-                  )}
+                  Seleccionar...
                 </Listbox.Option>
-              ))}
-            </Listbox.Options>
-          )}
-        </div>
-      </Listbox>
-      {errors[errorKey] && (
-        <p className="mt-1 text-sm text-red-600">{errors[errorKey]}</p>
-      )}
-    </div>
-  );
+                {safeOptions.map(option => (
+                  <Listbox.Option
+                    key={option.id}
+                    value={option.id}
+                    className={({ active }) =>
+                      `relative cursor-default select-none py-2 pl-3 pr-9 ${
+                        active
+                          ? 'bg-indigo-100 text-indigo-900'
+                          : 'text-gray-900'
+                      }`
+                    }
+                  >
+                    {({ selected }) => (
+                      <>
+                        <span
+                          className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}
+                        >
+                          {option.nombre}
+                        </span>
+                        {selected && (
+                          <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600">
+                            <Check className="h-5 w-5" />
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </Listbox.Option>
+                ))}
+              </Listbox.Options>
+            )}
+          </div>
+        </Listbox>
+        {errors[errorKey] && (
+          <p className="mt-1 text-sm text-red-600">{errors[errorKey]}</p>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -158,7 +161,7 @@ export default function MatrizBasicForm({
           />
         </div>
       </div>
-      
+
       <div className="flex flex-col md:flex-row gap-6">
         {renderSelectField(
           'Asignatura',
@@ -175,7 +178,7 @@ export default function MatrizBasicForm({
           'nivel'
         )}
       </div>
-      
+
       {onNext && (
         <div className="flex justify-end gap-4 mt-4">
           <button
@@ -189,4 +192,4 @@ export default function MatrizBasicForm({
       )}
     </div>
   );
-} 
+}

@@ -7,18 +7,21 @@ El sistema de corrección de evaluaciones permite cargar y procesar resultados d
 ## 🚀 Funcionalidades Implementadas
 
 ### 1. **Carga de Resultados**
+
 - **Formato CSV soportado**: `ID;NOMBRE;RESPUESTA;PREGUNTA`
 - **Detección automática**: Separa por punto y coma (;) o coma (,)
 - **Validación de datos**: Verifica que los datos sean válidos antes de procesar
 - **Preview en tiempo real**: Muestra las primeras 5 filas del archivo antes de cargar
 
 ### 2. **Procesamiento Automático**
+
 - **Creación de alumnos**: Genera automáticamente registros de alumnos desde el CSV
 - **Cálculo de puntuaciones**: Compara respuestas con alternativas correctas
 - **Escala de notas**: Convierte porcentajes a escala 1-7
 - **Almacenamiento estructurado**: Guarda resultados en múltiples tablas relacionadas
 
 ### 3. **Base de Datos**
+
 - **Tabla Alumno**: Almacena información de estudiantes
 - **Tabla ResultadoEvaluacion**: Registra cada carga de resultados
 - **Tabla ResultadoAlumno**: Puntuaciones individuales por alumno
@@ -45,6 +48,7 @@ src/
 ## 🗄️ Modelos de Base de Datos
 
 ### Alumno
+
 ```prisma
 model Alumno {
   id        Int      @id @default(autoincrement())
@@ -61,6 +65,7 @@ model Alumno {
 ```
 
 ### ResultadoEvaluacion
+
 ```prisma
 model ResultadoEvaluacion {
   id           Int               @id @default(autoincrement())
@@ -75,6 +80,7 @@ model ResultadoEvaluacion {
 ```
 
 ### ResultadoAlumno
+
 ```prisma
 model ResultadoAlumno {
   id                    Int                 @id @default(autoincrement())
@@ -91,6 +97,7 @@ model ResultadoAlumno {
 ```
 
 ### RespuestaAlumno
+
 ```prisma
 model RespuestaAlumno {
   id                Int             @id @default(autoincrement())
@@ -111,10 +118,12 @@ model RespuestaAlumno {
 **Propósito**: Procesa archivo CSV con resultados de evaluación
 
 **Parámetros**:
+
 - `file`: Archivo CSV (FormData)
 - `evaluacionId`: ID de la evaluación (FormData)
 
 **Formato CSV soportado**:
+
 ```csv
 ID;NOMBRE;RESPUESTA;PREGUNTA
 1;Juan Pérez;A;1
@@ -123,6 +132,7 @@ ID;NOMBRE;RESPUESTA;PREGUNTA
 ```
 
 **Respuesta exitosa**:
+
 ```json
 {
   "success": true,
@@ -137,6 +147,7 @@ ID;NOMBRE;RESPUESTA;PREGUNTA
 ```
 
 **Respuesta de error**:
+
 ```json
 {
   "error": "Formato de archivo no reconocido. Headers encontrados: id, nombre, respuesta, pregunta"
@@ -148,12 +159,14 @@ ID;NOMBRE;RESPUESTA;PREGUNTA
 ### Página Principal (/correccion-evaluaciones)
 
 **Componentes**:
+
 - **Header**: Título y estadísticas generales
 - **Selector de evaluación**: Dropdown para elegir evaluación
 - **Botón de carga**: Abre modal para subir archivo CSV
 - **Información de evaluación**: Cards con detalles de la evaluación seleccionada
 
 **Estados**:
+
 - **Sin evaluación seleccionada**: Solo muestra selector
 - **Con evaluación seleccionada**: Muestra botón de carga y detalles
 - **Sin evaluaciones**: Mensaje para crear evaluaciones primero
@@ -161,12 +174,14 @@ ID;NOMBRE;RESPUESTA;PREGUNTA
 ### Modal de Carga
 
 **Secciones**:
+
 1. **Información del formato**: Explica los formatos CSV soportados
 2. **Área de carga**: Drag & drop o click para seleccionar archivo
 3. **Preview de datos**: Tabla con las primeras 5 filas del CSV
 4. **Botones de acción**: Cancelar y Cargar Resultados
 
 **Características**:
+
 - **Responsive**: Se adapta a diferentes tamaños de pantalla
 - **Header fijo**: Permanece visible durante scroll
 - **Validación visual**: Muestra estado del archivo seleccionado
@@ -177,6 +192,7 @@ ID;NOMBRE;RESPUESTA;PREGUNTA
 ### 1. Preparar Archivo CSV
 
 **Formato requerido**:
+
 ```csv
 ID;NOMBRE;RESPUESTA;PREGUNTA
 1;Juan Pérez;A;1
@@ -185,6 +201,7 @@ ID;NOMBRE;RESPUESTA;PREGUNTA
 ```
 
 **Campos**:
+
 - `ID`: Identificador único del alumno
 - `NOMBRE`: Nombre completo del alumno
 - `RESPUESTA`: Alternativa marcada (A, B, C, D)
@@ -214,6 +231,7 @@ Los resultados se almacenan automáticamente y pueden ser consultados en la pant
 
 **Causa**: Problema en el procesamiento de datos
 **Solución**:
+
 1. Verificar que la evaluación tenga preguntas y alternativas correctas
 2. Revisar logs del servidor para detalles específicos
 3. Regenerar cliente Prisma: `npx prisma generate`
@@ -243,12 +261,14 @@ Los resultados se almacenan automáticamente y pueden ser consultados en la pant
 ## 📊 Métricas y Estadísticas
 
 ### Datos calculados automáticamente:
+
 - **Puntaje total**: Suma de respuestas correctas
 - **Puntaje máximo**: Total de preguntas respondidas
 - **Porcentaje**: (Puntaje total / Puntaje máximo) × 100
 - **Nota**: (Porcentaje / 100) × 7.0 (escala 1-7)
 
 ### Información almacenada:
+
 - **Resultados por alumno**: Puntuaciones individuales
 - **Respuestas específicas**: Cada respuesta con su corrección
 - **Metadatos**: Fecha de carga, total de alumnos, escala de notas
@@ -256,12 +276,14 @@ Los resultados se almacenan automáticamente y pueden ser consultados en la pant
 ## 🔮 Próximas Funcionalidades
 
 ### En Desarrollo:
+
 - **Visualización de resultados**: Gráficos y análisis detallado
 - **Exportación de reportes**: PDF y Excel
 - **Comparación de evaluaciones**: Análisis entre diferentes cargas
 - **Filtros avanzados**: Por alumno, pregunta, rango de notas
 
 ### Planificadas:
+
 - **Corrección manual**: Interfaz para corregir respuestas individuales
 - **Importación masiva**: Múltiples archivos simultáneos
 - **Validación avanzada**: Reglas personalizadas de validación
@@ -270,13 +292,15 @@ Los resultados se almacenan automáticamente y pueden ser consultados en la pant
 ## 📝 Notas de Desarrollo
 
 ### Consideraciones Técnicas:
+
 - **Transacciones**: Todas las operaciones de base de datos están en transacciones
 - **Validación**: Múltiples niveles de validación (frontend y backend)
 - **Performance**: Procesamiento optimizado para archivos grandes
 - **Seguridad**: Validación de tipos y sanitización de datos
 
 ### Mejores Prácticas:
+
 - **Error handling**: Manejo robusto de errores en todos los niveles
 - **Logging**: Logs detallados para debugging
 - **Testing**: Cobertura de tests para funcionalidades críticas
-- **Documentación**: Código documentado y APIs bien definidas 
+- **Documentación**: Código documentado y APIs bien definidas

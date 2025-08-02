@@ -14,24 +14,28 @@ Este documento compila todas las lecciones aprendidas durante el desarrollo de l
 ## ⚠️ Principios Fundamentales
 
 ### 1. **Preservación de Funcionalidad Existente**
+
 - **NUNCA** modificar APIs que funcionan sin testing exhaustivo
 - **SIEMPRE** verificar que el frontend reciba el formato esperado
 - **ANTES** de cambiar nombres de relaciones Prisma, verificar impacto en APIs
 - **MANTENER** compatibilidad hacia atrás en cambios de API
 
 ### 2. **Gestión de Errores Frontend**
+
 - **SIEMPRE** validar que `data` sea un array antes de usar `.map()`
 - **PROTEGER** contra errores de tipo: `Array.isArray(data) && data.map()`
 - **MANEJAR** casos edge: arrays vacíos, objetos de error, null/undefined
 - **LOGGING** para debugging: `console.log('Datos recibidos:', data)`
 
 ### 3. **Sincronización Prisma-API**
+
 - **REGENERAR** cliente Prisma después de cambios en schema: `npx prisma generate`
 - **VERIFICAR** nombres de relaciones: schema vs cliente generado
 - **TESTEAR** APIs inmediatamente después de cambios
 - **DOCUMENTAR** cambios en relaciones para futuras referencias
 
 ### 4. **Estructura de Respuestas API**
+
 - **GET endpoints** deben devolver SIEMPRE arrays (no objetos `{ data: [...] }`)
 - **Error handling** debe devolver arrays vacíos `[]` en lugar de objetos de error
 - **Consistencia** en formato de respuesta entre todos los endpoints
@@ -43,12 +47,14 @@ Este documento compila todas las lecciones aprendidas durante el desarrollo de l
 
 **Problema:** El frontend fallaba al intentar hacer `.map()` sobre datos que no eran arrays.
 
-**Causa Raíz:** 
+**Causa Raíz:**
+
 - APIs devolviendo objetos `{ data: [...] }` en lugar de arrays directos
 - Cambios en nombres de relaciones Prisma sin actualizar APIs
 - Falta de validación en el frontend
 
 **Solución Implementada:**
+
 ```typescript
 // En el frontend
 useEffect(() => {
@@ -81,20 +87,22 @@ useEffect(() => {
 **Problema:** Las APIs usaban nombres de relaciones que no coincidían con el schema.
 
 **Causa Raíz:**
+
 - Cliente Prisma generado con nombres diferentes al schema
 - Cambios en relaciones sin regenerar cliente
 - Falta de sincronización entre schema y código
 
 **Solución Implementada:**
+
 ```typescript
 // API corregida
 const evaluaciones = await prisma.evaluacion.findMany({
   include: {
-    archivo: true,        // ✅ Nombres del schema
-    matriz: true,         // ✅ Nombres del schema
-    preguntas: true       // ✅ Nombres del schema
-  }
-})
+    archivo: true, // ✅ Nombres del schema
+    matriz: true, // ✅ Nombres del schema
+    preguntas: true, // ✅ Nombres del schema
+  },
+});
 
 // Mapeo correcto
 const data = evaluaciones.map(ev => ({
@@ -103,8 +111,8 @@ const data = evaluaciones.map(ev => ({
   matrizId: ev.matrizId,
   matrizNombre: ev.matriz?.nombre || '',
   preguntasCount: ev.preguntas?.length || 0,
-  createdAt: ev.createdAt
-}))
+  createdAt: ev.createdAt,
+}));
 ```
 
 ### 3. **Estructura de Respuestas API Inconsistente**
@@ -112,15 +120,16 @@ const data = evaluaciones.map(ev => ({
 **Problema:** Algunas APIs devolvían objetos, otras arrays.
 
 **Solución Implementada:**
+
 ```typescript
 // GET endpoints SIEMPRE devuelven arrays
 export async function GET() {
   try {
     // ... lógica de obtención
-    return NextResponse.json(data) // ✅ Array directo
+    return NextResponse.json(data); // ✅ Array directo
   } catch (error) {
-    console.error('Error al obtener evaluaciones:', error)
-    return NextResponse.json([]) // ✅ Array vacío en caso de error
+    console.error('Error al obtener evaluaciones:', error);
+    return NextResponse.json([]); // ✅ Array vacío en caso de error
   }
 }
 ```
@@ -130,9 +139,10 @@ export async function GET() {
 **Problema:** Next.js 15 requiere await en params.
 
 **Solución:**
+
 ```typescript
 export async function GET({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+  const { id } = await params;
   // resto del código
 }
 ```
@@ -140,6 +150,7 @@ export async function GET({ params }: { params: Promise<{ id: string }> }) {
 ## 🔧 Lineamientos de Desarrollo
 
 ### 1. **Antes de Hacer Cambios**
+
 ```bash
 # 1. Verificar estado actual
 git status
@@ -154,6 +165,7 @@ curl http://localhost:3000/api/endpoint
 ```
 
 ### 2. **Durante el Desarrollo**
+
 ```bash
 # 1. Cambios incrementales
 # 2. Testing después de cada cambio
@@ -162,6 +174,7 @@ curl http://localhost:3000/api/endpoint
 ```
 
 ### 3. **Después de Cambios**
+
 ```bash
 # 1. Regenerar Prisma si es necesario
 npx prisma generate
@@ -176,6 +189,7 @@ npm run dev
 ## 📋 Checklists de Verificación
 
 ### Antes de Commit
+
 - [ ] Todas las APIs devuelven el formato esperado
 - [ ] Frontend maneja casos edge (arrays vacíos, errores)
 - [ ] No hay errores de console en navegador
@@ -184,12 +198,14 @@ npm run dev
 - [ ] Servidor reiniciado y probado
 
 ### Antes de Push
+
 - [ ] Tests pasan (si existen)
 - [ ] Documentación actualizada
 - [ ] Commit message descriptivo
 - [ ] Backup de cambios importantes
 
 ### Para Nuevas APIs
+
 - [ ] Verificar nombres de relaciones en schema.prisma
 - [ ] Regenerar cliente Prisma: `npx prisma generate`
 - [ ] Planificar estructura de respuesta (array vs objeto)
@@ -206,6 +222,7 @@ npm run dev
 ## 🎯 Patrones de Código
 
 ### 1. **Patrón Estándar para GET Endpoints**
+
 ```typescript
 export async function GET() {
   try {
@@ -213,61 +230,60 @@ export async function GET() {
     const data = await prisma.model.findMany({
       include: {
         // relaciones en minúscula según schema
-      }
-    })
-    
+      },
+    });
+
     // 2. Mapear a formato esperado por frontend
     const mappedData = data.map(item => ({
       id: item.id,
       // otros campos...
-    }))
-    
+    }));
+
     // 3. Devolver array directo
-    return NextResponse.json(mappedData)
+    return NextResponse.json(mappedData);
   } catch (error) {
     // 4. Log error para debugging
-    console.error('Error al obtener datos:', error)
-    
+    console.error('Error al obtener datos:', error);
+
     // 5. Devolver array vacío (no objeto de error)
-    return NextResponse.json([])
+    return NextResponse.json([]);
   }
 }
 ```
 
 ### 2. **Patrón Estándar para POST Endpoints**
+
 ```typescript
 export async function POST(request: NextRequest) {
   try {
     // 1. Validar request
-    const body = await request.json()
+    const body = await request.json();
     if (!body.requiredField) {
-      return NextResponse.json(
-        { error: 'Campo requerido' }, 
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Campo requerido' }, { status: 400 });
     }
-    
+
     // 2. Crear en base de datos
     const created = await prisma.model.create({
       data: body,
       include: {
         // relaciones necesarias
-      }
-    })
-    
+      },
+    });
+
     // 3. Devolver objeto creado
-    return NextResponse.json(created, { status: 201 })
+    return NextResponse.json(created, { status: 201 });
   } catch (error) {
-    console.error('Error al crear:', error)
+    console.error('Error al crear:', error);
     return NextResponse.json(
-      { error: 'Error interno del servidor' }, 
+      { error: 'Error interno del servidor' },
       { status: 500 }
-    )
+    );
   }
 }
 ```
 
 ### 3. **Validación de Tipos en Frontend**
+
 ```typescript
 // ✅ CORRECTO - Validación robusta
 const response = await fetch('/api/endpoint')
@@ -285,62 +301,74 @@ const arrayData = Array.isArray(data) ? data : []
 ## 🚫 Errores Comunes a Evitar
 
 ### 1. **Cambios en Relaciones Prisma**
+
 ❌ **INCORRECTO:**
+
 ```typescript
 // Cambiar nombres sin verificar impacto
 const evaluaciones = await prisma.evaluacion.findMany({
   include: {
-    Archivo: true,  // Cambió de 'archivo' a 'Archivo'
-    MatrizEspecificacion: true  // Cambió de 'matriz' a 'MatrizEspecificacion'
-  }
-})
+    Archivo: true, // Cambió de 'archivo' a 'Archivo'
+    MatrizEspecificacion: true, // Cambió de 'matriz' a 'MatrizEspecificacion'
+  },
+});
 ```
 
 ✅ **CORRECTO:**
+
 ```typescript
 // Mantener nombres del schema
 const evaluaciones = await prisma.evaluacion.findMany({
   include: {
     archivo: true,
     matriz: true,
-    preguntas: true
-  }
-})
+    preguntas: true,
+  },
+});
 ```
 
 ### 2. **Manejo de Respuestas API**
+
 ❌ **INCORRECTO:**
+
 ```typescript
 // Frontend sin validación
-const data = await res.json()
-setEvaluaciones(data)  // Puede fallar si data no es array
+const data = await res.json();
+setEvaluaciones(data); // Puede fallar si data no es array
 ```
 
 ✅ **CORRECTO:**
+
 ```typescript
 // Frontend con validación robusta
-const data = await res.json()
-const evaluacionesArray = Array.isArray(data) ? data : []
-setEvaluaciones(evaluacionesArray)
+const data = await res.json();
+const evaluacionesArray = Array.isArray(data) ? data : [];
+setEvaluaciones(evaluacionesArray);
 ```
 
 ### 3. **Renderizado sin Validación**
+
 ❌ **INCORRECTO:**
+
 ```jsx
-{evaluaciones.map((ev) => (
-  <div key={ev.id}>{ev.titulo}</div>
-))}
+{
+  evaluaciones.map(ev => <div key={ev.id}>{ev.titulo}</div>);
+}
 ```
 
 ✅ **CORRECTO:**
+
 ```jsx
-{Array.isArray(evaluaciones) && evaluaciones.map((ev) => (
-  <div key={ev.id}>{ev.titulo}</div>
-))}
+{
+  Array.isArray(evaluaciones) &&
+    evaluaciones.map(ev => <div key={ev.id}>{ev.titulo}</div>);
+}
 ```
 
 ### 4. **Inconsistencia en Formato de Respuesta**
+
 ❌ **INCORRECTO:**
+
 ```typescript
 // Inconsistente
 GET /api/evaluaciones → [{ id: 1, name: "test" }]
@@ -348,6 +376,7 @@ GET /api/matrices → { data: [{ id: 1, name: "test" }] }
 ```
 
 ✅ **CORRECTO:**
+
 ```typescript
 // Consistente
 GET /api/evaluaciones → [{ id: 1, name: "test" }]
@@ -357,17 +386,19 @@ GET /api/matrices → [{ id: 1, name: "test" }]
 ## 🔍 Troubleshooting
 
 ### Logs Útiles
+
 ```typescript
 // En el frontend
-console.log('Datos recibidos de la API:', data)
-console.log('Tipo de datos:', typeof data)
-console.log('Es array:', Array.isArray(data))
+console.log('Datos recibidos de la API:', data);
+console.log('Tipo de datos:', typeof data);
+console.log('Es array:', Array.isArray(data));
 
 // En la API
-console.error('Error al obtener evaluaciones:', error)
+console.error('Error al obtener evaluaciones:', error);
 ```
 
 ### Verificación de Schema
+
 ```bash
 # Verificar schema actual
 cat prisma/schema.prisma | grep -A 10 "model Evaluacion"
@@ -377,6 +408,7 @@ npx prisma generate
 ```
 
 ### Testing de Endpoints
+
 ```bash
 # Probar GET
 curl http://localhost:3000/api/evaluaciones
@@ -393,29 +425,35 @@ curl http://localhost:3000/api/evaluaciones | jq .
 ### Errores Críticos y Soluciones
 
 #### Error: `evaluaciones.map is not a function`
+
 **Causa:** API devuelve objeto en lugar de array
-**Solución:** 
+**Solución:**
+
 ```typescript
 // En el frontend
-const data = await res.json()
-const evaluacionesArray = Array.isArray(data) ? data : []
-setEvaluaciones(evaluacionesArray)
+const data = await res.json();
+const evaluacionesArray = Array.isArray(data) ? data : [];
+setEvaluaciones(evaluacionesArray);
 ```
 
 #### Error: `Property 'archivo' does not exist`
+
 **Causa:** Nombres de relaciones Prisma incorrectos
 **Solución:**
+
 ```bash
 npx prisma generate
 # Verificar nombres en schema.prisma
 ```
 
 #### Error: `Route used params.id without awaiting`
+
 **Causa:** Next.js 15 requiere await en params
 **Solución:**
+
 ```typescript
 export async function GET({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+  const { id } = await params;
   // resto del código
 }
 ```
@@ -423,6 +461,7 @@ export async function GET({ params }: { params: Promise<{ id: string }> }) {
 ## 📊 Estándares de Documentación
 
 ### Para Cada API
+
 - **Endpoint:** URL completa
 - **Método:** GET, POST, PUT, DELETE
 - **Parámetros:** Query params, body params
@@ -431,6 +470,7 @@ export async function GET({ params }: { params: Promise<{ id: string }> }) {
 - **Errores:** Posibles códigos de error
 
 ### Para Cada Módulo
+
 - **Lecciones aprendidas** específicas del módulo
 - **Patrones de código** utilizados
 - **Checklists** de verificación
@@ -439,12 +479,14 @@ export async function GET({ params }: { params: Promise<{ id: string }> }) {
 ## 🎯 Próximos Pasos
 
 ### Mejoras Planificadas
+
 1. **Testing automatizado** para todas las APIs
 2. **Validación de tipos** con TypeScript estricto
 3. **Documentación automática** de APIs
 4. **Monitoreo de errores** en producción
 
 ### Mantenimiento
+
 1. **Revisión periódica** de lecciones aprendidas
 2. **Actualización** de documentación
 3. **Refactoring** de código según patrones establecidos
@@ -455,4 +497,4 @@ export async function GET({ params }: { params: Promise<{ id: string }> }) {
 **Última actualización:** Julio 2025  
 **Versión:** 1.0  
 **Mantenido por:** Equipo de Desarrollo  
-**Estado:** Documentación completa de lecciones aprendidas 
+**Estado:** Documentación completa de lecciones aprendidas

@@ -7,6 +7,7 @@ La base de datos ha experimentado una **expansión significativa** con la adici�
 ## 🏗️ **ESQUEMA COMPLETO ACTUALIZADO**
 
 ### **Tablas Educativas Básicas**
+
 ```sql
 -- Asignaturas del currículum chileno
 asignatura (13 registros)
@@ -16,7 +17,7 @@ asignatura (13 registros)
 
 -- Niveles educativos
 nivel (12 registros)
-├── id: INTEGER PRIMARY KEY  
+├── id: INTEGER PRIMARY KEY
 ├── nombre: TEXT UNIQUE
 └── relaciones: matrices, alumnos, horarios, oas, profesores
 
@@ -43,6 +44,7 @@ oa (37 registros)
 ```
 
 ### **Sistema de Matrices de Especificación**
+
 ```sql
 -- Matrices de especificación
 MatrizEspecificacion
@@ -71,6 +73,7 @@ Indicador
 ```
 
 ### **Sistema de Contenido (Editor)**
+
 ```sql
 -- Archivos del editor
 Archivo
@@ -102,6 +105,7 @@ ArchivoImagen
 ```
 
 ### **Sistema de Profesores ⭐ NUEVO**
+
 ```sql
 -- Profesores
 Profesor
@@ -131,6 +135,7 @@ ProfesorNivel
 ```
 
 ### **Sistema de Horarios ⭐ NUEVO**
+
 ```sql
 -- Horarios docentes
 Horario
@@ -164,6 +169,7 @@ ModuloHorarioProfesor
 ```
 
 ### **Sistema de Planificación Anual ⭐ NUEVO**
+
 ```sql
 -- Planificaciones anuales
 PlanificacionAnual
@@ -188,6 +194,7 @@ AsignacionOA
 ```
 
 ### **Sistema de Evaluaciones**
+
 ```sql
 -- Evaluaciones
 Evaluacion
@@ -217,6 +224,7 @@ Alternativa
 ```
 
 ### **Sistema de Resultados de Evaluaciones ⭐ NUEVO**
+
 ```sql
 -- Cargas de resultados
 ResultadoEvaluacion
@@ -265,6 +273,7 @@ RespuestaAlumno
 ## 🔗 **RELACIONES COMPLETAS**
 
 ### **Diagrama de Relaciones Principales**
+
 ```
 asignatura (1) ←→ (N) oa ←→ (1) nivel
      ↑                                    ↑
@@ -300,9 +309,10 @@ Archivo (N) ←→ (N) Imagen
 ```
 
 ### **Claves Foráneas y Constraints**
+
 - **CASCADE DELETE:** ArchivoImagen, ProfesorAsignatura, ProfesorNivel, ModuloHorarioProfesor, AsignacionOA, ResultadoAlumno, RespuestaAlumno
 - **RESTRICT DELETE:** Evaluacion → Archivo, Evaluacion → MatrizEspecificacion
-- **UNIQUE Constraints:** 
+- **UNIQUE Constraints:**
   - `profesor.rut`
   - `alumno.rut`
   - `profesor_asignatura(profesorId, asignaturaId)`
@@ -313,6 +323,7 @@ Archivo (N) ←→ (N) Imagen
 ## 📈 **ESTADÍSTICAS DE LA BASE DE DATOS**
 
 ### **Conteo de Registros**
+
 ```sql
 -- Verificar datos cargados
 SELECT 'asignatura' as tabla, COUNT(*) as total FROM asignatura
@@ -329,6 +340,7 @@ SELECT 'alumno', COUNT(*) FROM alumno;
 ```
 
 **Resultado esperado:**
+
 - asignatura: 13 registros
 - nivel: 12 registros
 - metodologia: 12 registros
@@ -337,6 +349,7 @@ SELECT 'alumno', COUNT(*) FROM alumno;
 - alumno: Variable (depende de cargas de resultados)
 
 ### **Índices de Rendimiento**
+
 ```sql
 -- Índices automáticos creados por Prisma
 CREATE INDEX "alumno_nivelId_idx" ON "alumno"("nivelId");
@@ -350,22 +363,24 @@ CREATE INDEX "ResultadoEvaluacion_evaluacionId_idx" ON "ResultadoEvaluacion"("ev
 ## 🔧 **CONFIGURACIÓN DE PRISMA**
 
 ### **Cliente Prisma Configurado**
+
 ```typescript
 // src/lib/prisma.ts
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient }
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
     log: ['query', 'info', 'warn', 'error'],
-  })
+  });
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 ```
 
 ### **Variables de Entorno**
+
 ```env
 # .env
 DATABASE_URL="file:./dev.db"
@@ -374,6 +389,7 @@ DATABASE_URL="file:./dev.db"
 ## 🚀 **COMANDOS DE BASE DE DATOS**
 
 ### **Desarrollo**
+
 ```bash
 # Generar cliente Prisma
 npx prisma generate
@@ -389,6 +405,7 @@ npx prisma migrate dev --name nombre_migracion
 ```
 
 ### **Producción**
+
 ```bash
 # Aplicar migraciones en producción
 npx prisma migrate deploy
@@ -400,9 +417,10 @@ npx prisma generate
 ## 📊 **CONSULTAS ÚTILES**
 
 ### **Consultas de Verificación**
+
 ```sql
 -- Verificar integridad de datos educativos
-SELECT 
+SELECT
   a.nombre as asignatura,
   n.nombre as nivel,
   COUNT(o.id) as total_oas
@@ -413,7 +431,7 @@ GROUP BY a.id, n.id
 ORDER BY a.nombre, n.nombre;
 
 -- Ver horarios por profesor
-SELECT 
+SELECT
   p.nombre as profesor,
   h.nombre as horario,
   a.nombre as asignatura,
@@ -428,7 +446,7 @@ GROUP BY p.id, h.id
 ORDER BY p.nombre, h.nombre;
 
 -- Ver resultados de evaluaciones
-SELECT 
+SELECT
   re.nombre as carga_resultados,
   e.archivoId,
   re.totalAlumnos,
@@ -442,17 +460,18 @@ ORDER BY re.fechaCarga DESC;
 ```
 
 ### **Consultas de Mantenimiento**
+
 ```sql
 -- Limpiar imágenes huérfanas
-DELETE FROM Imagen 
+DELETE FROM Imagen
 WHERE id NOT IN (SELECT imagenId FROM ArchivoImagen);
 
 -- Verificar archivos sin imágenes
-SELECT * FROM Archivo 
+SELECT * FROM Archivo
 WHERE id NOT IN (SELECT archivoId FROM ArchivoImagen);
 
 -- Estadísticas de uso por módulo
-SELECT 
+SELECT
   DATE(createdAt) as fecha,
   COUNT(*) as archivos_creados
 FROM Archivo
@@ -460,7 +479,7 @@ GROUP BY DATE(createdAt)
 ORDER BY fecha DESC;
 
 -- Verificar integridad de horarios
-SELECT 
+SELECT
   h.nombre as horario,
   COUNT(mh.id) as modulos,
   COUNT(DISTINCT mhp.profesorId) as profesores_asignados
@@ -474,6 +493,7 @@ HAVING modulos = 0 OR profesores_asignados = 0;
 ## 🔒 **SEGURIDAD Y RESPALDO**
 
 ### **Respaldo Automático**
+
 ```bash
 # Crear respaldo con timestamp
 cp prisma/dev.db prisma/dev_backup_$(date +%Y%m%d_%H%M%S).db
@@ -483,6 +503,7 @@ ls -la prisma/*.db
 ```
 
 ### **Validaciones de Integridad**
+
 ```sql
 -- Verificar claves foráneas
 PRAGMA foreign_key_check;
@@ -492,6 +513,7 @@ PRAGMA integrity_check;
 ```
 
 ### **Límites de Tamaño**
+
 - **Archivos:** Máximo 10MB por archivo
 - **Imágenes:** Máximo 5MB por imagen
 - **Base de datos:** Sin límite práctico (SQLite)
@@ -499,6 +521,7 @@ PRAGMA integrity_check;
 ## 📈 **OPTIMIZACIÓN**
 
 ### **Índices Recomendados**
+
 ```sql
 -- Índices para mejorar rendimiento
 CREATE INDEX idx_oa_nivel_asignatura ON oa(nivel_id, asignatura_id);
@@ -511,6 +534,7 @@ CREATE INDEX idx_resultado_evaluacion_fecha ON ResultadoEvaluacion(fechaCarga);
 ```
 
 ### **Configuración de SQLite**
+
 ```sql
 -- Optimizaciones de rendimiento
 PRAGMA journal_mode = WAL;
@@ -524,6 +548,7 @@ PRAGMA temp_store = MEMORY;
 ### **Problemas Comunes**
 
 1. **Error de migración:**
+
 ```bash
 # Resetear base de datos
 npx prisma migrate reset
@@ -531,18 +556,21 @@ npx prisma db push
 ```
 
 2. **Cliente Prisma desactualizado:**
+
 ```bash
 # Regenerar cliente
 npx prisma generate
 ```
 
 3. **Datos corruptos:**
+
 ```bash
 # Restaurar desde respaldo
 cp prisma/dev_backup_YYYYMMDD_HHMMSS.db prisma/dev.db
 ```
 
 ### **Logs de Debug**
+
 ```bash
 # Ver logs de Prisma
 DEBUG=prisma:* npm run dev
@@ -568,4 +596,4 @@ npx prisma studio
 
 **Última actualización:** Julio 2025  
 **Versión de base de datos:** 3.0 (Sistema completo)  
-**Mantenido por:** Equipo de Desarrollo 
+**Mantenido por:** Equipo de Desarrollo

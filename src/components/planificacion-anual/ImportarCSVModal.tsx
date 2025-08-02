@@ -1,21 +1,26 @@
-"use client";
-import { useState, useRef } from "react";
+'use client';
+import { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { LoadingState, ErrorState, ModalHeader, SuccessState } from '@/components/resultados';
+import {
+  LoadingState,
+  ErrorState,
+  ModalHeader,
+  SuccessState,
+} from '@/components/resultados';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import SecondaryButton from '@/components/ui/SecondaryButton';
-import { 
-  CloudUpload, 
-  FileText, 
-  CheckCircle2, 
-  AlertTriangle, 
+import {
+  CloudUpload,
+  FileText,
+  CheckCircle2,
+  AlertTriangle,
   X,
   Download,
   Info,
   Calendar,
-  BarChart3
+  BarChart3,
 } from 'lucide-react';
 
 interface ImportarCSVModalProps {
@@ -25,15 +30,15 @@ interface ImportarCSVModalProps {
   loading?: boolean;
 }
 
-export default function ImportarCSVModal({ 
-  isOpen, 
-  onClose, 
-  onImport, 
-  loading = false 
+export default function ImportarCSVModal({
+  isOpen,
+  onClose,
+  onImport,
+  loading = false,
 }: ImportarCSVModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string[]>([]);
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,26 +47,29 @@ export default function ImportarCSVModal({
 
     // Validar que sea un archivo CSV
     if (!selectedFile.name.toLowerCase().endsWith('.csv')) {
-      setError("Por favor selecciona un archivo CSV válido");
+      setError('Por favor selecciona un archivo CSV válido');
       setFile(null);
       setPreview([]);
       return;
     }
 
-    setError("");
+    setError('');
     setFile(selectedFile);
 
     // Leer y previsualizar el archivo
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = event => {
       const content = event.target?.result as string;
       const lines = content.split('\n').filter(line => line.trim());
-      
+
       // Ignorar la primera fila (header) y extraer la primera columna (nombres de OA)
-      const oas = lines.slice(1).map(line => {
-        const columns = line.split(',');
-        return columns[0]?.trim() || '';
-      }).filter(oa => oa.length > 0);
+      const oas = lines
+        .slice(1)
+        .map(line => {
+          const columns = line.split(',');
+          return columns[0]?.trim() || '';
+        })
+        .filter(oa => oa.length > 0);
 
       setPreview(oas);
     };
@@ -76,9 +84,9 @@ export default function ImportarCSVModal({
   const handleClose = () => {
     setFile(null);
     setPreview([]);
-    setError("");
+    setError('');
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = '';
     }
     onClose();
   };
@@ -95,16 +103,30 @@ export default function ImportarCSVModal({
                 <CloudUpload className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Importar Planificación CSV</h2>
-                <p className="text-indigo-100 text-sm">Carga tu planificación desde un archivo CSV</p>
+                <h2 className="text-xl font-bold text-white">
+                  Importar Planificación CSV
+                </h2>
+                <p className="text-indigo-100 text-sm">
+                  Carga tu planificación desde un archivo CSV
+                </p>
               </div>
             </div>
             <button
               onClick={handleClose}
               className="text-white/80 hover:text-white hover:bg-white/20 rounded-full p-2 transition-colors"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -115,9 +137,16 @@ export default function ImportarCSVModal({
           <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-blue-200 rounded-lg p-4">
             <h3 className="font-semibold text-blue-800 mb-2">Instrucciones:</h3>
             <ul className="text-blue-700 text-sm space-y-1">
-              <li>• El archivo debe ser un CSV con los nombres de los OA en la primera columna</li>
-              <li>• La primera fila será ignorada (se considera como header)</li>
-              <li>• Los OA se asignarán secuencialmente según el horario activo</li>
+              <li>
+                • El archivo debe ser un CSV con los nombres de los OA en la
+                primera columna
+              </li>
+              <li>
+                • La primera fila será ignorada (se considera como header)
+              </li>
+              <li>
+                • Los OA se asignarán secuencialmente según el horario activo
+              </li>
               <li>• No es necesario incluir todos los OA del sistema</li>
               <li>• Se crearán clases automáticamente con los OA importados</li>
             </ul>
@@ -140,7 +169,9 @@ export default function ImportarCSVModal({
               {file ? (
                 <div className="flex flex-col items-center space-y-1">
                   <span className="text-gray-700 font-medium">{file.name}</span>
-                  <span className="text-gray-500 text-sm">Haz clic para cambiar archivo</span>
+                  <span className="text-gray-500 text-sm">
+                    Haz clic para cambiar archivo
+                  </span>
                 </div>
               ) : (
                 <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent font-semibold">
@@ -166,7 +197,10 @@ export default function ImportarCSVModal({
               <div className="max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
                 <div className="space-y-1">
                   {preview.slice(0, 10).map((oa, index) => (
-                    <div key={index} className="text-sm text-gray-600 py-1 px-2 bg-white rounded border">
+                    <div
+                      key={index}
+                      className="text-sm text-gray-600 py-1 px-2 bg-white rounded border"
+                    >
                       {index + 1}. {oa}
                     </div>
                   ))}
@@ -183,10 +217,7 @@ export default function ImportarCSVModal({
 
         {/* Footer */}
         <div className="flex justify-end gap-3 p-6 pt-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
-          <SecondaryButton
-            onClick={handleClose}
-            disabled={loading}
-          >
+          <SecondaryButton onClick={handleClose} disabled={loading}>
             Cancelar
           </SecondaryButton>
           <PrimaryButton
@@ -195,10 +226,10 @@ export default function ImportarCSVModal({
             className="flex items-center gap-2"
           >
             <CloudUpload className="w-4 h-4" />
-            {loading ? "Importando..." : "Importar Planificación"}
+            {loading ? 'Importando...' : 'Importar Planificación'}
           </PrimaryButton>
         </div>
       </div>
     </div>
   );
-} 
+}

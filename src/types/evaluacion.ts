@@ -27,5 +27,7 @@ export interface EvaluacionFormData {
   matrizId: number | null;
   contenido: any;
   respuestasCorrectas: { [preguntaNumero: number]: string };
-  indicadoresAsignados: { [preguntaNumero: number]: { contenido?: number; habilidad?: number } };
-} 
+  indicadoresAsignados: {
+    [preguntaNumero: number]: { contenido?: number; habilidad?: number };
+  };
+}

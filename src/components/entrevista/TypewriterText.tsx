@@ -1,5 +1,5 @@
-"use client";
-import React, { useState, useEffect } from "react";
+'use client';
+import React, { useState, useEffect } from 'react';
 
 type Props = {
   text: string;
@@ -7,14 +7,18 @@ type Props = {
   className?: string;
 };
 
-export default function TypewriterText({ text, active = true, className = "" }: Props) {
-  const [displayed, setDisplayed] = useState("");
+export default function TypewriterText({
+  text,
+  active = true,
+  className = '',
+}: Props) {
+  const [displayed, setDisplayed] = useState('');
   useEffect(() => {
     if (!active) {
       setDisplayed(text);
       return;
     }
-    setDisplayed("");
+    setDisplayed('');
     let i = 0;
     const interval = setInterval(() => {
       setDisplayed(text.slice(0, i + 1));
@@ -24,4 +28,4 @@ export default function TypewriterText({ text, active = true, className = "" }: 
     return () => clearInterval(interval);
   }, [text, active]);
   return <span className={className}>{displayed}</span>;
-} 
+}

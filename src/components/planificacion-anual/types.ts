@@ -20,4 +20,4 @@ export interface Eje {
 
 export interface OAClases {
   [oasId: string]: number;
-} 
+}

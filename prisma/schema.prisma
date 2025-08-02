@@ -395,6 +395,8 @@ model User {
   role          String    @default("user")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  password            String?   // Hash de contraseña
+  forcePasswordChange Boolean   @default(false)   // Forzar cambio de contraseña
   accounts      Account[]
   sessions      Session[]
   planificaciones PlanificacionAnual[]

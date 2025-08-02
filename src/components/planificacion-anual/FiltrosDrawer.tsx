@@ -1,5 +1,5 @@
-import Dropdown from "@/components/entrevista/Dropdown";
-import { Switch } from "@headlessui/react";
+import Dropdown from '@/components/entrevista/Dropdown';
+import { Switch } from '@headlessui/react';
 
 interface FiltrosDrawerProps {
   selectedEjeId: string;
@@ -45,4 +45,4 @@ export default function FiltrosDrawer({
       </div>
     </div>
   );
-} 
+}

@@ -1,6 +1,6 @@
-"use client";
-import React, { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+'use client';
+import React, { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   InterviewCard,
   Summary,
@@ -9,8 +9,8 @@ import {
   steps,
   preguntas,
   alternativas,
-  preguntaToStep
-} from "@/components/entrevista";
+  preguntaToStep,
+} from '@/components/entrevista';
 
 function EntrevistaContent() {
   const searchParams = useSearchParams();
@@ -31,7 +31,7 @@ function EntrevistaContent() {
   } = useInterview(preguntas, initialStep);
 
   // Saber si el paso es tipo S
-  const isTypeS = steps[step]?.tipo === "S";
+  const isTypeS = steps[step]?.tipo === 'S';
 
   return (
     <>
@@ -50,12 +50,12 @@ function EntrevistaContent() {
             </p>
           </div>
         </div>
-        
+
         {/* Indicador de progreso */}
         <div className="ml-auto flex items-center gap-4">
           <div className="flex items-center gap-2">
             <div className="w-32 bg-gray-200 rounded-full h-2">
-              <div 
+              <div
                 className="bg-gradient-to-r from-purple-400 to-indigo-400 h-2 rounded-full transition-all duration-500"
                 style={{ width: `${((step + 1) / steps.length) * 100}%` }}
               ></div>
@@ -112,4 +112,4 @@ export default function Entrevista() {
       <EntrevistaContent />
     </Suspense>
   );
-} 
+}
