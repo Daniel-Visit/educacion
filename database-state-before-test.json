@@ -1,0 +1,60 @@
+{
+  "timestamp": "2025-08-03T01:28:44.567Z",
+  "user": {
+    "id": "cmdutcv2c0000543btrwqo6oz",
+    "email": "daniel.hernandez@hyh.cl",
+    "name": "Daniel Hernández",
+    "role": "user",
+    "forcePasswordChange": true,
+    "password": "$2b$12$8XGsK15pcAXp8Kg2nsvSYO8fxnwTdhjTLJX22CIROf1p/8QUVF43.",
+    "createdAt": "2025-08-02T22:17:54.756Z",
+    "updatedAt": "2025-08-02T23:33:46.683Z"
+  },
+  "accounts": [
+    {
+      "id": "cmdutn2qg000154zhp6dlb60s",
+      "provider": "google",
+      "providerAccountId": "111718536956929922325",
+      "type": "oidc"
+    }
+  ],
+  "tokens": [],
+  "sessions": [
+    {
+      "id": "cmduu4aie000354zhmlxm6px4",
+      "sessionToken": "2d52775e-4cc4-45ac-945f-85ca314a8ccf",
+      "expires": "2025-09-01T22:39:14.483Z"
+    },
+    {
+      "id": "cmduvrabp000554zhaeyf1lq9",
+      "sessionToken": "f93b4b40-4713-456d-9ab0-02db52bdf190",
+      "expires": "2025-09-01T23:25:06.945Z"
+    },
+    {
+      "id": "cmduw33gx000754zhnmlvie4j",
+      "sessionToken": "7d3d26e4-ff47-4d3c-864d-d09c4e13ad2c",
+      "expires": "2025-09-01T23:34:17.935Z"
+    },
+    {
+      "id": "cmduw8rr7000954zhkb3hmly6",
+      "sessionToken": "7ad6ffa7-0f66-4202-8ef6-6675a940f2f1",
+      "expires": "2025-09-01T23:38:42.689Z"
+    },
+    {
+      "id": "cmduzev4k000154e9pvytj2a7",
+      "sessionToken": "2e36c05f-cb63-483f-8e1e-eabc302ea1fd",
+      "expires": "2025-09-02T01:07:25.840Z"
+    },
+    {
+      "id": "cmduzoibl000354e9s4gsrwt4",
+      "sessionToken": "64e0959d-65c9-4f4b-a62b-1b85343a05b4",
+      "expires": "2025-09-02T01:14:55.806Z"
+    }
+  ],
+  "summary": {
+    "userExists": true,
+    "oauthAccounts": 1,
+    "tokens": 0,
+    "sessions": 6
+  }
+}

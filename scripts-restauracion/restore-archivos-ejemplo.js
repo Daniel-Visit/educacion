@@ -7,8 +7,11 @@ const prisma = new PrismaClient();
 async function restoreArchivosEjemplo() {
   try {
     console.log('=== Restaurando archivos de ejemplo ===');
-    
-    const contentPath = path.join(__dirname, 'src/components/tiptap-templates/simple/data/content.json');
+
+    const contentPath = path.join(
+      __dirname,
+      'src/components/tiptap-templates/simple/data/content.json'
+    );
     const contentJson = fs.readFileSync(contentPath, 'utf-8');
 
     // Eliminar archivos previos de ejemplo para evitar duplicados
@@ -16,9 +19,9 @@ async function restoreArchivosEjemplo() {
       where: {
         OR: [
           { titulo: 'planificacion ejemplo' },
-          { titulo: 'material ejemplo' }
-        ]
-      }
+          { titulo: 'material ejemplo' },
+        ],
+      },
     });
 
     // Crear archivo de planificación ejemplo
@@ -26,8 +29,8 @@ async function restoreArchivosEjemplo() {
       data: {
         titulo: 'planificacion ejemplo',
         tipo: 'planificacion',
-        contenido: contentJson
-      }
+        contenido: contentJson,
+      },
     });
 
     // Crear archivo de material ejemplo
@@ -35,8 +38,8 @@ async function restoreArchivosEjemplo() {
       data: {
         titulo: 'material ejemplo',
         tipo: 'material',
-        contenido: contentJson
-      }
+        contenido: contentJson,
+      },
     });
 
     console.log('✅ Archivos de ejemplo restaurados correctamente');
@@ -47,4 +50,4 @@ async function restoreArchivosEjemplo() {
   }
 }
 
-restoreArchivosEjemplo(); 
+restoreArchivosEjemplo();

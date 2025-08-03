@@ -7,13 +7,13 @@ export async function GET(request: NextRequest) {
     // @ts-ignore - Prisma client sync issue
     const asignaturas = await prisma.asignatura.findMany({
       orderBy: {
-        nombre: 'asc'
-      }
+        nombre: 'asc',
+      },
     });
 
     return NextResponse.json({
       data: asignaturas,
-      message: 'Asignaturas obtenidas correctamente'
+      message: 'Asignaturas obtenidas correctamente',
     });
   } catch (error) {
     console.error('Error al obtener asignaturas:', error);
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     // Verificar si la asignatura ya existe
     // @ts-ignore - Prisma client sync issue
     const asignaturaExistente = await prisma.asignatura.findUnique({
-      where: { nombre }
+      where: { nombre },
     });
 
     if (asignaturaExistente) {
@@ -54,14 +54,17 @@ export async function POST(request: NextRequest) {
     // @ts-ignore - Prisma client sync issue
     const asignatura = await prisma.asignatura.create({
       data: {
-        nombre
-      }
+        nombre,
+      },
     });
 
-    return NextResponse.json({
-      data: asignatura,
-      message: 'Asignatura creada correctamente'
-    }, { status: 201 });
+    return NextResponse.json(
+      {
+        data: asignatura,
+        message: 'Asignatura creada correctamente',
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Error al crear asignatura:', error);
     return NextResponse.json(
@@ -69,4 +72,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

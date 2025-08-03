@@ -3,12 +3,14 @@
 ## 📋 Estado Actual
 
 ### ✅ Ya implementado:
+
 - NextAuth.js configurado en `src/lib/auth.ts`
 - Proveedores: Google, GitHub, Credentials
 - Configuración básica de callbacks y sesiones
 - Rutas configuradas: `/auth/signin`, `/auth/signup`
 
 ### 🔄 Pendiente por implementar:
+
 - Tablas de usuarios en Prisma
 - Páginas de autenticación
 - Componentes de UI
@@ -29,11 +31,11 @@ model User {
   role          String    @default("user") // "admin", "profesor", "user"
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  
+
   accounts      Account[]
   sessions      Session[]
   planificaciones PlanificacionAnual[] // Relación con planificaciones existentes
-  
+
   @@map("users")
 }
 
@@ -78,6 +80,7 @@ model VerificationToken {
 ```
 
 ### Modificaciones a tablas existentes:
+
 ```prisma
 model PlanificacionAnual {
   // ... campos existentes ...
@@ -89,6 +92,7 @@ model PlanificacionAnual {
 ## 📱 Pantallas a Crear
 
 ### 1. Autenticación (`/src/app/auth/`)
+
 ```
 /auth/
 ├── signin/
@@ -104,6 +108,7 @@ model PlanificacionAnual {
 ```
 
 ### 2. Perfil de Usuario (`/src/app/profile/`)
+
 ```
 /profile/
 ├── page.tsx              # Perfil principal
@@ -114,6 +119,7 @@ model PlanificacionAnual {
 ```
 
 ### 3. Administración (`/src/app/admin/`)
+
 ```
 /admin/
 ├── users/
@@ -127,6 +133,7 @@ model PlanificacionAnual {
 ## 🧩 Componentes a Crear
 
 ### 1. Componentes de Autenticación (`/src/components/auth/`)
+
 ```
 auth/
 ├── LoginForm.tsx         # Formulario de login
@@ -138,6 +145,7 @@ auth/
 ```
 
 ### 2. Componentes de Usuario (`/src/components/user/`)
+
 ```
 user/
 ├── UserMenu.tsx          # Menú desplegable del usuario
@@ -147,6 +155,7 @@ user/
 ```
 
 ### 3. Componentes de Administración (`/src/components/admin/`)
+
 ```
 admin/
 ├── UsersTable.tsx        # Tabla de usuarios
@@ -158,6 +167,7 @@ admin/
 ## 🔧 Configuración Técnica
 
 ### 1. Variables de Entorno (`.env`)
+
 ```env
 # NextAuth
 NEXTAUTH_URL=http://localhost:3000
@@ -180,8 +190,9 @@ EMAIL_FROM=noreply@yourdomain.com
 ```
 
 ### 2. Middleware (`/src/middleware.ts`)
+
 ```typescript
-import { withAuth } from "next-auth/middleware"
+import { withAuth } from 'next-auth/middleware';
 
 export default withAuth(
   function middleware(req) {
@@ -189,50 +200,51 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token
+      authorized: ({ token }) => !!token,
     },
   }
-)
+);
 
 export const config = {
   matcher: [
-    "/planificacion-anual/:path*",
-    "/matrices/:path*",
-    "/evaluaciones/:path*",
-    "/admin/:path*",
-    "/profile/:path*"
-  ]
-}
+    '/planificacion-anual/:path*',
+    '/matrices/:path*',
+    '/evaluaciones/:path*',
+    '/admin/:path*',
+    '/profile/:path*',
+  ],
+};
 ```
 
 ### 3. Tipos TypeScript (`/src/types/auth.ts`)
-```typescript
-import "next-auth"
 
-declare module "next-auth" {
+```typescript
+import 'next-auth';
+
+declare module 'next-auth' {
   interface Session {
     user: {
-      id: string
-      name?: string | null
-      email?: string | null
-      image?: string | null
-      role: string
-    }
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+      role: string;
+    };
   }
 
   interface User {
-    id: string
-    name?: string | null
-    email?: string | null
-    image?: string | null
-    role: string
+    id: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    role: string;
   }
 }
 
-declare module "next-auth/jwt" {
+declare module 'next-auth/jwt' {
   interface JWT {
-    id: string
-    role: string
+    id: string;
+    role: string;
   }
 }
 ```
@@ -240,6 +252,7 @@ declare module "next-auth/jwt" {
 ## 📋 Checklist de Implementación
 
 ### Día 1: Base de Datos y Configuración
+
 - [ ] Agregar tablas de usuarios al schema de Prisma
 - [ ] Ejecutar `prisma db push`
 - [ ] Configurar variables de entorno
@@ -247,6 +260,7 @@ declare module "next-auth/jwt" {
 - [ ] Configurar tipos TypeScript
 
 ### Día 2: Páginas de Autenticación
+
 - [ ] Crear página `/auth/signin`
 - [ ] Crear página `/auth/signup`
 - [ ] Crear página `/auth/forgot-password`
@@ -254,6 +268,7 @@ declare module "next-auth/jwt" {
 - [ ] Crear página `/auth/verify-email`
 
 ### Día 3: Componentes de UI
+
 - [ ] Crear `LoginForm.tsx`
 - [ ] Crear `RegisterForm.tsx`
 - [ ] Crear `ForgotPasswordForm.tsx`
@@ -261,6 +276,7 @@ declare module "next-auth/jwt" {
 - [ ] Crear `AuthGuard.tsx`
 
 ### Día 4: Integración
+
 - [ ] Integrar autenticación en dashboard
 - [ ] Modificar sidebar para mostrar usuario
 - [ ] Proteger rutas sensibles
@@ -268,6 +284,7 @@ declare module "next-auth/jwt" {
 - [ ] Testing básico
 
 ### Día 5: Funcionalidades Avanzadas
+
 - [ ] Implementar recuperación de contraseña
 - [ ] Implementar verificación de email
 - [ ] Crear página de perfil
@@ -275,6 +292,7 @@ declare module "next-auth/jwt" {
 - [ ] Testing completo
 
 ### Día 6: Administración
+
 - [ ] Crear panel de administración
 - [ ] Implementar gestión de usuarios
 - [ ] Implementar roles y permisos
@@ -282,6 +300,7 @@ declare module "next-auth/jwt" {
 - [ ] Testing de administración
 
 ### Día 7: Pulido y Deploy
+
 - [ ] Testing final completo
 - [ ] Optimización de performance
 - [ ] Documentación de uso
@@ -291,16 +310,19 @@ declare module "next-auth/jwt" {
 ## 🎯 Prioridades
 
 ### Alta Prioridad (Días 1-3)
+
 1. Base de datos y configuración
 2. Páginas básicas de autenticación
 3. Componentes esenciales de UI
 
 ### Media Prioridad (Días 4-5)
+
 1. Integración con funcionalidades existentes
 2. Funcionalidades de recuperación de contraseña
 3. Perfil de usuario
 
 ### Baja Prioridad (Días 6-7)
+
 1. Panel de administración
 2. Analytics
 3. Optimizaciones avanzadas
@@ -308,18 +330,21 @@ declare module "next-auth/jwt" {
 ## 🚨 Consideraciones Importantes
 
 ### Seguridad
+
 - Usar HTTPS en producción
 - Implementar rate limiting
 - Validar todas las entradas de usuario
 - Usar tokens seguros para reset de contraseña
 
 ### UX/UI
+
 - Mantener consistencia con el diseño actual
 - Implementar loading states
 - Manejar errores de forma amigable
 - Hacer responsive design
 
 ### Performance
+
 - Lazy loading de componentes
 - Optimizar queries de base de datos
 - Implementar caching donde sea apropiado
@@ -333,4 +358,4 @@ declare module "next-auth/jwt" {
 
 ---
 
-**Nota**: Este plan es flexible y puede ajustarse según las necesidades y prioridades del proyecto. 
+**Nota**: Este plan es flexible y puede ajustarse según las necesidades y prioridades del proyecto.

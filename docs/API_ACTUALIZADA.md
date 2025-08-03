@@ -9,68 +9,71 @@ La plataforma cuenta con **13 APIs principales** que cubren todos los aspectos d
 ### ⚠️ **PRINCIPIOS FUNDAMENTALES (NO VIOLAR)**
 
 #### 1. **Estructura de Respuestas Consistente**
+
 **Regla de Oro:** Los endpoints GET deben devolver SIEMPRE arrays directos, nunca objetos.
 
 ```typescript
 // ✅ CORRECTO - GET devuelve array directo
 export async function GET() {
   try {
-    const data = await getData()
-    return NextResponse.json(data) // Array directo
+    const data = await getData();
+    return NextResponse.json(data); // Array directo
   } catch (error) {
-    console.error('Error:', error)
-    return NextResponse.json([]) // Array vacío en error
+    console.error('Error:', error);
+    return NextResponse.json([]); // Array vacío en error
   }
 }
 
 // ❌ INCORRECTO - GET devuelve objeto
 export async function GET() {
   try {
-    const data = await getData()
-    return NextResponse.json({ data: data }) // Objeto con data
+    const data = await getData();
+    return NextResponse.json({ data: data }); // Objeto con data
   } catch (error) {
-    return NextResponse.json({ error: 'Error' }) // Objeto de error
+    return NextResponse.json({ error: 'Error' }); // Objeto de error
   }
 }
 ```
 
 #### 2. **Manejo de Errores Frontend-Friendly**
+
 **Regla:** Los errores no deben romper el frontend, deben devolver arrays vacíos.
 
 ```typescript
 // ✅ CORRECTO - Error handling que no rompe frontend
 export async function GET() {
   try {
-    const data = await getData()
-    return NextResponse.json(data)
+    const data = await getData();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error('Error al obtener datos:', error)
-    return NextResponse.json([]) // Array vacío, no objeto de error
+    console.error('Error al obtener datos:', error);
+    return NextResponse.json([]); // Array vacío, no objeto de error
   }
 }
 ```
 
 #### 3. **Nombres de Relaciones Prisma**
+
 **Regla:** Usar SIEMPRE los nombres exactos del schema, no los generados por el cliente.
 
 ```typescript
 // ✅ CORRECTO - Nombres del schema
 const evaluaciones = await prisma.evaluacion.findMany({
   include: {
-    archivo: true,        // Del schema
-    matriz: true,         // Del schema
-    preguntas: true       // Del schema
-  }
-})
+    archivo: true, // Del schema
+    matriz: true, // Del schema
+    preguntas: true, // Del schema
+  },
+});
 
 // ❌ INCORRECTO - Nombres del cliente generado
 const evaluaciones = await prisma.evaluacion.findMany({
   include: {
-    Archivo: true,        // Del cliente generado
-    MatrizEspecificacion: true,  // Del cliente generado
-    Pregunta: true        // Del cliente generado
-  }
-})
+    Archivo: true, // Del cliente generado
+    MatrizEspecificacion: true, // Del cliente generado
+    Pregunta: true, // Del cliente generado
+  },
+});
 ```
 
 ## 📁 **ESTRUCTURA COMPLETA DE APIS**
@@ -118,6 +121,7 @@ src/app/api/
 ## 🔧 **CONFIGURACIÓN BASE**
 
 ### **Headers Comunes**
+
 ```typescript
 {
   'Content-Type': 'application/json',
@@ -126,6 +130,7 @@ src/app/api/
 ```
 
 ### **Respuestas de Error**
+
 ```typescript
 {
   error: string,
@@ -135,6 +140,7 @@ src/app/api/
 ```
 
 ### **Respuestas de Éxito**
+
 ```typescript
 {
   data: any,
@@ -146,9 +152,11 @@ src/app/api/
 ## 📁 **APIs de Archivos**
 
 ### **GET `/api/archivos`**
+
 Obtiene todos los archivos, opcionalmente filtrados por tipo.
 
 **Query Parameters:**
+
 ```typescript
 {
   tipo?: 'planificacion' | 'material' | 'evaluacion'
@@ -156,6 +164,7 @@ Obtiene todos los archivos, opcionalmente filtrados por tipo.
 ```
 
 **Response:**
+
 ```typescript
 {
   id: number
@@ -168,35 +177,40 @@ Obtiene todos los archivos, opcionalmente filtrados por tipo.
 ```
 
 **Ejemplo:**
+
 ```bash
 GET /api/archivos?tipo=planificacion
 ```
 
 ### **POST `/api/archivos`**
+
 Crea un nuevo archivo.
 
 **Request Body:**
+
 ```typescript
 {
-  titulo: string
-  tipo: 'planificacion' | 'material' | 'evaluacion'
-  contenido: string // JSON de TipTap
+  titulo: string;
+  tipo: 'planificacion' | 'material' | 'evaluacion';
+  contenido: string; // JSON de TipTap
 }
 ```
 
 **Response:**
+
 ```typescript
 {
-  id: number
-  titulo: string
-  tipo: string
-  contenido: string
-  createdAt: string
-  updatedAt: string
+  id: number;
+  titulo: string;
+  tipo: string;
+  contenido: string;
+  createdAt: string;
+  updatedAt: string;
 }
 ```
 
 **Ejemplo:**
+
 ```bash
 POST /api/archivos
 Content-Type: application/json
@@ -209,9 +223,11 @@ Content-Type: application/json
 ```
 
 ### **PUT `/api/archivos/[id]`**
+
 Actualiza un archivo existente.
 
 **Request Body:**
+
 ```typescript
 {
   titulo?: string
@@ -220,54 +236,61 @@ Actualiza un archivo existente.
 ```
 
 **Response:**
+
 ```typescript
 {
-  id: number
-  titulo: string
-  tipo: string
-  contenido: string
-  createdAt: string
-  updatedAt: string
+  id: number;
+  titulo: string;
+  tipo: string;
+  contenido: string;
+  createdAt: string;
+  updatedAt: string;
 }
 ```
 
 ### **DELETE `/api/archivos/[id]`**
+
 Elimina un archivo y todas sus imágenes asociadas.
 
 **Response:**
+
 ```typescript
 {
-  message: "Archivo eliminado correctamente"
+  message: 'Archivo eliminado correctamente';
 }
 ```
 
 ## 🖼️ **APIs de Imágenes**
 
 ### **POST `/api/imagenes`**
+
 Sube una nueva imagen en formato Base64.
 
 **Request Body:**
+
 ```typescript
 {
-  nombre: string
-  tipo: string // MIME type (image/jpeg, image/png, etc.)
-  data: string // Base64 encoded image
-  tamaño: number // Size in bytes
+  nombre: string;
+  tipo: string; // MIME type (image/jpeg, image/png, etc.)
+  data: string; // Base64 encoded image
+  tamaño: number; // Size in bytes
 }
 ```
 
 **Response:**
+
 ```typescript
 {
-  id: number
-  nombre: string
-  tipo: string
-  tamaño: number
-  createdAt: string
+  id: number;
+  nombre: string;
+  tipo: string;
+  tamaño: number;
+  createdAt: string;
 }
 ```
 
 **Ejemplo:**
+
 ```bash
 POST /api/imagenes
 Content-Type: application/json
@@ -281,9 +304,11 @@ Content-Type: application/json
 ```
 
 ### **GET `/api/imagenes/[id]`**
+
 Sirve la imagen como respuesta de imagen.
 
 **Response Headers:**
+
 ```typescript
 {
   'Content-Type': string, // MIME type
@@ -294,21 +319,25 @@ Sirve la imagen como respuesta de imagen.
 **Response Body:** Binary image data
 
 ### **DELETE `/api/imagenes/[id]`**
+
 Elimina una imagen.
 
 **Response:**
+
 ```typescript
 {
-  message: "Imagen eliminada correctamente"
+  message: 'Imagen eliminada correctamente';
 }
 ```
 
 ## 🎯 **APIs de Matrices**
 
 ### **GET `/api/matrices`**
+
 Obtiene todas las matrices con sus OAs asociados.
 
 **Response:**
+
 ```typescript
 {
   id: number
@@ -338,9 +367,11 @@ Obtiene todas las matrices con sus OAs asociados.
 ```
 
 ### **POST `/api/matrices`**
+
 Crea una nueva matriz con sus OAs e indicadores.
 
 **Request Body:**
+
 ```typescript
 {
   nombre: string
@@ -358,6 +389,7 @@ Crea una nueva matriz con sus OAs e indicadores.
 ```
 
 **Response:**
+
 ```typescript
 {
   id: number
@@ -371,9 +403,11 @@ Crea una nueva matriz con sus OAs e indicadores.
 ```
 
 ### **PUT `/api/matrices/[id]`**
+
 Actualiza una matriz existente.
 
 **Request Body:**
+
 ```typescript
 {
   nombre?: string
@@ -385,28 +419,34 @@ Actualiza una matriz existente.
 ```
 
 ### **DELETE `/api/matrices/[id]`**
+
 Elimina una matriz y todos sus datos asociados.
 
 ## 📝 **APIs de Evaluaciones**
 
 ### **GET `/api/evaluaciones`**
+
 Obtiene todas las evaluaciones con información básica.
 
 **Response:**
+
 ```typescript
 {
-  id: number
-  titulo: string
-  matrizNombre: string
-  preguntasCount: number
-  createdAt: string
-}[]
+  id: number;
+  titulo: string;
+  matrizNombre: string;
+  preguntasCount: number;
+  createdAt: string;
+}
+[];
 ```
 
 ### **POST `/api/evaluaciones`**
+
 Crea una nueva evaluación.
 
 **Request Body:**
+
 ```typescript
 {
   archivoId: number
@@ -426,6 +466,7 @@ Crea una nueva evaluación.
 ```
 
 **Response:**
+
 ```typescript
 {
   id: number
@@ -437,36 +478,42 @@ Crea una nueva evaluación.
 ```
 
 ### **GET `/api/evaluaciones/[id]`**
+
 Obtiene una evaluación específica con todos sus datos.
 
 **Response:**
+
 ```typescript
 {
-  id: number
-  archivoId: number
-  matrizId: number
-  createdAt: string
-  updatedAt: string
-  archivo: Archivo
-  matriz: MatrizEspecificacion
+  id: number;
+  archivoId: number;
+  matrizId: number;
+  createdAt: string;
+  updatedAt: string;
+  archivo: Archivo;
+  matriz: MatrizEspecificacion;
   preguntas: {
-    id: number
-    numero: number
-    texto: string
+    id: number;
+    numero: number;
+    texto: string;
     alternativas: {
-      id: number
-      letra: string
-      texto: string
-      esCorrecta: boolean
-    }[]
-  }[]
+      id: number;
+      letra: string;
+      texto: string;
+      esCorrecta: boolean;
+    }
+    [];
+  }
+  [];
 }
 ```
 
 ### **PUT `/api/evaluaciones/[id]`**
+
 Actualiza una evaluación existente.
 
 **Request Body:**
+
 ```typescript
 {
   contenido?: string // JSON del contenido TipTap
@@ -477,43 +524,52 @@ Actualiza una evaluación existente.
 ```
 
 **Características:**
+
 - ✅ **Comparación inteligente:** Solo actualiza si las preguntas han cambiado
 - ✅ **Transacciones:** Asegura consistencia en eliminación/creación
 - ✅ **Eliminación en orden:** RespuestaAlumno → Alternativa → Pregunta
 - ✅ **Logging detallado:** Para debugging y monitoreo
 
 ### **DELETE `/api/evaluaciones/[id]`**
+
 Elimina una evaluación y sus relaciones.
 
 **Response:**
+
 ```typescript
 {
-  success: true
+  success: true;
 }
 ```
 
 ### **GET `/api/evaluaciones/[id]/preguntas` ⭐ NUEVO**
+
 Obtiene las preguntas de una evaluación específica.
 
 **Parámetros:**
+
 - `id` (path): ID de la evaluación
 
 **Response:**
+
 ```typescript
 {
-  id: number
-  numero: number
-  texto: string
-}[]
+  id: number;
+  numero: number;
+  texto: string;
+}
+[];
 ```
 
 **Características:**
+
 - ✅ **Ordenado por:** Número de pregunta
 - ✅ **Error handling:** Array vacío en caso de error
 - ✅ **Formato consistente:** Array directo (no objeto)
 - ✅ **Uso:** Tooltips en página de gráficos de resultados
 
 **Ejemplo de uso:**
+
 ```typescript
 const response = await fetch(`/api/evaluaciones/${evaluacionId}/preguntas`);
 const preguntas = await response.json();
@@ -521,43 +577,50 @@ const preguntas = await response.json();
 ```
 
 ### **GET `/api/evaluaciones/[id]/resultados`**
+
 Obtiene los resultados de una evaluación específica.
 
 **Response:**
+
 ```typescript
 {
-  id: number
+  id: number;
   alumno: {
-    rut: string
-    nombre: string
-    apellido: string
+    rut: string;
+    nombre: string;
+    apellido: string;
   }
-  puntajeTotal: number
-  puntajeMaximo: number
-  porcentaje: number
-  nota: number
+  puntajeTotal: number;
+  puntajeMaximo: number;
+  porcentaje: number;
+  nota: number;
   respuestas: {
-    id: number
-    preguntaId: number
-    alternativaDada: string
-    esCorrecta: boolean
-    puntajeObtenido: number
-  }[]
-}[]
+    id: number;
+    preguntaId: number;
+    alternativaDada: string;
+    esCorrecta: boolean;
+    puntajeObtenido: number;
+  }
+  [];
+}
+[];
 ```
 
 ### **POST `/api/evaluaciones/cargar-resultados` ⭐ NUEVO**
+
 Carga resultados desde archivo CSV.
 
 **Request Body:** FormData
+
 ```typescript
 {
-  file: File // Archivo CSV
-  evaluacionId: string
+  file: File; // Archivo CSV
+  evaluacionId: string;
 }
 ```
 
 **Formato CSV esperado:**
+
 ```csv
 rut,nombre,apellido,preguntaId,alternativaDada
 12345678-9,Juan,Pérez,1,A
@@ -567,15 +630,17 @@ rut,nombre,apellido,preguntaId,alternativaDada
 ```
 
 **Response:**
+
 ```typescript
 {
-  success: true
-  totalAlumnos: number
-  resultadoEvaluacionId: number
+  success: true;
+  totalAlumnos: number;
+  resultadoEvaluacionId: number;
 }
 ```
 
 **Características:**
+
 - ✅ **Procesamiento automático:** Cálculo de puntajes y notas
 - ✅ **Creación de alumnos:** Alumnos nuevos se crean automáticamente
 - ✅ **Validación de datos:** Verifica que las preguntas existan
@@ -585,9 +650,11 @@ rut,nombre,apellido,preguntaId,alternativaDada
 ## 👨‍🏫 **APIs de Profesores ⭐ NUEVO**
 
 ### **GET `/api/profesores`**
+
 Obtiene todos los profesores.
 
 **Query Parameters:**
+
 ```typescript
 {
   include?: 'true' // Incluir relaciones (asignaturas, niveles, horarios)
@@ -595,6 +662,7 @@ Obtiene todos los profesores.
 ```
 
 **Response:**
+
 ```typescript
 {
   data: {
@@ -636,9 +704,11 @@ Obtiene todos los profesores.
 ```
 
 ### **POST `/api/profesores`**
+
 Crea un nuevo profesor.
 
 **Request Body:**
+
 ```typescript
 {
   rut: string
@@ -651,28 +721,33 @@ Crea un nuevo profesor.
 ```
 
 **Response:**
+
 ```typescript
 {
-  data: Profesor
-  message: string
+  data: Profesor;
+  message: string;
 }
 ```
 
 ### **GET `/api/profesores/[id]`**
+
 Obtiene un profesor específico.
 
 **Response:**
+
 ```typescript
 {
-  data: Profesor
-  message: string
+  data: Profesor;
+  message: string;
 }
 ```
 
 ### **PUT `/api/profesores/[id]`**
+
 Actualiza un profesor existente.
 
 **Request Body:**
+
 ```typescript
 {
   nombre?: string
@@ -684,112 +759,128 @@ Actualiza un profesor existente.
 ```
 
 ### **DELETE `/api/profesores/[id]`**
+
 Elimina un profesor.
 
 **Response:**
+
 ```typescript
 {
-  message: string
+  message: string;
 }
 ```
 
 ## 🕐 **APIs de Horarios ⭐ NUEVO**
 
 ### **GET `/api/horarios`**
+
 Obtiene todos los horarios.
 
 **Response:**
+
 ```typescript
 {
   data: {
-    id: number
-    nombre: string
-    docenteId: number
-    asignaturaId: number
-    nivelId: number
-    fechaPrimeraClase: string
-    createdAt: string
-    updatedAt: string
+    id: number;
+    nombre: string;
+    docenteId: number;
+    asignaturaId: number;
+    nivelId: number;
+    fechaPrimeraClase: string;
+    createdAt: string;
+    updatedAt: string;
     asignatura: {
-      id: number
-      nombre: string
+      id: number;
+      nombre: string;
     }
     nivel: {
-      id: number
-      nombre: string
+      id: number;
+      nombre: string;
     }
     profesor: {
-      id: number
-      nombre: string
-      rut: string
+      id: number;
+      nombre: string;
+      rut: string;
     }
     modulos: {
-      id: number
-      dia: string
-      horaInicio: string
-      duracion: number
-      orden: number
+      id: number;
+      dia: string;
+      horaInicio: string;
+      duracion: number;
+      orden: number;
       profesores: {
         profesor: {
-          id: number
-          nombre: string
+          id: number;
+          nombre: string;
         }
-        rol: string
-      }[]
-    }[]
-  }[]
-  message: string
+        rol: string;
+      }
+      [];
+    }
+    [];
+  }
+  [];
+  message: string;
 }
 ```
 
 ### **POST `/api/horarios`**
+
 Crea un nuevo horario.
 
 **Request Body:**
+
 ```typescript
 {
-  nombre: string
-  docenteId: number
-  asignaturaId: number
-  nivelId: number
-  fechaPrimeraClase: string
+  nombre: string;
+  docenteId: number;
+  asignaturaId: number;
+  nivelId: number;
+  fechaPrimeraClase: string;
   modulos: {
-    dia: string // 'Lunes', 'Martes', etc.
-    horaInicio: string // '08:00', '09:00', etc.
-    duracion: number // minutos (30-240)
-  }[]
+    dia: string; // 'Lunes', 'Martes', etc.
+    horaInicio: string; // '08:00', '09:00', etc.
+    duracion: number; // minutos (30-240)
+  }
+  [];
 }
 ```
 
 **Validaciones:**
+
 - ✅ **Duración:** Entre 30 y 240 minutos
 - ✅ **Existencia:** Verifica que docente, asignatura y nivel existan
 - ✅ **Transacciones:** Crea horario y módulos en una transacción
 - ✅ **Profesor titular:** Se asigna automáticamente a todos los módulos
 
 **Response:**
+
 ```typescript
 {
-  data: Horario
-  message: string
+  data: Horario;
+  message: string;
 }
 ```
 
 ### **GET `/api/horarios/[id]`**
+
 Obtiene un horario específico.
 
 **Response:**
+
 ```typescript
 {
-  data: Horario
-  message: string
+  data: Horario;
+  message: string;
 }
 ```
 
 ### **PUT `/api/horarios/[id]`**
+
 Actualiza un horario existente.
 
 **Request Body:**
+
 ```typescript
 {
   nombre?: string
@@ -806,74 +897,83 @@ Actualiza un horario existente.
 ```
 
 **Características:**
+
 - ✅ **Eliminación completa:** Borra módulos existentes y crea nuevos
 - ✅ **Validaciones:** Mismas que POST
 - ✅ **Transacciones:** Asegura consistencia
 
 ### **DELETE `/api/horarios/[id]`**
+
 Elimina un horario y sus módulos.
 
 **Response:**
+
 ```typescript
 {
-  message: string
+  message: string;
 }
 ```
 
 ## 📅 **APIs de Planificación Anual ⭐ NUEVO**
 
 ### **GET `/api/planificaciones`**
+
 Obtiene todas las planificaciones anuales.
 
 **Response:**
+
 ```typescript
 {
-  id: number
-  nombre: string
-  horarioId: number
-  ano: number
-  createdAt: string
-  updatedAt: string
+  id: number;
+  nombre: string;
+  horarioId: number;
+  ano: number;
+  createdAt: string;
+  updatedAt: string;
   horario: {
-    id: number
-    nombre: string
+    id: number;
+    nombre: string;
     asignatura: {
-      id: number
-      nombre: string
+      id: number;
+      nombre: string;
     }
     nivel: {
-      id: number
-      nombre: string
+      id: number;
+      nombre: string;
     }
     profesor: {
-      id: number
-      nombre: string
+      id: number;
+      nombre: string;
     }
   }
   asignaciones: {
-    id: number
-    oaId: number
-    cantidadClases: number
+    id: number;
+    oaId: number;
+    cantidadClases: number;
     oa: {
-      id: number
-      descripcion_oas: string
+      id: number;
+      descripcion_oas: string;
       asignatura: {
-        id: number
-        nombre: string
+        id: number;
+        nombre: string;
       }
       nivel: {
-        id: number
-        nombre: string
+        id: number;
+        nombre: string;
       }
     }
-  }[]
-}[]
+  }
+  [];
+}
+[];
 ```
 
 ### **POST `/api/planificaciones`**
+
 Crea una nueva planificación anual.
 
 **Request Body:**
+
 ```typescript
 {
   nombre: string
@@ -887,6 +987,7 @@ Crea una nueva planificación anual.
 ```
 
 **Response:**
+
 ```typescript
 {
   id: number
@@ -901,9 +1002,11 @@ Crea una nueva planificación anual.
 ```
 
 ### **GET `/api/planificaciones/[id]`**
+
 Obtiene una planificación específica.
 
 **Response:**
+
 ```typescript
 {
   id: number
@@ -918,9 +1021,11 @@ Obtiene una planificación específica.
 ```
 
 ### **PUT `/api/planificaciones/[id]`**
+
 Actualiza una planificación existente.
 
 **Request Body:**
+
 ```typescript
 {
   nombre?: string
@@ -933,65 +1038,75 @@ Actualiza una planificación existente.
 ```
 
 ### **DELETE `/api/planificaciones/[id]`**
+
 Elimina una planificación.
 
 **Response:**
+
 ```typescript
 {
-  message: string
+  message: string;
 }
 ```
 
 ## 📊 **APIs de Resultados de Evaluaciones ⭐ NUEVO**
 
 ### **GET `/api/resultados-evaluaciones`**
+
 Obtiene todas las cargas de resultados de evaluaciones.
 
 **Response:**
+
 ```typescript
 {
-  id: number
-  evaluacionId: number
-  fechaCarga: string
-  totalAlumnos: number
-  escalaNota: number
+  id: number;
+  evaluacionId: number;
+  fechaCarga: string;
+  totalAlumnos: number;
+  escalaNota: number;
   evaluacion: {
-    id: number
-    titulo: string
-    matrizNombre: string
-    preguntasCount: number
+    id: number;
+    titulo: string;
+    matrizNombre: string;
+    preguntasCount: number;
   }
   resultados: {
-    id: number
-    puntajeTotal: number
-    puntajeMaximo: number
-    porcentaje: number
+    id: number;
+    puntajeTotal: number;
+    puntajeMaximo: number;
+    porcentaje: number;
     alumno: {
-      id: number
-      nombre: string
-      apellido: string
+      id: number;
+      nombre: string;
+      apellido: string;
     }
-  }[]
-}[]
+  }
+  [];
+}
+[];
 ```
 
 ## 📚 **APIs de Metodologías**
 
 ### **GET `/api/metodologias`**
+
 Obtiene todas las metodologías de enseñanza disponibles.
 
 **Response:**
+
 ```typescript
 {
-  id: number
-  nombre_metodologia: string
-  descripcion: string
-  nivel_recomendado: string
-  fuentes_literatura: string
-}[]
+  id: number;
+  nombre_metodologia: string;
+  descripcion: string;
+  nivel_recomendado: string;
+  fuentes_literatura: string;
+}
+[];
 ```
 
 **Ejemplo de respuesta:**
+
 ```json
 [
   {
@@ -1007,9 +1122,11 @@ Obtiene todas las metodologías de enseñanza disponibles.
 ## 🎓 **APIs de OAs**
 
 ### **GET `/api/oas`**
+
 Obtiene todos los Objetivos de Aprendizaje.
 
 **Query Parameters:**
+
 ```typescript
 {
   nivel_id?: number
@@ -1018,53 +1135,60 @@ Obtiene todos los Objetivos de Aprendizaje.
 ```
 
 **Response:**
+
 ```typescript
 {
-  id: number
-  nivel_id: number
-  asignatura_id: number
-  eje_id: number
-  eje_descripcion: string
-  oas_id: string
-  descripcion_oas: string
-  basal: boolean
-  minimo_clases: number
+  id: number;
+  nivel_id: number;
+  asignatura_id: number;
+  eje_id: number;
+  eje_descripcion: string;
+  oas_id: string;
+  descripcion_oas: string;
+  basal: boolean;
+  minimo_clases: number;
   asignatura: {
-    id: number
-    nombre: string
+    id: number;
+    nombre: string;
   }
   nivel: {
-    id: number
-    nombre: string
+    id: number;
+    nombre: string;
   }
-}[]
+}
+[];
 ```
 
 ## 🎯 **APIs de Ejes ⭐ NUEVO**
 
 ### **GET `/api/ejes`**
+
 Obtiene todos los OAs agrupados por eje.
 
 **Response:**
+
 ```typescript
 {
-  id: number
-  descripcion: string
+  id: number;
+  descripcion: string;
   oas: {
-    id: number
-    nivel_id: number
-    asignatura_id: number
-    eje_id: number
-    eje_descripcion: string
-    oas_id: string
-    descripcion_oas: string
-    basal: boolean
-    minimo_clases: number
-  }[]
-}[]
+    id: number;
+    nivel_id: number;
+    asignatura_id: number;
+    eje_id: number;
+    eje_descripcion: string;
+    oas_id: string;
+    descripcion_oas: string;
+    basal: boolean;
+    minimo_clases: number;
+  }
+  [];
+}
+[];
 ```
 
 **Características:**
+
 - ✅ **Agrupación automática:** OAs organizados por eje_id y eje_descripcion
 - ✅ **Ordenamiento:** Por eje_id y oas_id
 - ✅ **Uso:** Planificación anual con filtros por eje
@@ -1072,83 +1196,98 @@ Obtiene todos los OAs agrupados por eje.
 ## 📋 **APIs de Niveles**
 
 ### **GET `/api/niveles`**
+
 Obtiene todos los niveles educativos.
 
 **Response:**
+
 ```typescript
 {
-  id: number
-  nombre: string
-}[]
+  id: number;
+  nombre: string;
+}
+[];
 ```
 
 ### **POST `/api/niveles`**
+
 Crea un nuevo nivel.
 
 **Request Body:**
+
 ```typescript
 {
-  nombre: string
+  nombre: string;
 }
 ```
 
 **Validaciones:**
+
 - ✅ **Nombre requerido:** No puede estar vacío
 - ✅ **Longitud máxima:** 100 caracteres
 - ✅ **Unicidad:** No puede duplicar nombres existentes
 
 **Response:**
+
 ```typescript
 {
-  id: number
-  nombre: string
+  id: number;
+  nombre: string;
 }
 ```
 
 ## 📖 **APIs de Asignaturas**
 
 ### **GET `/api/asignaturas`**
+
 Obtiene todas las asignaturas.
 
 **Response:**
+
 ```typescript
 {
   data: {
-    id: number
-    nombre: string
-  }[]
-  message: string
+    id: number;
+    nombre: string;
+  }
+  [];
+  message: string;
 }
 ```
 
 ### **POST `/api/asignaturas`**
+
 Crea una nueva asignatura.
 
 **Request Body:**
+
 ```typescript
 {
-  nombre: string
+  nombre: string;
 }
 ```
 
 **Validaciones:**
+
 - ✅ **Nombre requerido:** No puede estar vacío
 - ✅ **Unicidad:** No puede duplicar nombres existentes
 
 **Response:**
+
 ```typescript
 {
   data: {
-    id: number
-    nombre: string
+    id: number;
+    nombre: string;
   }
-  message: string
+  message: string;
 }
 ```
 
 ## 🔐 **Autenticación y Seguridad**
 
 ### **Validación de Datos**
+
 Todas las APIs incluyen validación de datos de entrada:
 
 ```typescript
@@ -1157,24 +1296,26 @@ if (!titulo || titulo.trim().length === 0) {
   return NextResponse.json(
     { error: 'El título es requerido' },
     { status: 400 }
-  )
+  );
 }
 ```
 
 ### **Manejo de Errores**
+
 ```typescript
 try {
   // Operación de base de datos
 } catch (error) {
-  console.error('Error en la operación:', error)
+  console.error('Error en la operación:', error);
   return NextResponse.json(
     { error: 'Error interno del servidor' },
     { status: 500 }
-  )
+  );
 }
 ```
 
 ### **Límites de Tamaño**
+
 - **Imágenes:** Máximo 5MB
 - **Archivos:** Máximo 10MB
 - **Contenido JSON:** Máximo 1MB
@@ -1182,16 +1323,19 @@ try {
 ## 📊 **Códigos de Estado HTTP**
 
 ### **Éxito**
+
 - `200 OK` - Operación exitosa
 - `201 Created` - Recurso creado
 - `204 No Content` - Eliminación exitosa
 
 ### **Error del Cliente**
+
 - `400 Bad Request` - Datos inválidos
 - `404 Not Found` - Recurso no encontrado
 - `409 Conflict` - Conflicto de datos
 
 ### **Error del Servidor**
+
 - `500 Internal Server Error` - Error interno
 - `503 Service Unavailable` - Servicio no disponible
 
@@ -1200,6 +1344,7 @@ try {
 ### **Ejemplos con curl**
 
 **Crear profesor:**
+
 ```bash
 curl -X POST http://localhost:3000/api/profesores \
   -H "Content-Type: application/json" \
@@ -1213,6 +1358,7 @@ curl -X POST http://localhost:3000/api/profesores \
 ```
 
 **Crear horario:**
+
 ```bash
 curl -X POST http://localhost:3000/api/horarios \
   -H "Content-Type: application/json" \
@@ -1238,6 +1384,7 @@ curl -X POST http://localhost:3000/api/horarios \
 ```
 
 **Cargar resultados CSV:**
+
 ```bash
 curl -X POST http://localhost:3000/api/evaluaciones/cargar-resultados \
   -F "file=@resultados.csv" \
@@ -1245,6 +1392,7 @@ curl -X POST http://localhost:3000/api/evaluaciones/cargar-resultados \
 ```
 
 **Obtener preguntas para tooltips:**
+
 ```bash
 curl http://localhost:3000/api/evaluaciones/1/preguntas
 ```
@@ -1258,13 +1406,15 @@ curl http://localhost:3000/api/evaluaciones/1/preguntas
 ## 📈 **Monitoreo y Logs**
 
 ### **Logs de API**
+
 ```typescript
 // Logging de operaciones
-console.log(`[API] ${method} ${path} - ${status}`)
-console.error(`[API Error] ${method} ${path}:`, error)
+console.log(`[API] ${method} ${path} - ${status}`);
+console.error(`[API Error] ${method} ${path}:`, error);
 ```
 
 ### **Métricas**
+
 - **Tiempo de respuesta** promedio
 - **Tasa de error** por endpoint
 - **Uso de recursos** (CPU, memoria)
@@ -1273,11 +1423,13 @@ console.error(`[API Error] ${method} ${path}:`, error)
 ## 🔄 **Rate Limiting**
 
 ### **Límites por Endpoint**
+
 - **GET requests:** 1000/minuto
 - **POST requests:** 100/minuto
 - **PUT/DELETE requests:** 50/minuto
 
 ### **Headers de Rate Limiting**
+
 ```typescript
 {
   'X-RateLimit-Limit': '1000',
@@ -1289,15 +1441,18 @@ console.error(`[API Error] ${method} ${path}:`, error)
 ## 🚀 **Optimizaciones**
 
 ### **Caching**
+
 - **Imágenes:** Cache por 1 año
 - **Metodologías:** Cache por 1 hora
 - **OAs:** Cache por 1 día
 
 ### **Compresión**
+
 - **Gzip** para todas las respuestas JSON
 - **Optimización** de imágenes automática
 
 ### **Paginación**
+
 ```typescript
 // Para endpoints que lo requieran
 {
@@ -1328,4 +1483,4 @@ console.error(`[API Error] ${method} ${path}:`, error)
 
 **Última actualización:** Julio 2025  
 **Versión de APIs:** 3.0 (Sistema completo)  
-**Mantenido por:** Equipo de Desarrollo 
+**Mantenido por:** Equipo de Desarrollo

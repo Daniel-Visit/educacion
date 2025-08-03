@@ -10,12 +10,9 @@ export async function GET(
   try {
     const { id } = await params;
     const matrizId = parseInt(id);
-    
+
     if (isNaN(matrizId)) {
-      return NextResponse.json(
-        { error: 'ID inválido' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
     // @ts-ignore - Prisma client sync issue
@@ -41,12 +38,12 @@ export async function GET(
 
     // Obtener los OAs relacionados manualmente
     const oasWithDetails = await Promise.all(
-      matriz.oas.map(async (matrizOA) => {
+      matriz.oas.map(async matrizOA => {
         // @ts-ignore - Prisma client sync issue
         const oa = await prisma.oa.findUnique({
           where: { id: matrizOA.oaId },
         });
-        
+
         let nivel = null;
         let asignatura = null;
         if (oa) {
@@ -59,12 +56,10 @@ export async function GET(
             where: { id: oa.asignatura_id },
           });
         }
-        
+
         return {
           ...matrizOA,
-          oa: oa
-            ? { ...oa, nivel, asignatura }
-            : null,
+          oa: oa ? { ...oa, nivel, asignatura } : null,
         };
       })
     );
@@ -89,20 +84,27 @@ export async function PUT(
   try {
     const { id } = await params;
     const matrizId = parseInt(id);
-    
+
     if (isNaN(matrizId)) {
-      return NextResponse.json(
-        { error: 'ID inválido' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
     const body = await request.json();
     const { nombre, total_preguntas, asignatura_id, nivel_id, oas } = body;
 
-    if (!nombre || !total_preguntas || !asignatura_id || !nivel_id || !oas || !Array.isArray(oas)) {
+    if (
+      !nombre ||
+      !total_preguntas ||
+      !asignatura_id ||
+      !nivel_id ||
+      !oas ||
+      !Array.isArray(oas)
+    ) {
       return NextResponse.json(
-        { error: 'Datos incompletos o inválidos. Se requiere nombre, total_preguntas, asignatura_id, nivel_id y oas' },
+        {
+          error:
+            'Datos incompletos o inválidos. Se requiere nombre, total_preguntas, asignatura_id, nivel_id y oas',
+        },
         { status: 400 }
       );
     }
@@ -115,7 +117,9 @@ export async function PUT(
     // 2. Eliminar todos los Indicadores de esos MatrizOA
     if (matrizOAIds.length > 0) {
       // @ts-ignore - Prisma client sync issue
-      await prisma.indicador.deleteMany({ where: { matrizOAId: { in: matrizOAIds } } });
+      await prisma.indicador.deleteMany({
+        where: { matrizOAId: { in: matrizOAIds } },
+      });
     }
 
     // 3. Eliminar los MatrizOA
@@ -171,12 +175,9 @@ export async function DELETE(
   try {
     const { id } = await params;
     const matrizId = parseInt(id);
-    
+
     if (isNaN(matrizId)) {
-      return NextResponse.json(
-        { error: 'ID inválido' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
     // 1. Buscar todos los MatrizOA de la matriz
@@ -187,7 +188,9 @@ export async function DELETE(
     // 2. Eliminar todos los Indicadores de esos MatrizOA
     if (matrizOAIds.length > 0) {
       // @ts-ignore
-      await prisma.indicador.deleteMany({ where: { matrizOAId: { in: matrizOAIds } } });
+      await prisma.indicador.deleteMany({
+        where: { matrizOAId: { in: matrizOAIds } },
+      });
     }
 
     // 3. Eliminar los MatrizOA
@@ -206,4 +209,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-} 
+}

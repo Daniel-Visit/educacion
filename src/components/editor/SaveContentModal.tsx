@@ -1,17 +1,17 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { X, Save, FileText, BookOpen } from 'lucide-react'
-import { useContentSave, SavedContent } from '@/hooks/use-content-save'
-import { Editor } from '@tiptap/react'
+import { useState, useEffect } from 'react';
+import { X, Save, FileText, BookOpen } from 'lucide-react';
+import { useContentSave, SavedContent } from '@/hooks/use-content-save';
+import { Editor } from '@tiptap/react';
 
 interface SaveContentModalProps {
-  open: boolean
-  onClose: () => void
-  editor: Editor | null
-  tipoContenido: 'planificacion' | 'material'
-  onSave?: (savedContent: SavedContent) => void
-  currentFile?: SavedContent | null
+  open: boolean;
+  onClose: () => void;
+  editor: Editor | null;
+  tipoContenido: 'planificacion' | 'material';
+  onSave?: (savedContent: SavedContent) => void;
+  currentFile?: SavedContent | null;
 }
 
 export default function SaveContentModal({
@@ -20,58 +20,58 @@ export default function SaveContentModal({
   editor,
   tipoContenido,
   onSave,
-  currentFile
+  currentFile,
 }: SaveContentModalProps) {
-  const [titulo, setTitulo] = useState('')
-  const [tipo, setTipo] = useState<'planificacion' | 'material'>(tipoContenido)
-  const { saveContent, updateContent, isSaving } = useContentSave()
+  const [titulo, setTitulo] = useState('');
+  const [tipo, setTipo] = useState<'planificacion' | 'material'>(tipoContenido);
+  const { saveContent, updateContent, isSaving } = useContentSave();
 
   useEffect(() => {
     if (open) {
-      setTipo(tipoContenido)
+      setTipo(tipoContenido);
       // Pre-cargar el título si ya existe un archivo
       if (currentFile) {
-        setTitulo(currentFile.titulo)
+        setTitulo(currentFile.titulo);
       } else {
-        setTitulo('')
+        setTitulo('');
       }
     }
-  }, [open, tipoContenido, currentFile])
+  }, [open, tipoContenido, currentFile]);
 
   const handleSave = async () => {
     if (!editor || !titulo.trim()) {
-      return
+      return;
     }
 
     try {
-      let savedContent: SavedContent | null = null
+      let savedContent: SavedContent | null = null;
 
       if (currentFile) {
         // Actualizar archivo existente
-        savedContent = await updateContent(currentFile.id!, editor, titulo)
+        savedContent = await updateContent(currentFile.id!, editor, titulo);
       } else {
         // Crear nuevo archivo
-        savedContent = await saveContent(editor, titulo, tipo)
+        savedContent = await saveContent(editor, titulo, tipo);
       }
 
       if (savedContent && onSave) {
-        onSave(savedContent)
+        onSave(savedContent);
       }
-      onClose()
+      onClose();
     } catch (error) {
-      console.error('Error saving content:', error)
+      console.error('Error saving content:', error);
       // Aquí podrías mostrar un toast de error
     }
-  }
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSave()
+      e.preventDefault();
+      handleSave();
     }
-  }
+  };
 
-  if (!open) return null
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
@@ -104,7 +104,7 @@ export default function SaveContentModal({
             <input
               type="text"
               value={titulo}
-              onChange={(e) => setTitulo(e.target.value)}
+              onChange={e => setTitulo(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Ingresa un título descriptivo..."
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
@@ -176,5 +176,5 @@ export default function SaveContentModal({
         </div>
       </div>
     </div>
-  )
-} 
+  );
+}

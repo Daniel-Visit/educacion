@@ -1,15 +1,15 @@
-"use client"
+'use client';
 
-import { motion, AnimatePresence } from 'framer-motion'
-import React from 'react'
-import { X } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { X } from 'lucide-react';
 
 interface DrawerProps {
-  isOpen?: boolean
-  onClose: () => void
-  children: React.ReactNode
-  header?: React.ReactNode
-  width?: number | string // Nuevo: ancho opcional
+  isOpen?: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+  header?: React.ReactNode;
+  width?: number | string; // Nuevo: ancho opcional
 }
 
 export default function Drawer({
@@ -21,9 +21,9 @@ export default function Drawer({
 }: DrawerProps) {
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      onClose()
+      onClose();
     }
-  }
+  };
 
   return (
     <AnimatePresence>
@@ -46,7 +46,10 @@ export default function Drawer({
             exit={{ x: '100%' }}
             transition={{ type: 'tween', duration: 0.5 }}
             className="fixed inset-y-0 right-0 z-100 bg-white shadow-xl flex flex-col"
-            style={{ willChange: 'transform', width: typeof width === 'number' ? `${width}px` : width }}
+            style={{
+              willChange: 'transform',
+              width: typeof width === 'number' ? `${width}px` : width,
+            }}
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
@@ -60,12 +63,10 @@ export default function Drawer({
               </button>
             </div>
             {/* Drawer content */}
-            <div className="flex-1 overflow-y-auto">
-              {children}
-            </div>
+            <div className="flex-1 overflow-y-auto">{children}</div>
           </motion.div>
         </>
       )}
     </AnimatePresence>
-  )
-} 
+  );
+}

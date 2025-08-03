@@ -1,9 +1,15 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 function getFemaleEsVoice(voices: SpeechSynthesisVoice[]) {
-  return voices.find(v => v.lang.startsWith("es") && v.name.toLowerCase().includes("female"))
-    || voices.find(v => v.lang.startsWith("es") && v.name.toLowerCase().includes("mujer"))
-    || voices.find(v => v.lang.startsWith("es"));
+  return (
+    voices.find(
+      v => v.lang.startsWith('es') && v.name.toLowerCase().includes('female')
+    ) ||
+    voices.find(
+      v => v.lang.startsWith('es') && v.name.toLowerCase().includes('mujer')
+    ) ||
+    voices.find(v => v.lang.startsWith('es'))
+  );
 }
 
 export function useTTS(text: string, enabled: boolean) {
@@ -54,4 +60,4 @@ export function useTTS(text: string, enabled: boolean) {
   };
 
   return { speak, stop };
-} 
+}

@@ -1,22 +1,27 @@
-import { Listbox, Popover } from '@headlessui/react'
-import { ChevronsUpDown, Check, ChevronDown, ChevronRight, Eye } from 'lucide-react'
-import { useState } from 'react'
-import { MatrizEspecificacion } from '@/types/evaluacion'
+import { Listbox, Popover } from '@headlessui/react';
+import {
+  ChevronsUpDown,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Eye,
+} from 'lucide-react';
+import { useState } from 'react';
+import { MatrizEspecificacion } from '@/types/evaluacion';
 
 interface MatrizSelectorProps {
-  matrices: MatrizEspecificacion[]
-  selectedMatriz: MatrizEspecificacion | null
-  onMatrizSelect: (matriz: MatrizEspecificacion) => void
-  error?: string
+  matrices: MatrizEspecificacion[];
+  selectedMatriz: MatrizEspecificacion | null;
+  onMatrizSelect: (matriz: MatrizEspecificacion) => void;
+  error?: string;
 }
 
-export default function MatrizSelector({ 
-  matrices, 
-  selectedMatriz, 
-  onMatrizSelect, 
-  error 
+export default function MatrizSelector({
+  matrices,
+  selectedMatriz,
+  onMatrizSelect,
+  error,
 }: MatrizSelectorProps) {
-
   return (
     <div className="mb-4 mt-6">
       {/* Dropdown de Matriz */}
@@ -30,21 +35,27 @@ export default function MatrizSelector({
             <Listbox value={selectedMatriz} onChange={onMatrizSelect}>
               <div className="relative">
                 <Listbox.Button className="relative w-full bg-white border border-gray-300 rounded-lg py-3 px-4 text-left shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                  <span className={`block truncate ${selectedMatriz ? 'text-gray-900' : 'text-gray-500'}`}> 
-                    {selectedMatriz ? selectedMatriz.nombre : 'Seleccionar matriz...'}
+                  <span
+                    className={`block truncate ${selectedMatriz ? 'text-gray-900' : 'text-gray-500'}`}
+                  >
+                    {selectedMatriz
+                      ? selectedMatriz.nombre
+                      : 'Seleccionar matriz...'}
                   </span>
                   <span className="absolute inset-y-0 right-0 flex items-center pr-2">
                     <ChevronsUpDown size={20} className="text-gray-400" />
                   </span>
                 </Listbox.Button>
                 <Listbox.Options className="absolute z-50 w-full mt-1 py-1 px-2 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
-                  {matrices.map((matriz) => (
+                  {matrices.map(matriz => (
                     <Listbox.Option
                       key={matriz.id}
                       value={matriz}
                       className={({ active }) =>
                         `relative cursor-default select-none py-2 px-4 my-1 rounded-lg transition-colors ${
-                          active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'
+                          active
+                            ? 'bg-indigo-100 text-indigo-900'
+                            : 'text-gray-900'
                         }`
                       }
                     >
@@ -52,14 +63,19 @@ export default function MatrizSelector({
                         <>
                           <div className="flex items-center justify-between">
                             <div>
-                              <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}> 
+                              <span
+                                className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}
+                              >
                                 {matriz.nombre}
                               </span>
                               <span className="text-sm text-gray-500">
-                                {matriz.total_preguntas} preguntas • {matriz.oas.length} OAs
+                                {matriz.total_preguntas} preguntas •{' '}
+                                {matriz.oas.length} OAs
                               </span>
                             </div>
-                            {selected && <Check size={20} className="text-indigo-600" />}
+                            {selected && (
+                              <Check size={20} className="text-indigo-600" />
+                            )}
                           </div>
                         </>
                       )}
@@ -68,9 +84,7 @@ export default function MatrizSelector({
                 </Listbox.Options>
               </div>
             </Listbox>
-            {error && (
-              <p className="mt-1 text-sm text-red-600">{error}</p>
-            )}
+            {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
           </div>
 
           {/* Dropdown de OAs */}
@@ -84,7 +98,7 @@ export default function MatrizSelector({
                   <div className="flex items-center gap-2">
                     <div className="flex gap-1">
                       {selectedMatriz.oas.slice(0, 3).map((oaItem, index) => (
-                        <span 
+                        <span
                           key={index}
                           className="px-3 py-1.5 text-xs font-semibold bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 rounded-full border border-indigo-200 shadow-sm"
                         >
@@ -109,10 +123,13 @@ export default function MatrizSelector({
                         Objetivos de Aprendizaje ({selectedMatriz.oas.length})
                       </h3>
                     </div>
-                    
+
                     <div className="space-y-2 max-h-64 overflow-y-auto">
                       {selectedMatriz.oas.map((oaItem, index) => (
-                        <div key={index} className="flex items-start gap-3 p-3 bg-indigo-50 rounded-lg border border-indigo-100 hover:bg-indigo-100 transition-colors">
+                        <div
+                          key={index}
+                          className="flex items-start gap-3 p-3 bg-indigo-50 rounded-lg border border-indigo-100 hover:bg-indigo-100 transition-colors"
+                        >
                           <div className="flex-shrink-0 w-6 h-6 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center text-xs font-semibold">
                             {index + 1}
                           </div>
@@ -122,7 +139,8 @@ export default function MatrizSelector({
                                 {oaItem.oa.oas_id}
                               </span>
                               <span className="text-xs text-gray-600">
-                                {oaItem.oa.nivel.nombre} • {oaItem.oa.asignatura.nombre}
+                                {oaItem.oa.nivel.nombre} •{' '}
+                                {oaItem.oa.asignatura.nombre}
                               </span>
                             </div>
                             <p className="text-sm text-gray-700 leading-relaxed">
@@ -140,5 +158,5 @@ export default function MatrizSelector({
         </div>
       </div>
     </div>
-  )
-} 
+  );
+}

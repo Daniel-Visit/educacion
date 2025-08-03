@@ -39,15 +39,20 @@ interface Pregunta {
 }
 
 export function useEvaluacionData(resultadoId: string | null) {
-  const [resultadoData, setResultadoData] = useState<EvaluacionData | null>(null);
+  const [resultadoData, setResultadoData] = useState<EvaluacionData | null>(
+    null
+  );
   const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
-      console.log('DEBUG: Iniciando carga de datos con resultadoId:', resultadoId);
-      
+      console.log(
+        'DEBUG: Iniciando carga de datos con resultadoId:',
+        resultadoId
+      );
+
       if (!resultadoId) {
         console.log('DEBUG: No hay resultadoId, estableciendo error');
         setError('No se encontró resultadoId en la URL');
@@ -58,37 +63,52 @@ export function useEvaluacionData(resultadoId: string | null) {
       try {
         setLoading(true);
         setError(null);
-        
+
         console.log('DEBUG: Obteniendo información del resultado...');
         // Primero obtener el resultado para obtener el evaluacionId
-        const resultadoResponse = await fetch(`/api/resultados-evaluaciones/${resultadoId}`);
+        const resultadoResponse = await fetch(
+          `/api/resultados-evaluaciones/${resultadoId}`
+        );
         if (!resultadoResponse.ok) {
           throw new Error('Error al cargar el resultado');
         }
         const resultadoInfo = await resultadoResponse.json();
-        console.log('DEBUG: Información del resultado obtenida:', resultadoInfo);
-        
+        console.log(
+          'DEBUG: Información del resultado obtenida:',
+          resultadoInfo
+        );
+
         const evaluacionId = resultadoInfo.evaluacionId;
         console.log('DEBUG: EvaluacionId obtenido:', evaluacionId);
-        
+
         console.log('DEBUG: Cargando resultados de la evaluación...');
         // Cargar datos reales desde la API usando el evaluacionId correcto
-        const response = await fetch(`/api/evaluaciones/${evaluacionId}/resultados`);
+        const response = await fetch(
+          `/api/evaluaciones/${evaluacionId}/resultados`
+        );
         if (!response.ok) {
           throw new Error('Error al cargar resultados');
         }
         const resultadosData = await response.json();
-        console.log('DEBUG: Resultados cargados, cantidad:', resultadosData.length);
-        
+        console.log(
+          'DEBUG: Resultados cargados, cantidad:',
+          resultadosData.length
+        );
+
         console.log('DEBUG: Cargando preguntas...');
         // Cargar preguntas desde la API usando el evaluacionId correcto
-        const preguntasResponse = await fetch(`/api/evaluaciones/${evaluacionId}/preguntas`);
+        const preguntasResponse = await fetch(
+          `/api/evaluaciones/${evaluacionId}/preguntas`
+        );
         if (!preguntasResponse.ok) {
           throw new Error('Error al cargar preguntas');
         }
         const preguntasData = await preguntasResponse.json();
-        console.log('DEBUG: Preguntas cargadas, cantidad:', preguntasData.length);
-        
+        console.log(
+          'DEBUG: Preguntas cargadas, cantidad:',
+          preguntasData.length
+        );
+
         // Transformar datos al formato esperado
         const resultadoTransformado: EvaluacionData = {
           id: resultadoId,
@@ -96,28 +116,31 @@ export function useEvaluacionData(resultadoId: string | null) {
           fecha: resultadoInfo.fechaCarga || new Date().toISOString(),
           evaluacion: {
             id: evaluacionId.toString(),
-            nombre: resultadoInfo.evaluacion?.titulo || `Evaluación ${evaluacionId}`,
+            nombre:
+              resultadoInfo.evaluacion?.titulo || `Evaluación ${evaluacionId}`,
             matriz: {
-              id: "1",
-              nombre: resultadoInfo.evaluacion?.matrizNombre || "Matriz de Especificación",
-              nivelExigencia: 60
-            }
+              id: '1',
+              nombre:
+                resultadoInfo.evaluacion?.matrizNombre ||
+                'Matriz de Especificación',
+              nivelExigencia: 60,
+            },
           },
           respuestasAlumnos: resultadosData.map((resultado: any) => ({
             id: resultado.id.toString(),
             alumno: {
               id: resultado.alumno.rut,
               nombre: resultado.alumno.nombre,
-              apellido: resultado.alumno.apellido
+              apellido: resultado.alumno.apellido,
             },
             nota: resultado.nota,
             porcentaje: resultado.porcentaje,
             puntajeTotal: resultado.puntajeTotal,
             puntajeMaximo: resultado.puntajeMaximo,
-            respuestas: resultado.respuestas
-          }))
+            respuestas: resultado.respuestas,
+          })),
         };
-        
+
         console.log('DEBUG: Datos transformados, estableciendo estado...');
         setResultadoData(resultadoTransformado);
         setPreguntas(preguntasData);
@@ -135,4 +158,4 @@ export function useEvaluacionData(resultadoId: string | null) {
   }, [resultadoId]);
 
   return { resultadoData, preguntas, loading, error };
-} 
+}

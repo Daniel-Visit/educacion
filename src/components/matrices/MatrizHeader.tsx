@@ -13,7 +13,7 @@ export default function MatrizHeader({
   totalPreguntas,
   selectedOAsCount,
   currentStep,
-  totalSteps
+  totalSteps,
 }: MatrizHeaderProps) {
   const router = useRouter();
 
@@ -35,7 +35,7 @@ export default function MatrizHeader({
           </p>
         </div>
       </div>
-      
+
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white/10 rounded-lg p-3">
@@ -47,7 +47,7 @@ export default function MatrizHeader({
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white/10 rounded-lg p-3">
           <div className="flex items-center gap-2">
             <Target className="h-4 w-4 text-indigo-200" />
@@ -57,17 +57,19 @@ export default function MatrizHeader({
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white/10 rounded-lg p-3">
           <div className="flex items-center gap-2">
             <Check className="h-4 w-4 text-indigo-200" />
             <div>
               <p className="text-indigo-200 text-xs">Paso Actual</p>
-              <p className="text-lg font-bold text-white">{currentStep} de {totalSteps}</p>
+              <p className="text-lg font-bold text-white">
+                {currentStep} de {totalSteps}
+              </p>
             </div>
           </div>
         </div>
       </div>
     </div>
   );
-} 
+}

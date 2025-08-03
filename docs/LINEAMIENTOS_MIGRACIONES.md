@@ -54,4 +54,4 @@ DELETE FROM tabla_existente WHERE ...;
 
 ---
 
-**Este lineamiento es obligatorio y debe cumplirse en todas las migraciones del proyecto.** 
+**Este lineamiento es obligatorio y debe cumplirse en todas las migraciones del proyecto.**

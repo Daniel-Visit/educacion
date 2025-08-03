@@ -8,33 +8,39 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 ## [1.1.5] - 2025-07-19
 
 ### ✨ **Nuevas Funcionalidades**
+
 - **Tooltips de Preguntas:** Implementación de tooltips interactivos que muestran el texto real de las preguntas al hacer hover sobre los números en la tabla de resultados
 - **Nueva API Endpoint:** `/api/evaluaciones/:id/preguntas` para obtener preguntas de evaluaciones específicas
 - **Hook Personalizado:** `useEvaluacionData` para manejo centralizado de datos de evaluaciones
 
 ### 🔧 **Mejoras**
+
 - **Refactorización Completa:** Página de gráficos refactorizada de 742 a 541 líneas (27% reducción)
 - **Componentes Reutilizables:** Nuevos componentes `ErrorDisplay` y `QuestionTooltip`
 - **Separación de Responsabilidades:** Lógica de datos separada de UI mediante hook personalizado
 - **Eliminación de Código Duplicado:** Estados de error unificados y código duplicado eliminado
 
 ### 🎨 **UI/UX**
+
 - **Tooltips Mejorados:** Posicionamiento correcto, sin flecha, cursor pointer, texto en formato original
 - **Responsive Design:** Tooltips con ancho ajustable (`min-w-sm max-w-xl`)
 - **Transiciones Suaves:** Opacidad en hover para mejor experiencia visual
 
 ### 🐛 **Correcciones**
+
 - **CSS Inline:** Corregido uso de CSS inline en favor de clases de Tailwind
 - **Logs de Debug:** Limpieza de logs excesivos para mejor rendimiento
 - **Manejo de Errores:** Mejorado manejo de errores sin romper la UI
 
 ### 📚 **Documentación**
+
 - **API.md:** Documentación de nueva API de preguntas
 - **HOOKS.md:** Documentación del hook `useEvaluacionData`
 - **RESUMEN_EJECUTIVO_HOY.md:** Actualizado con cambios de hoy
 - **TAREAS_PENDIENTES.md:** Marcadas como completadas las tareas de refactorización
 
 ### 🔍 **Detalles Técnicos**
+
 - **APIs:** Nueva API que retorna array directo de preguntas ordenadas por número
 - **Componentes:** 3 nuevos componentes reutilizables creados
 - **Hooks:** 1 nuevo hook personalizado para manejo de datos
@@ -45,6 +51,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 ## [1.1.4] - 2025-07-18
 
 ### 🎨 Refactorización de Componentes
+
 - **Sistema de Componentes Reutilizables:**
   - `ResultadosHeader` - Header consistente para páginas de resultados
   - `LoadingState` - Estado de carga uniforme en toda la aplicación
@@ -58,6 +65,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
   - Exportación CSV optimizada
 
 ### 🔧 Optimización de Código
+
 - **Eliminación de Duplicación:**
   - ~100 líneas de código duplicado eliminadas
   - Funciones centralizadas en utilidades
@@ -68,6 +76,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
   - Modal de carga de resultados mejorado
 
 ### 🎯 Mejoras de UX/UI
+
 - **Consistencia Visual:**
   - Headers uniformes en todas las páginas de resultados
   - Estados de loading, error y éxito consistentes
@@ -78,12 +87,14 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
   - Promedio de notas mostrado junto al total de estudiantes
 
 ### 📚 Documentación
+
 - **Documentación de Cambios:** `docs/CAMBIOS_20250718.md`
 - **Actualización de Arquitectura:** Nuevos patrones de componentes
 - **Tareas Pendientes:** Homologación de headers en toda la plataforma
 - **Backup de Base de Datos:** Múltiples puntos de restauración
 
 ### 🏗️ Arquitectura
+
 - **Patrón de Componentes Reutilizables:**
   - Exportaciones centralizadas en `src/components/resultados/index.ts`
   - Interfaces TypeScript bien definidas
@@ -96,6 +107,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 ## [1.1.3] - 2025-07-10
 
 ### 💰 Análisis Financiero
+
 - **Análisis de Costos Detallado:**
   - Documentación completa en `docs/ANALISIS_COSTOS.md`
   - Análisis de ROI por escenarios (100, 500, 2,000 docentes)
@@ -104,12 +116,14 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
   - Proyección de ingresos: $7,000/mes en 12 meses
 
 ### 📊 Métricas Financieras
+
 - **Costos de Infraestructura:** $81/mes (básico) a $619/mes (enterprise)
 - **ROI Esperado:** 764% desde el primer mes
 - **Inversión Inicial:** $2,081 (desarrollo + infraestructura + marketing)
 - **Cronograma de Inversión:** 12 meses con proyecciones detalladas
 
 ### 🎯 Estrategia de Monetización
+
 - **Planes de Precios:**
   - Freemium: 1 docente, 5 planificaciones
   - Básico: $5/mes por docente
@@ -119,6 +133,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 ## [1.1.2] - 2025-07-10
 
 ### 📋 Planificación
+
 - **Plan de Escalabilidad Documentado:**
   - Documentación completa en `docs/PLAN_ESCALABILIDAD.md`
   - Cronograma de 3 días para implementar escalabilidad
@@ -126,6 +141,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
   - Análisis de costos y ROI detallado
 
 ### 🔄 Priorización
+
 - **Testing Aplazado por Escalabilidad:**
   - Priorizada la escalabilidad sobre testing completo
   - Plan de testing movido a post-escalabilidad
@@ -133,6 +149,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
   - Cronograma actualizado en `docs/TAREAS_PENDIENTES.md`
 
 ### 🎯 Objetivos
+
 - **Metas de Escalabilidad Definidas:**
   - 2,000+ usuarios simultáneos
   - Tiempo de respuesta < 1.5 segundos
@@ -142,6 +159,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 ## [1.1.1] - 2025-07-10
 
 ### ✨ Agregado
+
 - **Página de Listado de Planificaciones** (`/planificacion-anual/listado`)
   - Lista todas las planificaciones guardadas
   - Acciones para editar/eliminar cada planificación
@@ -150,12 +168,14 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
   - Diseño consistente con el listado de horarios
 
 ### 🔧 Mejorado
+
 - **Navegación del Sidebar:**
   - Agregado submenu "Planificaciones" en la sección "Planificación"
   - Enlace directo al listado de planificaciones
   - Estructura de navegación más organizada
 
 ### 🐛 Corregido
+
 - **Carga de Planificaciones Existentes:**
   - Al editar una planificación existente, el horario se preselecciona automáticamente
   - El dropdown de horario aparece bloqueado cuando se edita una planificación
@@ -163,6 +183,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
   - Los datos de la planificación se cargan correctamente
 
 ### 🏗️ Arquitectura
+
 - **Estructura de archivos corregida:**
   - Movido `listado.tsx` a `listado/page.tsx` para cumplir con Next.js App Router
   - Eliminado archivo incorrecto que causaba error 404
@@ -170,6 +191,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 ## [1.1.0] - 2025-07-04
 
 ### ✨ Agregado
+
 - **Módulo de Planificación Anual** completamente funcional
   - Calendario interactivo con eventos por eje
   - Sistema de asignación de OAs con validaciones
@@ -179,6 +201,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
   - Componentes modulares y reutilizables
 
 ### 🏗️ Arquitectura
+
 - **Refactorización completa** de la página de planificación anual
 - **Componentes modulares:**
   - `FiltrosDrawer.tsx` - Filtros del drawer
@@ -190,6 +213,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - **Tipado fuerte** con TypeScript en todos los componentes
 
 ### 🎨 Interfaz de Usuario
+
 - **Navegación mejorada:**
   - Ítem "Planificación Anual" en el sidebar principal
   - Tarjeta destacada en la página de inicio
@@ -203,6 +227,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
   - Indicadores de OA basal
 
 ### 🔧 Funcionalidades
+
 - **Cálculo automático de fechas:**
   - Horarios fijos (Martes y Jueves, 9-10 y 12-13)
   - Distribución desde julio 2025
@@ -217,12 +242,14 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
   - Filtrado combinado en tiempo real
 
 ### 📚 Documentación
+
 - **Documentación completa** del módulo en `docs/PLANIFICACION_ANUAL.md`
 - **Actualización del README** principal
 - **Estructura del proyecto** actualizada
 - **Casos de uso** y troubleshooting documentados
 
 ### 🔗 Integración
+
 - **API `/api/ejes`** para obtener OAs agrupados por eje
 - **Compatibilidad** con el sistema de navegación existente
 - **Relación** con otros módulos (Editor, Evaluaciones, Matrices)
@@ -230,6 +257,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 ## [1.0.0] - 2025-07-01
 
 ### ✨ Agregado
+
 - **Editor de Contenido** con TipTap
 - **Sistema de Evaluaciones** con matrices de especificación
 - **Entrevista Pedagógica** interactiva con TTS
@@ -240,6 +268,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - **Documentación completa** del proyecto
 
 ### 🏗️ Arquitectura
+
 - **Next.js 14** con App Router
 - **TypeScript** para tipado fuerte
 - **Tailwind CSS** para estilos
@@ -247,6 +276,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - **Componentes modulares** y reutilizables
 
 ### 🎨 Interfaz de Usuario
+
 - **Diseño moderno** y responsivo
 - **Tema consistente** en toda la aplicación
 - **Componentes UI** personalizados
@@ -264,13 +294,14 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - **📚 Documentación** para cambios en documentación
 - **🏗️ Arquitectura** para cambios en la estructura del proyecto
 - **🎨 Interfaz de Usuario** para cambios en la UI/UX
-- **🔗 Integración** para cambios en integraciones externas 
+- **🔗 Integración** para cambios en integraciones externas
 
 ## [2025-01-XX] - Refactorización de Página Crear Matrices
 
 ### 🏗️ Refactorización y Mejoras de Arquitectura
 
 #### Nuevos Componentes Creados
+
 - **`MatrizBasicForm`**: Componente reutilizable para el formulario básico de matrices (nombre, asignatura, nivel, total preguntas)
   - Soporta modo de solo lectura para edición
   - Maneja validaciones y navegación entre pasos
@@ -293,6 +324,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - **`MatrizHeader`**: Componente para el encabezado con estadísticas
 
 #### Nuevos Archivos de Utilidades
+
 - **`src/types/matrices.ts`**: Tipos centralizados para el módulo de matrices
   - Interfaces: `MatrizEspecificacion`, `MatrizFormState`, `ValidationResult`, `CSVRow`, `ImportedOA`, `Step`, `GradientConfig`
 
@@ -303,33 +335,38 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
   - Funciones auxiliares para filtrado y transformación de datos
 
 #### Mejoras en Hooks Personalizados
+
 - **`src/hooks/useMatrices.ts`**: Hooks mejorados para gestión de datos
   - `useMatricesData`: Manejo robusto de respuestas API con fallbacks
   - `useMatrizForm`: Validación mejorada con todos los parámetros requeridos
   - Manejo de errores y estados de carga
 
 #### Mejoras en Componentes Existentes
+
 - **`ImportarMatrizModal`**: Modal de importación CSV mejorado
   - Formato CSV simplificado y más intuitivo
   - Validaciones automáticas condicionales
   - Mejor manejo de errores y UX
 
 #### Correcciones de Bugs
+
 - **Dropdowns**: Altura consistente al abrir/cerrar
 - **Validaciones**: Verificación condicional de OAs de habilidad
 - **Navegación**: Botones "Anterior" y "Siguiente" consistentes
 - **Estados**: Manejo robusto de arrays y respuestas API
 
 #### Mejoras de UX/UI
+
 - **Consistencia**: Uso de `SecondaryButton` en todos los botones secundarios
 - **Responsividad**: Layout mejorado para diferentes tamaños de pantalla
 - **Feedback Visual**: Indicadores de estado y validación más claros
 - **Accesibilidad**: Mejor estructura semántica y navegación
 
 ### 📁 Archivos Modificados
+
 - `src/app/matrices/crear/page.tsx` - Refactorizado de 1220 líneas a ~400 líneas
 - `src/components/matrices/MatrizBasicForm.tsx` - Nuevo
-- `src/components/matrices/MatrizOASelector.tsx` - Nuevo  
+- `src/components/matrices/MatrizOASelector.tsx` - Nuevo
 - `src/components/matrices/MatrizIndicadoresSection.tsx` - Nuevo
 - `src/components/matrices/OASelector.tsx` - Nuevo
 - `src/components/matrices/IndicadoresSection.tsx` - Nuevo
@@ -342,6 +379,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - `src/app/api/matrices/import-csv/route.ts` - Nuevo
 
 ### 🎯 Beneficios Logrados
+
 - **Mantenibilidad**: Código más modular y fácil de mantener
 - **Reutilización**: Componentes reutilizables para otras páginas
 - **Legibilidad**: Separación clara de responsabilidades
@@ -349,10 +387,11 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 - **Consistencia**: UI/UX uniforme en toda la aplicación
 
 ### 🔧 Detalles Técnicos
+
 - Uso de TypeScript para mejor tipado y detección de errores
 - Implementación de patrones de diseño React modernos
 - Manejo robusto de estados y efectos secundarios
 - Validaciones centralizadas y reutilizables
 - Integración con sistema de diseño existente
 
---- 
+---

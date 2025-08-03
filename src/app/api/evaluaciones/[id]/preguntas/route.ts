@@ -22,14 +22,17 @@ export async function GET(
       select: {
         id: true,
         numero: true,
-        texto: true
+        texto: true,
       },
       orderBy: {
-        numero: 'asc'
-      }
+        numero: 'asc',
+      },
     });
 
-    console.log(`Preguntas encontradas para evaluación ${evaluacionId}:`, preguntas.length);
+    console.log(
+      `Preguntas encontradas para evaluación ${evaluacionId}:`,
+      preguntas.length
+    );
 
     return NextResponse.json(preguntas);
   } catch (error) {
@@ -39,4 +42,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}

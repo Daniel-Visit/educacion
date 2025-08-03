@@ -5,6 +5,7 @@ Una plataforma integral para la gestión educativa que incluye planificación de
 ## 🚀 Características Principales
 
 ### 📝 **Editor de Contenido Avanzado**
+
 - Editor TipTap con funcionalidades completas de edición
 - Guardado y carga de planificaciones y materiales
 - Upload de imágenes integrado
@@ -12,24 +13,28 @@ Una plataforma integral para la gestión educativa que incluye planificación de
 - Interfaz moderna y responsive
 
 ### 🎯 **Gestión de Matrices de Especificación**
+
 - Creación y edición de matrices
 - Gestión de OAs (Objetivos de Aprendizaje)
 - Indicadores y preguntas
 - Interfaz intuitiva para docentes
 
 ### 🎤 **Entrevista Interactiva**
+
 - Sistema de preguntas y respuestas
 - Text-to-Speech integrado
 - Interfaz conversacional
 - Generación de resúmenes
 
 ### 📊 **Base de Datos Educativa**
+
 - 13 asignaturas del currículum chileno
 - 12 niveles educativos (1° Básico a 4° Medio)
 - 12 metodologías de enseñanza
 - 37 Objetivos de Aprendizaje (OAs)
 
 ### 🎨 **Componentes Reutilizables**
+
 - Sistema de headers consistentes para toda la plataforma
 - Estados de carga, error y éxito unificados
 - Componentes modales reutilizables
@@ -49,24 +54,28 @@ Una plataforma integral para la gestión educativa que incluye planificación de
 ### ⚠️ **PRINCIPIOS FUNDAMENTALES (NO VIOLAR)**
 
 #### 1. **Preservación de Funcionalidad Existente**
+
 - **NUNCA** modificar APIs que funcionan sin testing exhaustivo
 - **SIEMPRE** verificar que el frontend reciba el formato esperado
 - **ANTES** de cambiar nombres de relaciones Prisma, verificar impacto en APIs
 - **MANTENER** compatibilidad hacia atrás en cambios de API
 
 #### 2. **Gestión de Errores Frontend**
+
 - **SIEMPRE** validar que `data` sea un array antes de usar `.map()`
 - **PROTEGER** contra errores de tipo: `Array.isArray(data) && data.map()`
 - **MANEJAR** casos edge: arrays vacíos, objetos de error, null/undefined
 - **LOGGING** para debugging: `console.log('Datos recibidos:', data)`
 
 #### 3. **Sincronización Prisma-API**
+
 - **REGENERAR** cliente Prisma después de cambios en schema: `npx prisma generate`
 - **VERIFICAR** nombres de relaciones: schema vs cliente generado
 - **TESTEAR** APIs inmediatamente después de cambios
 - **DOCUMENTAR** cambios en relaciones para futuras referencias
 
 #### 4. **Estructura de Respuestas API**
+
 - **GET endpoints** deben devolver SIEMPRE arrays (no objetos `{ data: [...] }`)
 - **Error handling** debe devolver arrays vacíos `[]` en lugar de objetos de error
 - **Consistencia** en formato de respuesta entre todos los endpoints
@@ -75,6 +84,7 @@ Una plataforma integral para la gestión educativa que incluye planificación de
 ### 🔧 **LINEAMIENTOS DE DESARROLLO**
 
 #### Antes de Hacer Cambios
+
 ```bash
 # 1. Verificar estado actual
 git status
@@ -89,6 +99,7 @@ curl http://localhost:3000/api/endpoint
 ```
 
 #### Después de Cambios
+
 ```bash
 # 1. Regenerar Prisma si es necesario
 npx prisma generate
@@ -103,48 +114,55 @@ npm run dev
 ### 🚫 **ERRORES COMUNES A EVITAR**
 
 #### 1. **Cambios en Relaciones Prisma**
+
 ❌ **INCORRECTO:**
+
 ```typescript
 // Cambiar nombres sin verificar impacto
 const evaluaciones = await prisma.evaluacion.findMany({
   include: {
-    Archivo: true,  // Cambió de 'archivo' a 'Archivo'
-    MatrizEspecificacion: true  // Cambió de 'matriz' a 'MatrizEspecificacion'
-  }
-})
+    Archivo: true, // Cambió de 'archivo' a 'Archivo'
+    MatrizEspecificacion: true, // Cambió de 'matriz' a 'MatrizEspecificacion'
+  },
+});
 ```
 
 ✅ **CORRECTO:**
+
 ```typescript
 // Mantener nombres del schema
 const evaluaciones = await prisma.evaluacion.findMany({
   include: {
     archivo: true,
     matriz: true,
-    preguntas: true
-  }
-})
+    preguntas: true,
+  },
+});
 ```
 
 #### 2. **Manejo de Respuestas API**
+
 ❌ **INCORRECTO:**
+
 ```typescript
 // Frontend sin validación
-const data = await res.json()
-setEvaluaciones(data)  // Puede fallar si data no es array
+const data = await res.json();
+setEvaluaciones(data); // Puede fallar si data no es array
 ```
 
 ✅ **CORRECTO:**
+
 ```typescript
 // Frontend con validación robusta
-const data = await res.json()
-const evaluacionesArray = Array.isArray(data) ? data : []
-setEvaluaciones(evaluacionesArray)
+const data = await res.json();
+const evaluacionesArray = Array.isArray(data) ? data : [];
+setEvaluaciones(evaluacionesArray);
 ```
 
 ### 📋 **CHECKLIST DE VERIFICACIÓN**
 
 #### Antes de Commit
+
 - [ ] Todas las APIs devuelven el formato esperado
 - [ ] Frontend maneja casos edge (arrays vacíos, errores)
 - [ ] No hay errores de console en navegador
@@ -153,13 +171,16 @@ setEvaluaciones(evaluacionesArray)
 - [ ] Servidor reiniciado y probado
 
 #### Antes de Push
+
 - [ ] Tests pasan (si existen)
 - [ ] Documentación actualizada
 - [ ] Commit message descriptivo
 - [ ] Backup de cambios importantes
 
 ### 📚 **Documentación Completa**
+
 Para más detalles sobre lecciones aprendidas, patrones de código y troubleshooting, consulta:
+
 - **[Lecciones Aprendidas Completas](docs/LECCIONES_APRENDIDAS.md)** - Documento principal de lecciones
 - **[Documentación de APIs](docs/API.md)** - Lecciones específicas de APIs
 - **[Documentación de Evaluaciones](docs/EVALUACIONES.md)** - Lecciones específicas del módulo de evaluaciones
@@ -168,23 +189,27 @@ Para más detalles sobre lecciones aprendidas, patrones de código y troubleshoo
 ## 📦 Instalación
 
 ### Prerrequisitos
-- Node.js 18+ 
+
+- Node.js 18+
 - npm, yarn, pnpm o bun
 
 ### Pasos de instalación
 
 1. **Clonar el repositorio**
+
 ```bash
 git clone https://github.com/Daniel-Visit/educacion.git
 cd educacion
 ```
 
 2. **Instalar dependencias**
+
 ```bash
 npm install
 ```
 
 3. **Configurar la base de datos (SIMPLIFICADO)**
+
 ```bash
 # Crear archivo .env con la URL de la base de datos
 echo DATABASE_URL="file:./dev.db" > .env
@@ -194,11 +219,13 @@ npx prisma generate
 ```
 
 4. **Ejecutar el servidor de desarrollo**
+
 ```bash
 npm run dev
 ```
 
 5. **Abrir en el navegador**
+
 ```
 http://localhost:3000
 ```
@@ -232,6 +259,7 @@ educacion-app/
 ## 🎮 Uso de la Aplicación
 
 ### Planificación Anual
+
 1. Navega a `/planificacion-anual` o usa el sidebar "Planificación → Planificación Anual"
 2. Selecciona un horario existente o crea uno nuevo
 3. Abre el drawer "Objetivos de Aprendizaje"
@@ -241,12 +269,14 @@ educacion-app/
 7. Guarda la planificación con el botón "Guardar"
 
 ### Gestión de Planificaciones
+
 1. Navega a `/planificacion-anual/listado` o usa el sidebar "Planificación → Planificaciones"
 2. Ve todas las planificaciones guardadas
 3. Haz clic en "Ver/Editar" para modificar una planificación existente
 4. El horario se preselecciona automáticamente al editar
 
 ### Editor de Contenido
+
 1. Navega a `/editor`
 2. Selecciona entre "Planificación de Clase" o "Material de Apoyo"
 3. Usa el editor TipTap para crear contenido
@@ -254,12 +284,14 @@ educacion-app/
 5. Carga archivos existentes desde el FAB flotante
 
 ### Gestión de Matrices
+
 1. Ve a `/matrices` para ver todas las matrices
 2. Crea una nueva matriz con `/matrices/crear`
 3. Edita matrices existentes desde la lista
 4. Gestiona OAs e indicadores
 
 ### Entrevista Interactiva
+
 1. Accede a `/entrevista`
 2. Responde las preguntas interactivamente
 3. Escucha las respuestas con TTS
@@ -287,6 +319,7 @@ npx prisma db push   # Aplicar cambios al esquema
 ## 📊 Base de Datos
 
 ### Tablas Principales
+
 - **asignatura:** 13 asignaturas del currículum
 - **nivel:** 12 niveles educativos
 - **metodologia:** 12 metodologías de enseñanza
@@ -296,7 +329,9 @@ npx prisma db push   # Aplicar cambios al esquema
 - **MatrizEspecificacion:** Matrices de especificación
 
 ### Base de Datos Completa
+
 La base de datos SQLite (`prisma/dev.db`) ya incluye todos los datos:
+
 - 13 asignaturas del currículum chileno
 - 12 niveles educativos
 - 12 metodologías de enseñanza

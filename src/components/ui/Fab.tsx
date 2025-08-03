@@ -29,12 +29,12 @@ export default function Fab({
 
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      
+
       if (fabRef.current && !fabRef.current.contains(target)) {
-        const isClickInChildren = Array.from(document.querySelectorAll('[data-fab-panel]')).some(
-          panel => panel.contains(target)
-        );
-        
+        const isClickInChildren = Array.from(
+          document.querySelectorAll('[data-fab-panel]')
+        ).some(panel => panel.contains(target));
+
         if (!isClickInChildren) {
           onClose();
         }
@@ -60,8 +60,12 @@ export default function Fab({
       disabled={disabled}
       type="button"
     >
-      {open ? <X size={36} className="text-white" /> : icon || <FileText size={32} className="text-white" />}
+      {open ? (
+        <X size={36} className="text-white" />
+      ) : (
+        icon || <FileText size={32} className="text-white" />
+      )}
       {children}
     </button>
   );
-} 
+}

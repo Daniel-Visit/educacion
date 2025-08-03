@@ -8,18 +8,18 @@ export async function GET(request: NextRequest) {
         evaluacion: {
           include: {
             archivo: true,
-            matriz: true
-          }
+            matriz: true,
+          },
         },
         resultados: {
           include: {
-            alumno: true
-          }
-        }
+            alumno: true,
+          },
+        },
       },
       orderBy: {
-        fechaCarga: 'desc'
-      }
+        fechaCarga: 'desc',
+      },
     });
 
     // Transformar los datos para el frontend
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
         id: resultado.evaluacion.id,
         titulo: resultado.evaluacion.archivo.titulo,
         matrizNombre: resultado.evaluacion.matriz.nombre,
-        preguntasCount: resultado.evaluacion.matriz.total_preguntas
+        preguntasCount: resultado.evaluacion.matriz.total_preguntas,
       },
       resultados: resultado.resultados.map(resultadoAlumno => ({
         id: resultadoAlumno.id,
@@ -43,9 +43,9 @@ export async function GET(request: NextRequest) {
         alumno: {
           id: resultadoAlumno.alumno.id,
           nombre: resultadoAlumno.alumno.nombre,
-          apellido: resultadoAlumno.alumno.apellido
-        }
-      }))
+          apellido: resultadoAlumno.alumno.apellido,
+        },
+      })),
     }));
 
     return NextResponse.json(resultadosTransformados);
@@ -56,4 +56,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

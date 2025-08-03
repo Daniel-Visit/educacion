@@ -44,9 +44,7 @@ export const storageUtils = {
 
   // Obtener URL pública
   getPublicUrl(bucket: string, path: string) {
-    const { data } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(path);
+    const { data } = supabase.storage.from(bucket).getPublicUrl(path);
 
     return data.publicUrl;
   },
@@ -66,9 +64,7 @@ export const storageUtils = {
 
   // Eliminar archivo
   async deleteFile(bucket: string, path: string) {
-    const { error } = await supabase.storage
-      .from(bucket)
-      .remove([path]);
+    const { error } = await supabase.storage.from(bucket).remove([path]);
 
     if (error) {
       throw new Error(`Error deleting file: ${error.message}`);
@@ -77,16 +73,14 @@ export const storageUtils = {
 
   // Listar archivos en bucket
   async listFiles(bucket: string, path?: string) {
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .list(path);
+    const { data, error } = await supabase.storage.from(bucket).list(path);
 
     if (error) {
       throw new Error(`Error listing files: ${error.message}`);
     }
 
     return data;
-  }
+  },
 };
 
 // Buckets disponibles
@@ -94,7 +88,8 @@ export const STORAGE_BUCKETS = {
   IMAGENES: 'imagenes',
   ARCHIVOS: 'archivos',
   AVATARES: 'avatares',
-  DOCUMENTOS: 'documentos'
+  DOCUMENTOS: 'documentos',
 } as const;
 
-export type StorageBucket = typeof STORAGE_BUCKETS[keyof typeof STORAGE_BUCKETS]; 
+export type StorageBucket =
+  (typeof STORAGE_BUCKETS)[keyof typeof STORAGE_BUCKETS];

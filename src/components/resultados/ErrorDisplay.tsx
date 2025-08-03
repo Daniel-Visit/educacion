@@ -6,10 +6,10 @@ interface ErrorDisplayProps {
   showBackButton?: boolean;
 }
 
-export function ErrorDisplay({ 
-  title = "Error al cargar datos", 
-  message, 
-  showBackButton = true 
+export function ErrorDisplay({
+  title = 'Error al cargar datos',
+  message,
+  showBackButton = true,
 }: ErrorDisplayProps) {
   return (
     <div className="min-h-screen bg-white p-4">
@@ -21,7 +21,7 @@ export function ErrorDisplay({
               <h3 className="text-lg font-bold text-gray-900 mb-2">{title}</h3>
               <p className="text-red-600 text-sm mb-4">{message}</p>
               {showBackButton && (
-                <button 
+                <button
                   onClick={() => window.history.back()}
                   className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 mx-auto"
                 >
@@ -34,4 +34,4 @@ export function ErrorDisplay({
       </div>
     </div>
   );
-} 
+}

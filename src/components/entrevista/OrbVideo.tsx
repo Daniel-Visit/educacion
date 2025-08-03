@@ -1,5 +1,5 @@
-"use client";
-import React from "react";
+'use client';
+import React from 'react';
 
 interface OrbVideoProps {
   step: number;
@@ -15,11 +15,11 @@ const OrbVideo: React.FC<OrbVideoProps> = ({ step, showResumen }) => {
   return (
     <div className="flex justify-center mb-0 mt-4">
       <div className="w-30 h-30 rounded-full overflow-hidden mx-auto flex items-center justify-center">
-        <video 
-          src="/orb.mp4" 
-          autoPlay 
-          loop 
-          muted 
+        <video
+          src="/orb.mp4"
+          autoPlay
+          loop
+          muted
           className="w-full h-full object-cover object-center scale-125"
         />
       </div>
@@ -27,4 +27,4 @@ const OrbVideo: React.FC<OrbVideoProps> = ({ step, showResumen }) => {
   );
 };
 
-export default OrbVideo; 
+export default OrbVideo;

@@ -3,6 +3,7 @@
 ## 📋 **Problema Identificado**
 
 ### **Contexto del Problema:**
+
 Los OAs y ejes en la tabla `oa` son **contextuales** según la combinación `asignatura_id + nivel_id`. Esto significa que:
 
 - **Mismo `eje_id`** puede tener **diferentes `eje_descripcion`** según la asignatura
@@ -10,18 +11,20 @@ Los OAs y ejes en la tabla `oa` son **contextuales** según la combinación `asi
 - **Ejemplo:** `eje_id = 1` puede ser "Lectura y comprensión" en Lenguaje, pero "Álgebra" en Matemáticas
 
 ### **Problema Específico:**
+
 En la creación de matrices, el **Paso 2** no está filtrando correctamente por contexto, lo que puede mostrar OAs de asignaturas diferentes a la seleccionada.
 
 ## 🔍 **Análisis del Código Actual**
 
 ### **Ubicación del Problema:**
+
 ```typescript
 // src/app/matrices/crear/page.tsx - Líneas ~90-100
 const oasDeAsignaturaNivel = useMemo(() => {
   if (!selectedAsignatura || !selectedNivel) return [];
-  return oas.filter(oa => 
-    oa.asignatura_id === selectedAsignatura && 
-    oa.nivel_id === selectedNivel
+  return oas.filter(
+    oa =>
+      oa.asignatura_id === selectedAsignatura && oa.nivel_id === selectedNivel
   );
 }, [oas, selectedAsignatura, selectedNivel]);
 ```
@@ -29,15 +32,13 @@ const oasDeAsignaturaNivel = useMemo(() => {
 ### **Problemas Identificados:**
 
 #### **1. API `/api/ejes` No Filtra por Contexto:**
+
 ```typescript
 // src/app/api/ejes/route.ts - Líneas ~10-30
 export async function GET() {
   // ❌ PROBLEMA: No filtra por asignatura/nivel
   const oas = await prisma.oa.findMany({
-    orderBy: [
-      { eje_id: 'asc' },
-      { oas_id: 'asc' },
-    ],
+    orderBy: [{ eje_id: 'asc' }, { oas_id: 'asc' }],
   });
 
   // ❌ PROBLEMA: Agrupa todos los OAs sin contexto
@@ -50,6 +51,7 @@ export async function GET() {
 ```
 
 #### **2. Agrupación de Ejes Sin Contexto:**
+
 ```typescript
 // src/app/matrices/crear/page.tsx - Líneas ~100-110
 const ejesDisponibles = useMemo(() => {
@@ -58,7 +60,7 @@ const ejesDisponibles = useMemo(() => {
     if (!ejeExistente) {
       acc.push({
         id: oa.eje_id,
-        descripcion: oa.eje_descripcion
+        descripcion: oa.eje_descripcion,
       });
     }
     return acc;
@@ -71,6 +73,7 @@ const ejesDisponibles = useMemo(() => {
 ### **Solución 1: Modificar API `/api/ejes`**
 
 #### **Nueva Estructura de API:**
+
 ```typescript
 // src/app/api/ejes/route.ts
 export async function GET(request: NextRequest) {
@@ -91,12 +94,9 @@ export async function GET(request: NextRequest) {
     const oas = await prisma.oa.findMany({
       where: {
         asignatura_id: parseInt(asignaturaId),
-        nivel_id: parseInt(nivelId)
+        nivel_id: parseInt(nivelId),
       },
-      orderBy: [
-        { eje_id: 'asc' },
-        { oas_id: 'asc' },
-      ],
+      orderBy: [{ eje_id: 'asc' }, { oas_id: 'asc' }],
     });
 
     // ✅ Agrupar por eje contextualizado
@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
       }
       ejesMap.get(ejeKey).oas.push(oa);
     }
-    
+
     const ejes = Array.from(ejesMap.values());
     return NextResponse.json(ejes);
   } catch (error) {
@@ -126,34 +126,40 @@ export async function GET(request: NextRequest) {
 ```
 
 #### **Uso de la API Modificada:**
+
 ```typescript
 // Llamada desde el frontend
-const response = await fetch(`/api/ejes?asignaturaId=${selectedAsignatura}&nivelId=${selectedNivel}`);
+const response = await fetch(
+  `/api/ejes?asignaturaId=${selectedAsignatura}&nivelId=${selectedNivel}`
+);
 const ejes = await response.json();
 ```
 
 ### **Solución 2: Validación en Paso 1**
 
 #### **Agregar Validación de OAs Disponibles:**
+
 ```typescript
 // src/app/matrices/crear/page.tsx - Agregar después de la línea ~150
 const oasDisponiblesParaCombinacion = useMemo(() => {
   if (!selectedAsignatura || !selectedNivel) return [];
-  return oas.filter(oa => 
-    oa.asignatura_id === selectedAsignatura && 
-    oa.nivel_id === selectedNivel
+  return oas.filter(
+    oa =>
+      oa.asignatura_id === selectedAsignatura && oa.nivel_id === selectedNivel
   );
 }, [oas, selectedAsignatura, selectedNivel]);
 
 // Validar si hay OAs disponibles antes de permitir continuar
-const puedeContinuarAlPaso2 = matrizName.trim() && 
-  totalPreguntas > 0 && 
-  selectedAsignatura && 
-  selectedNivel && 
+const puedeContinuarAlPaso2 =
+  matrizName.trim() &&
+  totalPreguntas > 0 &&
+  selectedAsignatura &&
+  selectedNivel &&
   oasDisponiblesParaCombinacion.length > 0;
 ```
 
 #### **Modificar Botón "Siguiente":**
+
 ```typescript
 // src/app/matrices/crear/page.tsx - Línea ~440
 <PrimaryButton
@@ -165,6 +171,7 @@ const puedeContinuarAlPaso2 = matrizName.trim() &&
 ```
 
 #### **Agregar Mensaje de Error:**
+
 ```typescript
 // src/app/matrices/crear/page.tsx - Agregar después de la línea ~430
 {selectedAsignatura && selectedNivel && oasDisponiblesParaCombinacion.length === 0 && (
@@ -187,13 +194,16 @@ const puedeContinuarAlPaso2 = matrizName.trim() &&
 ### **Solución 3: Filtrado Estricto en Paso 2**
 
 #### **Modificar Carga de Ejes:**
+
 ```typescript
 // src/app/matrices/crear/page.tsx - Reemplazar fetchEjes (línea ~120)
 const fetchEjes = async () => {
   try {
     if (!selectedAsignatura || !selectedNivel) return;
-    
-    const response = await fetch(`/api/ejes?asignaturaId=${selectedAsignatura}&nivelId=${selectedNivel}`);
+
+    const response = await fetch(
+      `/api/ejes?asignaturaId=${selectedAsignatura}&nivelId=${selectedNivel}`
+    );
     if (response.ok) {
       const data = await response.json();
       setEjes(data);
@@ -210,6 +220,7 @@ useEffect(() => {
 ```
 
 #### **Eliminar Cálculo Local de Ejes:**
+
 ```typescript
 // src/app/matrices/crear/page.tsx - Eliminar líneas ~100-110
 // ELIMINAR este useMemo ya que los ejes vendrán de la API
@@ -219,24 +230,28 @@ useEffect(() => {
 ## 📝 **Plan de Implementación**
 
 ### **Paso 1: Modificar API `/api/ejes`**
+
 1. ✅ Agregar parámetros `asignaturaId` y `nivelId`
 2. ✅ Implementar filtrado por contexto
 3. ✅ Agrupar ejes correctamente
 4. ✅ Agregar validaciones de parámetros
 
 ### **Paso 2: Actualizar Frontend - Paso 1**
+
 1. ✅ Agregar validación de OAs disponibles
 2. ✅ Modificar botón "Siguiente"
 3. ✅ Agregar mensaje de error cuando no hay OAs
 4. ✅ Actualizar lógica de validación
 
 ### **Paso 3: Actualizar Frontend - Paso 2**
+
 1. ✅ Modificar llamada a API de ejes
 2. ✅ Eliminar cálculo local de ejes
 3. ✅ Agregar useEffect para recargar ejes
 4. ✅ Verificar que solo se muestren OAs del contexto
 
 ### **Paso 4: Testing**
+
 1. ✅ Probar con combinaciones válidas
 2. ✅ Probar con combinaciones sin OAs
 3. ✅ Verificar que no se mezclen contextos
@@ -245,20 +260,24 @@ useEffect(() => {
 ## 🔧 **Archivos a Modificar**
 
 ### **Backend:**
+
 - `src/app/api/ejes/route.ts` - Modificar para filtrar por contexto
 
 ### **Frontend:**
+
 - `src/app/matrices/crear/page.tsx` - Agregar validaciones y modificar lógica
 - `src/app/matrices/[id]/editar/page.tsx` - Aplicar las mismas correcciones
 
 ## 🎯 **Resultado Esperado**
 
 ### **Antes de la Corrección:**
+
 - ❌ Paso 1 permite continuar sin verificar OAs disponibles
 - ❌ Paso 2 muestra OAs de todas las asignaturas
 - ❌ Ejes se agrupan incorrectamente sin contexto
 
 ### **Después de la Corrección:**
+
 - ✅ Paso 1 valida que existan OAs para la combinación
 - ✅ Paso 2 muestra solo OAs del contexto específico
 - ✅ Ejes se agrupan correctamente por contexto
@@ -267,6 +286,7 @@ useEffect(() => {
 ## 📊 **Ejemplo de Datos**
 
 ### **Estructura de la Tabla `oa`:**
+
 ```sql
 -- Ejemplo con contexto
 INSERT INTO oa (nivel_id, asignatura_id, eje_id, eje_descripcion, oas_id, descripcion_oas) VALUES
@@ -277,21 +297,26 @@ INSERT INTO oa (nivel_id, asignatura_id, eje_id, eje_descripcion, oas_id, descri
 ```
 
 ### **Resultado del Filtrado:**
+
 ```typescript
 // Para Lenguaje (asignatura_id: 1) + 2° Básico (nivel_id: 2)
 {
   ejes: [
     {
       id: 1,
-      descripcion: "Lectura y comprensión",
-      oas: [/* solo OAs de Lenguaje */]
+      descripcion: 'Lectura y comprensión',
+      oas: [
+        /* solo OAs de Lenguaje */
+      ],
     },
     {
-      id: 2, 
-      descripcion: "Escritura",
-      oas: [/* solo OAs de Lenguaje */]
-    }
-  ]
+      id: 2,
+      descripcion: 'Escritura',
+      oas: [
+        /* solo OAs de Lenguaje */
+      ],
+    },
+  ];
 }
 
 // Para Matemáticas (asignatura_id: 2) + 2° Básico (nivel_id: 2)
@@ -299,15 +324,19 @@ INSERT INTO oa (nivel_id, asignatura_id, eje_id, eje_descripcion, oas_id, descri
   ejes: [
     {
       id: 1,
-      descripcion: "Álgebra",  // ¡Diferente descripción!
-      oas: [/* solo OAs de Matemáticas */]
+      descripcion: 'Álgebra', // ¡Diferente descripción!
+      oas: [
+        /* solo OAs de Matemáticas */
+      ],
     },
     {
       id: 2,
-      descripcion: "Geometría",  // ¡Diferente descripción!
-      oas: [/* solo OAs de Matemáticas */]
-    }
-  ]
+      descripcion: 'Geometría', // ¡Diferente descripción!
+      oas: [
+        /* solo OAs de Matemáticas */
+      ],
+    },
+  ];
 }
 ```
 
@@ -316,4 +345,4 @@ INSERT INTO oa (nivel_id, asignatura_id, eje_id, eje_descripcion, oas_id, descri
 **Fecha de Documentación:** Julio 2025  
 **Estado:** Pendiente de implementación  
 **Prioridad:** Alta - Corrige funcionalidad crítica  
-**Responsable:** Equipo de Desarrollo 
+**Responsable:** Equipo de Desarrollo

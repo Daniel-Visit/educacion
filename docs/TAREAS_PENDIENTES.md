@@ -1,9 +1,11 @@
 # 📋 Tareas Pendientes - Sistema de Planificación Anual
 
 ## 🎯 Objetivo
+
 Completar el sistema de planificación anual con configuración de horarios y gestión de planificaciones guardadas.
 
 ## 📅 Estado Actual
+
 - ✅ **Planificación Anual Básica** - Implementada
   - Calendario interactivo con eventos por eje
   - Drawer de OAs con filtros y asignación
@@ -21,9 +23,11 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 ## 🚧 Tareas Pendientes
 
 ### 🚀 **FASE PRIORITARIA: Escalabilidad (3 días intensivos)**
+
 **Estado:** 🔥 **ALTA PRIORIDAD** - Aplazado testing por escalabilidad
 
 #### **Plan de Escalabilidad (Ver docs/PLAN_ESCALABILIDAD.md)**
+
 - [ ] **Día 1:** Migración a PostgreSQL + NextAuth
 - [ ] **Día 2:** Redis + SWR + Optimización
 - [ ] **Día 3:** Sentry + Analytics + Deploy
@@ -31,9 +35,11 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 **Justificación:** La escalabilidad es crítica para el éxito del producto. El testing se puede implementar después de tener una base sólida y usuarios reales.
 
 ### ✅ **COMPLETADO: Refactorización de Resultados y Tooltips (19 Julio 2025)**
+
 **Estado:** ✅ **COMPLETADO** - Implementado tooltips con texto real y refactorización
 
 #### **Cambios Implementados:**
+
 - ✅ **Nueva API endpoint** `/api/evaluaciones/:id/preguntas` creada
 - ✅ **Tooltips interactivos** con texto real de preguntas implementados
 - ✅ **Refactorización completa** de página de gráficos (742 → 541 líneas)
@@ -43,12 +49,14 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 - ✅ **Mejoras de UX** con tooltips posicionados correctamente
 
 #### **Beneficios Obtenidos:**
+
 - **201 líneas de código eliminadas** (27% reducción)
 - **Experiencia de usuario mejorada** con tooltips informativos
 - **Código más mantenible** con componentes modulares
 - **Separación de responsabilidades** entre datos y UI
 
 ### 🧪 **Fase 1: Testing Completo de la Plataforma (APLAZADO)**
+
 **Estado:** ⏸️ **APLAZADO** - Se implementará después de la escalabilidad
 
 #### **Plan de Testing (4 días intensivos) - POST ESCALABILIDAD**
@@ -56,6 +64,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 #### **📋 Plan Eficiente - 4 Días Intensivos**
 
 ##### **Día 1: APIs Completas (1 día intensivo)**
+
 - [ ] **Tests para TODAS las APIs** (reutilizando estructura de horarios.test.js):
   - [ ] `/api/evaluaciones` (GET, POST, PUT, DELETE) - 8 tests
   - [ ] `/api/matrices` (GET, POST, PUT, DELETE) - 8 tests
@@ -68,6 +77,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   - **Total**: ~48 tests en 1 día intensivo
 
 ##### **Día 2: Componentes Completos (1 día intensivo)**
+
 - [ ] **Tests para TODOS los componentes**:
   - [ ] `EvaluacionForm.tsx`, `MatrizSelector.tsx`, `MatrizForm.tsx` - 18 tests
   - [ ] `SimpleEditor.tsx`, `SaveContentModal.tsx` - 12 tests
@@ -78,6 +88,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   - **Total**: ~88 tests en 1 día intensivo
 
 ##### **Día 3: Integración + Utilidades (1 día intensivo)**
+
 - [ ] **Tests para flujos + utilidades + DB**:
   - [ ] Flujo completo de creación de evaluación - 6 tests
   - [ ] Flujo completo de creación de matriz - 6 tests
@@ -90,6 +101,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   - **Total**: ~68 tests en 1 día intensivo
 
 ##### **Día 4: Calidad + CI/CD + Documentación (1 día intensivo)**
+
 - [ ] **Tests de calidad + configuración + documentación**:
   - [ ] Edge cases críticos - 10 tests
   - [ ] Performance básico - 8 tests
@@ -100,6 +112,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   - **Total**: ~30 tests + configuración + documentación
 
 #### **🎯 Resultado Esperado (4 días intensivos)**
+
 - ✅ **234+ tests** implementados
 - ✅ **90%+ cobertura** del código completo
 - ✅ **CI/CD completo** funcionando
@@ -107,12 +120,14 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 - ✅ **Base sólida** para desarrollo futuro
 
 #### **📊 Estrategias de Optimización**
+
 - [ ] **Reutilización de código**: Templates de tests
 - [ ] **Tests automatizados**: Scripts de generación
 - [ ] **Priorización inteligente**: Crítico → Importante → Opcional
 - [ ] **Paralelización**: 2 desarrolladores trabajando simultáneamente
 
 #### **🔄 Cronograma Actualizado**
+
 1. **Semana 1:** Escalabilidad (3 días) + Funcionalidades críticas (2 días)
 2. **Semana 2:** Testing completo (4 días) + Optimización (1 día)
 3. **Semana 3:** Funcionalidades avanzadas + Monetización inicial
@@ -120,7 +135,9 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 ### 🔧 Fase 1: Configuración de Horario Docente
 
 #### 1.1 Modelo de Base de Datos
+
 - [ ] **Crear tablas en Prisma Schema:**
+
   ```sql
   -- Tabla de profesores
   model Profesor {
@@ -200,6 +217,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   ```
 
 #### 1.2 API Endpoints
+
 - [ ] **Crear API `/api/profesores`:**
   - `GET /api/profesores` - Listar todos los profesores
   - `POST /api/profesores` - Crear nuevo profesor
@@ -218,6 +236,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   - `GET /api/horarios/:id` - Obtener horario específico
 
 #### 1.3 Pantalla de Gestión de Horarios
+
 - [ ] **Crear página `/horarios`**
 - [ ] **Componente `HorariosList.tsx`:**
   - Lista de horarios guardados del docente
@@ -270,6 +289,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   - Navegación a planificación anual
 
 #### 1.4 Validaciones
+
 - [ ] **Validaciones de horario:**
   - No permitir bloques solapados en el mismo día
   - **Restricciones de horario:**
@@ -287,19 +307,21 @@ Completar el sistema de planificación anual con configuración de horarios y ge
     - Máximo 8 horas por día
     - **Cálculo automático:** horaFin = horaInicio + duración
 - [ ] **Validaciones de asignatura y nivel:**
-    - Asignatura y nivel son obligatorios al crear horario
-    - No permitir horarios duplicados para la misma asignatura/nivel/docente
-    - Validar que la asignatura y nivel existan en la base de datos
+  - Asignatura y nivel son obligatorios al crear horario
+  - No permitir horarios duplicados para la misma asignatura/nivel/docente
+  - Validar que la asignatura y nivel existan en la base de datos
 - [ ] **Validaciones de profesores:**
-    - Al menos un profesor titular por módulo
-    - Profesores deben impartir la asignatura y nivel seleccionados
-    - No permitir el mismo profesor como titular y ayudante en el mismo módulo
-    - Validar que los profesores existan en la base de datos
+  - Al menos un profesor titular por módulo
+  - Profesores deben impartir la asignatura y nivel seleccionados
+  - No permitir el mismo profesor como titular y ayudante en el mismo módulo
+  - Validar que los profesores existan en la base de datos
 
 ### 🔧 Fase 2: Gestión de Planificaciones Guardadas
 
 #### 2.1 Modelo de Base de Datos
+
 - [ ] **Crear tablas en Prisma Schema:**
+
   ```sql
   -- Tabla de planificaciones anuales
   model PlanificacionAnual {
@@ -333,6 +355,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   ```
 
 #### 2.2 API Endpoints
+
 - [ ] **Crear API `/api/planificaciones-anuales`:**
   - `GET /api/planificaciones-anuales` - Listar planificaciones del docente
   - `POST /api/planificaciones-anuales` - Crear nueva planificación
@@ -341,6 +364,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   - `DELETE /api/planificaciones-anuales/:id` - Eliminar planificación
 
 #### 2.3 Componentes de Gestión
+
 - [ ] **Componente `PlanificacionesList.tsx`:**
   - Lista de planificaciones guardadas
   - **Filtros avanzados:**
@@ -383,6 +407,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   - Botones: Cancelar, Importar
 
 #### 2.4 Hook de Gestión
+
 - [ ] **Hook `use-planificaciones.ts`:**
   - Carga de planificaciones guardadas
   - **Filtrado por asignatura y nivel:**
@@ -402,6 +427,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 ### 🔧 Fase 3: Navegación y Estructura del Sidebar
 
 #### 3.1 Actualización del Sidebar Principal
+
 - [ ] **Modificar `src/components/ui/Sidebar.tsx`:**
   - Agregar submenu "Planificación" con ícono Calendar
   - Submenu "Horarios" que enlaza a `/horarios`
@@ -421,6 +447,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   ```
 
 #### 3.2 Flujo de Navegación
+
 - [ ] **Flujo desde Sidebar:**
   1. Usuario hace clic en "Planificación" → Se expande submenu
   2. Usuario hace clic en "Horarios" → Va a `/horarios`
@@ -435,6 +462,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 ### 🔧 Fase 4: Integración y Mejoras
 
 #### 4.1 Integración con Planificación Anual
+
 - [ ] **Modificar página `/planificacion-anual`:**
   - Recibir horarioId como parámetro de URL
   - Cargar horario seleccionado automáticamente
@@ -457,6 +485,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
     - Permite confirmar o cancelar importación
 
 #### 4.2 Mejoras en la UI
+
 - [ ] **Mejoras en el calendario:**
   - Mostrar horario seleccionado en el header
   - **Información de profesores en eventos:**
@@ -471,6 +500,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   - Botones de acción rápida
 
 #### 4.3 Validaciones Avanzadas
+
 - [ ] **Validaciones de planificación:**
   - Verificar que todos los OAs obligatorios estén asignados
   - Validar distribución temporal equilibrada
@@ -480,6 +510,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 ### 🔧 Fase 5: Funcionalidades Avanzadas
 
 #### 5.1 Exportación e Importación
+
 - [ ] **Exportar planificación:**
   - Exportar a PDF con formato profesional
   - Exportar a Excel para análisis
@@ -496,6 +527,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   - Plantillas predefinidas por asignatura
 
 #### 5.2 Analytics y Reportes
+
 - [ ] **Métricas de planificación:**
   - Cobertura de OAs por período
   - Distribución temporal por eje
@@ -503,6 +535,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   - Comparación con años anteriores
 
 #### 5.3 Integración con Otros Módulos
+
 - [ ] **Integración con Editor:**
   - Generar planificaciones de clase desde OAs asignados
   - Vincular contenido con OAs específicos
@@ -513,10 +546,11 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 ## 🆕 Requerimientos Adicionales
 
 ### 📋 Importación de Planificaciones desde CSV
+
 - [ ] **Descripción:** Permitir importar planificaciones desde archivos CSV en la pantalla del calendario
 - [ ] **Prioridad:** Media
 - [ ] **Fase:** Fase 4 - Integración y Mejoras
-- [ ] **Criterios de aceptación:** 
+- [ ] **Criterios de aceptación:**
   - Usuario puede subir archivo CSV con eventos de planificación
   - Los eventos se importan como eventos del calendario (no como OAs asignados)
   - El sistema valida formato del CSV y muestra errores si es necesario
@@ -525,6 +559,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 - [ ] **Estimación:** 2-3 días de desarrollo
 
 ### 📝 Notas del Requerimiento
+
 - **Fecha de registro:** Julio 2025
 - **Estado:** Planificado
 - **Contexto:** El calendario ya permite agregar eventos manualmente sin usar el drawer de OAs. Esta funcionalidad permitirá importar planificaciones predefinidas desde CSV que no necesariamente cumplan con el horario establecido, ya que son solo eventos del calendario.
@@ -532,12 +567,14 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 ## 📊 Priorización
 
 ### 🔥 Alta Prioridad (Fase 1)
+
 1. Modelo de base de datos para horarios
 2. API endpoints básicos
 3. Pantalla de configuración de horario
 4. Integración con planificación anual
 
 ### 🔶 Media Prioridad (Fase 2-3)
+
 1. Modelo de base de datos para planificaciones
 2. API endpoints para planificaciones
 3. Componentes de gestión
@@ -545,6 +582,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 5. Navegación y estructura del sidebar
 
 ### 🔵 Baja Prioridad (Fase 4-5)
+
 1. Mejoras en UI/UX
 2. Funcionalidades avanzadas
 3. Analytics y reportes
@@ -553,6 +591,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 ## 🎯 Criterios de Aceptación
 
 ### Para Configuración de Horario
+
 - [ ] El docente puede crear y guardar múltiples horarios
 - [ ] El sistema valida que no haya solapamientos
 - [ ] El horario se puede seleccionar en la planificación anual
@@ -585,6 +624,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
     - Cálculo automático de hora de fin
 
 ### Para Gestión de Planificaciones
+
 - [ ] El docente puede guardar la planificación actual
 - [ ] Se pueden listar y cargar planificaciones guardadas
 - [ ] Se pueden editar y duplicar planificaciones
@@ -596,12 +636,14 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   - La información de asignatura y nivel se muestra correctamente
 
 ### Para Navegación y Sidebar
+
 - [ ] El submenu "Planificación" se expande correctamente
 - [ ] Los enlaces "Horarios" y "Calendario" funcionan
 - [ ] La navegación desde horarios a planificación funciona con parámetros
 - [ ] El flujo de creación de horario es intuitivo
 
 ### Para Importación CSV (NUEVO REQUERIMIENTO)
+
 - [ ] El botón "Importar CSV" está visible en la pantalla del calendario
 - [ ] Se puede subir archivo CSV mediante drag & drop o click
 - [ ] El sistema valida el formato del CSV y muestra errores apropiados
@@ -613,6 +655,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 ## 📝 Notas Técnicas
 
 ### Consideraciones de Base de Datos
+
 - Usar relaciones apropiadas entre tablas
 - Implementar cascada delete donde sea necesario
 - Considerar índices para consultas frecuentes
@@ -631,6 +674,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   - Considerar timezone del usuario para conversiones
 
 ### Consideraciones de UI/UX
+
 - Mantener consistencia con el diseño actual
 - Usar componentes existentes cuando sea posible
 - Implementar feedback visual para todas las acciones
@@ -639,7 +683,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   - **Vista de calendario semanal:** Grid con días en columnas y horas en filas
   - **Slots clickeables:** Hacer clic en un slot para crear bloque
   - **Drag & drop:** Arrastrar para crear bloques de tiempo
-  - **Listas desplegables:** 
+  - **Listas desplegables:**
     - Selector de día: Lunes, Martes, Miércoles, Jueves, Viernes
     - Selector de hora de comienzo: 8:00, 8:30, 9:00... hasta 18:00
     - Selector de duración: 30min, 45min, 1h, 1.5h, 2h
@@ -649,6 +693,7 @@ Completar el sistema de planificación anual con configuración de horarios y ge
   - **Información de bloque:** Mostrar hora inicio + duración en cada bloque
 
 ### Consideraciones de Performance
+
 - Implementar paginación para listas grandes
 - Usar lazy loading para componentes pesados
 - Optimizar consultas de base de datos
@@ -658,16 +703,18 @@ Completar el sistema de planificación anual con configuración de horarios y ge
 
 **Estado:** 📋 Planificado  
 **Última actualización:** Julio 2025  
-**Responsable:** Equipo de Desarrollo 
+**Responsable:** Equipo de Desarrollo
 
 # TAREAS PENDIENTES
 
 ## 🎯 **HOMOLOGACIÓN DE HEADERS - PRIORIDAD ALTA**
 
 ### **Objetivo**
+
 Homologar todos los headers de la plataforma al estilo del componente `ResultadosHeader` para mantener consistencia visual en toda la aplicación.
 
 ### **Componente de Referencia**
+
 - **Archivo**: `src/components/resultados/ResultadosHeader.tsx`
 - **Estilo**: Gradiente emerald-teal, icono con fondo blanco/20, contador en esquina superior derecha
 - **Props**: `title`, `subtitle`, `icon`, `totalCount`, `totalLabel`, `showBackButton`, `showExportButton`
@@ -675,6 +722,7 @@ Homologar todos los headers de la plataforma al estilo del componente `Resultado
 ### **Páginas a Homologar**
 
 #### **Páginas Principales**
+
 - [ ] `/matrices` - Listado de matrices
 - [ ] `/matrices/crear` - Crear matriz
 - [ ] `/matrices/[id]` - Ver matriz específica
@@ -685,12 +733,14 @@ Homologar todos los headers de la plataforma al estilo del componente `Resultado
 - [ ] `/evaluaciones/[id]/editar` - Editar evaluación
 
 #### **Páginas de Gestión**
+
 - [ ] `/horarios` - Gestión de horarios
 - [ ] `/planificacion-anual` - Planificación anual
 - [ ] `/planificacion-anual/listado` - Listado de planificaciones
 - [ ] `/editor` - Editor de contenido
 
 #### **Páginas de Administración**
+
 - [ ] `/asignaturas` - Gestión de asignaturas
 - [ ] `/profesores` - Gestión de profesores
 - [ ] `/niveles` - Gestión de niveles
@@ -699,6 +749,7 @@ Homologar todos los headers de la plataforma al estilo del componente `Resultado
 ### **Criterios de Homologación**
 
 #### **Estructura Visual**
+
 ```tsx
 <ResultadosHeader
   title="Título de la Página"
@@ -712,6 +763,7 @@ Homologar todos los headers de la plataforma al estilo del componente `Resultado
 ```
 
 #### **Gradientes por Categoría**
+
 - **Evaluaciones**: `from-emerald-600 to-teal-600` (actual)
 - **Matrices**: `from-blue-600 to-indigo-600`
 - **Horarios**: `from-purple-600 to-pink-600`
@@ -719,6 +771,7 @@ Homologar todos los headers de la plataforma al estilo del componente `Resultado
 - **Administración**: `from-gray-600 to-slate-600`
 
 #### **Iconos Sugeridos**
+
 - **Matrices**: `Grid3X3` o `Table`
 - **Evaluaciones**: `FileText` o `ClipboardList`
 - **Horarios**: `Calendar` o `Clock`
@@ -726,12 +779,14 @@ Homologar todos los headers de la plataforma al estilo del componente `Resultado
 - **Administración**: `Settings` o `Database`
 
 ### **Beneficios Esperados**
+
 - 🎨 **Consistencia visual** en toda la plataforma
 - 🧩 **Componentes reutilizables** y mantenibles
 - 📱 **Experiencia de usuario** mejorada
 - 🔧 **Desarrollo más eficiente** con patrones establecidos
 
 ### **Notas Técnicas**
+
 - Mantener la funcionalidad existente intacta
 - Solo cambiar la presentación visual del header
 - Asegurar que los contadores muestren información relevante
@@ -742,20 +797,23 @@ Homologar todos los headers de la plataforma al estilo del componente `Resultado
 ## 📋 **OTRAS TAREAS PENDIENTES**
 
 ### **Refactorización de Componentes**
+
 - [ ] Refactorizar página de carga de resultados usando componentes reutilizables
 - [ ] Crear componentes comunes para formularios (inputs, selects, etc.)
 - [ ] Estandarizar modales y diálogos
 
 ### **Mejoras de UX/UI**
+
 - [ ] Implementar skeleton loading en todas las páginas
 - [ ] Mejorar feedback visual en formularios
 - [ ] Optimizar responsive design en móviles
 
 ### **Testing**
+
 - [ ] Completar tests de integración para flujos principales
 - [ ] Agregar tests unitarios para componentes reutilizables
 - [ ] Implementar tests E2E para flujos críticos
 
 ---
 
-*Última actualización: $(date)* 
+_Última actualización: $(date)_

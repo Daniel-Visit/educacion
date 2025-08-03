@@ -2,7 +2,19 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, FileText, Trash2, Edit, Eye, BarChart3, Calendar, Target, Users, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Plus,
+  FileText,
+  Trash2,
+  Edit,
+  Eye,
+  BarChart3,
+  Calendar,
+  Target,
+  Users,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import { Dialog } from '@headlessui/react';
 import { useMatricesList } from '@/hooks/useMatrices';
 import { formatDate, getGradient, getPageNumbers } from '@/utils/matrices';
@@ -14,17 +26,20 @@ export default function MatricesPage() {
   const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
-  const [alert, setAlert] = useState<{ type: 'error' | 'success', message: string } | null>(null);
-  
+  const [alert, setAlert] = useState<{
+    type: 'error' | 'success';
+    message: string;
+  } | null>(null);
+
   const {
     matrices,
     loading,
     currentPage,
     setCurrentPage,
     deletingId,
-    deleteMatriz
+    deleteMatriz,
   } = useMatricesList();
-  
+
   const matricesPerPage = 6;
 
   const handleCreateMatriz = () => {
@@ -47,17 +62,18 @@ export default function MatricesPage() {
   const confirmDeleteMatriz = async () => {
     if (!pendingDeleteId) return;
     setShowDeleteModal(false);
-    
+
     const result = await deleteMatriz(pendingDeleteId);
     if (result.success) {
       setAlert({ type: 'success', message: 'Matriz eliminada correctamente.' });
     } else {
-      setAlert({ type: 'error', message: result.error || 'Error al eliminar la matriz.' });
+      setAlert({
+        type: 'error',
+        message: result.error || 'Error al eliminar la matriz.',
+      });
     }
     setPendingDeleteId(null);
   };
-
-
 
   // Funciones de paginación
   const totalPages = Math.ceil(matrices.length / matricesPerPage);
@@ -73,7 +89,7 @@ export default function MatricesPage() {
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    
+
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -101,7 +117,7 @@ export default function MatricesPage() {
         pages.push(totalPages);
       }
     }
-    
+
     return pages;
   };
 
@@ -134,17 +150,17 @@ export default function MatricesPage() {
               </p>
             </div>
           </div>
-          
+
           {/* Botones de acción */}
-          <PrimaryButton 
-            onClick={handleCreateMatriz} 
+          <PrimaryButton
+            onClick={handleCreateMatriz}
             className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
           >
             <Plus className="w-4 h-4" />
             Nueva Matriz
           </PrimaryButton>
         </div>
-        
+
         {/* Stats y información */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white/10 rounded-lg p-3">
@@ -152,13 +168,11 @@ export default function MatricesPage() {
               <FileText className="h-4 w-4 text-indigo-200" />
               <div>
                 <p className="text-indigo-200 text-xs">Total Matrices</p>
-                <p className="text-lg font-bold">
-                  {matrices.length}
-                </p>
+                <p className="text-lg font-bold">{matrices.length}</p>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white/10 rounded-lg p-3">
             <div className="flex items-center gap-2">
               <Target className="h-4 w-4 text-indigo-200" />
@@ -170,7 +184,7 @@ export default function MatricesPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white/10 rounded-lg p-3">
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-indigo-200" />
@@ -182,14 +196,16 @@ export default function MatricesPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white/10 rounded-lg p-3">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-indigo-200" />
               <div>
                 <p className="text-indigo-200 text-xs">Última Creada</p>
                 <p className="text-lg font-bold">
-                  {matrices.length > 0 ? formatDate(matrices[0].createdAt || '') : '-'}
+                  {matrices.length > 0
+                    ? formatDate(matrices[0].createdAt || '')
+                    : '-'}
                 </p>
               </div>
             </div>
@@ -209,9 +225,10 @@ export default function MatricesPage() {
                 No hay matrices creadas
               </h3>
               <p className="text-indigo-600 text-xl mb-10 max-w-lg mx-auto leading-relaxed">
-                Crea tu primera matriz de especificación para comenzar a diseñar evaluaciones estructuradas y efectivas
+                Crea tu primera matriz de especificación para comenzar a diseñar
+                evaluaciones estructuradas y efectivas
               </p>
-              <PrimaryButton 
+              <PrimaryButton
                 onClick={handleCreateMatriz}
                 className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-10 py-4 text-xl font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
               >
@@ -225,13 +242,15 @@ export default function MatricesPage() {
             {/* Grid responsivo */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {currentMatrices.map((matriz, index) => (
-                <div 
-                  key={matriz.id} 
+                <div
+                  key={matriz.id}
                   className="group bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 relative overflow-hidden"
                 >
                   {/* Accent line superior */}
-                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${getGradient(index)}`}></div>
-                  
+                  <div
+                    className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${getGradient(index)}`}
+                  ></div>
+
                   {/* Botones de acciones */}
                   <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <div className="flex gap-1">
@@ -259,54 +278,73 @@ export default function MatricesPage() {
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* Contenido principal */}
                   <div className="p-6">
                     {/* Icono y título */}
                     <div className="flex items-center gap-3 mb-4">
-                      <div className={`h-10 w-10 bg-gradient-to-br ${getGradient(index)} rounded-xl flex items-center justify-center shadow-sm`}>
+                      <div
+                        className={`h-10 w-10 bg-gradient-to-br ${getGradient(index)} rounded-xl flex items-center justify-center shadow-sm`}
+                      >
                         <BarChart3 size={20} className="text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900 truncate">{matriz.nombre}</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 truncate">
+                          {matriz.nombre}
+                        </h3>
                       </div>
                     </div>
-                    
+
                     {/* Información de la matriz */}
                     <div className="space-y-4">
                       {/* Total de preguntas */}
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                          <span className="text-gray-600 font-medium text-sm">Total Preguntas</span>
+                          <span className="text-gray-600 font-medium text-sm">
+                            Total Preguntas
+                          </span>
                         </div>
-                        <span className="text-gray-900 font-semibold text-sm block pl-4">{matriz.total_preguntas}</span>
+                        <span className="text-gray-900 font-semibold text-sm block pl-4">
+                          {matriz.total_preguntas}
+                        </span>
                       </div>
-                      
+
                       {/* Total de OAs */}
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                          <span className="text-gray-600 font-medium text-sm">Objetivos de Aprendizaje</span>
+                          <span className="text-gray-600 font-medium text-sm">
+                            Objetivos de Aprendizaje
+                          </span>
                         </div>
-                        <span className="text-gray-900 font-semibold text-sm block pl-4">{matriz.oas?.length || 0} OAs</span>
+                        <span className="text-gray-900 font-semibold text-sm block pl-4">
+                          {matriz.oas?.length || 0} OAs
+                        </span>
                       </div>
-                      
+
                       {/* Fecha de creación */}
                       <div className="flex items-center gap-2 text-sm">
                         <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                        <span className="text-gray-600 font-medium">Creada:</span>
-                        <span className="text-gray-900 font-semibold">{formatDate(matriz.createdAt || '')}</span>
+                        <span className="text-gray-600 font-medium">
+                          Creada:
+                        </span>
+                        <span className="text-gray-900 font-semibold">
+                          {formatDate(matriz.createdAt || '')}
+                        </span>
                       </div>
                     </div>
-                    
+
                     {/* Botón de acción principal */}
                     <div className="mt-6 pt-4 border-t border-gray-100">
                       <button
                         onClick={() => handleViewMatriz(matriz.id)}
                         className={`w-full bg-gradient-to-r ${getGradient(index)} hover:from-emerald-600 hover:to-teal-700 text-white py-2.5 px-4 rounded-xl font-medium text-sm transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 group/btn`}
                       >
-                        <Eye size={16} className="group-hover/btn:scale-110 transition-transform" />
+                        <Eye
+                          size={16}
+                          className="group-hover/btn:scale-110 transition-transform"
+                        />
                         Ver Matriz
                       </button>
                     </div>
@@ -315,32 +353,46 @@ export default function MatricesPage() {
               ))}
             </div>
 
-                        {/* Paginación exacta estilo imagen */}
+            {/* Paginación exacta estilo imagen */}
             <div className="flex justify-center mt-8">
-              <nav className="inline-flex items-center gap-4 select-none" aria-label="Pagination">
+              <nav
+                className="inline-flex items-center gap-4 select-none"
+                aria-label="Pagination"
+              >
                 <button
                   className="flex items-center gap-1 text-[1.7rem] text-gray-800 font-normal px-2 py-1 rounded-md hover:bg-gray-50 transition disabled:opacity-40"
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
                 >
-                  <ChevronLeft size={20} strokeWidth={2.2} /> 
+                  <ChevronLeft size={20} strokeWidth={2.2} />
                 </button>
                 <div className="flex items-center gap-4">
                   {getPageNumbers().map((page, index) =>
-                    page === '...'
-                      ? <span key={index} className="text-3xl text-gray-700 font-light px-2">•••</span>
-                      : <button
-                          key={page}
-                          className={
-                            currentPage === page
-                              ? 'flex items-center justify-center text-sm font-medium rounded-xl border-2 border-gray-200 bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] px-4 py-2'
-                              : 'flex items-center justify-center text-sm font-normal rounded-xl px-4 py-2 hover:bg-gray-50 transition'
-                          }
-                          onClick={() => typeof page === 'number' ? handlePageChange(page) : null}
-                          aria-current={currentPage === page ? 'page' : undefined}
-                        >
-                          {page}
-                        </button>
+                    page === '...' ? (
+                      <span
+                        key={index}
+                        className="text-3xl text-gray-700 font-light px-2"
+                      >
+                        •••
+                      </span>
+                    ) : (
+                      <button
+                        key={page}
+                        className={
+                          currentPage === page
+                            ? 'flex items-center justify-center text-sm font-medium rounded-xl border-2 border-gray-200 bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] px-4 py-2'
+                            : 'flex items-center justify-center text-sm font-normal rounded-xl px-4 py-2 hover:bg-gray-50 transition'
+                        }
+                        onClick={() =>
+                          typeof page === 'number'
+                            ? handlePageChange(page)
+                            : null
+                        }
+                        aria-current={currentPage === page ? 'page' : undefined}
+                      >
+                        {page}
+                      </button>
+                    )
                   )}
                 </div>
                 <button
@@ -348,40 +400,70 @@ export default function MatricesPage() {
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                 >
-                   <ChevronRight size={20} strokeWidth={2.2} />
+                  <ChevronRight size={20} strokeWidth={2.2} />
                 </button>
               </nav>
             </div>
-
-
           </div>
         )}
       </div>
 
       {/* Modales de confirmación y alerta */}
-      <Dialog open={showDeleteModal} onClose={() => setShowDeleteModal(false)} className="fixed z-50 inset-0 overflow-y-auto">
+      <Dialog
+        open={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        className="fixed z-50 inset-0 overflow-y-auto"
+      >
         <div className="flex items-center justify-center min-h-screen px-4">
-          <div className="fixed inset-0 bg-black opacity-30" aria-hidden="true" />
+          <div
+            className="fixed inset-0 bg-black opacity-30"
+            aria-hidden="true"
+          />
           <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full mx-auto p-8 z-10">
-            <Dialog.Title className="text-lg font-bold mb-4">¿Eliminar matriz?</Dialog.Title>
-            <Dialog.Description className="mb-6 text-gray-600">Esta acción no se puede deshacer. ¿Estás seguro de que quieres eliminar esta matriz?</Dialog.Description>
+            <Dialog.Title className="text-lg font-bold mb-4">
+              ¿Eliminar matriz?
+            </Dialog.Title>
+            <Dialog.Description className="mb-6 text-gray-600">
+              Esta acción no se puede deshacer. ¿Estás seguro de que quieres
+              eliminar esta matriz?
+            </Dialog.Description>
             <div className="flex gap-4 justify-end">
-              <SecondaryButton onClick={() => setShowDeleteModal(false)}>Cancelar</SecondaryButton>
-              <PrimaryButton onClick={confirmDeleteMatriz} disabled={deletingId !== null}>Eliminar</PrimaryButton>
+              <SecondaryButton onClick={() => setShowDeleteModal(false)}>
+                Cancelar
+              </SecondaryButton>
+              <PrimaryButton
+                onClick={confirmDeleteMatriz}
+                disabled={deletingId !== null}
+              >
+                Eliminar
+              </PrimaryButton>
             </div>
           </div>
         </div>
       </Dialog>
-      
+
       {alert && (
-        <Dialog open={!!alert} onClose={() => setAlert(null)} className="fixed z-50 inset-0 overflow-y-auto">
+        <Dialog
+          open={!!alert}
+          onClose={() => setAlert(null)}
+          className="fixed z-50 inset-0 overflow-y-auto"
+        >
           <div className="flex items-center justify-center min-h-screen px-4">
-            <div className="fixed inset-0 bg-black opacity-30" aria-hidden="true" />
+            <div
+              className="fixed inset-0 bg-black opacity-30"
+              aria-hidden="true"
+            />
             <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full mx-auto p-8 z-10">
-              <Dialog.Title className="text-lg font-bold mb-4">{alert.type === 'error' ? 'Error' : 'Éxito'}</Dialog.Title>
-              <Dialog.Description className="mb-6 text-gray-600">{alert.message}</Dialog.Description>
+              <Dialog.Title className="text-lg font-bold mb-4">
+                {alert.type === 'error' ? 'Error' : 'Éxito'}
+              </Dialog.Title>
+              <Dialog.Description className="mb-6 text-gray-600">
+                {alert.message}
+              </Dialog.Description>
               <div className="flex gap-4 justify-end">
-                <PrimaryButton onClick={() => setAlert(null)}>Cerrar</PrimaryButton>
+                <PrimaryButton onClick={() => setAlert(null)}>
+                  Cerrar
+                </PrimaryButton>
               </div>
             </div>
           </div>

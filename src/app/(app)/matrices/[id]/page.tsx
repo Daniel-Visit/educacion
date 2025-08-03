@@ -2,7 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft, FileText, Hash, Calendar, BookOpen, List, Clock, Edit, Trash2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  FileText,
+  Hash,
+  Calendar,
+  BookOpen,
+  List,
+  Clock,
+  Edit,
+  Trash2,
+} from 'lucide-react';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import SecondaryButton from '@/components/ui/SecondaryButton';
 import { Dialog } from '@headlessui/react';
@@ -44,7 +54,10 @@ export default function VerMatrizPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [alert, setAlert] = useState<{ type: 'error' | 'success', message: string } | null>(null);
+  const [alert, setAlert] = useState<{
+    type: 'error' | 'success';
+    message: string;
+  } | null>(null);
 
   useEffect(() => {
     if (params.id) {
@@ -100,7 +113,7 @@ export default function VerMatrizPage() {
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
@@ -131,33 +144,49 @@ export default function VerMatrizPage() {
     );
   }
 
-  const totalPreguntasIndicadores = matriz.oas.reduce((sum, matrizOA) => 
-    sum + matrizOA.indicadores.reduce((oaSum, ind) => oaSum + ind.preguntas, 0), 0
+  const totalPreguntasIndicadores = matriz.oas.reduce(
+    (sum, matrizOA) =>
+      sum +
+      matrizOA.indicadores.reduce((oaSum, ind) => oaSum + ind.preguntas, 0),
+    0
   );
 
   // Separar OAs por tipo de eje
-  const oasContenido = matriz.oas.filter(matrizOA => matrizOA.oa.tipo_eje === 'Contenido');
-  const oasHabilidad = matriz.oas.filter(matrizOA => matrizOA.oa.tipo_eje === 'Habilidad');
+  const oasContenido = matriz.oas.filter(
+    matrizOA => matrizOA.oa.tipo_eje === 'Contenido'
+  );
+  const oasHabilidad = matriz.oas.filter(
+    matrizOA => matrizOA.oa.tipo_eje === 'Habilidad'
+  );
 
   // Calcular totales separados por tipo de eje
-  const totalPreguntasContenido = oasContenido.reduce((sum, matrizOA) => 
-    sum + matrizOA.indicadores.reduce((oaSum, ind) => oaSum + ind.preguntas, 0), 0
+  const totalPreguntasContenido = oasContenido.reduce(
+    (sum, matrizOA) =>
+      sum +
+      matrizOA.indicadores.reduce((oaSum, ind) => oaSum + ind.preguntas, 0),
+    0
   );
-  
-  const totalPreguntasHabilidad = oasHabilidad.reduce((sum, matrizOA) => 
-    sum + matrizOA.indicadores.reduce((oaSum, ind) => oaSum + ind.preguntas, 0), 0
+
+  const totalPreguntasHabilidad = oasHabilidad.reduce(
+    (sum, matrizOA) =>
+      sum +
+      matrizOA.indicadores.reduce((oaSum, ind) => oaSum + ind.preguntas, 0),
+    0
   );
 
   // Determinar si hay ambos tipos de eje
   const hasBothTypes = oasContenido.length > 0 && oasHabilidad.length > 0;
-  
+
   // Para mostrar el total correcto: si hay ambos tipos, usar el total de contenido (o habilidad, ambos deberían ser iguales)
-  const totalPreguntasToShow = hasBothTypes ? totalPreguntasContenido : totalPreguntasIndicadores;
-  
+  const totalPreguntasToShow = hasBothTypes
+    ? totalPreguntasContenido
+    : totalPreguntasIndicadores;
+
   // Validación: si hay ambos tipos, ambos deben sumar el total de la matriz
-  const isMatrizValid = hasBothTypes 
-    ? (totalPreguntasContenido === matriz.total_preguntas && totalPreguntasHabilidad === matriz.total_preguntas)
-    : (totalPreguntasIndicadores === matriz.total_preguntas);
+  const isMatrizValid = hasBothTypes
+    ? totalPreguntasContenido === matriz.total_preguntas &&
+      totalPreguntasHabilidad === matriz.total_preguntas
+    : totalPreguntasIndicadores === matriz.total_preguntas;
 
   return (
     <>
@@ -203,7 +232,7 @@ export default function VerMatrizPage() {
             </button>
           </div>
         </div>
-        
+
         {/* Stats compactas */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white/10 rounded-lg p-3">
@@ -232,7 +261,10 @@ export default function VerMatrizPage() {
               <div>
                 <p className="text-indigo-200 text-xs">Indicadores</p>
                 <p className="text-lg font-bold">
-                  {matriz.oas.reduce((sum, matrizOA) => sum + matrizOA.indicadores.length, 0)}
+                  {matriz.oas.reduce(
+                    (sum, matrizOA) => sum + matrizOA.indicadores.length,
+                    0
+                  )}
                 </p>
               </div>
             </div>
@@ -254,20 +286,24 @@ export default function VerMatrizPage() {
 
       {/* Validation Status - Modernizado */}
       <div className="mb-8">
-        <div className={`relative overflow-hidden rounded-2xl shadow-lg ${
-          isMatrizValid
-            ? 'bg-gradient-to-r from-emerald-500 to-green-500'
-            : 'bg-gradient-to-r from-amber-500 to-orange-500'
-        }`}>
+        <div
+          className={`relative overflow-hidden rounded-2xl shadow-lg ${
+            isMatrizValid
+              ? 'bg-gradient-to-r from-emerald-500 to-green-500'
+              : 'bg-gradient-to-r from-amber-500 to-orange-500'
+          }`}
+        >
           <div className="absolute inset-0 bg-black/10"></div>
           <div className="relative p-6 text-white">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className={`p-3 rounded-xl ${
-                  isMatrizValid
-                    ? 'bg-white/20 backdrop-blur-sm'
-                    : 'bg-white/20 backdrop-blur-sm'
-                }`}>
+                <div
+                  className={`p-3 rounded-xl ${
+                    isMatrizValid
+                      ? 'bg-white/20 backdrop-blur-sm'
+                      : 'bg-white/20 backdrop-blur-sm'
+                  }`}
+                >
                   {isMatrizValid ? (
                     <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
                       <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
@@ -278,19 +314,20 @@ export default function VerMatrizPage() {
                 </div>
                 <div>
                   <p className="text-lg font-bold">
-                    {isMatrizValid
-                      ? 'Matriz Válida'
-                      : 'Matriz Incompleta'
-                    }
+                    {isMatrizValid ? 'Matriz Válida' : 'Matriz Incompleta'}
                   </p>
                   <p className="text-white/90 text-sm">
-                    Preguntas de indicadores: {totalPreguntasToShow} / {matriz.total_preguntas}
+                    Preguntas de indicadores: {totalPreguntasToShow} /{' '}
+                    {matriz.total_preguntas}
                   </p>
                 </div>
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold">
-                  {Math.round((totalPreguntasToShow / matriz.total_preguntas) * 100)}%
+                  {Math.round(
+                    (totalPreguntasToShow / matriz.total_preguntas) * 100
+                  )}
+                  %
                 </div>
                 <div className="text-white/80 text-xs">Completado</div>
               </div>
@@ -312,8 +349,12 @@ export default function VerMatrizPage() {
                     <BookOpen className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold">Objetivos de Aprendizaje - Contenido</h2>
-                    <p className="text-blue-100">OAs de contenido incluidos en esta matriz</p>
+                    <h2 className="text-2xl font-bold">
+                      Objetivos de Aprendizaje - Contenido
+                    </h2>
+                    <p className="text-blue-100">
+                      OAs de contenido incluidos en esta matriz
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -330,7 +371,10 @@ export default function VerMatrizPage() {
             {/* OAs de Contenido */}
             <div className="grid gap-6">
               {oasContenido.map((matrizOA, index) => (
-                <div key={matrizOA.id} className="group bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
+                <div
+                  key={matrizOA.id}
+                  className="group bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
+                >
                   {/* Header del OA */}
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b border-gray-100">
                     <div className="flex items-start justify-between">
@@ -351,7 +395,8 @@ export default function VerMatrizPage() {
                           )}
                         </div>
                         <p className="text-gray-700 text-sm leading-relaxed">
-                          {matrizOA.oa?.descripcion_oas || 'Descripción no disponible'}
+                          {matrizOA.oa?.descripcion_oas ||
+                            'Descripción no disponible'}
                         </p>
                       </div>
                     </div>
@@ -370,18 +415,23 @@ export default function VerMatrizPage() {
                         {matrizOA.indicadores.length} indicadores
                       </div>
                     </div>
-                    
+
                     {matrizOA.indicadores.length === 0 ? (
                       <div className="text-center py-8">
                         <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
                           <List size={20} className="text-gray-400" />
                         </div>
-                        <p className="text-gray-500 text-sm">No hay indicadores definidos</p>
+                        <p className="text-gray-500 text-sm">
+                          No hay indicadores definidos
+                        </p>
                       </div>
                     ) : (
                       <div className="space-y-3">
                         {matrizOA.indicadores.map((indicador, idx) => (
-                          <div key={indicador.id} className="group/indicator bg-gradient-to-r from-gray-50 to-gray-100 hover:from-blue-50 hover:to-indigo-50 border border-gray-200 hover:border-blue-200 rounded-xl p-4 transition-all duration-200">
+                          <div
+                            key={indicador.id}
+                            className="group/indicator bg-gradient-to-r from-gray-50 to-gray-100 hover:from-blue-50 hover:to-indigo-50 border border-gray-200 hover:border-blue-200 rounded-xl p-4 transition-all duration-200"
+                          >
                             <div className="flex items-center justify-between">
                               <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
@@ -422,8 +472,12 @@ export default function VerMatrizPage() {
                     <BookOpen className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold">Objetivos de Aprendizaje - Habilidad</h2>
-                    <p className="text-green-100">OAs de habilidad incluidos en esta matriz</p>
+                    <h2 className="text-2xl font-bold">
+                      Objetivos de Aprendizaje - Habilidad
+                    </h2>
+                    <p className="text-green-100">
+                      OAs de habilidad incluidos en esta matriz
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -440,7 +494,10 @@ export default function VerMatrizPage() {
             {/* OAs de Habilidad */}
             <div className="grid gap-6">
               {oasHabilidad.map((matrizOA, index) => (
-                <div key={matrizOA.id} className="group bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
+                <div
+                  key={matrizOA.id}
+                  className="group bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
+                >
                   {/* Header del OA */}
                   <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 border-b border-gray-100">
                     <div className="flex items-start justify-between">
@@ -461,7 +518,8 @@ export default function VerMatrizPage() {
                           )}
                         </div>
                         <p className="text-gray-700 text-sm leading-relaxed">
-                          {matrizOA.oa?.descripcion_oas || 'Descripción no disponible'}
+                          {matrizOA.oa?.descripcion_oas ||
+                            'Descripción no disponible'}
                         </p>
                       </div>
                     </div>
@@ -480,18 +538,23 @@ export default function VerMatrizPage() {
                         {matrizOA.indicadores.length} indicadores
                       </div>
                     </div>
-                    
+
                     {matrizOA.indicadores.length === 0 ? (
                       <div className="text-center py-8">
                         <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
                           <List size={20} className="text-gray-400" />
                         </div>
-                        <p className="text-gray-500 text-sm">No hay indicadores definidos</p>
+                        <p className="text-gray-500 text-sm">
+                          No hay indicadores definidos
+                        </p>
                       </div>
                     ) : (
                       <div className="space-y-3">
                         {matrizOA.indicadores.map((indicador, idx) => (
-                          <div key={indicador.id} className="group/indicator bg-gradient-to-r from-gray-50 to-gray-100 hover:from-green-50 hover:to-emerald-50 border border-gray-200 hover:border-green-200 rounded-xl p-4 transition-all duration-200">
+                          <div
+                            key={indicador.id}
+                            className="group/indicator bg-gradient-to-r from-gray-50 to-gray-100 hover:from-green-50 hover:to-emerald-50 border border-gray-200 hover:border-green-200 rounded-xl p-4 transition-all duration-200"
+                          >
                             <div className="flex items-center justify-between">
                               <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
@@ -523,28 +586,55 @@ export default function VerMatrizPage() {
       </div>
 
       {/* Modales de confirmación y alerta */}
-      <Dialog open={showDeleteModal} onClose={() => setShowDeleteModal(false)} className="fixed z-50 inset-0 overflow-y-auto">
+      <Dialog
+        open={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        className="fixed z-50 inset-0 overflow-y-auto"
+      >
         <div className="flex items-center justify-center min-h-screen px-4">
-          <div className="fixed inset-0 bg-black opacity-30" aria-hidden="true" />
+          <div
+            className="fixed inset-0 bg-black opacity-30"
+            aria-hidden="true"
+          />
           <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full mx-auto p-8 z-10">
-            <Dialog.Title className="text-lg font-bold mb-4">¿Eliminar matriz?</Dialog.Title>
-            <Dialog.Description className="mb-6 text-gray-600">Esta acción no se puede deshacer. ¿Estás seguro de que quieres eliminar esta matriz?</Dialog.Description>
+            <Dialog.Title className="text-lg font-bold mb-4">
+              ¿Eliminar matriz?
+            </Dialog.Title>
+            <Dialog.Description className="mb-6 text-gray-600">
+              Esta acción no se puede deshacer. ¿Estás seguro de que quieres
+              eliminar esta matriz?
+            </Dialog.Description>
             <div className="flex gap-4 justify-end">
-              <SecondaryButton onClick={() => setShowDeleteModal(false)}>Cancelar</SecondaryButton>
+              <SecondaryButton onClick={() => setShowDeleteModal(false)}>
+                Cancelar
+              </SecondaryButton>
               <PrimaryButton onClick={confirmDelete}>Eliminar</PrimaryButton>
             </div>
           </div>
         </div>
       </Dialog>
       {alert && (
-        <Dialog open={!!alert} onClose={() => setAlert(null)} className="fixed z-50 inset-0 overflow-y-auto">
+        <Dialog
+          open={!!alert}
+          onClose={() => setAlert(null)}
+          className="fixed z-50 inset-0 overflow-y-auto"
+        >
           <div className="flex items-center justify-center min-h-screen px-4">
-            <div className="fixed inset-0 bg-black opacity-30" aria-hidden="true" />
+            <div
+              className="fixed inset-0 bg-black opacity-30"
+              aria-hidden="true"
+            />
             <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full mx-auto p-8 z-10">
-              <Dialog.Title className="text-lg font-bold mb-4">{alert.type === 'error' ? 'Error' : 'Éxito'}</Dialog.Title>
-              <Dialog.Description className="mb-6 text-gray-600">{alert.message}</Dialog.Description>
+              <Dialog.Title className="text-lg font-bold mb-4">
+                {alert.type === 'error' ? 'Error' : 'Éxito'}
+              </Dialog.Title>
+              <Dialog.Description className="mb-6 text-gray-600">
+                {alert.message}
+              </Dialog.Description>
               <div className="flex gap-4 justify-end">
-                <PrimaryButton onClick={() => setAlert(null)}>Cerrar</PrimaryButton>
+                <PrimaryButton onClick={() => setAlert(null)}>
+                  Cerrar
+                </PrimaryButton>
               </div>
             </div>
           </div>
@@ -552,4 +642,4 @@ export default function VerMatrizPage() {
       )}
     </>
   );
-} 
+}

@@ -1,6 +1,9 @@
-import * as React from "react"
+import * as React from 'react';
 
-export function MinusIcon({ className, ...props }: React.SVGProps<SVGSVGElement>) {
+export function MinusIcon({
+  className,
+  ...props
+}: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -17,5 +20,5 @@ export function MinusIcon({ className, ...props }: React.SVGProps<SVGSVGElement>
     >
       <path d="M5 12h14" />
     </svg>
-  )
-} 
+  );
+}

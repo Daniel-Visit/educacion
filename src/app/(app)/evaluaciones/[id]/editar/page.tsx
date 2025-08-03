@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import EvaluacionForm from '@/components/evaluacion/EvaluacionForm';
@@ -32,15 +32,21 @@ export default function EditarEvaluacionPage() {
       if (event.detail.evaluacionId === parseInt(id as string)) {
         setEvaluacion((prev: any) => ({
           ...prev,
-          estado: event.detail.estado
+          estado: event.detail.estado,
         }));
       }
     };
 
-    window.addEventListener('evaluacionEstadoActualizado', handleEstadoActualizado as EventListener);
-    
+    window.addEventListener(
+      'evaluacionEstadoActualizado',
+      handleEstadoActualizado as EventListener
+    );
+
     return () => {
-      window.removeEventListener('evaluacionEstadoActualizado', handleEstadoActualizado as EventListener);
+      window.removeEventListener(
+        'evaluacionEstadoActualizado',
+        handleEstadoActualizado as EventListener
+      );
     };
   }, [id]);
 
@@ -80,10 +86,7 @@ export default function EditarEvaluacionPage() {
           </div>
         </div>
       )}
-      <EvaluacionForm
-        modoEdicion={true}
-        evaluacionInicial={evaluacion}
-      />
+      <EvaluacionForm modoEdicion={true} evaluacionInicial={evaluacion} />
     </div>
   );
-} 
+}

@@ -7,6 +7,7 @@ El editor de contenido es el núcleo de la plataforma educativa, permitiendo a l
 ## Características Principales
 
 ### ✨ Funcionalidades del Editor
+
 - **Editor TipTap completo** con todas las extensiones necesarias
 - **Guardado y carga** de archivos con persistencia en base de datos
 - **Upload de imágenes** con almacenamiento Base64
@@ -15,6 +16,7 @@ El editor de contenido es el núcleo de la plataforma educativa, permitiendo a l
 - **Interfaz responsive** y moderna
 
 ### 🎨 Extensiones TipTap Implementadas
+
 - **Formato de texto:** Bold, Italic, Underline, Strike, Subscript, Superscript
 - **Encabezados:** H1-H6 con dropdown
 - **Listas:** Ordenadas, no ordenadas, tareas
@@ -55,22 +57,26 @@ src/app/api/
 ## Uso del Editor
 
 ### 1. Acceso al Editor
+
 ```bash
 # Navegar a la página del editor
 http://localhost:3000/editor
 ```
 
 ### 2. Selección de Tipo de Contenido
+
 - **Planificación de Clase:** Para crear planificaciones detalladas
 - **Material de Apoyo:** Para crear materiales para estudiantes
 
 ### 3. Creación de Contenido
+
 1. Selecciona el tipo de contenido en la sidebar
 2. Usa la barra de herramientas para formatear texto
 3. Sube imágenes con el botón de imagen
 4. Guarda tu trabajo con "Guardar" o "Guardar Cambios"
 
 ### 4. Carga de Archivos Existentes
+
 1. Haz clic en el FAB flotante (botón circular)
 2. Selecciona el archivo que quieres cargar
 3. El contenido se cargará automáticamente en el editor
@@ -80,7 +86,9 @@ http://localhost:3000/editor
 ### Archivos (`/api/archivos`)
 
 #### GET `/api/archivos`
+
 Obtiene todos los archivos filtrados por tipo.
+
 ```typescript
 // Query parameters
 {
@@ -89,17 +97,21 @@ Obtiene todos los archivos filtrados por tipo.
 ```
 
 #### POST `/api/archivos`
+
 Crea un nuevo archivo.
+
 ```typescript
 {
-  titulo: string
-  tipo: 'planificacion' | 'material'
-  contenido: string // JSON de TipTap
+  titulo: string;
+  tipo: 'planificacion' | 'material';
+  contenido: string; // JSON de TipTap
 }
 ```
 
 #### PUT `/api/archivos/[id]`
+
 Actualiza un archivo existente.
+
 ```typescript
 {
   titulo?: string
@@ -108,49 +120,47 @@ Actualiza un archivo existente.
 ```
 
 #### DELETE `/api/archivos/[id]`
+
 Elimina un archivo.
 
 ### Imágenes (`/api/imagenes`)
 
 #### POST `/api/imagenes`
+
 Sube una nueva imagen.
+
 ```typescript
 {
-  nombre: string
-  tipo: string // MIME type
-  data: string // Base64
-  tamaño: number
+  nombre: string;
+  tipo: string; // MIME type
+  data: string; // Base64
+  tamaño: number;
 }
 ```
 
 #### GET `/api/imagenes/[id]`
+
 Sirve la imagen como respuesta de imagen.
 
 ## Hooks Personalizados
 
 ### use-content-save
+
 ```typescript
-const {
-  saveContent,
-  loadContent,
-  savedFiles,
-  isLoading,
-  error
-} = useContentSave(tipoContenido)
+const { saveContent, loadContent, savedFiles, isLoading, error } =
+  useContentSave(tipoContenido);
 ```
 
 ### use-image-upload
+
 ```typescript
-const {
-  uploadImage,
-  isUploading,
-  uploadError
-} = useImageUpload()
+const { uploadImage, isUploading, uploadError } = useImageUpload();
 ```
 
 ## Base de Datos
 
 ### Tabla `Archivo`
+
 ```sql
 CREATE TABLE Archivo (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -163,6 +173,7 @@ CREATE TABLE Archivo (
 ```
 
 ### Tabla `Imagen`
+
 ```sql
 CREATE TABLE Imagen (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -175,6 +186,7 @@ CREATE TABLE Imagen (
 ```
 
 ### Tabla `ArchivoImagen`
+
 ```sql
 CREATE TABLE ArchivoImagen (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -190,6 +202,7 @@ CREATE TABLE ArchivoImagen (
 ## Configuración del Editor
 
 ### TipTap Configuration
+
 ```typescript
 // src/components/tiptap-templates/simple/simple-editor.tsx
 const extensions = [
@@ -203,11 +216,12 @@ const extensions = [
   Superscript,
   TaskList,
   TaskItem,
-  Typography
-]
+  Typography,
+];
 ```
 
 ### Estilos
+
 - **SCSS:** `src/components/tiptap-templates/simple/simple-editor.scss`
 - **Variables:** `src/styles/_variables.scss`
 - **Animaciones:** `src/styles/_keyframe-animations.scss`
@@ -247,6 +261,7 @@ const extensions = [
    - Revisar que el título no esté vacío
 
 ### Logs de Debug
+
 ```bash
 # Ver logs del servidor
 npm run dev
@@ -262,4 +277,4 @@ npx prisma studio
 - [ ] Colaboración en tiempo real
 - [ ] Versionado de archivos
 - [ ] Búsqueda avanzada
-- [ ] Etiquetas y categorías 
+- [ ] Etiquetas y categorías

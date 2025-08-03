@@ -25,15 +25,15 @@ export async function GET(
             alumno: true,
             respuestas: {
               include: {
-                pregunta: true
-              }
-            }
-          }
-        }
+                pregunta: true,
+              },
+            },
+          },
+        },
       },
       orderBy: {
-        fechaCarga: 'desc'
-      }
+        fechaCarga: 'desc',
+      },
     });
 
     // Si no hay resultados, devolver array vacío
@@ -43,30 +43,31 @@ export async function GET(
 
     // Tomar el resultado más reciente
     const resultadoMasReciente = resultados[0];
-    
+
     // Transformar los datos para el frontend
-    const resultadosFormateados = resultadoMasReciente.resultados.map(resultado => ({
-      id: resultado.id,
-      alumno: {
-        rut: resultado.alumno.rut,
-        nombre: resultado.alumno.nombre,
-        apellido: resultado.alumno.apellido
-      },
-      puntajeTotal: resultado.puntajeTotal,
-      puntajeMaximo: resultado.puntajeMaximo,
-      porcentaje: resultado.porcentaje,
-      nota: resultado.nota,
-      respuestas: resultado.respuestas.map(respuesta => ({
-        id: respuesta.id,
-        preguntaId: respuesta.pregunta.numero,
-        alternativaDada: respuesta.alternativaDada,
-        esCorrecta: respuesta.esCorrecta,
-        puntajeObtenido: respuesta.puntajeObtenido
-      }))
-    }));
+    const resultadosFormateados = resultadoMasReciente.resultados.map(
+      resultado => ({
+        id: resultado.id,
+        alumno: {
+          rut: resultado.alumno.rut,
+          nombre: resultado.alumno.nombre,
+          apellido: resultado.alumno.apellido,
+        },
+        puntajeTotal: resultado.puntajeTotal,
+        puntajeMaximo: resultado.puntajeMaximo,
+        porcentaje: resultado.porcentaje,
+        nota: resultado.nota,
+        respuestas: resultado.respuestas.map(respuesta => ({
+          id: respuesta.id,
+          preguntaId: respuesta.pregunta.numero,
+          alternativaDada: respuesta.alternativaDada,
+          esCorrecta: respuesta.esCorrecta,
+          puntajeObtenido: respuesta.puntajeObtenido,
+        })),
+      })
+    );
 
     return NextResponse.json(resultadosFormateados);
-
   } catch (error) {
     console.error('Error fetching resultados:', error);
     return NextResponse.json(
@@ -74,4 +75,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}

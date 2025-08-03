@@ -29,10 +29,12 @@ export default function OASelector({
   ejes,
   tipo,
   error,
-  className = ''
+  className = '',
 }: OASelectorProps) {
-  const filteredOAs = selectedEje 
-    ? availableOAs.filter(oa => oa.eje_id === selectedEje && oa.tipo_eje === tipo)
+  const filteredOAs = selectedEje
+    ? availableOAs.filter(
+        oa => oa.eje_id === selectedEje && oa.tipo_eje === tipo
+      )
     : [];
 
   const handleOAToggle = (oa: OA) => {
@@ -49,7 +51,9 @@ export default function OASelector({
   };
 
   return (
-    <div className={`bg-white rounded-2xl shadow-lg border border-gray-100 p-6 ${className}`}>
+    <div
+      className={`bg-white rounded-2xl shadow-lg border border-gray-100 p-6 ${className}`}
+    >
       <div className="mb-6">
         <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
         <p className="text-gray-600">{description}</p>
@@ -64,10 +68,10 @@ export default function OASelector({
           <div className="relative">
             <Listbox.Button className="relative w-full bg-white border border-gray-300 rounded-lg py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
               <span className="block truncate">
-                {selectedEje 
-                  ? ejes.find(eje => eje.id === selectedEje)?.descripcion || 'Seleccionar eje...'
-                  : 'Seleccionar eje...'
-                }
+                {selectedEje
+                  ? ejes.find(eje => eje.id === selectedEje)?.descripcion ||
+                    'Seleccionar eje...'
+                  : 'Seleccionar eje...'}
               </span>
               <span className="absolute inset-y-0 right-0 flex items-center pr-2">
                 <ChevronsUpDown className="h-5 w-5 text-gray-400" />
@@ -85,8 +89,12 @@ export default function OASelector({
                 Seleccionar eje...
               </Listbox.Option>
               {ejes
-                .filter(eje => availableOAs.some(oa => oa.eje_id === eje.id && oa.tipo_eje === tipo))
-                .map((eje) => (
+                .filter(eje =>
+                  availableOAs.some(
+                    oa => oa.eje_id === eje.id && oa.tipo_eje === tipo
+                  )
+                )
+                .map(eje => (
                   <Listbox.Option
                     key={eje.id}
                     value={eje.id}
@@ -98,7 +106,9 @@ export default function OASelector({
                   >
                     {({ selected }) => (
                       <>
-                        <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                        <span
+                          className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}
+                        >
                           {eje.descripcion}
                         </span>
                         {selected && (
@@ -123,15 +133,18 @@ export default function OASelector({
           </label>
           <div className="space-y-2 max-h-60 overflow-y-auto">
             {filteredOAs.map((oa, index) => {
-              const isSelected = selectedOAs.some(selected => selected.id === oa.id);
+              const isSelected = selectedOAs.some(
+                selected => selected.id === oa.id
+              );
               return (
                 <div
                   key={oa.id}
                   className={`
                     p-3 rounded-lg border cursor-pointer transition-all duration-200
-                    ${isSelected 
-                      ? `bg-gradient-to-r ${getGradient(index)} text-white border-transparent` 
-                      : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                    ${
+                      isSelected
+                        ? `bg-gradient-to-r ${getGradient(index)} text-white border-transparent`
+                        : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                     }
                   `}
                   onClick={() => handleOAToggle(oa)}
@@ -139,7 +152,9 @@ export default function OASelector({
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="font-medium">{oa.oas_id}</div>
-                      <div className={`text-sm mt-1 ${isSelected ? 'text-white/90' : 'text-gray-600'}`}>
+                      <div
+                        className={`text-sm mt-1 ${isSelected ? 'text-white/90' : 'text-gray-600'}`}
+                      >
                         {oa.descripcion_oas}
                       </div>
                     </div>
@@ -193,4 +208,4 @@ export default function OASelector({
       )}
     </div>
   );
-} 
+}

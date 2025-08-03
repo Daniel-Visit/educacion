@@ -1,8 +1,8 @@
-"use client";
-import React from "react";
-import TypewriterText from "./TypewriterText";
-import Dropdown from "./Dropdown";
-import { Respuestas } from "./constants";
+'use client';
+import React from 'react';
+import TypewriterText from './TypewriterText';
+import Dropdown from './Dropdown';
+import { Respuestas } from './constants';
 
 interface InterviewCardProps {
   step: number;
@@ -39,7 +39,7 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
   showResumen,
   setShowCierre,
   setShowResumen,
-  renderResumen
+  renderResumen,
 }) => {
   // Renderizar alternativas si corresponde
   const renderSelect = () => {
@@ -47,7 +47,7 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
       return (
         <Dropdown
           value={respuestas.anios}
-          onChange={v => handleSelect("anios", v)}
+          onChange={v => handleSelect('anios', v)}
           options={alternativas.anios}
           placeholder="Selecciona años"
           className="mt-4"
@@ -58,7 +58,7 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
       return (
         <Dropdown
           value={respuestas.nivel}
-          onChange={v => handleSelect("nivel", v)}
+          onChange={v => handleSelect('nivel', v)}
           options={alternativas.nivel}
           placeholder="Selecciona nivel"
           className="mt-4"
@@ -69,7 +69,7 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
       return (
         <Dropdown
           value={respuestas.asignatura}
-          onChange={v => handleSelect("asignatura", v)}
+          onChange={v => handleSelect('asignatura', v)}
           options={alternativas.asignatura}
           placeholder="Selecciona asignatura"
           className="mt-4 min-w-[320px]"
@@ -80,7 +80,7 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
       return (
         <Dropdown
           value={respuestas.horas}
-          onChange={v => handleSelect("horas", v)}
+          onChange={v => handleSelect('horas', v)}
           options={alternativas.horas}
           placeholder="Selecciona horas"
           className="mt-4"
@@ -91,7 +91,7 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
       return (
         <Dropdown
           value={respuestas.estudiantes}
-          onChange={v => handleSelect("estudiantes", v)}
+          onChange={v => handleSelect('estudiantes', v)}
           options={alternativas.estudiantes}
           placeholder="Selecciona estudiantes"
           className="mt-4"
@@ -152,9 +152,7 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
           </button>
         </>
       ) : step === 8 && showResumen ? (
-        <>
-          {renderResumen()}
-        </>
+        <>{renderResumen()}</>
       ) : (
         renderResumen()
       )}
@@ -162,4 +160,4 @@ const InterviewCard: React.FC<InterviewCardProps> = ({
   );
 };
 
-export default InterviewCard; 
+export default InterviewCard;

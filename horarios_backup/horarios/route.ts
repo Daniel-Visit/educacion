@@ -14,23 +14,23 @@ export async function GET(request: NextRequest) {
           include: {
             profesores: {
               include: {
-                profesor: true
-              }
-            }
+                profesor: true,
+              },
+            },
           },
           orderBy: {
-            orden: 'asc'
-          }
-        }
+            orden: 'asc',
+          },
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     });
 
     return NextResponse.json({
       data: horarios,
-      message: 'Horarios obtenidos correctamente'
+      message: 'Horarios obtenidos correctamente',
     });
   } catch (error) {
     console.error('Error al obtener horarios:', error);
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     // Validar que el docente existe
     // @ts-ignore - Prisma client sync issue
     const docente = await prisma.profesor.findUnique({
-      where: { id: parseInt(docenteId) }
+      where: { id: parseInt(docenteId) },
     });
 
     if (!docente) {
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     // Validar que la asignatura existe
     // @ts-ignore - Prisma client sync issue
     const asignatura = await prisma.asignatura.findUnique({
-      where: { id: parseInt(asignaturaId) }
+      where: { id: parseInt(asignaturaId) },
     });
 
     if (!asignatura) {
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
     // Validar que el nivel existe
     // @ts-ignore - Prisma client sync issue
     const nivel = await prisma.nivel.findUnique({
-      where: { id: parseInt(nivelId) }
+      where: { id: parseInt(nivelId) },
     });
 
     if (!nivel) {
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
 
     // Crear horario con módulos en una transacción
     // @ts-ignore - Prisma client sync issue
-    const horario = await prisma.$transaction(async (tx) => {
+    const horario = await prisma.$transaction(async tx => {
       // Crear el horario
       // @ts-ignore - Prisma client sync issue
       const nuevoHorario = await tx.horario.create({
@@ -111,17 +111,19 @@ export async function POST(request: NextRequest) {
           nombre: nombre.trim(),
           docenteId: parseInt(docenteId),
           asignaturaId: parseInt(asignaturaId),
-          nivelId: parseInt(nivelId)
-        }
+          nivelId: parseInt(nivelId),
+        },
       });
 
       // Crear los módulos
       for (let i = 0; i < modulos.length; i++) {
         const modulo = modulos[i];
-        
+
         // Validar módulo
         if (!modulo.dia || !modulo.horaInicio || !modulo.duracion) {
-          throw new Error('Cada módulo debe tener día, hora de inicio y duración');
+          throw new Error(
+            'Cada módulo debe tener día, hora de inicio y duración'
+          );
         }
 
         // Validar que la duración esté en el rango permitido
@@ -137,8 +139,8 @@ export async function POST(request: NextRequest) {
             dia: modulo.dia,
             horaInicio: modulo.horaInicio,
             duracion: modulo.duracion,
-            orden: i + 1
-          }
+            orden: i + 1,
+          },
         });
 
         // Asignar el profesor titular al módulo
@@ -147,8 +149,8 @@ export async function POST(request: NextRequest) {
           data: {
             moduloHorarioId: nuevoModulo.id,
             profesorId: parseInt(docenteId),
-            rol: 'titular'
-          }
+            rol: 'titular',
+          },
         });
       }
 
@@ -164,35 +166,35 @@ export async function POST(request: NextRequest) {
             include: {
               profesores: {
                 include: {
-                  profesor: true
-                }
-              }
+                  profesor: true,
+                },
+              },
             },
             orderBy: {
-              orden: 'asc'
-            }
-          }
-        }
+              orden: 'asc',
+            },
+          },
+        },
       });
     });
 
-    return NextResponse.json({
-      data: horario,
-      message: 'Horario creado correctamente'
-    }, { status: 201 });
+    return NextResponse.json(
+      {
+        data: horario,
+        message: 'Horario creado correctamente',
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Error al crear horario:', error);
-    
+
     if (error instanceof Error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
-    
+
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }
     );
   }
-} 
+}
