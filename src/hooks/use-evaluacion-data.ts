@@ -43,7 +43,7 @@ export function useEvaluacionData(resultadoId: string | null) {
     null
   );
   const [preguntas, setPreguntas] = useState<Pregunta[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -56,13 +56,15 @@ export function useEvaluacionData(resultadoId: string | null) {
       if (!resultadoId) {
         console.log('DEBUG: No hay resultadoId, estableciendo error');
         setError('No se encontró resultadoId en la URL');
-        setLoading(false);
+        setIsLoading(false);
         return;
       }
 
       try {
-        setLoading(true);
+        setIsLoading(true);
         setError(null);
+        setResultadoData(null); // Limpiar datos anteriores
+        setPreguntas([]); // Limpiar preguntas anteriores
 
         console.log('DEBUG: Obteniendo información del resultado...');
         // Primero obtener el resultado para obtener el evaluacionId
@@ -73,6 +75,12 @@ export function useEvaluacionData(resultadoId: string | null) {
           throw new Error('Error al cargar el resultado');
         }
         const resultadoInfo = await resultadoResponse.json();
+
+        // Verificar si la respuesta contiene un error
+        if (resultadoInfo.error) {
+          throw new Error(resultadoInfo.error);
+        }
+
         console.log(
           'DEBUG: Información del resultado obtenida:',
           resultadoInfo
@@ -82,9 +90,9 @@ export function useEvaluacionData(resultadoId: string | null) {
         console.log('DEBUG: EvaluacionId obtenido:', evaluacionId);
 
         console.log('DEBUG: Cargando resultados de la evaluación...');
-        // Cargar datos reales desde la API usando el evaluacionId correcto
+        // Cargar datos reales desde la API usando el resultadoId correcto
         const response = await fetch(
-          `/api/evaluaciones/${evaluacionId}/resultados`
+          `/api/resultados-evaluaciones/${resultadoId}/alumnos`
         );
         if (!response.ok) {
           throw new Error('Error al cargar resultados');
@@ -126,19 +134,38 @@ export function useEvaluacionData(resultadoId: string | null) {
               nivelExigencia: 60,
             },
           },
-          respuestasAlumnos: resultadosData.map((resultado: any) => ({
-            id: resultado.id.toString(),
-            alumno: {
-              id: resultado.alumno.rut,
-              nombre: resultado.alumno.nombre,
-              apellido: resultado.alumno.apellido,
-            },
-            nota: resultado.nota,
-            porcentaje: resultado.porcentaje,
-            puntajeTotal: resultado.puntajeTotal,
-            puntajeMaximo: resultado.puntajeMaximo,
-            respuestas: resultado.respuestas,
-          })),
+          respuestasAlumnos: resultadosData.map(
+            (resultado: {
+              id: number;
+              alumno: {
+                id: number;
+                nombre: string;
+                apellido: string;
+              };
+              nota: number;
+              porcentaje: number;
+              puntajeTotal: number;
+              puntajeMaximo: number;
+              respuestas: Array<{
+                preguntaId: number;
+                alternativaDada: string;
+                esCorrecta: boolean;
+                puntajeObtenido: number;
+              }>;
+            }) => ({
+              id: resultado.id.toString(),
+              alumno: {
+                id: resultado.alumno.id.toString(),
+                nombre: resultado.alumno.nombre,
+                apellido: resultado.alumno.apellido,
+              },
+              nota: resultado.nota,
+              porcentaje: resultado.porcentaje,
+              puntajeTotal: resultado.puntajeTotal,
+              puntajeMaximo: resultado.puntajeMaximo,
+              respuestas: resultado.respuestas,
+            })
+          ),
         };
 
         console.log('DEBUG: Datos transformados, estableciendo estado...');
@@ -149,7 +176,7 @@ export function useEvaluacionData(resultadoId: string | null) {
         console.error('Error al cargar datos:', error);
         setError('Error al cargar los datos');
       } finally {
-        setLoading(false);
+        setIsLoading(false);
         console.log('DEBUG: Loading establecido en false');
       }
     };
@@ -157,5 +184,5 @@ export function useEvaluacionData(resultadoId: string | null) {
     loadData();
   }, [resultadoId]);
 
-  return { resultadoData, preguntas, loading, error };
+  return { resultadoData, preguntas, isLoading, error };
 }

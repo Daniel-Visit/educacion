@@ -25,7 +25,7 @@ export default function OACard({
   const isSkipped = skippedOAs.has(oa.id);
   const canAdd =
     prevOk || isSkipped || oa.eje_descripcion.toLowerCase() === 'actitud';
-  const nextHasClases = nextOA && (oaClases[nextOA.oas_id] || 0) > 0;
+
   const currentClases = oaClases[oa.oas_id] || 0;
 
   return (

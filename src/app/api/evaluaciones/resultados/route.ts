@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   return NextResponse.json(
     { error: 'Método GET no soportado. Use POST para cargar resultados.' },
     { status: 405 }
@@ -95,15 +95,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parsear datos
-    const data = lines
+    // Procesar CSV
+    const data = csvText
+      .split('\n')
       .slice(1)
       .map(line => {
         const values = line.split(separator).map(v => v.trim());
-        return headers.reduce((obj, header, index) => {
-          obj[header] = values[index] || '';
-          return obj;
-        }, {} as any);
+        return headers.reduce(
+          (obj, header, index) => {
+            obj[header] = values[index] || '';
+            return obj;
+          },
+          {} as Record<string, string>
+        );
       })
       .filter(row => {
         return row.rut && row.pregunta_id && row.alternativa_dada;
@@ -118,15 +122,24 @@ export async function POST(request: NextRequest) {
 
     // Crear mapa de preguntas y alternativas correctas
     const preguntaMap = new Map();
-    evaluacion.preguntas.forEach((pregunta: any) => {
-      const alternativaCorrecta = pregunta.alternativas.find(
-        (alt: any) => alt.esCorrecta
-      );
-      preguntaMap.set(pregunta.numero, {
-        id: pregunta.id,
-        alternativaCorrecta: alternativaCorrecta?.letra || 'A',
-      });
-    });
+    evaluacion.preguntas.forEach(
+      (pregunta: {
+        numero: number;
+        id: number;
+        alternativas: Array<{
+          letra: string;
+          esCorrecta: boolean;
+        }>;
+      }) => {
+        const alternativaCorrecta = pregunta.alternativas.find(
+          alt => alt.esCorrecta
+        );
+        preguntaMap.set(pregunta.numero, {
+          id: pregunta.id,
+          alternativaCorrecta: alternativaCorrecta?.letra || 'A',
+        });
+      }
+    );
 
     console.log(
       'DEBUG: Mapa de preguntas creado:',
@@ -150,9 +163,16 @@ export async function POST(request: NextRequest) {
 
     // Crear mapa de alumnos por RUT para acceso rápido
     const alumnosMap = new Map();
-    alumnos.forEach((alumno: any) => {
-      alumnosMap.set(alumno.rut, alumno);
-    });
+    alumnos.forEach(
+      (alumno: {
+        id: number;
+        rut: string;
+        nombre: string;
+        apellido: string;
+      }) => {
+        alumnosMap.set(alumno.rut, alumno);
+      }
+    );
 
     // Verificar alumnos no encontrados
     const alumnosNoEncontrados = rutsUnicos.filter(rut => !alumnosMap.has(rut));
@@ -231,62 +251,66 @@ export async function POST(request: NextRequest) {
       'respuestas totales'
     );
 
-    // Procesar todos los alumnos y sus respuestas en una sola transacción
-    const resultadosAlumnos = await prisma.$transaction(
-      async (tx: any) => {
-        const resultados = [];
-        const todasLasRespuestas = [];
+    // Procesar todos los alumnos y sus respuestas en transacciones separadas
+    const resultados = [];
+    const todasLasRespuestas = [];
 
-        for (const [alumnoId, respuestas] of Array.from(
-          respuestasPorAlumno.entries()
-        )) {
-          const alumno = alumnosMap.get(alumnoId);
-          const puntajeTotal = respuestas.reduce(
-            (sum: number, r: any) => sum + r.puntajeObtenido,
-            0
-          );
-          const puntajeMaximo = respuestas.length;
-          const porcentaje =
-            puntajeMaximo > 0 ? (puntajeTotal / puntajeMaximo) * 100 : 0;
-          const nota = (porcentaje / 100) * 7.0; // Escala de 1-7
+    for (const [alumnoId, respuestas] of Array.from(
+      respuestasPorAlumno.entries()
+    )) {
+      const alumno = alumnosMap.get(alumnoId);
+      const puntajeTotal = respuestas.reduce(
+        (
+          sum: number,
+          r: {
+            puntajeObtenido: number;
+          }
+        ) => sum + r.puntajeObtenido,
+        0
+      );
+      const puntajeMaximo = respuestas.length;
+      const porcentaje =
+        puntajeMaximo > 0 ? (puntajeTotal / puntajeMaximo) * 100 : 0;
+      const nota = (porcentaje / 100) * 7.0; // Escala de 1-7
 
-          const resultadoAlumno = await tx.resultadoAlumno.create({
-            data: {
-              resultadoEvaluacionId: resultadoEvaluacion.id,
-              alumnoId: alumno.id,
-              puntajeTotal,
-              puntajeMaximo,
-              porcentaje,
-              nota,
-            },
-          });
+      // Crear resultado del alumno en transacción separada
+      const resultadoAlumno = await prisma.resultadoAlumno.create({
+        data: {
+          resultadoEvaluacionId: resultadoEvaluacion.id,
+          alumnoId: alumno.id,
+          puntajeTotal,
+          puntajeMaximo,
+          porcentaje,
+          nota,
+        },
+      });
 
-          // Preparar respuestas para inserción en lote
-          const respuestasData = respuestas.map((respuesta: any) => ({
-            resultadoAlumnoId: resultadoAlumno.id,
-            preguntaId: respuesta.preguntaId,
-            alternativaDada: respuesta.alternativaDada,
-            esCorrecta: respuesta.esCorrecta,
-            puntajeObtenido: respuesta.puntajeObtenido,
-          }));
+      // Preparar respuestas para inserción en lote
+      const respuestasData = respuestas.map(
+        (respuesta: {
+          preguntaId: number;
+          alternativaDada: string;
+          esCorrecta: boolean;
+          puntajeObtenido: number;
+        }) => ({
+          resultadoAlumnoId: resultadoAlumno.id,
+          preguntaId: respuesta.preguntaId,
+          alternativaDada: respuesta.alternativaDada,
+          esCorrecta: respuesta.esCorrecta,
+          puntajeObtenido: respuesta.puntajeObtenido,
+        })
+      );
 
-          todasLasRespuestas.push(...respuestasData);
-          resultados.push(resultadoAlumno);
-        }
+      todasLasRespuestas.push(...respuestasData);
+      resultados.push(resultadoAlumno);
+    }
 
-        // Insertar todas las respuestas en un solo lote
-        if (todasLasRespuestas.length > 0) {
-          await tx.respuestaAlumno.createMany({
-            data: todasLasRespuestas,
-          });
-        }
-
-        return resultados;
-      },
-      {
-        timeout: 30000, // 30 segundos de timeout
-      }
-    );
+    // Insertar todas las respuestas en un solo lote
+    if (todasLasRespuestas.length > 0) {
+      await prisma.respuestaAlumno.createMany({
+        data: todasLasRespuestas,
+      });
+    }
 
     return NextResponse.json({
       success: true,

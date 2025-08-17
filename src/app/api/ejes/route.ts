@@ -11,7 +11,10 @@ export async function GET(request: NextRequest) {
     const asignaturaIds = searchParams.get('asignaturaIds'); // Para múltiples asignaturas
 
     // Construir filtros
-    const where: any = {};
+    const where: {
+      asignatura_id?: number | { in: number[] };
+      nivel_id?: number;
+    } = {};
     if (asignaturaIds) {
       // Si se proporcionan múltiples asignaturas
       const ids = asignaturaIds.split(',').map(id => parseInt(id));

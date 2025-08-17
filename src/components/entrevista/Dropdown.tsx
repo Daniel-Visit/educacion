@@ -37,7 +37,7 @@ export default function Dropdown({
 
   return (
     <Listbox value={value} onChange={onChange} as={React.Fragment}>
-      {({ open }) => (
+      {() => (
         <div className={`relative ${className}`}>
           <Listbox.Button className="w-full rounded-lg border px-3 py-2 bg-white text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-indigo-400">
             <span className="block truncate">

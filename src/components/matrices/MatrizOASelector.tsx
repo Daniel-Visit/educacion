@@ -160,8 +160,9 @@ export default function MatrizOASelector({
           {/* Información adicional */}
           <div className="mt-6 p-4 bg-white/50 rounded-2xl border border-amber-100">
             <p className="text-amber-600 text-xs font-medium">
-              💡 Tip: Prueba con otras asignaturas como "Lenguaje y
-              Comunicación" o "Matemática" que suelen tener más OAs disponibles.
+              💡 Tip: Prueba con otras asignaturas como &ldquo;Lenguaje y
+              Comunicación&rdquo; o &ldquo;Matemática&rdquo; que suelen tener
+              más OAs disponibles.
             </p>
           </div>
         </div>

@@ -7,29 +7,36 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { Lock, Eye, EyeOff, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { Lock, Eye, EyeOff, X } from 'lucide-react';
 import { z } from 'zod';
 
 // Schema de validación con Zod
-const resetPasswordSchema = z.object({
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
-  confirmPassword: z.string().min(1, "Confirmar contraseña requerida")
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Las contraseñas no coinciden",
-  path: ["confirmPassword"]
-});
+const resetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(6, 'La contraseña debe tener al menos 6 caracteres'),
+    confirmPassword: z.string().min(1, 'Confirmar contraseña requerida'),
+  })
+  .refine(data => data.password === data.confirmPassword, {
+    message: 'Las contraseñas no coinciden',
+    path: ['confirmPassword'],
+  });
 
 type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
 
 export default function ResetPasswordPage() {
   const [formData, setFormData] = useState<ResetPasswordForm>({
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: 'success' | 'error';
+    text: string;
+  } | null>(null);
   const [errors, setErrors] = useState<Partial<ResetPasswordForm>>({});
   const [token, setToken] = useState<string | null>(null);
   const router = useRouter();
@@ -47,21 +54,21 @@ export default function ResetPasswordPage() {
     }
   }, [searchParams]);
 
-  const handleInputChange = (field: keyof ResetPasswordForm) => (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = e.target.value;
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Limpiar error del campo cuando el usuario empiece a escribir
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
-    }
-  };
+  const handleInputChange =
+    (field: keyof ResetPasswordForm) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setFormData(prev => ({ ...prev, [field]: value }));
+
+      // Limpiar error del campo cuando el usuario empiece a escribir
+      if (errors[field]) {
+        setErrors(prev => ({ ...prev, [field]: undefined }));
+      }
+    };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!token) {
       setMessage({
         type: 'error',
@@ -77,7 +84,7 @@ export default function ResetPasswordPage() {
     try {
       // Validar con Zod
       const validatedData = resetPasswordSchema.parse(formData);
-      
+
       const response = await fetch('/api/auth/reset-password', {
         method: 'POST',
         headers: {
@@ -105,11 +112,13 @@ export default function ResetPasswordPage() {
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
-        // Convertir errores de Zod a formato de errores
+        // Convertir errores de Zod a formato de errores usando z.flattenError()
         const fieldErrors: Partial<ResetPasswordForm> = {};
-        (error as any).errors.forEach((err: any) => {
-          const field = err.path[0] as keyof ResetPasswordForm;
-          fieldErrors[field] = err.message;
+        const flattened = z.flattenError(error);
+        Object.entries(flattened.fieldErrors).forEach(([field, messages]) => {
+          fieldErrors[field as keyof ResetPasswordForm] = (
+            messages as string[]
+          )[0];
         });
         setErrors(fieldErrors);
       } else {
@@ -205,24 +214,26 @@ export default function ResetPasswordPage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             Nueva contraseña
           </h1>
-          <p className="text-gray-600">
-            Ingresa tu nueva contraseña
-          </p>
+          <p className="text-gray-600">Ingresa tu nueva contraseña</p>
         </div>
 
         <Card className="border border-gray-200 shadow-sm">
           <CardContent className="p-6">
             {message && (
-              <div className={`mb-4 p-3 rounded-lg border flex items-center justify-between ${
-                message.type === 'success' 
-                  ? 'bg-green-100 text-green-600 border-green-200' 
-                  : 'bg-red-100 text-red-600 border-red-200'
-              }`}>
+              <div
+                className={`mb-4 p-3 rounded-lg border flex items-center justify-between ${
+                  message.type === 'success'
+                    ? 'bg-green-100 text-green-600 border-green-200'
+                    : 'bg-red-100 text-red-600 border-red-200'
+                }`}
+              >
                 <span className="text-sm">{message.text}</span>
                 <button
                   onClick={() => setMessage(null)}
                   className={`ml-3 w-6 h-6 rounded-full flex items-center justify-center hover:opacity-80 ${
-                    message.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+                    message.type === 'success'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-red-600 text-white'
                   }`}
                 >
                   <X size={12} />
@@ -301,7 +312,9 @@ export default function ResetPasswordPage() {
                   </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-sm text-red-500">{errors.confirmPassword}</p>
+                  <p className="text-sm text-red-500">
+                    {errors.confirmPassword}
+                  </p>
                 )}
               </div>
 
@@ -340,4 +353,4 @@ export default function ResetPasswordPage() {
       </div>
     </div>
   );
-} 
+}

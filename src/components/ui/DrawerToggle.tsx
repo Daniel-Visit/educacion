@@ -1,6 +1,6 @@
 'use client';
 
-import { PanelLeftClose, ChevronRight } from 'lucide-react';
+import { PanelLeftClose } from 'lucide-react';
 import React from 'react';
 
 interface DrawerToggleProps {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
@@ -9,13 +9,14 @@ import {
   Check,
   FileText,
   Target,
-  Clock,
 } from 'lucide-react';
 import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor';
+import { Editor } from '@tiptap/react';
+
 import PrimaryButton from '@/components/ui/PrimaryButton';
-import FabPlanificaciones from '@/components/editor/FabPlanificaciones';
+
 import { useEvaluacionForm } from '@/hooks/use-evaluacion-form';
-import { usePreguntasEditor } from '@/hooks/use-preguntas-editor';
+
 import MatrizSelector from '@/components/evaluacion/MatrizSelector';
 import PreguntasSidebarContent from '@/components/evaluacion/PreguntasSidebar';
 import SaveModal from '@/components/evaluacion/SaveModal';
@@ -45,6 +46,18 @@ interface EvaluacionInicial {
   }>;
 }
 
+interface EvaluacionListItem {
+  id: number;
+  titulo?: string;
+  archivo?: {
+    id: number;
+    titulo: string;
+    createdAt?: string;
+  };
+  createdAt?: string;
+  matrizId?: number;
+}
+
 export default function EvaluacionForm({
   modoEdicion = false,
   evaluacionInicial = null,
@@ -57,16 +70,15 @@ export default function EvaluacionForm({
   const [dataPreloaded, setDataPreloaded] = useState(false);
   const [editorReady, setEditorReady] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [contentInitialized, setContentInitialized] = useState(false);
+
   const [openFab, setOpenFab] = useState(false);
-  const [evaluaciones, setEvaluaciones] = useState<any[]>([]);
+  const [evaluaciones, setEvaluaciones] = useState<EvaluacionListItem[]>([]);
   const [loadingEvals, setLoadingEvals] = useState(false);
   const [shouldSetInitialContent, setShouldSetInitialContent] = useState(false);
   const lastEvaluacionId = useRef<number | null>(null);
 
   // Hook personalizado
   const {
-    loading,
     saving,
     matrices,
     selectedMatriz,
@@ -75,39 +87,20 @@ export default function EvaluacionForm({
     showSaveModal,
     titulo,
     errors,
-    showSuccess,
     evaluacionId,
     currentEditor,
     setPreguntasExtraidas,
     setShowSaveModal,
     setTitulo,
-    setShowSuccess,
-    setEvaluacionId,
     handleEditorReady,
     handleMatrizSelect,
     handleRespuestaCorrectaChange,
     handleIndicadorChange,
     handleSave,
     handleLoadContent,
-    clearErrors,
     updateFormData,
     validateForm,
   } = useEvaluacionForm();
-
-  const {
-    editingPregunta,
-    editValue,
-    openDropdown,
-    setEditValue,
-    handleStartEdit,
-    handleSaveEdit,
-    handleCancelEdit,
-    handleKeyPress,
-    handleDeletePregunta,
-    handleDeleteAlternativa,
-    handleToggleDropdown,
-    handleDropdownAction,
-  } = usePreguntasEditor();
 
   // Precargar datos si es edición
   useEffect(() => {
@@ -117,41 +110,28 @@ export default function EvaluacionForm({
       matrices.length > 0 &&
       !dataPreloaded
     ) {
-      // Establecer el ID de la evaluación para modo edición
       console.log(
-        'Estableciendo evaluacionId para edición:',
-        evaluacionInicial.id
+        '🔍 [EvaluacionForm] Precargando datos de evaluación inicial:',
+        evaluacionInicial
       );
-      setEvaluacionId(evaluacionInicial.id);
-      setTitulo(evaluacionInicial.archivo?.titulo || '');
 
-      // Buscar y seleccionar la matriz
-      const matriz = matrices.find(m => m.id === evaluacionInicial.matriz?.id);
-      if (matriz) {
-        handleMatrizSelect(matriz);
+      // Cargar el título inicial
+      if (evaluacionInicial.archivo?.titulo) {
+        setTitulo(evaluacionInicial.archivo.titulo);
       }
 
-      // Precargar preguntas y respuestas
-      if (evaluacionInicial.preguntas) {
-        setPreguntasExtraidas(evaluacionInicial.preguntas);
-
-        // Reconstruir respuestas correctas
-        const respuestasCorrectas: { [key: number]: string } = {};
-        evaluacionInicial.preguntas.forEach((pregunta: any) => {
-          const correcta = pregunta.alternativas.find((a: any) => a.esCorrecta);
-          if (correcta) {
-            respuestasCorrectas[pregunta.numero] = correcta.letra;
-          }
-        });
-
-        updateFormData({
-          respuestasCorrectas,
-        });
-      }
-
+      // Usar handleLoadContent para cargar todos los datos incluyendo indicadores
+      handleLoadContent(evaluacionInicial);
       setDataPreloaded(true);
     }
-  }, [modoEdicion, evaluacionInicial, matrices, dataPreloaded]);
+  }, [
+    modoEdicion,
+    evaluacionInicial,
+    matrices.length,
+    dataPreloaded,
+    handleLoadContent,
+    setTitulo,
+  ]);
 
   // Detectar cuando se carga una evaluación nueva (modo edición o desde FAB)
   useEffect(() => {
@@ -259,6 +239,7 @@ export default function EvaluacionForm({
         }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorReady, modoEdicion, evaluacionInicial, dataPreloaded]);
 
   // Cargar evaluaciones cuando se abre el FAB y hay una matriz seleccionada
@@ -293,7 +274,7 @@ export default function EvaluacionForm({
     return `hace ${Math.floor(diffDays / 365)} años`;
   };
 
-  const handleLoadEvaluacion = async (evaluacion: any) => {
+  const handleLoadEvaluacion = async (evaluacion: EvaluacionListItem) => {
     try {
       const response = await fetch(`/api/evaluaciones/${evaluacion.id}`);
       if (response.ok) {
@@ -326,7 +307,7 @@ export default function EvaluacionForm({
     }
   };
 
-  const handleEditorReadyWithContent = (editor: any) => {
+  const handleEditorReadyWithContent = (editor: Editor) => {
     handleEditorReady(editor);
     setEditorReady(true);
     if (
@@ -348,8 +329,8 @@ export default function EvaluacionForm({
     <>
       {/* Header moderno */}
       <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white shadow-lg mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-4">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start gap-4">
             <button
               onClick={() => router.back()}
               className="p-2 text-white/80 hover:bg-white/20 rounded-lg transition-all duration-200"
@@ -365,11 +346,21 @@ export default function EvaluacionForm({
                   ? 'Editar Evaluación'
                   : 'Crear Nueva Evaluación'}
               </h1>
-              <p className="text-indigo-100 text-sm">
-                {modoEdicion || evaluacionId
-                  ? 'Edita tu evaluación existente'
-                  : 'Crea una evaluación basada en una matriz de especificación'}
-              </p>
+              {modoEdicion ? (
+                <div className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    value={titulo}
+                    onChange={e => setTitulo(e.target.value)}
+                    placeholder="Título de la evaluación"
+                    className="px-3 py-1.5 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:ring-2 focus:ring-white/40 focus:border-white/50 transition-colors text-sm"
+                  />
+                </div>
+              ) : (
+                <p className="text-indigo-100 text-sm">
+                  Crea una evaluación basada en una matriz de especificación
+                </p>
+              )}
             </div>
           </div>
 
@@ -480,6 +471,7 @@ export default function EvaluacionForm({
           </div>
         </div>
       </div>
+
       {/* Fila de MatrizSelector */}
       <div className="mb-6">
         <MatrizSelector
@@ -668,13 +660,6 @@ export default function EvaluacionForm({
           saving={saving}
           error={errors.titulo}
         />
-      )}
-      {/* Toast de éxito */}
-      {showSuccess && (
-        <div className="fixed top-6 right-6 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2">
-          <Check size={20} />
-          <span>Evaluación guardada exitosamente</span>
-        </div>
       )}
     </>
   );

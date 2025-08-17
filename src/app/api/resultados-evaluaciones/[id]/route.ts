@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+// DELETE /api/resultados-evaluaciones/[id] - eliminar un archivo de resultados específico
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -16,17 +17,36 @@ export async function DELETE(
       );
     }
 
-    // Eliminar el resultado y todas sus relaciones (cascade)
-    await prisma.resultadoEvaluacion.delete({
+    // Verificar que el resultado existe
+    const resultado = await prisma.resultadoEvaluacion.findUnique({
+      where: { id: resultadoId },
+    });
+
+    if (!resultado) {
+      return NextResponse.json(
+        { error: 'Resultado no encontrado' },
+        { status: 404 }
+      );
+    }
+
+    // Eliminar en orden: respuestas de alumnos -> resultados de alumnos -> archivo de resultados
+    await prisma.respuestaAlumno.deleteMany({
       where: {
-        id: resultadoId,
+        resultadoAlumno: {
+          resultadoEvaluacionId: resultadoId,
+        },
       },
     });
 
-    return NextResponse.json(
-      { message: 'Resultado eliminado exitosamente' },
-      { status: 200 }
-    );
+    await prisma.resultadoAlumno.deleteMany({
+      where: { resultadoEvaluacionId: resultadoId },
+    });
+
+    await prisma.resultadoEvaluacion.delete({
+      where: { id: resultadoId },
+    });
+
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error eliminando resultado:', error);
     return NextResponse.json(

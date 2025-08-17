@@ -3,11 +3,11 @@ import { CalendarEvent, EventColor } from '@/components/event-calendar';
 import { OA, Eje, OAClases } from '@/components/planificacion-anual/types';
 import { addDays, getDay } from 'date-fns';
 
-const modulosFijos = [
-  { dia: 'Martes', horaInicio: '09:00', horaFin: '10:00' },
-  { dia: 'Martes', horaInicio: '12:00', horaFin: '13:00' },
-  { dia: 'Jueves', horaInicio: '09:00', horaFin: '10:00' },
-  { dia: 'Jueves', horaInicio: '12:00', horaFin: '13:00' },
+const modulosFijos: Modulo[] = [
+  { dia: 'Martes', horaInicio: '09:00', horaFin: '10:00', duracion: 60 },
+  { dia: 'Martes', horaInicio: '12:00', horaFin: '13:00', duracion: 60 },
+  { dia: 'Jueves', horaInicio: '09:00', horaFin: '10:00', duracion: 60 },
+  { dia: 'Jueves', horaInicio: '12:00', horaFin: '13:00', duracion: 60 },
 ];
 
 // Colores disponibles para los ejes
@@ -19,11 +19,7 @@ const getEjeColor = (ejeId: number) => {
 };
 
 // Utilidad para obtener la fecha real del módulo (martes/jueves) a partir del índice
-function getModuloDate(
-  baseDate: Date,
-  moduloIdx: number,
-  modulos: { dia: string; horaInicio: string; horaFin: string }[]
-) {
+function getModuloDate(baseDate: Date, moduloIdx: number, modulos: Modulo[]) {
   // Martes = 2, Jueves = 4 (date-fns: 0=domingo)
   const modulo = modulos[moduloIdx % modulos.length];
   const semana = Math.floor(moduloIdx / modulos.length);
@@ -41,8 +37,45 @@ function getModuloDate(
   return fecha;
 }
 
+// Interfaces para reemplazar tipos 'any'
+interface HorarioSeleccionado {
+  asignatura?: { id: number };
+  nivel?: { id: number };
+  modulos?: Array<{
+    dia: string;
+    horaInicio: string;
+    horaFin?: string;
+    duracion?: number;
+  }>;
+  fechaPrimeraClase?: string;
+}
+
+interface PlanificacionActual {
+  id?: string;
+  nombre?: string;
+  asignaciones?: Array<{
+    oa: OA;
+    cantidadClases: number;
+  }>;
+  horario?: {
+    id?: number;
+    asignaturaId?: number;
+    nivelId?: number;
+    modulos?: Array<{ dia: string; horaInicio: string; duracion?: number }>;
+    fechaPrimeraClase?: string;
+  };
+}
+
+// Tipo unificado para módulos que soporte tanto horaFin como duracion
+type Modulo = {
+  dia: string;
+  horaInicio: string;
+  horaFin?: string;
+  duracion?: number;
+};
+
 export function usePlanificacionAnual(
-  horarioSeleccionado?: any, // Cambiar a any por ahora para evitar problemas de tipos
+  horarioSeleccionado?: HorarioSeleccionado,
   planificacionId?: string
 ) {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -52,7 +85,8 @@ export function usePlanificacionAnual(
   const [showOnlyAssignable, setShowOnlyAssignable] = useState(false);
   const [selectedEjeId, setSelectedEjeId] = useState<string>('Todos');
   const [skippedOAs, setSkippedOAs] = useState<Set<number>>(new Set());
-  const [planificacionActual, setPlanificacionActual] = useState<any>(null);
+  const [planificacionActual, setPlanificacionActual] =
+    useState<PlanificacionActual | null>(null);
   const [loadingPlanificacion, setLoadingPlanificacion] = useState(false);
   const [planificacionCargada, setPlanificacionCargada] = useState(false);
 
@@ -64,29 +98,29 @@ export function usePlanificacionAnual(
     asignacionesRef.current = oaClases;
   }, [oaClases]);
 
-  // Cargar ejes y OAs (solo si no hay planificacionId)
+  // Cargar ejes y OAs filtrados por asignatura y nivel del horario
   useEffect(() => {
-    if (!planificacionId) {
-      setLoadingOAs(true);
-      // Cargar todos los ejes sin filtros para mostrar todas las opciones
-      fetch('/api/ejes')
-        .then(res => res.json())
-        .then(data => {
-          setEjes(data);
-          // Solo inicializar oaClases si no hay una planificación cargada
-          if (!planificacionCargada) {
-            const initial: OAClases = {};
-            data.forEach((eje: Eje) =>
-              eje.oas.forEach((oa: OA) => {
-                initial[oa.id] = 0;
-              })
-            );
-            setOaClases(initial);
-          }
-        })
-        .finally(() => setLoadingOAs(false));
+    if (!planificacionId && horarioSeleccionado) {
+      const asignaturaId = horarioSeleccionado.asignatura?.id;
+      const nivelId = horarioSeleccionado.nivel?.id;
+
+      if (asignaturaId && nivelId) {
+        setLoadingOAs(true);
+        // Cargar solo los ejes de la asignatura y nivel seleccionados
+        fetch(`/api/ejes?asignaturaId=${asignaturaId}&nivelId=${nivelId}`)
+          .then(res => res.json())
+          .then(data => {
+            setEjes(data);
+            // Solo inicializar oaClases si no hay una planificación cargada
+            if (!planificacionCargada) {
+              // No inicializar con 0s, dejar vacío para que el filtro funcione correctamente
+              setOaClases({});
+            }
+          })
+          .finally(() => setLoadingOAs(false));
+      }
     }
-  }, [planificacionId]);
+  }, [planificacionId, horarioSeleccionado, planificacionCargada]);
 
   // Cargar planificación existente si se proporciona un ID
   useEffect(() => {
@@ -104,9 +138,11 @@ export function usePlanificacionAnual(
 
           // Cargar asignaciones de OAs
           const asignaciones: OAClases = {};
-          data.asignaciones?.forEach((asignacion: any) => {
-            asignaciones[asignacion.oaId] = asignacion.cantidadClases;
-          });
+          data.asignaciones?.forEach(
+            (asignacion: { oaId: string; cantidadClases: number }) => {
+              asignaciones[asignacion.oaId] = asignacion.cantidadClases;
+            }
+          );
 
           setOaClases(asignaciones);
           asignacionesRef.current = asignaciones; // Guardar en ref
@@ -117,7 +153,7 @@ export function usePlanificacionAnual(
         })
         .finally(() => setLoadingPlanificacion(false));
     }
-  }, [planificacionId]);
+  }, [planificacionId, planificacionCargada]);
 
   // Cargar ejes filtrados después de cargar la planificación
   useEffect(() => {
@@ -146,14 +182,15 @@ export function usePlanificacionAnual(
 
             // Primero, obtener los OAs de las asignaciones originales para obtener sus oas_id
             if (planificacionActual && planificacionActual.asignaciones) {
-              planificacionActual.asignaciones.forEach((asignacion: any) => {
-                const oaOriginal = asignacion.oa;
-                if (oaOriginal && oasIdMap.has(oaOriginal.oas_id)) {
-                  const nuevoId = oasIdMap.get(oaOriginal.oas_id);
-                  asignacionesMapeadas[oaOriginal.oas_id] =
-                    asignacion.cantidadClases;
+              planificacionActual.asignaciones.forEach(
+                (asignacion: { oa: OA; cantidadClases: number }) => {
+                  const oaOriginal = asignacion.oa;
+                  if (oaOriginal && oasIdMap.has(oaOriginal.oas_id)) {
+                    asignacionesMapeadas[oaOriginal.oas_id] =
+                      asignacion.cantidadClases;
+                  }
                 }
-              });
+              );
             }
 
             setEjes(data);
@@ -178,52 +215,52 @@ export function usePlanificacionAnual(
       const eventos: CalendarEvent[] = [];
       let eventoIndex = 0;
 
-      planificacionActual.asignaciones?.forEach((asignacion: any) => {
-        const oa = asignacion.oa;
-        const cantidadClases = asignacion.cantidadClases;
+      planificacionActual.asignaciones?.forEach(
+        (asignacion: { oa: OA; cantidadClases: number }) => {
+          const oa = asignacion.oa;
+          const cantidadClases = asignacion.cantidadClases;
 
-        if (oa) {
-          for (let i = 0; i < cantidadClases; i++) {
-            const eje = ejes.find((e: Eje) =>
-              e.oas.some((o: OA) => o.id === oa.id)
-            );
-            const ejeColor = (
-              eje ? getEjeColor(eje.ejeId) : 'sky'
-            ) as EventColor;
+          if (oa) {
+            for (let i = 0; i < cantidadClases; i++) {
+              const eje = ejes.find((e: Eje) =>
+                e.oas.some((o: OA) => o.id === oa.id)
+              );
+              const ejeColor = (
+                eje ? getEjeColor(eje.ejeId) : 'sky'
+              ) as EventColor;
 
-            const modulos =
-              planificacionActual.horario?.modulos &&
-              planificacionActual.horario.modulos.length > 0
-                ? planificacionActual.horario.modulos
-                : modulosFijos;
+              const modulos =
+                planificacionActual.horario?.modulos &&
+                planificacionActual.horario.modulos.length > 0
+                  ? planificacionActual.horario.modulos
+                  : modulosFijos;
 
-            const fechaBase = planificacionActual.horario?.fechaPrimeraClase
-              ? new Date(planificacionActual.horario.fechaPrimeraClase)
-              : new Date(2025, 6, 1);
+              const fechaBase = planificacionActual.horario?.fechaPrimeraClase
+                ? new Date(planificacionActual.horario.fechaPrimeraClase)
+                : new Date(2025, 6, 1);
 
-            const start = getModuloDate(fechaBase, eventoIndex, modulos);
-            const end = new Date(start);
-            end.setHours(
-              end.getHours() +
-                (modulos[eventoIndex % modulos.length]?.duracion
-                  ? modulos[eventoIndex % modulos.length].duracion / 60
-                  : 1)
-            );
+              const start = getModuloDate(fechaBase, eventoIndex, modulos);
+              const end = new Date(start);
+              const modulo = modulos[eventoIndex % modulos.length];
+              end.setHours(
+                end.getHours() + (modulo?.duracion ? modulo.duracion / 60 : 1)
+              );
 
-            eventos.push({
-              id: Math.random().toString(36).slice(2),
-              title: oa.oas_id,
-              start,
-              end,
-              allDay: false,
-              color: ejeColor,
-              location: `${modulos[eventoIndex % modulos.length]?.dia} ${modulos[eventoIndex % modulos.length]?.horaInicio}`,
-            });
+              eventos.push({
+                id: Math.random().toString(36).slice(2),
+                title: oa.oas_id,
+                start,
+                end,
+                allDay: false,
+                color: ejeColor,
+                location: `${modulos[eventoIndex % modulos.length]?.dia} ${modulos[eventoIndex % modulos.length]?.horaInicio}`,
+              });
 
-            eventoIndex++;
+              eventoIndex++;
+            }
           }
         }
-      });
+      );
 
       setEvents(eventos);
     }
@@ -301,7 +338,7 @@ export function usePlanificacionAnual(
   };
 
   // Función para activar OA saltando la lógica de restricción
-  const handleActivateSkippedOA = (oa: OA, eje: Eje) => {
+  const handleActivateSkippedOA = (oa: OA) => {
     // Marcar el OA como saltado (habilitado)
     setSkippedOAs(prev => new Set([...prev, oa.id]));
   };
@@ -332,17 +369,34 @@ export function usePlanificacionAnual(
   const ejesFiltrados = useMemo(() => {
     const filtrados = ejes
       .filter((e: Eje) => selectedEjeId === 'Todos' || e.id === selectedEjeId)
-      .map((e: Eje) => ({
-        ...e,
-        oas: e.oas.filter((oa: OA, idx: number, arr: OA[]) => {
-          // Temporalmente mostrar todos los OAs para debug
+      .map((e: Eje) => {
+        const oasFiltrados = e.oas.filter((oa: OA, idx: number) => {
+          // Si showOnlyAssignable está activado, solo mostrar OAs que pueden ser asignados
+          if (showOnlyAssignable) {
+            const prevOA = idx > 0 ? e.oas[idx - 1] : null;
+            const prevOk =
+              !prevOA || (oaClases[prevOA.id] || 0) >= prevOA.minimo_clases;
+            const isSkipped = skippedOAs.has(oa.id);
+            const canAdd =
+              prevOk ||
+              isSkipped ||
+              oa.eje_descripcion.toLowerCase() === 'actitud';
+
+            return canAdd;
+          }
+          // Si no está activado, mostrar todos los OAs
           return true;
-        }),
-      }))
+        });
+
+        return {
+          ...e,
+          oas: oasFiltrados,
+        };
+      })
       .filter((e: Eje) => e.oas.length > 0);
 
     return filtrados;
-  }, [ejes, selectedEjeId, showOnlyAssignable, oaClases]);
+  }, [ejes, selectedEjeId, showOnlyAssignable, oaClases, skippedOAs]);
 
   // Función para guardar planificación
   const guardarPlanificacion = async (nombre: string, horarioId: string) => {
@@ -356,7 +410,7 @@ export function usePlanificacionAnual(
       });
 
       const asignaciones = Object.entries(oaClases)
-        .filter(([_, cantidad]) => cantidad > 0)
+        .filter(([, cantidad]) => cantidad > 0)
         .map(([oasId, cantidad]) => {
           const oaId = oasIdToOaIdMap.get(oasId);
           if (!oaId) {
@@ -412,7 +466,7 @@ export function usePlanificacionAnual(
       });
 
       const asignaciones = Object.entries(oaClases)
-        .filter(([_, cantidad]) => cantidad > 0)
+        .filter(([, cantidad]) => cantidad > 0)
         .map(([oasId, cantidad]) => {
           const oaId = oasIdToOaIdMap.get(oasId);
           if (!oaId) {
@@ -521,8 +575,8 @@ export function usePlanificacionAnual(
 
       // Procesar cada OA del CSV
       let eventoIndex = 0;
-      const nuevosEventos: any[] = [];
-      const nuevasAsignaciones: any = {};
+      const nuevosEventos: CalendarEvent[] = [];
+      const nuevasAsignaciones: OAClases = {};
 
       for (const oaNombre of oasNombres) {
         // Buscar el OA en el mapa
@@ -537,7 +591,7 @@ export function usePlanificacionAnual(
           const eje = ejes.find((e: Eje) =>
             e.oas.some((o: OA) => o.id === oa.id)
           );
-          const ejeColor = (eje ? getEjeColor(eje.ejeId) : 'sky') as any;
+          const ejeColor = (eje ? getEjeColor(eje.ejeId) : 'sky') as EventColor;
 
           // Calcular fecha real del módulo usando los módulos del horario seleccionado
           const modulos =
@@ -552,11 +606,9 @@ export function usePlanificacionAnual(
 
           const start = getModuloDate(fechaBase, eventoIndex, modulos);
           const end = new Date(start);
+          const modulo = modulos[eventoIndex % modulos.length];
           end.setHours(
-            end.getHours() +
-              (modulos[eventoIndex % modulos.length]?.duracion
-                ? modulos[eventoIndex % modulos.length].duracion / 60
-                : 1)
+            end.getHours() + (modulo?.duracion ? modulo.duracion / 60 : 1)
           );
 
           nuevosEventos.push({

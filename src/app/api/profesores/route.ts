@@ -1,6 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+// Interfaz para los datos de creación del profesor
+interface ProfesorCreateData {
+  rut: string;
+  nombre: string;
+  email: string | null;
+  telefono: string | null;
+  asignaturas?: {
+    create: Array<{
+      asignaturaId: number;
+    }>;
+  };
+  niveles?: {
+    create: Array<{
+      nivelId: number;
+    }>;
+  };
+}
+
 // GET /api/profesores - Listar profesores
 export async function GET(request: NextRequest) {
   try {
@@ -28,7 +46,6 @@ export async function GET(request: NextRequest) {
         }
       : {};
 
-    // @ts-ignore - Prisma client sync issue
     const profesores = await prisma.profesor.findMany({
       include: includeOptions,
       orderBy: {
@@ -64,7 +81,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar si el RUT ya existe
-    // @ts-ignore - Prisma client sync issue
     const profesorExistente = await prisma.profesor.findUnique({
       where: { rut },
     });
@@ -77,7 +93,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear el profesor con sus relaciones
-    const data: any = {
+    const data: ProfesorCreateData = {
       rut,
       nombre,
       email: email || null,
@@ -102,7 +118,6 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    // @ts-ignore - Prisma client sync issue
     const profesor = await prisma.profesor.create({
       data,
       include: {

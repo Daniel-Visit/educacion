@@ -1,26 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Upload, Download, Info, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-  LoadingState,
-  ErrorState,
-  ModalHeader,
-  SuccessState,
-} from '@/components/resultados';
-import {
-  Upload,
-  FileText,
-  CheckCircle2,
-  AlertTriangle,
-  X,
-  Download,
-  Info,
-  Users,
-  BarChart3,
-} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ErrorState, ModalHeader, SuccessState } from '@/components/resultados';
+
+// Interfaces para tipar los datos del CSV
+interface CSVRowData {
+  [key: string]: string;
+}
 
 interface CargarResultadosModalProps {
   isOpen: boolean;
@@ -41,7 +30,7 @@ export default function CargarResultadosModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [preview, setPreview] = useState<any[]>([]);
+  const [preview, setPreview] = useState<CSVRowData[]>([]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -70,7 +59,7 @@ export default function CargarResultadosModal({
             return headers.reduce((obj, header, index) => {
               obj[header] = values[index] || '';
               return obj;
-            }, {} as any);
+            }, {} as CSVRowData);
           })
           .filter(row => Object.values(row).some(val => val !== ''));
 
@@ -109,11 +98,20 @@ export default function CargarResultadosModal({
         const errorData = await response.json();
         setError(errorData.error || 'Error al cargar los resultados');
       }
-    } catch (error) {
+    } catch {
       setError('Error de conexión');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleClose = () => {
+    // Limpiar todo el estado al cerrar
+    setFile(null);
+    setError(null);
+    setSuccess(false);
+    setPreview([]);
+    onClose();
   };
 
   const downloadTemplate = () => {
@@ -139,7 +137,7 @@ export default function CargarResultadosModal({
           title="Cargar Resultados"
           subtitle={evaluacionNombre}
           icon={<Upload className="h-6 w-6 text-white" />}
-          onClose={onClose}
+          onClose={handleClose}
           gradient="from-indigo-600 to-purple-600"
         />
 
@@ -214,15 +212,21 @@ export default function CargarResultadosModal({
             />
             <button
               onClick={() =>
-                document.querySelector('input[type="file"]')?.click()
+                (
+                  document.querySelector(
+                    'input[type="file"]'
+                  ) as HTMLInputElement
+                )?.click()
               }
               className="w-full text-indigo-400 hover:text-indigo-700 font-medium"
             >
               <Upload className="w-8 h-8 mx-auto mb-2 text-indigo-500 hover:text-indigo-600 transition-colors" />
               {file ? (
                 <div className="flex flex-col items-center space-y-1">
-                  <span className="text-gray-700 font-medium">{file.name}</span>
-                  <span className="text-gray-500 text-sm">
+                  <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent font-semibold">
+                    {file.name}
+                  </span>
+                  <span className="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent text-sm">
                     Haz clic para cambiar archivo
                   </span>
                 </div>
@@ -284,7 +288,12 @@ export default function CargarResultadosModal({
           )}
 
           {/* Mensajes de error/éxito */}
-          {error && <ErrorState message={error} />}
+          {error && (
+            <>
+              {console.log('Error renderizando:', error)}
+              <ErrorState message={error} />
+            </>
+          )}
 
           {success && (
             <SuccessState message="¡Resultados cargados exitosamente!" />
@@ -294,7 +303,7 @@ export default function CargarResultadosModal({
           <div className="flex justify-end gap-3 pt-4">
             <Button
               variant="outline"
-              onClick={onClose}
+              onClick={handleClose}
               className="border-gray-300 text-gray-700 hover:bg-gray-50"
             >
               Cancelar

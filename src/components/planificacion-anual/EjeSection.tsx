@@ -105,6 +105,7 @@ export default function EjeSection({
       </div>
       <div className="flex flex-col gap-6">
         {eje.oas.map((oa: OA, idx: number) => {
+          // Solo renderizar OAs que estén en la lista filtrada
           const prevOA = idx > 0 ? eje.oas[idx - 1] : null;
           const nextOA = idx < eje.oas.length - 1 ? eje.oas[idx + 1] : null;
 

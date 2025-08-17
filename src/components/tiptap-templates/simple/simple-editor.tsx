@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { EditorContent, EditorContext, useEditor } from '@tiptap/react';
+import { EditorContent, EditorContext, useEditor, Editor } from '@tiptap/react';
 
 // --- Tiptap Core Extensions ---
 import { StarterKit } from '@tiptap/starter-kit';
@@ -40,7 +40,7 @@ import '@/components/tiptap-node/image-upload-node/image-upload-node.scss';
 
 // --- Tiptap UI ---
 import { HeadingDropdownMenu } from '@/components/tiptap-ui/heading-dropdown-menu';
-import ImageUploadButton from '@/components/tiptap-ui/image-upload-button';
+
 import { ListDropdownMenu } from '@/components/tiptap-ui/list-dropdown-menu';
 import { BlockquoteButton } from '@/components/tiptap-ui/blockquote-button';
 import { CodeBlockButton } from '@/components/tiptap-ui/code-block-button';
@@ -69,9 +69,6 @@ import { useMobile } from '@/hooks/use-mobile';
 import { useWindowSize } from '@/hooks/use-window-size';
 import { useCursorVisibility } from '@/hooks/use-cursor-visibility';
 
-// --- Components ---
-import { ThemeToggle } from '@/components/tiptap-templates/simple/theme-toggle';
-
 // --- Lib ---
 import { handleImageUpload, MAX_FILE_SIZE } from '@/lib/tiptap-utils';
 
@@ -79,8 +76,8 @@ import { handleImageUpload, MAX_FILE_SIZE } from '@/lib/tiptap-utils';
 import '@/components/tiptap-templates/simple/simple-editor.scss';
 
 interface SimpleEditorProps {
-  initialContent?: any;
-  onEditorReady?: (editor: any) => void;
+  initialContent?: string | Record<string, unknown>;
+  onEditorReady?: (editor: Editor) => void;
 }
 
 const MainToolbarContent = ({
@@ -89,7 +86,7 @@ const MainToolbarContent = ({
   onLinkClick,
   isMobile,
 }: {
-  editor: any;
+  editor: Editor | null;
   onHighlighterClick: () => void;
   onLinkClick: () => void;
   isMobile: boolean;
@@ -205,7 +202,6 @@ export function SimpleEditor({
     'main' | 'highlighter' | 'link'
   >('main');
   const toolbarRef = React.useRef<HTMLDivElement>(null);
-  const [contentInitialized, setContentInitialized] = React.useState(false);
 
   const editor = useEditor({
     immediatelyRender: false,

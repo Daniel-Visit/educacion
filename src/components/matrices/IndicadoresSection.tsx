@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { Plus, X, Target } from 'lucide-react';
 import { OA, Indicador } from '@/types/matrices';
 import { getGradient } from '@/utils/matrices';
-import PrimaryButton from '@/components/ui/PrimaryButton';
-import SecondaryButton from '@/components/ui/SecondaryButton';
 
 interface IndicadoresSectionProps {
   selectedOAsContenido: OA[];
@@ -68,7 +66,7 @@ export default function IndicadoresSection({
     onIndicadoresChange(oaId, updatedIndicadores);
   };
 
-  const renderOASection = (oas: OA[], title: string, tipo: string) => {
+  const renderOASection = (oas: OA[], title: string) => {
     if (oas.length === 0) return null;
 
     return (
@@ -222,8 +220,8 @@ export default function IndicadoresSection({
 
   return (
     <div className={`space-y-8 ${className}`}>
-      {renderOASection(selectedOAsContenido, 'OAs de Contenido', 'contenido')}
-      {renderOASection(selectedOAsHabilidad, 'OAs de Habilidad', 'habilidad')}
+      {renderOASection(selectedOAsContenido, 'OAs de Contenido')}
+      {renderOASection(selectedOAsHabilidad, 'OAs de Habilidad')}
 
       {selectedOAsContenido.length === 0 &&
         selectedOAsHabilidad.length === 0 && (

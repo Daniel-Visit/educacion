@@ -1,20 +1,42 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Calendar,
   Edit3,
   Trash2,
-  BookOpen,
-  User,
   Clock,
   Layers,
   Plus,
-  MoreVertical,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import LoadingState from '@/components/ui/LoadingState';
 import PrimaryButton from '@/components/ui/PrimaryButton';
+
+// Definir tipos para las planificaciones
+type Asignacion = {
+  id: number;
+  cantidadClases: number;
+  oaId: number;
+  moduloHorarioId?: number;
+};
+
+type Planificacion = {
+  id: number;
+  nombre: string;
+  horarioId: number;
+  ano: number;
+  activa: boolean;
+  createdAt: string;
+  updatedAt: string;
+  asignaciones: Asignacion[];
+  horario: {
+    asignatura: { nombre: string };
+    nivel: { nombre: string };
+    profesor: { nombre: string };
+  };
+};
 
 function getPagination(current: number, total: number) {
   const delta = 1;
@@ -35,17 +57,16 @@ function getPagination(current: number, total: number) {
 
 export default function PlanificacionesList() {
   const router = useRouter();
-  const [planificaciones, setPlanificaciones] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [planificaciones, setPlanificaciones] = useState<Planificacion[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [planificacionToDelete, setPlanificacionToDelete] = useState<any>(null);
+  const [planificacionToDelete, setPlanificacionToDelete] =
+    useState<Planificacion | null>(null);
   const [notification, setNotification] = useState<{
     type: 'success' | 'error';
     message: string;
   } | null>(null);
-  const menuRef = useRef<HTMLDivElement | null>(null);
   const [pagina, setPagina] = useState(1);
   const porPagina = 6;
   const totalPaginas = Math.ceil(planificaciones.length / porPagina);
@@ -59,7 +80,7 @@ export default function PlanificacionesList() {
   }, []);
 
   const cargarPlanificaciones = async () => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const response = await fetch('/api/planificaciones');
       if (response.ok) {
@@ -69,29 +90,13 @@ export default function PlanificacionesList() {
     } catch (error) {
       console.error('Error al cargar planificaciones:', error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  // Cerrar menú al hacer click fuera
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setOpenMenuId(null);
-      }
-    }
-    if (openMenuId !== null) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [openMenuId]);
-
-  const handleEliminar = (planificacion: any) => {
+  const handleEliminar = (planificacion: Planificacion) => {
     setPlanificacionToDelete(planificacion);
     setShowDeleteConfirm(true);
-    setOpenMenuId(null);
   };
 
   const confirmarEliminacion = async () => {
@@ -135,17 +140,17 @@ export default function PlanificacionesList() {
     setPlanificacionToDelete(null);
   };
 
-  const totalClases = (asignaciones: any[]) => {
+  const totalClases = (asignaciones: Asignacion[]) => {
     return asignaciones.reduce(
       (total, asignacion) => total + (asignacion.cantidadClases || 0),
       0
     );
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div>
+        <LoadingState message="Cargando planificaciones..." />
       </div>
     );
   }
@@ -253,51 +258,33 @@ export default function PlanificacionesList() {
                 {/* Accent line superior */}
                 <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
 
-                {/* Botón de acciones */}
-                <div
-                  className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                  ref={openMenuId === planificacion.id ? menuRef : undefined}
-                >
-                  <button
-                    onClick={() =>
-                      setOpenMenuId(
-                        openMenuId === planificacion.id
-                          ? null
-                          : planificacion.id
-                      )
-                    }
-                    className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/80 backdrop-blur-sm border border-gray-200 hover:bg-white hover:border-gray-300 text-gray-600 hover:text-gray-800 transition-all duration-200 shadow-sm"
-                    title="Acciones"
-                  >
-                    <MoreVertical size={16} />
-                  </button>
-                  {openMenuId === planificacion.id && (
-                    <div className="absolute right-0 top-full mt-2 p-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 min-w-[140px]">
-                      <button
-                        onClick={() => {
-                          router.push(
-                            `/planificacion-anual?planificacionId=${planificacion.id}`
-                          );
-                          setOpenMenuId(null);
-                        }}
-                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 rounded-lg transition-colors"
-                      >
-                        <Edit3 size={16} /> Ver/Editar
-                      </button>
-                      <button
-                        onClick={() => handleEliminar(planificacion)}
-                        disabled={deletingId === planificacion.id}
-                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 rounded-lg transition-colors disabled:opacity-50"
-                      >
-                        {deletingId === planificacion.id ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
-                        ) : (
-                          <Trash2 size={16} />
-                        )}
-                        Eliminar
-                      </button>
-                    </div>
-                  )}
+                {/* Botones de acciones */}
+                <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => {
+                        router.push(
+                          `/planificacion-anual?planificacionId=${planificacion.id}`
+                        );
+                      }}
+                      className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/80 backdrop-blur-sm border border-gray-200 hover:bg-white hover:border-gray-300 text-gray-600 hover:text-gray-800 transition-all duration-200 shadow-sm"
+                      title="Ver/Editar planificación"
+                    >
+                      <Edit3 size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleEliminar(planificacion)}
+                      disabled={deletingId === planificacion.id}
+                      className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/80 backdrop-blur-sm border border-gray-200 hover:bg-white hover:border-gray-300 text-red-600 hover:text-red-700 transition-all duration-200 shadow-sm"
+                      title="Eliminar planificación"
+                    >
+                      {deletingId === planificacion.id ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                      ) : (
+                        <Trash2 size={16} />
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Contenido principal */}
@@ -476,7 +463,7 @@ export default function PlanificacionesList() {
               <p className="text-gray-700 mb-6">
                 ¿Estás seguro de que quieres eliminar la planificación{' '}
                 <strong className="text-gray-900">
-                  "{planificacionToDelete.nombre}"
+                  &ldquo;{planificacionToDelete.nombre}&rdquo;
                 </strong>
                 ?
               </p>

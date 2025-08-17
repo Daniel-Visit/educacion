@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import SecondaryButton from '@/components/ui/SecondaryButton';
+import LoadingState from '@/components/ui/LoadingState';
 import { Dialog } from '@headlessui/react';
 
 interface OA {
@@ -119,11 +120,8 @@ export default function VerMatrizPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f7f8fd] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando matriz...</p>
-        </div>
+      <div className="container mx-auto">
+        <LoadingState message="Cargando matriz..." />
       </div>
     );
   }
@@ -370,7 +368,7 @@ export default function VerMatrizPage() {
 
             {/* OAs de Contenido */}
             <div className="grid gap-6">
-              {oasContenido.map((matrizOA, index) => (
+              {oasContenido.map(matrizOA => (
                 <div
                   key={matrizOA.id}
                   className="group bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
@@ -493,7 +491,7 @@ export default function VerMatrizPage() {
 
             {/* OAs de Habilidad */}
             <div className="grid gap-6">
-              {oasHabilidad.map((matrizOA, index) => (
+              {oasHabilidad.map(matrizOA => (
                 <div
                   key={matrizOA.id}
                   className="group bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"

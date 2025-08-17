@@ -22,9 +22,10 @@ import {
   Award,
   FileText,
   Calendar,
+  AlertTriangle,
 } from 'lucide-react';
+import LoadingState from '@/components/ui/LoadingState';
 import { ResultadosHeader } from '@/components/resultados';
-import { ErrorDisplay } from '@/components/resultados/ErrorDisplay';
 import { QuestionTooltip } from '@/components/resultados/QuestionTooltip';
 import { useEvaluacionData } from '@/hooks/use-evaluacion-data';
 import {
@@ -34,7 +35,7 @@ import {
 
 export default function GraficosPage() {
   const [evaluacionId, setEvaluacionId] = useState<string | null>(null);
-  const { resultadoData, preguntas, loading, error } =
+  const { resultadoData, preguntas, isLoading, error } =
     useEvaluacionData(evaluacionId);
 
   useEffect(() => {
@@ -43,14 +44,34 @@ export default function GraficosPage() {
     setEvaluacionId(id);
   }, []);
 
-  if (loading) {
+  // Mostrar loading mientras se está cargando o mientras no hay evaluacionId
+  if (isLoading || !evaluacionId) {
     return (
-      <div className="min-h-screen bg-white p-4">
-        <div className="container mx-auto">
-          <div className="flex items-center justify-center h-64">
+      <div className="container mx-auto">
+        <LoadingState message="Cargando datos..." />
+      </div>
+    );
+  }
+
+  // Mostrar error si hay un error específico
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-gradient-to-br from-red-50 via-pink-50 to-rose-50 border border-red-200 rounded-3xl p-8 shadow-lg">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-              <p className="text-indigo-600 font-medium">Cargando datos...</p>
+              <div className="w-20 h-20 bg-gradient-to-br from-red-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <AlertTriangle className="w-10 h-10 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-red-800 mb-3">
+                Error al cargar datos
+              </h3>
+              <div className="max-w-md mx-auto space-y-3">
+                <p className="text-red-700 text-base leading-relaxed">
+                  {error}
+                </p>
+              </div>
+              <div className="w-24 h-1 bg-gradient-to-r from-red-400 to-pink-500 rounded-full mx-auto my-6"></div>
             </div>
           </div>
         </div>
@@ -58,23 +79,55 @@ export default function GraficosPage() {
     );
   }
 
-  if (error) {
-    return <ErrorDisplay message={error} />;
-  }
-
+  // Mostrar error si no hay datos después de la carga
   if (
     !resultadoData ||
     !resultadoData.respuestasAlumnos ||
     resultadoData.respuestasAlumnos.length === 0
   ) {
-    return <ErrorDisplay message="No se encontraron datos para mostrar" />;
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-gradient-to-br from-red-50 via-pink-50 to-rose-50 border border-red-200 rounded-3xl p-8 shadow-lg">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-red-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <AlertTriangle className="w-10 h-10 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-red-800 mb-3">
+                Sin datos disponibles
+              </h3>
+              <div className="max-w-md mx-auto space-y-3">
+                <p className="text-red-700 text-base leading-relaxed">
+                  No se encontraron datos para mostrar
+                </p>
+              </div>
+              <div className="w-24 h-1 bg-gradient-to-r from-red-400 to-pink-500 rounded-full mx-auto my-6"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const rangosData = calcularRangosPorcentajes(
-    resultadoData.respuestasAlumnos as any
+    resultadoData.respuestasAlumnos as Array<{
+      id: string;
+      alumno: { id: string; nombre: string; apellido: string };
+      nota: number;
+      porcentaje: number;
+      puntajeTotal: number;
+      puntajeMaximo: number;
+    }>
   );
   const estadisticas = calcularEstadisticas(
-    resultadoData.respuestasAlumnos as any,
+    resultadoData.respuestasAlumnos as Array<{
+      id: string;
+      alumno: { id: string; nombre: string; apellido: string };
+      nota: number;
+      porcentaje: number;
+      puntajeTotal: number;
+      puntajeMaximo: number;
+    }>,
     resultadoData.evaluacion.matriz.nivelExigencia
   );
 
@@ -114,6 +167,39 @@ export default function GraficosPage() {
 
   const notasData = distribucionNotas();
 
+  // Interfaces para los tooltips
+  interface PieChartTooltipProps {
+    active?: boolean;
+    payload?: Array<{
+      payload: {
+        name: string;
+        value: number;
+        porcentaje: string;
+      };
+    }>;
+  }
+
+  interface BarChartTooltipProps {
+    active?: boolean;
+    payload?: Array<{
+      payload: {
+        estudiantes: number;
+      };
+    }>;
+    label?: string;
+  }
+
+  interface AreaChartTooltipProps {
+    active?: boolean;
+    payload?: Array<{
+      payload: {
+        nombre: string;
+        nota: number;
+        porcentaje: number;
+      };
+    }>;
+  }
+
   // Preparar datos para el gráfico de área - notas ordenadas por alumno
   const areaChartData = resultadoData.respuestasAlumnos
     .map(respuesta => ({
@@ -123,7 +209,7 @@ export default function GraficosPage() {
     }))
     .sort((a, b) => a.nota - b.nota); // Ordenar de menor a mayor nota
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  const CustomTooltip = ({ active, payload }: PieChartTooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
@@ -141,7 +227,11 @@ export default function GraficosPage() {
     return null;
   };
 
-  const CustomBarTooltip = ({ active, payload, label }: any) => {
+  const CustomBarTooltip = ({
+    active,
+    payload,
+    label,
+  }: BarChartTooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       const porcentaje = (
@@ -178,7 +268,7 @@ export default function GraficosPage() {
     return null;
   };
 
-  const CustomAreaTooltip = ({ active, payload, label }: any) => {
+  const CustomAreaTooltip = ({ active, payload }: AreaChartTooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
 
@@ -186,7 +276,7 @@ export default function GraficosPage() {
         <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
           <p className="font-semibold text-gray-900">{data.nombre}</p>
           <p className="text-sm text-gray-600">
-            Nota: <span className="font-medium">{data.nota}</span>
+            Nota: <span className="font-medium">{data.nota.toFixed(2)}</span>
           </p>
           <p className="text-sm text-gray-600">
             Porcentaje:{' '}
@@ -567,7 +657,7 @@ export default function GraficosPage() {
                       <th className="sticky left-0 z-40 bg-white px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 min-w-[200px]">
                         Estudiante
                       </th>
-                      {preguntasParaTabla.map((pregunta, index) => (
+                      {preguntasParaTabla.map(pregunta => (
                         <th
                           key={pregunta.id}
                           className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[60px] bg-white relative group"
@@ -587,7 +677,7 @@ export default function GraficosPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {respuestasEstudiantes.map((estudiante, index) => (
+                    {respuestasEstudiantes.map(estudiante => (
                       <tr
                         key={estudiante.alumno.id}
                         className="border-b border-gray-100 hover:bg-gray-50"

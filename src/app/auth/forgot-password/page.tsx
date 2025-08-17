@@ -1,35 +1,36 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Mail, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { Mail, X } from 'lucide-react';
 import { z } from 'zod';
 
 // Schema de validación con Zod
 const forgotPasswordSchema = z.object({
-  email: z.string().email("Email inválido").min(1, "Email requerido")
+  email: z.string().email('Email inválido').min(1, 'Email requerido'),
 });
 
 type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPasswordPage() {
   const [formData, setFormData] = useState<ForgotPasswordForm>({
-    email: ''
+    email: '',
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: 'success' | 'error';
+    text: string;
+  } | null>(null);
   const [errors, setErrors] = useState<Partial<ForgotPasswordForm>>({});
-  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setFormData(prev => ({ ...prev, email: value }));
-    
+
     // Limpiar error cuando el usuario empiece a escribir
     if (errors.email) {
       setErrors(prev => ({ ...prev, email: undefined }));
@@ -45,7 +46,7 @@ export default function ForgotPasswordPage() {
     try {
       // Validar con Zod
       const validatedData = forgotPasswordSchema.parse(formData);
-      
+
       const response = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: {
@@ -70,11 +71,13 @@ export default function ForgotPasswordPage() {
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
-        // Convertir errores de Zod a formato de errores
+        // Convertir errores de Zod a formato de errores usando z.flattenError()
         const fieldErrors: Partial<ForgotPasswordForm> = {};
-        (error as any).errors.forEach((err: any) => {
-          const field = err.path[0] as keyof ForgotPasswordForm;
-          fieldErrors[field] = err.message;
+        const flattened = z.flattenError(error);
+        Object.entries(flattened.fieldErrors).forEach(([field, messages]) => {
+          fieldErrors[field as keyof ForgotPasswordForm] = (
+            messages as string[]
+          )[0];
         });
         setErrors(fieldErrors);
       } else {
@@ -112,23 +115,28 @@ export default function ForgotPasswordPage() {
             Recuperar contraseña
           </h1>
           <p className="text-gray-600">
-            Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña
+            Ingresa tu email y te enviaremos un enlace para restablecer tu
+            contraseña
           </p>
         </div>
 
         <Card className="border border-gray-200 shadow-sm">
           <CardContent className="p-6">
             {message && (
-              <div className={`mb-4 p-3 rounded-lg border flex items-center justify-between ${
-                message.type === 'success' 
-                  ? 'bg-green-100 text-green-600 border-green-200' 
-                  : 'bg-red-100 text-red-600 border-red-200'
-              }`}>
+              <div
+                className={`mb-4 p-3 rounded-lg border flex items-center justify-between ${
+                  message.type === 'success'
+                    ? 'bg-green-100 text-green-600 border-green-200'
+                    : 'bg-red-100 text-red-600 border-red-200'
+                }`}
+              >
                 <span className="text-sm">{message.text}</span>
                 <button
                   onClick={() => setMessage(null)}
                   className={`ml-3 w-6 h-6 rounded-full flex items-center justify-center hover:opacity-80 ${
-                    message.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+                    message.type === 'success'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-red-600 text-white'
                   }`}
                 >
                   <X size={12} />
@@ -197,4 +205,4 @@ export default function ForgotPasswordPage() {
       </div>
     </div>
   );
-} 
+}

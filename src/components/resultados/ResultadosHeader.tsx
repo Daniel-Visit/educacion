@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart3, FileText, Users, ArrowLeft, Download } from 'lucide-react';
+import { BarChart3, FileText, ArrowLeft, Download } from 'lucide-react';
 import Link from 'next/link';
 
 interface ResultadosHeaderProps {

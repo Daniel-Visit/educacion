@@ -60,7 +60,7 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
       const progressInterval = simulateProgress();
 
       // Subir archivo
-      const result = await storageUtils.uploadFile(bucket, path, file, {
+      await storageUtils.uploadFile(bucket, path, file, {
         upsert: true,
       });
 

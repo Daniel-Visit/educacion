@@ -1,12 +1,10 @@
 'use client';
 import Link from 'next/link';
 import {
-  BookOpen,
   Sparkles,
   FileText,
   Edit3,
   CheckSquare,
-  MessageSquare,
   ArrowRight,
   Users,
   Brain,
@@ -15,7 +13,7 @@ import {
   School,
   Clock,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export default function Dashboard() {
   const [currentDateTime] = useState(new Date());

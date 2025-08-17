@@ -53,7 +53,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
-    const imagen = await prisma.imagen.delete({
+    await prisma.imagen.delete({
       where: { id: idNum },
     });
 

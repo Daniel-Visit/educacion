@@ -16,7 +16,7 @@ export const useMatricesData = () => {
   const [ejes, setEjes] = useState<Eje[]>([]);
   const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
   const [niveles, setNiveles] = useState<Nivel[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchOAs = useCallback(async () => {
     try {
@@ -76,14 +76,14 @@ export const useMatricesData = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      setLoading(true);
+      setIsLoading(true);
       await Promise.all([
         fetchOAs(),
         fetchEjes(),
         fetchAsignaturas(),
         fetchNiveles(),
       ]);
-      setLoading(false);
+      setIsLoading(false);
     };
     loadData();
   }, [fetchOAs, fetchEjes, fetchAsignaturas, fetchNiveles]);
@@ -93,7 +93,7 @@ export const useMatricesData = () => {
     ejes,
     asignaturas,
     niveles,
-    loading,
+    isLoading,
     refetch: {
       fetchOAs,
       fetchEjes,
@@ -194,22 +194,22 @@ export const useMatrizForm = (initialState?: Partial<MatrizFormState>) => {
 // Hook para manejar la lista de matrices
 export const useMatricesList = () => {
   const [matrices, setMatrices] = useState<MatrizEspecificacion[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const fetchMatrices = useCallback(async () => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       const response = await fetch('/api/matrices');
       if (response.ok) {
         const data = await response.json();
         setMatrices(data);
       }
-    } catch (error) {
-      console.error('Error fetching matrices:', error);
+    } catch {
+      console.error('Error fetching matrices');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }, []);
 
@@ -225,7 +225,7 @@ export const useMatricesList = () => {
       } else {
         return { success: false, error: 'Error al eliminar la matriz' };
       }
-    } catch (error) {
+    } catch {
       return { success: false, error: 'Error de conexión' };
     } finally {
       setDeletingId(null);
@@ -238,7 +238,7 @@ export const useMatricesList = () => {
 
   return {
     matrices,
-    loading,
+    isLoading,
     currentPage,
     setCurrentPage,
     deletingId,
@@ -260,8 +260,8 @@ export const useMatriz = (matrizId: number) => {
         const data = await response.json();
         setMatriz(data);
       }
-    } catch (error) {
-      console.error('Error fetching matriz:', error);
+    } catch {
+      console.error('Error fetching matriz');
     } finally {
       setLoading(false);
     }

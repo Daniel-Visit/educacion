@@ -1,14 +1,44 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Editor } from '@tiptap/react';
 import {
   extraerPreguntasAlternativas,
   PreguntaExtraida,
+  TipTapJSON,
 } from '@/lib/extract-evaluacion';
 import { MatrizEspecificacion, EvaluacionFormData } from '@/types/evaluacion';
 
 interface FormErrors {
   [key: string]: string;
 }
+
+// TODO: Usar esta interfaz cuando se refactorice handleLoadContent
+// interface EvaluacionContent {
+//   id: number;
+//   archivo: {
+//     id: number;
+//     titulo: string;
+//     contenido: string;
+//   };
+//   matriz?: {
+//     id: number;
+//     nombre: string;
+//   };
+//   preguntas: Array<{
+//     numero: number;
+//     texto: string;
+//     alternativas: Array<{
+//       letra: string;
+//       texto: string;
+//       esCorrecta: boolean;
+//     }>;
+//     indicadores?: Array<{
+//       id: number;
+//       preguntaId: number;
+//       indicadorId: number;
+//       tipo: string;
+//     }>;
+//   }>;
+// }
 
 export function useEvaluacionForm() {
   const [loading, setLoading] = useState(false);
@@ -22,7 +52,7 @@ export function useEvaluacionForm() {
   >([]);
   const [formData, setFormData] = useState<EvaluacionFormData>({
     matrizId: null,
-    contenido: null,
+    contenido: '',
     respuestasCorrectas: {},
     indicadoresAsignados: {},
   });
@@ -37,6 +67,35 @@ export function useEvaluacionForm() {
   useEffect(() => {
     fetchMatrices();
   }, []);
+
+  const handleContentChange = useCallback(() => {
+    if (!currentEditor || isSettingInitialContent) return;
+
+    const content = currentEditor.getJSON();
+    setFormData(prev => ({ ...prev, contenido: JSON.stringify(content) }));
+
+    // Extraer preguntas automáticamente cuando se modifica el contenido
+    // Esto funciona tanto en modo creación como en modo edición
+    try {
+      const preguntas = extraerPreguntasAlternativas(content as TipTapJSON);
+      setPreguntasExtraidas(preguntas);
+
+      // Limpiar respuestas correctas de preguntas que ya no existen
+      setFormData(prev => {
+        const nuevasRespuestas: { [key: number]: string } = {};
+        preguntas.forEach(pregunta => {
+          if (prev.respuestasCorrectas[pregunta.numero]) {
+            nuevasRespuestas[pregunta.numero] =
+              prev.respuestasCorrectas[pregunta.numero];
+          }
+        });
+        return { ...prev, respuestasCorrectas: nuevasRespuestas };
+      });
+    } catch (error) {
+      console.error('Error al extraer preguntas:', error);
+      setPreguntasExtraidas([]);
+    }
+  }, [currentEditor, isSettingInitialContent]);
 
   // Escuchar cambios del editor
   useEffect(() => {
@@ -54,10 +113,11 @@ export function useEvaluacionForm() {
         currentEditor.off('update', handleUpdate);
       };
     }
-  }, [currentEditor, isSettingInitialContent]);
+  }, [currentEditor, isSettingInitialContent, handleContentChange]);
 
   const fetchMatrices = async () => {
     try {
+      console.log('🔍 [useEvaluacionForm] fetchMatrices llamado');
       setLoading(true);
       const response = await fetch('/api/matrices');
       if (response.ok) {
@@ -76,32 +136,6 @@ export function useEvaluacionForm() {
     // Evitar establecer el mismo editor múltiples veces
     if (currentEditor !== editor) {
       setCurrentEditor(editor);
-    }
-  };
-
-  const handleContentChange = () => {
-    if (!currentEditor || isSettingInitialContent) return;
-
-    const content = currentEditor.getJSON();
-    setFormData(prev => ({ ...prev, contenido: content }));
-
-    // Extraer preguntas automáticamente
-    try {
-      const preguntas = extraerPreguntasAlternativas(content);
-      setPreguntasExtraidas(preguntas);
-
-      // Limpiar respuestas correctas de preguntas que ya no existen
-      const nuevasRespuestas: { [key: number]: string } = {};
-      preguntas.forEach(pregunta => {
-        if (formData.respuestasCorrectas[pregunta.numero]) {
-          nuevasRespuestas[pregunta.numero] =
-            formData.respuestasCorrectas[pregunta.numero];
-        }
-      });
-      setFormData(prev => ({ ...prev, respuestasCorrectas: nuevasRespuestas }));
-    } catch (error) {
-      console.error('Error al extraer preguntas:', error);
-      setPreguntasExtraidas([]);
     }
   };
 
@@ -133,16 +167,30 @@ export function useEvaluacionForm() {
     tipo: 'contenido' | 'habilidad',
     indicadorId: number | null
   ) => {
-    setFormData(prev => ({
-      ...prev,
-      indicadoresAsignados: {
-        ...prev.indicadoresAsignados,
-        [preguntaNumero]: {
-          ...prev.indicadoresAsignados[preguntaNumero],
-          [tipo]: indicadorId || undefined,
+    console.log('🔍 [handleIndicadorChange] Asignando indicador:', {
+      preguntaNumero,
+      tipo,
+      indicadorId,
+      indicadoresAsignadosActuales: formData.indicadoresAsignados,
+    });
+
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        indicadoresAsignados: {
+          ...prev.indicadoresAsignados,
+          [preguntaNumero]: {
+            ...prev.indicadoresAsignados[preguntaNumero],
+            [tipo]: indicadorId || undefined,
+          },
         },
-      },
-    }));
+      };
+      console.log(
+        '🔍 [handleIndicadorChange] Nuevo estado:',
+        newData.indicadoresAsignados
+      );
+      return newData;
+    });
   };
 
   const validateForm = () => {
@@ -181,64 +229,6 @@ export function useEvaluacionForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSaveWithPreguntas = async (preguntas: any[]) => {
-    setSaving(true);
-    try {
-      console.log(
-        'Guardando evaluación con preguntas forzadas, evaluacionId:',
-        evaluacionId
-      );
-      const requestBody = {
-        contenido: JSON.stringify(formData.contenido),
-        preguntas: preguntas,
-        respuestasCorrectas: formData.respuestasCorrectas,
-        matrizId: selectedMatriz?.id || null,
-        indicadoresAsignados: formData.indicadoresAsignados,
-      };
-      console.log('Datos a enviar con preguntas forzadas:', requestBody);
-
-      const evaluacionResponse = await fetch(
-        `/api/evaluaciones/${evaluacionId}`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody),
-        }
-      );
-      if (evaluacionResponse.ok) {
-        const evaluacionActualizada = await evaluacionResponse.json();
-        console.log('Evaluación actualizada:', evaluacionActualizada);
-
-        // Actualizar el estado en la interfaz
-        if (evaluacionActualizada.estado) {
-          // Disparar un evento personalizado para notificar el cambio de estado
-          window.dispatchEvent(
-            new CustomEvent('evaluacionEstadoActualizado', {
-              detail: { evaluacionId, estado: evaluacionActualizada.estado },
-            })
-          );
-        }
-
-        setShowSaveModal(false);
-        setShowSuccess(true);
-        setTimeout(() => setShowSuccess(false), 3000);
-      } else {
-        const errorData = await evaluacionResponse.json();
-        setErrors({
-          submit: errorData.error || 'Error al actualizar la evaluación',
-        });
-      }
-    } catch (error) {
-      console.error(
-        'Error al guardar evaluación con preguntas forzadas:',
-        error
-      );
-      setErrors({ submit: 'Error al guardar la evaluación' });
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const handleSave = async () => {
     console.log('[useEvaluacionForm] handleSave llamado', {
       evaluacionId,
@@ -257,24 +247,22 @@ export function useEvaluacionForm() {
     );
 
     // Si estamos en modo edición y no hay preguntas extraídas, extraerlas del contenido
+    // PERO NO GUARDAR AUTOMÁTICAMENTE - solo extraer para mostrar en el sidebar
     if (evaluacionId && preguntasExtraidas.length === 0 && formData.contenido) {
       console.log(
-        '[useEvaluacionForm] Forzando extracción de preguntas del contenido'
+        '[useEvaluacionForm] Forzando extracción de preguntas del contenido (solo para mostrar)'
       );
       try {
         const preguntasExtraidas = extraerPreguntasAlternativas(
-          formData.contenido
+          JSON.parse(formData.contenido) as TipTapJSON
         );
         console.log(
           '[useEvaluacionForm] Preguntas extraídas forzadamente:',
           preguntasExtraidas.length
         );
 
-        // Usar las preguntas recién extraídas para el guardado
-        if (preguntasExtraidas.length > 0) {
-          await handleSaveWithPreguntas(preguntasExtraidas);
-          return;
-        }
+        // Solo actualizar el estado para mostrar en el sidebar, NO guardar
+        setPreguntasExtraidas(preguntasExtraidas);
       } catch (error) {
         console.error('Error al extraer preguntas forzadamente:', error);
       }
@@ -294,6 +282,7 @@ export function useEvaluacionForm() {
         console.log('Preguntas para enviar:', preguntasParaEnviar.length);
 
         const requestBody = {
+          titulo: titulo,
           contenido: JSON.stringify(formData.contenido),
           preguntas: preguntasParaEnviar,
           respuestasCorrectas: formData.respuestasCorrectas,
@@ -391,18 +380,54 @@ export function useEvaluacionForm() {
     }
   };
 
-  const handleLoadContent = (content: any) => {
+  // TODO: Refactorizar para usar tipos más específicos
+  interface PreguntaContent {
+    numero: number;
+    texto: string;
+    alternativas: Array<{
+      letra: string;
+      texto: string;
+      esCorrecta?: boolean;
+    }>;
+    indicadores?: Array<{
+      tipo: string;
+      indicadorId: number;
+    }>;
+  }
+
+  interface ContentData {
+    id: number;
+    preguntas: PreguntaContent[];
+    archivo: {
+      contenido: string;
+      titulo?: string;
+    };
+    matriz?: {
+      id: number;
+    };
+    contenido?: string | Record<string, unknown>; // Para compatibilidad con datos existentes
+    respuestasCorrectas?: { [key: number]: string };
+    indicadoresAsignados?: {
+      [key: number]: { contenido?: number; habilidad?: number };
+    };
+  }
+
+  const handleLoadContent = (content: ContentData) => {
     // Limpiar errores previos
     setErrors({});
+
+    console.log('🔍 [handleLoadContent] Datos completos recibidos:', content);
+    console.log('🔍 [handleLoadContent] Tiene preguntas:', !!content.preguntas);
+    console.log('🔍 [handleLoadContent] Tiene archivo:', !!content.archivo);
 
     // Si viene de evaluacion (de /api/evaluaciones), poblar sidebar con preguntas y alternativas del backend
     if (content.preguntas && content.archivo) {
       setEvaluacionId(content.id);
       setPreguntasExtraidas(
-        content.preguntas.map((p: any) => ({
+        content.preguntas.map((p: PreguntaContent) => ({
           numero: p.numero,
           texto: p.texto,
-          alternativas: p.alternativas.map((a: any) => ({
+          alternativas: p.alternativas.map(a => ({
             letra: a.letra,
             texto: a.texto,
           })),
@@ -410,32 +435,93 @@ export function useEvaluacionForm() {
       );
       // Reconstruir respuestasCorrectas
       const respuestasCorrectas: { [key: number]: string } = {};
-      content.preguntas.forEach((pregunta: any) => {
-        const correcta = pregunta.alternativas.find((a: any) => a.esCorrecta);
+      console.log(
+        '🔍 [handleLoadContent] Reconstruyendo respuestas correctas...'
+      );
+      content.preguntas.forEach((pregunta: PreguntaContent) => {
+        console.log(
+          '🔍 [handleLoadContent] Pregunta',
+          pregunta.numero,
+          'alternativas:',
+          pregunta.alternativas
+        );
+        const correcta = pregunta.alternativas.find(a => a.esCorrecta);
         if (correcta) {
           respuestasCorrectas[pregunta.numero] = correcta.letra;
+          console.log(
+            '🔍 [handleLoadContent] Respuesta correcta para pregunta',
+            pregunta.numero,
+            ':',
+            correcta.letra
+          );
         }
       });
+      console.log(
+        '🔍 [handleLoadContent] Respuestas correctas reconstruidas:',
+        respuestasCorrectas
+      );
 
       // Reconstruir indicadoresAsignados
       const indicadoresAsignados: {
         [key: number]: { contenido?: number; habilidad?: number };
       } = {};
-      content.preguntas.forEach((pregunta: any) => {
+
+      console.log(
+        '🔍 [handleLoadContent] Reconstruyendo indicadoresAsignados...'
+      );
+      console.log(
+        '🔍 [handleLoadContent] Preguntas con indicadores:',
+        content.preguntas.length
+      );
+
+      content.preguntas.forEach((pregunta: PreguntaContent) => {
+        console.log(
+          '🔍 [handleLoadContent] Pregunta',
+          pregunta.numero,
+          'indicadores:',
+          pregunta.indicadores
+        );
+
         if (pregunta.indicadores && pregunta.indicadores.length > 0) {
           const asignacion: { contenido?: number; habilidad?: number } = {};
-          pregunta.indicadores.forEach((indicador: any) => {
-            if (indicador.tipo === 'Contenido') {
-              asignacion.contenido = indicador.indicadorId;
-            } else if (indicador.tipo === 'Habilidad') {
-              asignacion.habilidad = indicador.indicadorId;
+          pregunta.indicadores.forEach(
+            (indicador: { tipo: string; indicadorId: number }) => {
+              console.log(
+                '🔍 [handleLoadContent] Procesando indicador:',
+                indicador
+              );
+              console.log(
+                '🔍 [handleLoadContent] Indicador tipo:',
+                indicador.tipo
+              );
+              console.log(
+                '🔍 [handleLoadContent] Indicador indicadorId:',
+                indicador.indicadorId
+              );
+
+              if (indicador.tipo === 'Contenido') {
+                asignacion.contenido = indicador.indicadorId;
+              } else if (indicador.tipo === 'Habilidad') {
+                asignacion.habilidad = indicador.indicadorId;
+              }
             }
-          });
+          );
           if (Object.keys(asignacion).length > 0) {
             indicadoresAsignados[pregunta.numero] = asignacion;
+            console.log(
+              '🔍 [handleLoadContent] Asignación creada para pregunta',
+              pregunta.numero,
+              ':',
+              asignacion
+            );
           }
         }
       });
+
+      console.log(
+        '🔍 [handleLoadContent] IndicadoresAsignados final:',
+        indicadoresAsignados
+      );
       let parsedContent = null;
       try {
         parsedContent = JSON.parse(content.archivo.contenido);
@@ -448,7 +534,7 @@ export function useEvaluacionForm() {
       }
       // Seleccionar la matriz correspondiente si está disponible
       if (content.matriz && matrices.length > 0) {
-        const matriz = matrices.find(m => m.id === content.matriz.id);
+        const matriz = matrices.find(m => m.id === content.matriz!.id);
         if (matriz) {
           handleMatrizSelect(matriz);
         }
@@ -461,21 +547,11 @@ export function useEvaluacionForm() {
       }));
       setTitulo(content.archivo.titulo || '');
 
-      // Extraer preguntas del contenido cargado para mantener sincronización
-      try {
-        const preguntasExtraidas = extraerPreguntasAlternativas(parsedContent);
-        console.log(
-          '[handleLoadContent] Preguntas extraídas del contenido:',
-          preguntasExtraidas.length
-        );
-        setPreguntasExtraidas(preguntasExtraidas);
-      } catch (error) {
-        console.error(
-          'Error al extraer preguntas del contenido cargado:',
-          error
-        );
-        // Mantener las preguntas de la base de datos si no se pueden extraer del contenido
-      }
+      // NO extraer preguntas del contenido en modo edición
+      // Las preguntas ya vienen de la base de datos y no deben ser sobrescritas
+      console.log(
+        '[handleLoadContent] Modo edición: manteniendo preguntas de la base de datos'
+      );
 
       return;
     }
@@ -490,7 +566,11 @@ export function useEvaluacionForm() {
     }
 
     try {
-      const parsedContent = JSON.parse(content.contenido);
+      const parsedContent = JSON.parse(
+        typeof content.contenido === 'string'
+          ? content.contenido
+          : JSON.stringify(content.contenido)
+      );
       if (
         !parsedContent ||
         typeof parsedContent !== 'object' ||
@@ -511,7 +591,7 @@ export function useEvaluacionForm() {
       try {
         const preguntas = extraerPreguntasAlternativas(parsedContent);
         setPreguntasExtraidas(preguntas);
-      } catch (error) {
+      } catch {
         setPreguntasExtraidas([]);
       }
     } catch (error) {

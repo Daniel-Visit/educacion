@@ -13,7 +13,6 @@ interface OAData {
 
 export async function GET() {
   try {
-    // @ts-ignore - Prisma client sync issue
     const matrices = await prisma.matrizEspecificacion.findMany({
       include: {
         oas: {
@@ -29,7 +28,6 @@ export async function GET() {
       matrices.map(async matriz => {
         const oasWithDetails = await Promise.all(
           matriz.oas.map(async matrizOA => {
-            // @ts-ignore - Prisma client sync issue
             const oa = await prisma.oa.findUnique({
               where: { id: matrizOA.oaId },
             });
@@ -37,11 +35,9 @@ export async function GET() {
             let nivel = null;
             let asignatura = null;
             if (oa) {
-              // @ts-ignore - Prisma client sync issue
               nivel = await prisma.nivel.findUnique({
                 where: { id: oa.nivel_id },
               });
-              // @ts-ignore - Prisma client sync issue
               asignatura = await prisma.asignatura.findUnique({
                 where: { id: oa.asignatura_id },
               });
@@ -98,7 +94,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // @ts-ignore - Prisma client sync issue
     const matriz = await prisma.matrizEspecificacion.create({
       data: {
         nombre,
@@ -123,9 +118,7 @@ export async function POST(request: NextRequest) {
             indicadores: true,
           },
         },
-        // @ts-ignore - Prisma client sync issue
         asignatura: true,
-        // @ts-ignore - Prisma client sync issue
         nivel: true,
       },
     });

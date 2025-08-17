@@ -41,17 +41,32 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    console.log('🔵 [API] PUT /api/archivos/[id] - Iniciando actualización');
     const { id } = await params;
     const idNum = parseInt(id);
 
+    console.log('🔵 [API] ID recibido:', { id, idNum });
+
     if (isNaN(idNum)) {
+      console.log('❌ [API] ID inválido:', id);
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
     const body = await request.json();
     const { titulo, tipo, contenido } = body;
 
+    console.log('🔵 [API] Datos recibidos:', {
+      titulo,
+      tipo,
+      contenidoLength: contenido?.length,
+    });
+
     if (!titulo || !tipo || !contenido) {
+      console.log('❌ [API] Datos faltantes:', {
+        titulo: !!titulo,
+        tipo: !!tipo,
+        contenido: !!contenido,
+      });
       return NextResponse.json(
         { error: 'Título, tipo y contenido son requeridos' },
         { status: 400 }
@@ -77,6 +92,7 @@ export async function PUT(
       );
     }
 
+    console.log('🔵 [API] Actualizando archivo en base de datos...');
     const archivo = await prisma.archivo.update({
       where: { id: idNum },
       data: {
@@ -86,9 +102,13 @@ export async function PUT(
       },
     });
 
+    console.log('✅ [API] Archivo actualizado exitosamente:', {
+      id: archivo.id,
+      titulo: archivo.titulo,
+    });
     return NextResponse.json(archivo);
   } catch (error) {
-    console.error('Error al actualizar archivo:', error);
+    console.error('❌ [API] Error al actualizar archivo:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }
@@ -108,7 +128,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
-    const archivo = await prisma.archivo.delete({
+    await prisma.archivo.delete({
       where: { id: idNum },
     });
 

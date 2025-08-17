@@ -1,9 +1,4 @@
-import {
-  OA,
-  Indicador,
-  ValidationResult,
-  MatrizFormState,
-} from '@/types/matrices';
+import { OA, Indicador } from '@/types/matrices';
 
 // Configuración de gradientes
 export const GRADIENT_CONFIGS = [
@@ -35,10 +30,6 @@ export const GRADIENT_CONFIGS = [
 
 export const getGradient = (index: number): string => {
   return GRADIENT_CONFIGS[index % GRADIENT_CONFIGS.length].gradient;
-};
-
-export const getHoverGradient = (index: number): string => {
-  return GRADIENT_CONFIGS[index % GRADIENT_CONFIGS.length].hoverGradient;
 };
 
 // Pasos del formulario

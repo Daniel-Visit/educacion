@@ -3,32 +3,29 @@
 import { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-  LoadingState,
-  ErrorState,
-  ModalHeader,
-  SuccessState,
-} from '@/components/resultados';
-import {
-  Upload,
-  CloudUpload,
-  FileText,
-  CheckCircle2,
-  AlertTriangle,
-  X,
-  Download,
-  Info,
-  BarChart3,
-  BookOpen,
-  Target,
-  ArrowLeft,
-} from 'lucide-react';
+import { ModalHeader, SuccessState, ErrorState } from '@/components/resultados';
+
+import { CloudUpload, Download, Info, BarChart3 } from 'lucide-react';
+
+// Tipo para los datos de preview del CSV
+type CSVRow = Record<string, string>;
+
+// Tipo para los datos de la matriz importada
+type MatrizData = {
+  success: boolean;
+  message: string;
+  oas?: Array<{
+    id: number;
+    tipo_eje: string;
+    indicador: string;
+    preguntas_por_indicador: number;
+  }>;
+};
 
 interface ImportarMatrizModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onMatrizImportada: (data: any) => void;
+  onMatrizImportada: (data: MatrizData) => void;
   asignaturaId: number | null;
   nivelId: number | null;
 }
@@ -44,7 +41,7 @@ export default function ImportarMatrizModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [preview, setPreview] = useState<any[]>([]);
+  const [preview, setPreview] = useState<CSVRow[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,7 +75,7 @@ export default function ImportarMatrizModal({
             return headers.reduce((obj, header, index) => {
               obj[header] = values[index] || '';
               return obj;
-            }, {} as any);
+            }, {} as CSVRow);
           })
           .filter(row => Object.values(row).some(val => val !== ''));
 
@@ -128,11 +125,20 @@ export default function ImportarMatrizModal({
         const errorData = await response.json();
         setError(errorData.error || 'Error al importar los OAs');
       }
-    } catch (error) {
+    } catch {
       setError('Error de conexión');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleClose = () => {
+    // Limpiar todo el estado al cerrar
+    setFile(null);
+    setError(null);
+    setSuccess(false);
+    setPreview([]);
+    onClose();
   };
 
   const downloadTemplate = () => {
@@ -160,7 +166,7 @@ export default function ImportarMatrizModal({
           title="Importar Matriz desde CSV"
           subtitle="Carga una matriz completa con OAs, indicadores y preguntas desde un archivo CSV"
           icon={<CloudUpload className="h-6 w-6 text-white" />}
-          onClose={onClose}
+          onClose={handleClose}
           gradient="from-indigo-600 to-purple-600"
         />
 
@@ -182,10 +188,11 @@ export default function ImportarMatrizModal({
                 <ul className="text-sm text-blue-700 space-y-1">
                   <li>
                     • <strong>oa_identificador:</strong> Identificador del OA
-                    (ej: "OA 01", "OAH A")
+                    (ej: &ldquo;OA 01&rdquo;, &ldquo;OAH A&rdquo;)
                   </li>
                   <li>
-                    • <strong>tipo_oa:</strong> "Contenido" o "Habilidad"
+                    • <strong>tipo_oa:</strong> &ldquo;Contenido&rdquo; o
+                    &ldquo;Habilidad&rdquo;
                   </li>
                   <li>
                     • <strong>indicador:</strong> Descripción del indicador
@@ -199,11 +206,11 @@ export default function ImportarMatrizModal({
                 <div className="bg-white p-3 rounded-lg border border-blue-200 text-xs font-mono text-blue-800">
                   oa_identificador,tipo_oa,indicador,preguntas_por_indicador
                   <br />
-                  "OA 01","Contenido","Leer textos significativos que incluyan
-                  palabras con hiatos",10
+                  &ldquo;OA 01&rdquo;,&ldquo;Contenido&rdquo;,&ldquo;Leer textos
+                  significativos que incluyan palabras con hiatos&rdquo;,10
                   <br />
-                  "OA 01","Contenido","Comprender textos aplicando estrategias
-                  de comprensión",5
+                  &ldquo;OA 01&rdquo;,&ldquo;Contenido&rdquo;,&ldquo;Comprender
+                  textos aplicando estrategias de comprensión&rdquo;,5
                 </div>
 
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3">
@@ -255,8 +262,10 @@ export default function ImportarMatrizModal({
               <CloudUpload className="w-8 h-8 mx-auto mb-2 text-indigo-500 hover:text-indigo-600 transition-colors" />
               {file ? (
                 <div className="flex flex-col items-center space-y-1">
-                  <span className="text-gray-700 font-medium">{file.name}</span>
-                  <span className="text-gray-500 text-sm">
+                  <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent font-semibold">
+                    {file.name}
+                  </span>
+                  <span className="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent text-sm">
                     Haz clic para cambiar archivo
                   </span>
                 </div>
@@ -318,27 +327,7 @@ export default function ImportarMatrizModal({
           )}
 
           {/* Mensajes de error/éxito */}
-          {error && (
-            <div className="flex items-center justify-center">
-              <div className="text-center">
-                <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-8 border-2 border-dashed border-red-200">
-                  <AlertTriangle className="h-16 w-16 text-red-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-red-900 mb-2">
-                    Error
-                  </h3>
-                  <p className="text-red-600 mb-4">{error}</p>
-                  <Button
-                    variant="outline"
-                    onClick={() => setError(null)}
-                    className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-500 hover:text-red-800"
-                  >
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Volver
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
+          {error && <ErrorState message={error} />}
 
           {success && (
             <SuccessState message="¡OAs importados exitosamente! Redirigiendo al paso 3..." />
@@ -348,7 +337,7 @@ export default function ImportarMatrizModal({
           <div className="flex justify-end gap-3 pt-4">
             <Button
               variant="outline"
-              onClick={onClose}
+              onClick={handleClose}
               className="border-gray-300 text-gray-700 hover:bg-gray-50"
             >
               Cancelar

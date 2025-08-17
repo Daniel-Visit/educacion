@@ -74,7 +74,10 @@ export async function POST(request: NextRequest) {
 
     if (error && typeof error === 'object' && 'errors' in error) {
       return NextResponse.json(
-        { error: 'Datos inválidos', details: (error as any).errors },
+        {
+          error: 'Datos inválidos',
+          details: (error as { errors: unknown }).errors,
+        },
         { status: 400 }
       );
     }

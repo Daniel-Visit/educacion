@@ -1,14 +1,21 @@
 'use client';
 
-import { useState, useRef, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor';
 import ModalIA from '@/components/editor/ModalIA';
-import FabPlanificaciones from '@/components/editor/FabPlanificaciones';
+
 import SaveContentModal from '@/components/editor/SaveContentModal';
 import { SavedContent } from '@/hooks/use-content-save';
 import { Editor } from '@tiptap/react';
-import { Save, Sparkles, FileText, BookOpen, Edit3, Clock } from 'lucide-react';
+
+// Tipo para el contenido de TipTap
+interface TipTapContent {
+  type: 'doc';
+  content?: unknown[];
+  [key: string]: unknown;
+}
+import { Save, Sparkles, FileText, BookOpen, Clock } from 'lucide-react';
 import Fab from '@/components/ui/Fab';
 import { useContentSave } from '@/hooks/use-content-save';
 
@@ -17,7 +24,9 @@ function EditorPageContent() {
   const [openModalIA, setOpenModalIA] = useState(false);
   const [openSaveModal, setOpenSaveModal] = useState(false);
   const [tipoContenido, setTipoContenido] = useState('planificacion');
-  const [currentContent, setCurrentContent] = useState<any>(null);
+  const [currentContent, setCurrentContent] = useState<TipTapContent | null>(
+    null
+  );
   const [currentEditor, setCurrentEditor] = useState<Editor | null>(null);
   const [currentFile, setCurrentFile] = useState<SavedContent | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -62,6 +71,9 @@ function EditorPageContent() {
     // Actualizar el archivo actual
     setCurrentFile(savedContent);
     console.log('Contenido guardado:', savedContent);
+
+    // Recargar la lista de archivos guardados para que el FAB se actualice
+    loadSavedContents();
   };
 
   const handleGenerateIA = () => {
@@ -218,7 +230,7 @@ function EditorPageContent() {
           className="fixed top-24 right-22 w-[380px] bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] border border-gray-100 z-40 px-8 pt-8 pb-4 flex flex-col gap-4 animate-fade-in"
           style={{ minWidth: 340, maxHeight: 'calc(100vh - 120px)' }}
         >
-          <h2 className="text-lg font-bold text-indigo-700 mb-4">
+          <h2 className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
             {tipoContenido === 'planificacion'
               ? 'Planificaciones Guardadas'
               : 'Materiales Guardados'}

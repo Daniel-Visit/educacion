@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+interface AlumnoData {
+  rut: string;
+  nombre: string;
+  apellido: string;
+  puntajeTotal: number;
+  puntajeMaximo: number;
+  respuestas: RespuestaData[];
+}
+
+interface RespuestaData {
+  preguntaId: number;
+  alternativaDada: string;
+  esCorrecta: boolean;
+  puntajeObtenido: number;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -47,8 +63,8 @@ export async function POST(request: NextRequest) {
 
     // Procesar las líneas (ignorar la primera que es header)
     const dataLines = lines.slice(1);
-    const alumnosMap = new Map<string, any>();
-    const respuestasMap = new Map<string, any[]>();
+    const alumnosMap = new Map<string, AlumnoData>();
+    const respuestasMap = new Map<string, RespuestaData[]>();
 
     for (const line of dataLines) {
       const [rut, nombre, apellido, preguntaIdStr, alternativaDada] = line

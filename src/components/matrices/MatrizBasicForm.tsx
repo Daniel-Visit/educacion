@@ -38,17 +38,6 @@ export default function MatrizBasicForm({
   onNext,
   canProceed = false,
 }: MatrizBasicFormProps) {
-  const renderReadOnlyField = (label: string, value: string) => (
-    <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        {label}
-      </label>
-      <div className="p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-900">
-        {value}
-      </div>
-    </div>
-  );
-
   const renderSelectField = (
     label: string,
     value: number | null,

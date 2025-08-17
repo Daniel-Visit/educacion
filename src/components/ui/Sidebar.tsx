@@ -1,30 +1,21 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useCallback } from 'react';
 import {
   Home,
-  FileText,
-  CheckSquare,
-  Puzzle,
   MessageSquare,
   BookOpen,
   ChevronDown,
   ChevronRight,
-  UserCircle,
-  Info,
-  HelpCircle,
   Calendar,
-  Layers,
-  Clock,
-  Users,
   CheckCircle2,
   Sparkles,
   ClipboardList,
 } from 'lucide-react';
 
 // Importar constantes de la entrevista
-import { steps, preguntaToStep } from '@/components/entrevista/constants';
+import { steps } from '@/components/entrevista/constants';
 
 const navigation = [
   { name: 'Inicio', href: '/', icon: Home },
@@ -39,9 +30,9 @@ const navigation = [
     ],
   },
   {
-    name: 'Clase a Clase',
+    name: 'Editor IA',
     href: '/editor',
-    icon: Puzzle,
+    icon: Sparkles,
     submenu: [
       { name: 'Planificación de Clase', href: '/editor?tipo=planificacion' },
       { name: 'Material de Apoyo', href: '/editor?tipo=material' },
@@ -94,18 +85,18 @@ function SidebarContent() {
   const isSubmenuActive = (href: string) => pathname === href;
 
   // Determinar el paso actual de la entrevista
-  const getCurrentInterviewStep = () => {
+  const getCurrentInterviewStep = useCallback(() => {
     if (pathname === '/entrevista') {
       const stepParam = searchParams.get('step');
       return stepParam ? parseInt(stepParam) : 0;
     }
     return 0;
-  };
+  }, [pathname, searchParams]);
 
   // Actualizar el paso actual cuando cambien los parámetros de URL
   useEffect(() => {
     setCurrentInterviewStep(getCurrentInterviewStep());
-  }, [pathname, searchParams]);
+  }, [getCurrentInterviewStep]);
 
   return (
     <aside className="w-80 h-full min-h-0 flex flex-col bg-white/70 backdrop-blur-md py-10 px-6 border-r border-[#f0f0fa] overflow-hidden transition-all">
@@ -114,11 +105,9 @@ function SidebarContent() {
           <BookOpen className="text-white" size={32} />
         </div>
         <div>
-          <div className="text-2xl font-extrabold text-indigo-900">
-            Educación
-          </div>
+          <div className="text-2xl font-extrabold text-indigo-900">EdK</div>
           <div className="text-sm text-purple-500 font-medium">
-            Plataforma docente
+            Soluciones IA en educación
           </div>
         </div>
       </div>

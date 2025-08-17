@@ -2,34 +2,15 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  ArrowLeft,
-  ChevronsUpDown,
-  Check,
-  X,
-  Plus,
-  CloudUpload,
-  BarChart3,
-  Target,
-  BookOpen,
-  Zap,
-} from 'lucide-react';
-import { Listbox } from '@headlessui/react';
-import { Dialog } from '@headlessui/react';
-import {
-  getGradient,
-  getHoverGradient,
-  MATRIZ_STEPS,
-  validateMatrizForm,
-} from '@/utils/matrices';
-import { useMatricesData } from '@/hooks/useMatrices';
+
+import { MATRIZ_STEPS, validateMatrizForm } from '@/utils/matrices';
+
 import MatrizBasicForm from '@/components/matrices/MatrizBasicForm';
 import MatrizHeader from '@/components/matrices/MatrizHeader';
 import MatrizStepIndicator from '@/components/matrices/MatrizStepIndicator';
 import MatrizOASelector from '@/components/matrices/MatrizOASelector';
 import MatrizIndicadoresSection from '@/components/matrices/MatrizIndicadoresSection';
-import PrimaryButton from '@/components/ui/PrimaryButton';
-import SecondaryButton from '@/components/ui/SecondaryButton';
+
 import ImportarMatrizModal from '@/components/matrices/ImportarMatrizModal';
 
 interface OA {
@@ -60,12 +41,11 @@ export default function CrearMatrizPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [oas, setOAs] = useState<OA[]>([]);
-  const [ejes, setEjes] = useState<Eje[]>([]);
+
   const [asignaturas, setAsignaturas] = useState<
     { id: number; nombre: string }[]
   >([]);
   const [niveles, setNiveles] = useState<{ id: number; nombre: string }[]>([]);
-  const [dataLoading, setDataLoading] = useState(true);
 
   const [selectedAsignatura, setSelectedAsignatura] = useState<number | null>(
     null
@@ -94,16 +74,12 @@ export default function CrearMatrizPage() {
   const [matrizName, setMatrizName] = useState('');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [step, setStep] = useState(1);
-  const [showOaChangeModal, setShowOaChangeModal] = useState(false);
-  const [pendingOAs, setPendingOAs] = useState<OA[]>([]);
   const [showImportModal, setShowImportModal] = useState(false);
-  const [importSuccess, setImportSuccess] = useState(false);
 
+  // Cargar datos al montar el componente
   useEffect(() => {
     const loadData = async () => {
-      setDataLoading(true);
       await Promise.all([fetchOAs(), fetchAsignaturas(), fetchNiveles()]);
-      setDataLoading(false);
     };
     loadData();
   }, []);
@@ -307,14 +283,6 @@ export default function CrearMatrizPage() {
     }
   };
 
-  const isValid =
-    selectedAsignatura &&
-    selectedNivel &&
-    (selectedEjeContenido || selectedEjeHabilidad) &&
-    (selectedOAsContenido.length > 0 || selectedOAsHabilidad.length > 0) &&
-    matrizName.trim() &&
-    totalPreguntas > 0;
-
   // Calcula el total de preguntas de los indicadores por tipo de eje
   const totalPreguntasIndicadores = Object.values(oaIndicadores)
     .flat()
@@ -370,11 +338,6 @@ export default function CrearMatrizPage() {
       totalPreguntasHabilidad === totalPreguntas &&
       allOAsHaveIndicators
     : totalPreguntasIndicadores === totalPreguntas && allOAsHaveIndicators;
-
-  // Para mostrar el total correcto en el contador
-  const totalPreguntasToShow = hasBothTypes
-    ? totalPreguntasContenido
-    : totalPreguntasIndicadores;
 
   return (
     <>
@@ -480,16 +443,50 @@ export default function CrearMatrizPage() {
           if (data.oas && data.oas.length > 0) {
             // Separar OAs únicos por tipo (usar tipo_eje que es el campo real de la BD)
             const oasContenido = data.oas
-              .filter((oa: any) => oa.tipo_eje === 'Contenido')
+              .filter(oa => oa.tipo_eje === 'Contenido')
               .filter(
-                (oa: any, index: number, self: any[]) =>
-                  index === self.findIndex((o: any) => o.id === oa.id)
+                (oa, index, self) =>
+                  index === self.findIndex(o => o.id === oa.id)
+              )
+              .map(
+                (oa): OA => ({
+                  id: oa.id,
+                  oas_id: `OA ${oa.id}`,
+                  descripcion_oas: oa.indicador,
+                  eje_id: 1,
+                  eje_descripcion: 'Eje importado',
+                  nivel_id: selectedNivel!,
+                  asignatura_id: selectedAsignatura!,
+                  nivel: { nombre: 'Nivel importado' },
+                  asignatura: { nombre: 'Asignatura importada' },
+                  tipo_eje: oa.tipo_eje as
+                    | 'Contenido'
+                    | 'Habilidad'
+                    | 'Actitud',
+                })
               );
             const oasHabilidad = data.oas
-              .filter((oa: any) => oa.tipo_eje === 'Habilidad')
+              .filter(oa => oa.tipo_eje === 'Habilidad')
               .filter(
-                (oa: any, index: number, self: any[]) =>
-                  index === self.findIndex((o: any) => o.id === oa.id)
+                (oa, index, self) =>
+                  index === self.findIndex(o => o.id === oa.id)
+              )
+              .map(
+                (oa): OA => ({
+                  id: oa.id,
+                  oas_id: `OA ${oa.id}`,
+                  descripcion_oas: oa.indicador,
+                  eje_id: 1,
+                  eje_descripcion: 'Eje importado',
+                  nivel_id: selectedNivel!,
+                  asignatura_id: selectedAsignatura!,
+                  nivel: { nombre: 'Nivel importado' },
+                  asignatura: { nombre: 'Asignatura importada' },
+                  tipo_eje: oa.tipo_eje as
+                    | 'Contenido'
+                    | 'Habilidad'
+                    | 'Actitud',
+                })
               );
 
             setSelectedOAsContenido(oasContenido);
@@ -498,7 +495,7 @@ export default function CrearMatrizPage() {
             // Procesar indicadores por OA
             const indicadoresPorOA: { [key: number]: Indicador[] } = {};
 
-            data.oas.forEach((oa: any) => {
+            data.oas.forEach(oa => {
               // Crear objeto Indicador con la estructura correcta
               const indicador = {
                 descripcion: oa.indicador,
@@ -514,12 +511,8 @@ export default function CrearMatrizPage() {
             setOAIndicadores(prev => ({ ...prev, ...indicadoresPorOA }));
           }
 
-          setImportSuccess(true);
-          setTimeout(() => {
-            setImportSuccess(false);
-            // Avanzar al paso 3 después de importar exitosamente
-            setStep(3);
-          }, 2000);
+          // Avanzar al paso 3 después de importar exitosamente
+          setStep(3);
         }}
       />
     </>

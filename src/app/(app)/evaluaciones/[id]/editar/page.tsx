@@ -4,12 +4,24 @@ import { useRouter, useParams } from 'next/navigation';
 import EvaluacionForm from '@/components/evaluacion/EvaluacionForm';
 import EstadoEvaluacion from '@/components/evaluacion/EstadoEvaluacion';
 
+interface Evaluacion {
+  id: number;
+  titulo: string;
+  descripcion?: string;
+  estado?: string;
+  matrizId?: number;
+  archivoId?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  [key: string]: unknown;
+}
+
 export default function EditarEvaluacionPage() {
   const router = useRouter();
   const params = useParams();
   const { id } = params;
   const [loading, setLoading] = useState(true);
-  const [evaluacion, setEvaluacion] = useState<any>(null);
+  const [evaluacion, setEvaluacion] = useState<Evaluacion | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -30,7 +42,7 @@ export default function EditarEvaluacionPage() {
   useEffect(() => {
     const handleEstadoActualizado = (event: CustomEvent) => {
       if (event.detail.evaluacionId === parseInt(id as string)) {
-        setEvaluacion((prev: any) => ({
+        setEvaluacion((prev: Evaluacion | null) => ({
           ...prev,
           estado: event.detail.estado,
         }));

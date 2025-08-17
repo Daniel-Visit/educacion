@@ -12,8 +12,8 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { PreguntaExtraida } from '@/lib/extract-evaluacion';
-import { useState, useEffect } from 'react';
-import { Indicador, MatrizOA, MatrizEspecificacion } from '@/types/evaluacion';
+import { useState } from 'react';
+import { MatrizEspecificacion, EvaluacionFormData } from '@/types/evaluacion';
 import Dropdown from '@/components/entrevista/Dropdown';
 import { createPortal } from 'react-dom';
 
@@ -74,8 +74,8 @@ interface PreguntasSidebarContentProps {
   respuestasCorrectas: { [preguntaNumero: number]: string };
   onRespuestaChange: (preguntaNumero: number, letra: string) => void;
   onPreguntasChange: (preguntas: PreguntaExtraida[]) => void;
-  onFormDataChange: (data: any) => void;
-  formData: any;
+  onFormDataChange: (data: Partial<EvaluacionFormData>) => void;
+  formData: EvaluacionFormData;
   error?: string;
   selectedMatriz?: MatrizEspecificacion | null;
   indicadoresAsignados: {
@@ -100,6 +100,12 @@ export default function PreguntasSidebarContent({
   indicadoresAsignados,
   onIndicadorChange,
 }: PreguntasSidebarContentProps) {
+  console.log('🔍 [PreguntasSidebar] Estado actual:', {
+    preguntasCount: preguntasExtraidas.length,
+    indicadoresAsignadosCount: Object.keys(indicadoresAsignados).length,
+    indicadoresAsignados: indicadoresAsignados,
+    selectedMatriz: !!selectedMatriz,
+  });
   const [editingPregunta, setEditingPregunta] = useState<{
     numero: number;
     field: 'texto' | 'alternativa';
@@ -359,28 +365,46 @@ export default function PreguntasSidebarContent({
     tipo: 'contenido' | 'habilidad'
   ) => {
     const asignacion = indicadoresAsignados[preguntaNumero];
-    if (!asignacion) return null;
+    if (!asignacion) {
+      console.log(
+        '🔍 [getIndicadorAsignado] No hay asignación para pregunta:',
+        preguntaNumero,
+        'tipo:',
+        tipo
+      );
+      return null;
+    }
 
     const indicadorId =
       tipo === 'contenido' ? asignacion.contenido : asignacion.habilidad;
-    if (!indicadorId) return null;
+    if (!indicadorId) {
+      console.log(
+        '🔍 [getIndicadorAsignado] No hay indicadorId para pregunta:',
+        preguntaNumero,
+        'tipo:',
+        tipo,
+        'asignación:',
+        asignacion
+      );
+      return null;
+    }
 
     const indicadores =
       tipo === 'contenido'
         ? getIndicadoresContenido()
         : getIndicadoresHabilidad();
-    return indicadores.find(ind => ind.id === indicadorId) || null;
-  };
 
-  const getIndicadorDescripcion = (
-    indicadorId: number,
-    tipo: 'contenido' | 'habilidad'
-  ) => {
-    const indicadores =
-      tipo === 'contenido'
-        ? getIndicadoresContenido()
-        : getIndicadoresHabilidad();
-    return indicadores.find(ind => ind.id === indicadorId)?.descripcion || '';
+    const indicadorEncontrado = indicadores.find(ind => ind.id === indicadorId);
+    console.log(
+      '🔍 [getIndicadorAsignado] Buscando indicador:',
+      indicadorId,
+      'en',
+      indicadores.length,
+      'indicadores. Encontrado:',
+      !!indicadorEncontrado
+    );
+
+    return indicadorEncontrado || null;
   };
 
   // Función para calcular cuántas preguntas faltan por asignar para cada indicador
@@ -582,14 +606,14 @@ export default function PreguntasSidebarContent({
                                   </div>
                                 )}
                                 {estado === 'exceso' && (
-                                  <div className="flex items-center gap-1 px-2 py-1 bg-red-50 border border-red-200 rounded-full">
+                                  <div className="flex items-center justify-center min-w-[24px] h-6 px-2 bg-red-50 border border-red-200 rounded-full">
                                     <span className="text-xs font-bold text-red-700">
                                       +{Math.abs(faltantes)}
                                     </span>
                                   </div>
                                 )}
                                 {estado === 'incompleto' && (
-                                  <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 border border-amber-200 rounded-full">
+                                  <div className="flex items-center justify-center min-w-[24px] h-6 px-2 bg-amber-50 border border-amber-200 rounded-full">
                                     <span className="text-xs font-bold text-amber-700">
                                       {faltantes}
                                     </span>
@@ -659,14 +683,14 @@ export default function PreguntasSidebarContent({
                                     </div>
                                   )}
                                   {estado === 'exceso' && (
-                                    <div className="flex items-center gap-1 px-2 py-1 bg-red-50 border border-red-200 rounded-full">
+                                    <div className="flex items-center justify-center min-w-[24px] h-6 px-2 bg-red-50 border border-red-200 rounded-full">
                                       <span className="text-xs font-bold text-red-700">
                                         +{Math.abs(faltantes)}
                                       </span>
                                     </div>
                                   )}
                                   {estado === 'incompleto' && (
-                                    <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 border border-amber-200 rounded-full">
+                                    <div className="flex items-center justify-center min-w-[24px] h-6 px-2 bg-amber-50 border border-amber-200 rounded-full">
                                       <span className="text-xs font-bold text-amber-700">
                                         {faltantes}
                                       </span>
@@ -833,10 +857,6 @@ export default function PreguntasSidebarContent({
                         )
                       }
                       options={getIndicadoresContenido().map(ind => {
-                        const faltantes =
-                          getPreguntasFaltantesPorIndicador().contenido[
-                            ind.id
-                          ] || 0;
                         const estado = getEstadoIndicador(ind.id, 'contenido');
                         const isDisabled =
                           estado === 'completo' &&
@@ -881,10 +901,6 @@ export default function PreguntasSidebarContent({
                           )
                         }
                         options={getIndicadoresHabilidad().map(ind => {
-                          const faltantes =
-                            getPreguntasFaltantesPorIndicador().habilidad[
-                              ind.id
-                            ] || 0;
                           const estado = getEstadoIndicador(
                             ind.id,
                             'habilidad'
@@ -916,121 +932,127 @@ export default function PreguntasSidebarContent({
 
               {/* Alternativas */}
               <div className="space-y-2">
-                {pregunta.alternativas.map((alternativa, index) => {
-                  const esCorrecta =
-                    respuestasCorrectas[pregunta.numero] === alternativa.letra;
-                  return (
-                    <div
-                      key={index}
-                      className={`flex items-center gap-3 ${esCorrecta ? 'bg-green-50 border border-green-200' : ''} rounded-lg px-2 py-1`}
-                    >
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name={`pregunta-${pregunta.numero}`}
-                          value={alternativa.letra}
-                          checked={esCorrecta}
-                          onChange={() =>
-                            onRespuestaChange(
-                              pregunta.numero,
-                              alternativa.letra
-                            )
-                          }
-                          className="text-indigo-600 focus:ring-indigo-500"
-                        />
-                        <span
-                          className={`font-medium w-6 ${esCorrecta ? 'text-green-700 font-bold' : 'text-gray-700'}`}
-                        >
-                          {alternativa.letra}.
-                        </span>
-                      </label>
-                      {esCorrecta && (
-                        <Check size={16} className="text-green-600" />
-                      )}
-                      {editingPregunta?.numero === pregunta.numero &&
-                      editingPregunta?.field === 'alternativa' &&
-                      editingPregunta?.alternativaIndex === index ? (
-                        <div className="flex-1 flex items-center gap-2">
+                {pregunta.alternativas
+                  .sort((a, b) => a.letra.localeCompare(b.letra))
+                  .map((alternativa, index) => {
+                    const esCorrecta =
+                      respuestasCorrectas[pregunta.numero] ===
+                      alternativa.letra;
+                    return (
+                      <div
+                        key={index}
+                        className={`flex items-center gap-3 ${esCorrecta ? 'bg-green-50 border border-green-200' : ''} rounded-lg px-2 py-1`}
+                      >
+                        <label className="flex items-center gap-2 cursor-pointer">
                           <input
-                            type="text"
-                            value={editValue}
-                            onChange={e => setEditValue(e.target.value)}
-                            onKeyDown={handleKeyPress}
-                            className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                            placeholder="Texto de la alternativa"
-                            autoFocus
+                            type="radio"
+                            name={`pregunta-${pregunta.numero}`}
+                            value={alternativa.letra}
+                            checked={esCorrecta}
+                            onChange={() =>
+                              onRespuestaChange(
+                                pregunta.numero,
+                                alternativa.letra
+                              )
+                            }
+                            className="text-indigo-600 focus:ring-indigo-500"
                           />
-                          <button
-                            onClick={handleSaveEdit}
-                            className="p-1 text-green-600 hover:text-green-700"
+                          <span
+                            className={`font-medium w-6 ${esCorrecta ? 'text-green-700 font-bold' : 'text-gray-700'}`}
                           >
-                            <Check size={14} />
-                          </button>
-                          <button
-                            onClick={handleCancelEdit}
-                            className="p-1 text-gray-400 hover:text-gray-600"
-                          >
-                            <X size={14} />
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flex-1 flex items-center justify-between group">
-                          <span className="text-gray-700 text-sm flex-1">
-                            {alternativa.texto}
+                            {alternativa.letra}.
                           </span>
-                          <div className="relative dropdown-container">
+                        </label>
+                        {editingPregunta?.numero === pregunta.numero &&
+                        editingPregunta?.field === 'alternativa' &&
+                        editingPregunta?.alternativaIndex === index ? (
+                          <div className="flex-1 flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={editValue}
+                              onChange={e => setEditValue(e.target.value)}
+                              onKeyDown={handleKeyPress}
+                              className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                              placeholder="Texto de la alternativa"
+                              autoFocus
+                            />
                             <button
-                              onClick={() =>
-                                handleToggleDropdown(
-                                  'alternativa',
-                                  pregunta.numero,
-                                  index
-                                )
-                              }
-                              className="p-1 text-gray-400 hover:text-gray-600 rounded opacity-60 hover:opacity-100 transition-opacity"
+                              onClick={handleSaveEdit}
+                              className="p-1 text-green-600 hover:text-green-700"
                             >
-                              <MoreVertical size={14} />
+                              <Check size={14} />
                             </button>
-                            {openDropdown?.tipo === 'alternativa' &&
-                              openDropdown?.numero === pregunta.numero &&
-                              openDropdown?.alternativaIndex === index && (
-                                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[120px]">
-                                  <button
-                                    onClick={() =>
-                                      handleDropdownAction(
-                                        'edit',
-                                        'alternativa',
-                                        pregunta.numero,
-                                        index
-                                      )
-                                    }
-                                    className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
-                                  >
-                                    <Edit2 size={14} />
-                                    Editar
-                                  </button>
-                                  <button
-                                    onClick={() =>
-                                      handleDropdownAction(
-                                        'delete',
-                                        'alternativa',
-                                        pregunta.numero,
-                                        index
-                                      )
-                                    }
-                                    className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                                  >
-                                    <Trash2 size={14} />
-                                    Eliminar
-                                  </button>
-                                </div>
-                              )}
+                            <button
+                              onClick={handleCancelEdit}
+                              className="p-1 text-gray-400 hover:text-gray-600"
+                            >
+                              <X size={14} />
+                            </button>
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                        ) : (
+                          <div className="flex-1 flex items-center justify-between group">
+                            <span className="text-gray-700 text-sm flex-1">
+                              {alternativa.texto}
+                            </span>
+                            {esCorrecta && (
+                              <Check
+                                size={16}
+                                className="text-green-600 ml-2"
+                              />
+                            )}
+                            <div className="relative dropdown-container">
+                              <button
+                                onClick={() =>
+                                  handleToggleDropdown(
+                                    'alternativa',
+                                    pregunta.numero,
+                                    index
+                                  )
+                                }
+                                className="p-1 text-gray-400 hover:text-gray-600 rounded opacity-60 hover:opacity-100 transition-opacity"
+                              >
+                                <MoreVertical size={14} />
+                              </button>
+                              {openDropdown?.tipo === 'alternativa' &&
+                                openDropdown?.numero === pregunta.numero &&
+                                openDropdown?.alternativaIndex === index && (
+                                  <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[120px]">
+                                    <button
+                                      onClick={() =>
+                                        handleDropdownAction(
+                                          'edit',
+                                          'alternativa',
+                                          pregunta.numero,
+                                          index
+                                        )
+                                      }
+                                      className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                    >
+                                      <Edit2 size={14} />
+                                      Editar
+                                    </button>
+                                    <button
+                                      onClick={() =>
+                                        handleDropdownAction(
+                                          'delete',
+                                          'alternativa',
+                                          pregunta.numero,
+                                          index
+                                        )
+                                      }
+                                      className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                    >
+                                      <Trash2 size={14} />
+                                      Eliminar
+                                    </button>
+                                  </div>
+                                )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
 
                 {/* Botón para agregar alternativa */}
                 <div className="flex justify-center pt-2">

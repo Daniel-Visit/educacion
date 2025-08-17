@@ -9,7 +9,7 @@ export async function GET() {
       orderBy: { nombre_metodologia: 'asc' },
     });
     return NextResponse.json(metodologias);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Error al obtener metodologías' },
       { status: 500 }

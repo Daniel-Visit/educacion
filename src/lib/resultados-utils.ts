@@ -118,8 +118,7 @@ export const calcularRangosPorcentajes = (
 // Función para generar CSV de resultados
 export const generarCSV = (
   respuestasAlumnos: RespuestaAlumno[],
-  nivelExigencia: number,
-  nombreEvaluacion: string
+  nivelExigencia: number
 ) => {
   const headers = [
     'Alumno',

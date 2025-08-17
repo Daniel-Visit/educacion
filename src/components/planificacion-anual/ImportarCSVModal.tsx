@@ -1,27 +1,9 @@
 'use client';
 import { useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-  LoadingState,
-  ErrorState,
-  ModalHeader,
-  SuccessState,
-} from '@/components/resultados';
+
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import SecondaryButton from '@/components/ui/SecondaryButton';
-import {
-  CloudUpload,
-  FileText,
-  CheckCircle2,
-  AlertTriangle,
-  X,
-  Download,
-  Info,
-  Calendar,
-  BarChart3,
-} from 'lucide-react';
+import { CloudUpload } from 'lucide-react';
 
 interface ImportarCSVModalProps {
   isOpen: boolean;

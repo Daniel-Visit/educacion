@@ -1,12 +1,6 @@
 import { Listbox, Popover } from '@headlessui/react';
-import {
-  ChevronsUpDown,
-  Check,
-  ChevronDown,
-  ChevronRight,
-  Eye,
-} from 'lucide-react';
-import { useState } from 'react';
+import { ChevronsUpDown, Check, ChevronDown } from 'lucide-react';
+
 import { MatrizEspecificacion } from '@/types/evaluacion';
 
 interface MatrizSelectorProps {

@@ -1,6 +1,16 @@
 import { useState, useEffect } from 'react';
 import { PreguntaExtraida } from '@/lib/extract-evaluacion';
 
+// Interfaces para reemplazar tipos 'any'
+interface FormData {
+  respuestasCorrectas: { [key: number]: string };
+  [key: string]: unknown;
+}
+
+interface SetFormDataFunction {
+  (data: FormData | ((prev: FormData) => FormData)): void;
+}
+
 export function usePreguntasEditor() {
   const [editingPregunta, setEditingPregunta] = useState<{
     numero: number;
@@ -41,9 +51,7 @@ export function usePreguntasEditor() {
 
   const handleSaveEdit = (
     preguntasExtraidas: PreguntaExtraida[],
-    setPreguntasExtraidas: (preguntas: PreguntaExtraida[]) => void,
-    formData: any,
-    setFormData: (data: any) => void
+    setPreguntasExtraidas: (preguntas: PreguntaExtraida[]) => void
   ) => {
     if (!editingPregunta || !editValue.trim()) return;
 
@@ -99,8 +107,8 @@ export function usePreguntasEditor() {
     preguntaNumero: number,
     preguntasExtraidas: PreguntaExtraida[],
     setPreguntasExtraidas: (preguntas: PreguntaExtraida[]) => void,
-    formData: any,
-    setFormData: (data: any) => void
+    formData: FormData,
+    setFormData: SetFormDataFunction
   ) => {
     const nuevasPreguntas = preguntasExtraidas
       .filter(p => p.numero !== preguntaNumero)
@@ -117,7 +125,7 @@ export function usePreguntasEditor() {
       }
     });
 
-    setFormData((prev: any) => ({
+    setFormData((prev: FormData) => ({
       ...prev,
       respuestasCorrectas: nuevasRespuestas,
     }));
@@ -130,8 +138,8 @@ export function usePreguntasEditor() {
     alternativaIndex: number,
     preguntasExtraidas: PreguntaExtraida[],
     setPreguntasExtraidas: (preguntas: PreguntaExtraida[]) => void,
-    formData: any,
-    setFormData: (data: any) => void
+    formData: FormData,
+    setFormData: SetFormDataFunction
   ) => {
     const nuevasPreguntas = [...preguntasExtraidas];
     const preguntaIndex = nuevasPreguntas.findIndex(
@@ -157,7 +165,7 @@ export function usePreguntasEditor() {
     // Actualizar respuesta correcta si la eliminada era la correcta
     const letraEliminada = String.fromCharCode(65 + alternativaIndex);
     if (formData.respuestasCorrectas[preguntaNumero] === letraEliminada) {
-      setFormData((prev: any) => ({
+      setFormData((prev: FormData) => ({
         ...prev,
         respuestasCorrectas: {
           ...prev.respuestasCorrectas,
@@ -194,8 +202,8 @@ export function usePreguntasEditor() {
     alternativaIndex?: number,
     preguntasExtraidas?: PreguntaExtraida[],
     setPreguntasExtraidas?: (preguntas: PreguntaExtraida[]) => void,
-    formData?: any,
-    setFormData?: (data: any) => void
+    formData?: FormData,
+    setFormData?: SetFormDataFunction
   ) => {
     if (action === 'edit') {
       if (tipo === 'pregunta') {

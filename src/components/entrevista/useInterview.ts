@@ -15,6 +15,7 @@ export function useInterview(preguntas: string[], initialStep: number = 0) {
   });
   const [showCierre, setShowCierre] = useState(false);
   const [showResumen, setShowResumen] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -83,7 +84,8 @@ export function useInterview(preguntas: string[], initialStep: number = 0) {
   // TTS hook: leer el texto correcto según el estado
   const ttsText =
     step === 8 && showCierre && !showResumen ? preguntas[9] : preguntas[step];
-  useTTS(ttsText, true);
+
+  const { speak, stop } = useTTS(ttsText, audioEnabled);
 
   return {
     step,
@@ -97,5 +99,9 @@ export function useInterview(preguntas: string[], initialStep: number = 0) {
     handleSidebarClick,
     setShowCierre,
     setShowResumen,
+    speak,
+    stop,
+    audioEnabled,
+    setAudioEnabled,
   };
 }

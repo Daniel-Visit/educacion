@@ -7,7 +7,7 @@ interface LoadingStateProps {
 
 export default function LoadingState({
   message = 'Cargando...',
-  size = 'md',
+  size = 'lg',
 }: LoadingStateProps) {
   const sizeClasses = {
     sm: 'h-6 w-6',
@@ -16,12 +16,12 @@ export default function LoadingState({
   };
 
   return (
-    <div className="flex items-center justify-center h-64">
+    <div className="min-h-screen bg-transparent flex items-center justify-center">
       <div className="text-center">
         <div
-          className={`animate-spin rounded-full ${sizeClasses[size]} border-b-2 border-emerald-600 mx-auto mb-4`}
+          className={`animate-spin rounded-full ${sizeClasses[size]} border-b-2 border-indigo-600 mx-auto`}
         ></div>
-        <p className="text-emerald-600 font-medium">{message}</p>
+        <p className="mt-4 text-gray-600 font-medium">{message}</p>
       </div>
     </div>
   );

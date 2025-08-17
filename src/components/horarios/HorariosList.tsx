@@ -1,8 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import PrimaryButton from '@/components/ui/PrimaryButton';
-import SecondaryButton from '@/components/ui/SecondaryButton';
+import LoadingState from '@/components/ui/LoadingState';
 import {
   Play,
   Edit3,
@@ -15,7 +13,24 @@ import {
 } from 'lucide-react';
 import CrearHorarioModal from './CrearHorarioModal';
 import { useHorarios } from '@/hooks/use-horarios';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+
+// Importar el tipo Horario del hook para mantener consistencia total
+type Horario = {
+  id: number;
+  nombre: string;
+  asignatura: { id: number; nombre: string };
+  nivel: { id: number; nombre: string };
+  profesor: { id: number; nombre: string };
+  fechaPrimeraClase?: string;
+  createdAt: string;
+  modulos: Array<{
+    id: number;
+    dia: string;
+    horaInicio: string;
+    duracion: number;
+  }>;
+};
 
 // Utilidad para generar los números de página con puntos suspensivos
 function getPagination(current: number, total: number) {
@@ -36,10 +51,11 @@ function getPagination(current: number, total: number) {
 }
 
 export default function HorariosList() {
-  const router = useRouter();
-  const { horarios, loadHorarios, deleteHorario } = useHorarios();
+  const { horarios, loadHorarios, deleteHorario, isLoading } = useHorarios();
   const [modalOpen, setModalOpen] = React.useState(false);
-  const [horarioEditando, setHorarioEditando] = useState<any | null>(null);
+  const [horarioEditando, setHorarioEditando] = useState<Horario | undefined>(
+    undefined
+  );
   const [pagina, setPagina] = useState(1);
   const porPagina = 6;
   const totalPaginas = Math.ceil(horarios.length / porPagina);
@@ -47,6 +63,11 @@ export default function HorariosList() {
     (pagina - 1) * porPagina,
     pagina * porPagina
   );
+
+  // Estado para el modal de confirmación de eliminación
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [horarioToDelete, setHorarioToDelete] = useState<Horario | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   // Funciones de gradientes ordenados
   const getGradient = (index: number) => {
@@ -86,10 +107,40 @@ export default function HorariosList() {
     }
   }
 
-  // Recargar horarios después de crear uno nuevo
-  const handleHorarioCreated = async () => {
-    setModalOpen(false);
-    await loadHorarios();
+  // Mostrar loading state mientras se cargan los datos
+  if (isLoading) {
+    return (
+      <div className="container mx-auto">
+        <LoadingState message="Cargando horarios..." />
+      </div>
+    );
+  }
+
+  // Funciones para el modal de confirmación de eliminación
+  const handleDeleteClick = (horario: Horario) => {
+    setHorarioToDelete(horario);
+    setShowDeleteConfirm(true);
+  };
+
+  const cancelarEliminacion = () => {
+    setShowDeleteConfirm(false);
+    setHorarioToDelete(null);
+  };
+
+  const confirmarEliminacion = async () => {
+    if (!horarioToDelete) return;
+
+    setDeletingId(horarioToDelete.id);
+    try {
+      await deleteHorario(horarioToDelete.id);
+      setShowDeleteConfirm(false);
+      setHorarioToDelete(null);
+      await loadHorarios(); // Recargar la lista
+    } catch (error) {
+      console.error('Error al eliminar horario:', error);
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
@@ -108,13 +159,13 @@ export default function HorariosList() {
               </p>
             </div>
           </div>
-          <PrimaryButton
+          <button
             onClick={() => setModalOpen(true)}
             className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
           >
             <Calendar className="w-4 h-4" />
             Nuevo Horario
-          </PrimaryButton>
+          </button>
         </div>
 
         {/* Stats compactas */}
@@ -164,11 +215,11 @@ export default function HorariosList() {
         isOpen={modalOpen || !!horarioEditando}
         onClose={() => {
           setModalOpen(false);
-          setHorarioEditando(null);
+          setHorarioEditando(undefined);
         }}
         onHorarioCreated={() => {
           setModalOpen(false);
-          setHorarioEditando(null);
+          setHorarioEditando(undefined);
           loadHorarios();
         }}
         modoEdicion={!!horarioEditando}
@@ -183,12 +234,12 @@ export default function HorariosList() {
           <p className="text-xl text-gray-500 mb-8">
             Crea tu primer horario para comenzar
           </p>
-          <PrimaryButton
+          <button
             onClick={() => setModalOpen(true)}
-            className="text-lg px-10 py-4"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-lg px-10 py-4 rounded-lg transition-colors duration-200"
           >
             Nuevo Horario
-          </PrimaryButton>
+          </button>
         </div>
       ) : (
         <>
@@ -223,7 +274,7 @@ export default function HorariosList() {
                       <Edit3 size={16} />
                     </button>
                     <button
-                      onClick={() => deleteHorario(horario.id)}
+                      onClick={() => handleDeleteClick(horario)}
                       className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/80 backdrop-blur-sm border border-gray-200 hover:bg-white hover:border-gray-300 text-red-600 hover:text-red-700 transition-all duration-200 shadow-sm"
                       title="Eliminar horario"
                     >
@@ -351,6 +402,66 @@ export default function HorariosList() {
             </nav>
           </div>
         </>
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {showDeleteConfirm && horarioToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+            <div className="bg-gradient-to-r from-red-600 to-pink-600 rounded-t-2xl p-6 text-white">
+              <div className="flex items-center gap-4">
+                <div className="bg-white/20 p-2 rounded-lg">
+                  <Trash2 className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">
+                    Confirmar Eliminación
+                  </h2>
+                  <p className="text-red-100 text-sm">
+                    Esta acción no se puede deshacer
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <p className="text-gray-700 mb-6">
+                ¿Estás seguro de que quieres eliminar el horario{' '}
+                <strong className="text-gray-900">
+                  &ldquo;{horarioToDelete.nombre}&rdquo;
+                </strong>
+                ?
+              </p>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={cancelarEliminacion}
+                  disabled={deletingId === horarioToDelete.id}
+                  className="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmarEliminacion}
+                  disabled={deletingId === horarioToDelete.id}
+                  className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
+                >
+                  {deletingId === horarioToDelete.id ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Eliminando...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4" />
+                      Eliminar
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

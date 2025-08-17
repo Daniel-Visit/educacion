@@ -5,15 +5,11 @@ import { Step } from '@/types/matrices';
 interface MatrizStepIndicatorProps {
   steps: Step[];
   currentStep: number;
-  onStepClick?: (step: number) => void;
-  className?: string;
 }
 
 export default function MatrizStepIndicator({
   steps,
   currentStep,
-  onStepClick,
-  className = '',
 }: MatrizStepIndicatorProps) {
   return (
     <div className="flex justify-center items-center gap-0 mb-12 mt-8">

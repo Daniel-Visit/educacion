@@ -40,21 +40,25 @@ export const ResetPasswordEmail = ({
             </div>
 
             <Heading style={h1}>Recupera tu contraseña</Heading>
-            
+
             <Text style={text}>Hola {userFirstname},</Text>
-            
+
             <Text style={text}>
-              Has solicitado restablecer tu contraseña en la Plataforma Educativa. Haz clic en el botón de abajo para crear una nueva contraseña segura.
+              Has solicitado restablecer tu contraseña en la Plataforma
+              Educativa. Haz clic en el botón de abajo para crear una nueva
+              contraseña segura.
             </Text>
-            
+
             <Section style={buttonContainer}>
               <Button style={button} href={resetUrl}>
                 Restablecer Contraseña
               </Button>
             </Section>
-            
+
             <Text style={text}>
-              Este enlace expirará en 1 hora por seguridad. Si no solicitaste restablecer tu contraseña, puedes ignorar este email de forma segura.
+              Este enlace expirará en 1 hora por seguridad. Si no solicitaste
+              restablecer tu contraseña, puedes ignorar este email de forma
+              segura.
             </Text>
           </Section>
         </Container>
@@ -132,29 +136,3 @@ const button = {
   padding: '12px 24px',
   border: 'none',
 };
-
-const warningText = {
-  fontSize: '14px',
-  lineHeight: '20px',
-  color: '#dc2626',
-  margin: '16px 0',
-  padding: '12px',
-  backgroundColor: '#fef2f2',
-  borderRadius: '6px',
-  border: '1px solid #fecaca',
-};
-
-const footer = {
-  marginTop: '40px',
-  padding: '20px',
-  backgroundColor: '#f9fafb',
-  borderRadius: '8px',
-  textAlign: 'center' as const,
-};
-
-const footerText = {
-  fontSize: '14px',
-  lineHeight: '20px',
-  color: '#6b7280',
-  margin: '8px 0',
-}; 

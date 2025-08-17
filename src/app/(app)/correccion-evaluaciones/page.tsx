@@ -11,7 +11,8 @@ import {
 } from 'lucide-react';
 import GlobalDropdown from '@/components/ui/GlobalDropdown';
 import CargarResultadosModal from '@/components/correccion/CargarResultadosModal';
-
+import LoadingState from '@/components/ui/LoadingState';
+import ResultadosDataTable from '@/components/correccion/ResultadosDataTable';
 interface Evaluacion {
   id: number;
   titulo: string;
@@ -27,10 +28,11 @@ export default function CorreccionEvaluacionesPage() {
     useState<Evaluacion | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showCargarModal, setShowCargarModal] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0); // Para forzar refresh de la tabla
 
   useEffect(() => {
     cargarEvaluaciones();
-  }, []);
+  }, [isLoading]);
 
   const cargarEvaluaciones = async () => {
     try {
@@ -57,21 +59,25 @@ export default function CorreccionEvaluacionesPage() {
 
   const handleResultadosCargados = () => {
     if (evaluacionSeleccionada) {
+      // Recargar evaluaciones
+      cargarEvaluaciones();
+
+      // Forzar refresh de la tabla de resultados
+      setRefreshKey(prev => prev + 1);
+    }
+  };
+
+  const handleResultadosEliminados = () => {
+    // Solo recargar evaluaciones cuando se elimina un resultado
+    if (evaluacionSeleccionada) {
       cargarEvaluaciones();
     }
   };
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-            <p className="text-indigo-600 font-medium">
-              Cargando evaluaciones...
-            </p>
-          </div>
-        </div>
+      <div className="container mx-auto">
+        <LoadingState message="Cargando evaluaciones..." />
       </div>
     );
   }
@@ -79,7 +85,7 @@ export default function CorreccionEvaluacionesPage() {
   return (
     <div className="container mx-auto p-6 space-y-8">
       {/* Header compacto */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white shadow-lg mb-6 mt-0">
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 text-white shadow-lg mb-6 mt-0">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
             <div className="bg-white/20 p-2 rounded-lg">
@@ -186,10 +192,10 @@ export default function CorreccionEvaluacionesPage() {
           {evaluacionSeleccionada && (
             <button
               onClick={() => setShowCargarModal(true)}
-              className="h-12 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold text-sm rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+              className="h-10 px-6 mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold text-sm rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
             >
               <Upload className="h-5 w-5" />
-              Cargar Resultados
+              Subir
             </button>
           )}
         </div>
@@ -235,6 +241,15 @@ export default function CorreccionEvaluacionesPage() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Tabla de resultados cargados */}
+        {evaluacionSeleccionada && (
+          <ResultadosDataTable
+            evaluacionId={evaluacionSeleccionada.id}
+            onResultadoEliminado={handleResultadosEliminados}
+            refreshKey={refreshKey} // Pasar el refreshKey
+          />
         )}
 
         {evaluaciones.length === 0 && (

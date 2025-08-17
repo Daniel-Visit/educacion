@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
+// Interfaces para reemplazar tipos 'any'
+interface AsignacionInput {
+  oaId: number;
+  cantidadClases: number;
+}
+
 const prisma = new PrismaClient();
 
 export async function GET() {
@@ -95,13 +101,17 @@ export async function POST(request: NextRequest) {
       Array.isArray(asignaciones) &&
       asignaciones.length > 0
     ) {
+      console.log('DEBUG: Asignaciones recibidas:', asignaciones);
+
       await prisma.asignacionOA.createMany({
-        data: asignaciones.map((asignacion: any) => ({
+        data: asignaciones.map((asignacion: AsignacionInput) => ({
           planificacionId: planificacion.id,
           oaId: asignacion.oaId,
           cantidadClases: asignacion.cantidadClases,
         })),
       });
+
+      console.log('DEBUG: Asignaciones creadas exitosamente');
 
       // Recargar la planificación con las asignaciones
       const planificacionConAsignaciones =

@@ -15,12 +15,9 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import { Dialog } from '@headlessui/react';
+import LoadingState from '@/components/ui/LoadingState';
 import { useMatricesList } from '@/hooks/useMatrices';
-import { formatDate, getGradient, getPageNumbers } from '@/utils/matrices';
-import { MatrizEspecificacion } from '@/types/matrices';
-import PrimaryButton from '@/components/ui/PrimaryButton';
-import SecondaryButton from '@/components/ui/SecondaryButton';
+import { formatDate, getGradient } from '@/utils/matrices';
 
 export default function MatricesPage() {
   const router = useRouter();
@@ -33,7 +30,7 @@ export default function MatricesPage() {
 
   const {
     matrices,
-    loading,
+    isLoading,
     currentPage,
     setCurrentPage,
     deletingId,
@@ -121,17 +118,14 @@ export default function MatricesPage() {
     return pages;
   };
 
-  if (loading) {
+  // Mostrar loading state mientras se cargan los datos
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 font-medium">Cargando matrices...</p>
-        </div>
+      <div className="container mx-auto">
+        <LoadingState message="Cargando matrices..." />
       </div>
     );
   }
-
   return (
     <>
       {/* Header moderno */}
@@ -152,13 +146,13 @@ export default function MatricesPage() {
           </div>
 
           {/* Botones de acción */}
-          <PrimaryButton
+          <button
             onClick={handleCreateMatriz}
             className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
           >
             <Plus className="w-4 h-4" />
             Nueva Matriz
-          </PrimaryButton>
+          </button>
         </div>
 
         {/* Stats y información */}
@@ -228,13 +222,13 @@ export default function MatricesPage() {
                 Crea tu primera matriz de especificación para comenzar a diseñar
                 evaluaciones estructuradas y efectivas
               </p>
-              <PrimaryButton
+              <button
                 onClick={handleCreateMatriz}
                 className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-10 py-4 text-xl font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
               >
                 <Plus size={28} className="mr-3" />
                 Crear Primera Matriz
-              </PrimaryButton>
+              </button>
             </div>
           </div>
         ) : (
@@ -339,7 +333,7 @@ export default function MatricesPage() {
                     <div className="mt-6 pt-4 border-t border-gray-100">
                       <button
                         onClick={() => handleViewMatriz(matriz.id)}
-                        className={`w-full bg-gradient-to-r ${getGradient(index)} hover:from-emerald-600 hover:to-teal-700 text-white py-2.5 px-4 rounded-xl font-medium text-sm transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 group/btn`}
+                        className={`w-full bg-gradient-to-r ${getGradient(index)} text-white py-2.5 px-4 rounded-xl font-medium text-sm transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 group/btn`}
                       >
                         <Eye
                           size={16}
@@ -408,66 +402,112 @@ export default function MatricesPage() {
         )}
       </div>
 
-      {/* Modales de confirmación y alerta */}
-      <Dialog
-        open={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        className="fixed z-50 inset-0 overflow-y-auto"
-      >
-        <div className="flex items-center justify-center min-h-screen px-4">
-          <div
-            className="fixed inset-0 bg-black opacity-30"
-            aria-hidden="true"
-          />
-          <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full mx-auto p-8 z-10">
-            <Dialog.Title className="text-lg font-bold mb-4">
-              ¿Eliminar matriz?
-            </Dialog.Title>
-            <Dialog.Description className="mb-6 text-gray-600">
-              Esta acción no se puede deshacer. ¿Estás seguro de que quieres
-              eliminar esta matriz?
-            </Dialog.Description>
-            <div className="flex gap-4 justify-end">
-              <SecondaryButton onClick={() => setShowDeleteModal(false)}>
-                Cancelar
-              </SecondaryButton>
-              <PrimaryButton
-                onClick={confirmDeleteMatriz}
-                disabled={deletingId !== null}
-              >
-                Eliminar
-              </PrimaryButton>
+      {/* Modal de confirmación de eliminación */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+            <div className="bg-gradient-to-r from-red-600 to-pink-600 rounded-t-2xl p-6 text-white">
+              <div className="flex items-center gap-4">
+                <div className="bg-white/20 p-2 rounded-lg">
+                  <Trash2 className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">
+                    Confirmar Eliminación
+                  </h2>
+                  <p className="text-red-100 text-sm">
+                    Esta acción no se puede deshacer
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </Dialog>
 
-      {alert && (
-        <Dialog
-          open={!!alert}
-          onClose={() => setAlert(null)}
-          className="fixed z-50 inset-0 overflow-y-auto"
-        >
-          <div className="flex items-center justify-center min-h-screen px-4">
-            <div
-              className="fixed inset-0 bg-black opacity-30"
-              aria-hidden="true"
-            />
-            <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full mx-auto p-8 z-10">
-              <Dialog.Title className="text-lg font-bold mb-4">
-                {alert.type === 'error' ? 'Error' : 'Éxito'}
-              </Dialog.Title>
-              <Dialog.Description className="mb-6 text-gray-600">
-                {alert.message}
-              </Dialog.Description>
-              <div className="flex gap-4 justify-end">
-                <PrimaryButton onClick={() => setAlert(null)}>
-                  Cerrar
-                </PrimaryButton>
+            <div className="p-6">
+              <p className="text-gray-700 mb-6">
+                ¿Estás seguro de que quieres eliminar esta matriz?
+              </p>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmDeleteMatriz}
+                  disabled={deletingId !== null}
+                  className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-50 flex items-center gap-2 transition-colors"
+                >
+                  {deletingId !== null ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Eliminando...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4" />
+                      Eliminar
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>
-        </Dialog>
+        </div>
+      )}
+
+      {alert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+            <div
+              className={`rounded-t-2xl p-6 text-white ${
+                alert.type === 'error'
+                  ? 'bg-gradient-to-r from-red-600 to-pink-600'
+                  : 'bg-gradient-to-r from-green-600 to-emerald-600'
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                <div className="bg-white/20 p-2 rounded-lg">
+                  {alert.type === 'error' ? (
+                    <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                      <span className="text-red-600 font-bold text-sm">!</span>
+                    </div>
+                  ) : (
+                    <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                      <span className="text-green-600 font-bold text-sm">
+                        ✓
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">
+                    {alert.type === 'error' ? 'Error' : 'Éxito'}
+                  </h2>
+                  <p className="text-white/80 text-sm">
+                    {alert.type === 'error'
+                      ? 'Ha ocurrido un error'
+                      : 'Operación completada'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <p className="text-gray-700 mb-6">{alert.message}</p>
+
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setAlert(null)}
+                  className="px-6 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors font-medium"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

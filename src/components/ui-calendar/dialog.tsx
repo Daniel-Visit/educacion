@@ -57,7 +57,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          'bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100%-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-xl border p-6 shadow-lg duration-200 sm:max-w-100',
+          'bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100%-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-2xl shadow-lg duration-200 sm:max-w-100',
           className
         )}
         {...props}
@@ -79,7 +79,10 @@ function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="alert-dialog-header"
-      className={cn('flex flex-col gap-1 text-center sm:text-left', className)}
+      className={cn(
+        'flex flex-col gap-1 text-center sm:text-left px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600',
+        className
+      )}
       {...props}
     />
   );
@@ -90,7 +93,7 @@ function DialogFooter({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="alert-dialog-footer"
       className={cn(
-        'flex flex-col-reverse gap-3 sm:flex-row sm:justify-end',
+        'flex flex-col-reverse gap-3 sm:flex-row sm:justify-end px-6 pb-6',
         className
       )}
       {...props}
@@ -105,7 +108,7 @@ function DialogTitle({
   return (
     <DialogPrimitive.Title
       data-slot="alert-dialog-title"
-      className={cn('text-lg leading-none font-semibold', className)}
+      className={cn('text-lg text-white leading-none font-semibold', className)}
       {...props}
     />
   );

@@ -10,8 +10,21 @@ export interface SavedContent {
   updatedAt?: string;
 }
 
+// Tipo para nodos de TipTap
+interface TipTapNode {
+  type: string;
+  attrs?: {
+    src?: string;
+    [key: string]: unknown;
+  };
+  content?: TipTapNode[];
+  [key: string]: unknown;
+}
+
 // Función para procesar imágenes base64 en el contenido
-async function processImagesInContent(content: any): Promise<any> {
+async function processImagesInContent(
+  content: TipTapNode
+): Promise<TipTapNode> {
   if (!content || typeof content !== 'object') {
     return content;
   }
@@ -56,7 +69,7 @@ async function processImagesInContent(content: any): Promise<any> {
   if (content.content && Array.isArray(content.content)) {
     const processedContent = await Promise.all(
       content.content.map(
-        async (node: any) => await processImagesInContent(node)
+        async (node: TipTapNode) => await processImagesInContent(node)
       )
     );
     return {
@@ -103,42 +116,106 @@ export function useContentSave() {
       titulo: string,
       tipo: 'planificacion' | 'material' | 'evaluacion' = 'planificacion'
     ): Promise<SavedContent | null> => {
+      console.log('🔵 [Hook] saveContent - Iniciando guardado:', {
+        titulo,
+        tipo,
+      });
+
       if (!editor || !titulo.trim()) {
+        console.log('❌ [Hook] saveContent - Datos faltantes:', {
+          editor: !!editor,
+          titulo: !!titulo.trim(),
+        });
         throw new Error('Editor y título son requeridos');
       }
 
       setIsSaving(true);
       try {
         const content = editor.getJSON();
+        console.log('🔵 [Hook] saveContent - Contenido del editor:', {
+          contentType: content?.type,
+          hasContent: !!content,
+        });
+
         // Validar que sea un JSON de TipTap (type: 'doc')
         if (!content || typeof content !== 'object' || content.type !== 'doc') {
+          console.log('❌ [Hook] saveContent - Contenido inválido:', {
+            content,
+            type: content?.type,
+          });
           throw new Error('El contenido no tiene un formato válido de TipTap.');
         }
 
         // Procesar imágenes base64 antes de guardar
-        const processedContent = await processImagesInContent(content);
+        console.log('🔵 [Hook] saveContent - Procesando imágenes...');
+        let processedContent;
+        try {
+          processedContent = await processImagesInContent(content);
+          console.log('✅ [Hook] saveContent - Imágenes procesadas');
+        } catch (imageError) {
+          console.log(
+            '⚠️ [Hook] saveContent - Error procesando imágenes, usando contenido original:',
+            imageError
+          );
+          processedContent = content;
+        }
+
+        console.log('🔵 [Hook] saveContent - Enviando a API...');
+        const requestBody = {
+          titulo: titulo.trim(),
+          tipo,
+          contenido: JSON.stringify(processedContent),
+        };
+        console.log('🔵 [Hook] saveContent - Request body:', {
+          titulo: requestBody.titulo,
+          tipo: requestBody.tipo,
+          contenidoLength: requestBody.contenido.length,
+        });
 
         const response = await fetch('/api/archivos', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            titulo: titulo.trim(),
-            tipo,
-            contenido: JSON.stringify(processedContent),
-          }),
+          body: JSON.stringify(requestBody),
+        });
+
+        console.log('🔵 [Hook] saveContent - Respuesta recibida:', {
+          status: response.status,
+          ok: response.ok,
         });
 
         if (!response.ok) {
           const error = await response.json();
+          console.log('❌ [Hook] saveContent - Error de API:', error);
           throw new Error(error.error || 'Error al guardar');
         }
 
         const newContent = await response.json();
+        console.log(
+          '✅ [Hook] saveContent - Contenido guardado exitosamente:',
+          { id: newContent.id, titulo: newContent.titulo }
+        );
 
         // Actualizar estado
-        setSavedContents(prev => [newContent, ...prev]);
+        console.log(
+          '🔵 [Hook] saveContent - Actualizando estado local con nuevo contenido:',
+          newContent
+        );
+        setSavedContents(prev => {
+          console.log(
+            '🔵 [Hook] saveContent - Estado anterior:',
+            prev.length,
+            'archivos'
+          );
+          const newState = [newContent, ...prev];
+          console.log(
+            '🔵 [Hook] saveContent - Nuevo estado:',
+            newState.length,
+            'archivos'
+          );
+          return newState;
+        });
 
         return newContent;
       } catch (error) {
@@ -158,20 +235,44 @@ export function useContentSave() {
       editor: Editor,
       titulo: string
     ): Promise<SavedContent | null> => {
+      console.log('🔵 [Hook] updateContent - Iniciando actualización:', {
+        id,
+        titulo,
+      });
+
       if (!editor || !titulo.trim()) {
+        console.log('❌ [Hook] updateContent - Datos faltantes:', {
+          editor: !!editor,
+          titulo: !!titulo.trim(),
+        });
         throw new Error('Editor y título son requeridos');
       }
 
       setIsSaving(true);
       try {
         const content = editor.getJSON();
+        console.log('🔵 [Hook] updateContent - Contenido del editor:', {
+          contentType: content?.type,
+          hasContent: !!content,
+        });
+
         // Validar que sea un JSON de TipTap (type: 'doc')
         if (!content || typeof content !== 'object' || content.type !== 'doc') {
+          console.log('❌ [Hook] updateContent - Contenido inválido:', {
+            content,
+            type: content?.type,
+          });
           throw new Error('El contenido no tiene un formato válido de TipTap.');
         }
 
         // Procesar imágenes base64 antes de guardar
+        console.log('🔵 [Hook] updateContent - Procesando imágenes...');
         const processedContent = await processImagesInContent(content);
+        console.log('✅ [Hook] updateContent - Imágenes procesadas');
+
+        const tipo =
+          savedContents.find(c => c.id === id)?.tipo || 'planificacion';
+        console.log('🔵 [Hook] updateContent - Enviando a API:', { id, tipo });
 
         const response = await fetch(`/api/archivos/${id}`, {
           method: 'PUT',
@@ -180,17 +281,27 @@ export function useContentSave() {
           },
           body: JSON.stringify({
             titulo: titulo.trim(),
-            tipo: savedContents.find(c => c.id === id)?.tipo || 'planificacion',
+            tipo,
             contenido: JSON.stringify(processedContent),
           }),
         });
 
+        console.log('🔵 [Hook] updateContent - Respuesta recibida:', {
+          status: response.status,
+          ok: response.ok,
+        });
+
         if (!response.ok) {
           const error = await response.json();
+          console.log('❌ [Hook] updateContent - Error de API:', error);
           throw new Error(error.error || 'Error al actualizar');
         }
 
         const updatedContent = await response.json();
+        console.log(
+          '✅ [Hook] updateContent - Contenido actualizado exitosamente:',
+          { id: updatedContent.id, titulo: updatedContent.titulo }
+        );
 
         // Actualizar estado
         setSavedContents(prev =>

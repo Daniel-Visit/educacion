@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+// Interfaces para tipar los datos del CSV
+interface CSVRowData {
+  oa_identificador: string;
+  tipo_oa: string;
+  indicador: string;
+  preguntas_por_indicador: string;
+  [key: string]: string; // Para otros campos que puedan existir
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -9,8 +18,6 @@ export async function POST(request: NextRequest) {
     const nivelId = formData.get('nivelId') as string;
 
     // Verificar que los IDs sean números válidos
-    const asignaturaIdNum = parseInt(asignaturaId);
-    const nivelIdNum = parseInt(nivelId);
 
     if (!file || !asignaturaId || !nivelId) {
       return NextResponse.json(
@@ -66,7 +73,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Procesar todas las filas de datos
-    const matrizData: any[] = [];
+    const matrizData: CSVRowData[] = [];
     let tieneContenido = false;
     let tieneHabilidad = false;
 
@@ -77,10 +84,10 @@ export async function POST(request: NextRequest) {
         // Remover comillas dobles del inicio y final si existen
         return trimmed.replace(/^"|"$/g, '');
       });
-      const rowData = headers.reduce((obj, header, index) => {
+      const rowData = headers.reduce((obj: CSVRowData, header, index) => {
         obj[header] = values[index] || '';
         return obj;
-      }, {} as any);
+      }, {} as CSVRowData);
 
       // Validar datos básicos
       if (
@@ -154,10 +161,6 @@ export async function POST(request: NextRequest) {
           tipo_eje: true,
         },
       });
-
-      const oasNoEncontrados = oaIdentificadores.filter(
-        id => !oas.some(oa => oa.oas_id === id)
-      );
 
       return NextResponse.json(
         {

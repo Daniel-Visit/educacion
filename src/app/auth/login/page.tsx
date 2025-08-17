@@ -1,27 +1,21 @@
 'use client';
 
-import { signIn, getSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+
 import { Loader2, Mail, Lock, Eye, EyeOff, X } from 'lucide-react';
 import { Icon } from '@iconify/react';
 import { z } from 'zod';
 
 // Schema de validación con Zod
 const loginSchema = z.object({
-  email: z.string().email("Email inválido").min(1, "Email requerido"),
-  password: z.string().min(1, "Contraseña requerida")
+  email: z.string().email('Email inválido').min(1, 'Email requerido'),
+  password: z.string().min(1, 'Contraseña requerida'),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -33,7 +27,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<LoginForm>({
     email: '',
-    password: ''
+    password: '',
   });
   const [errors, setErrors] = useState<Partial<LoginForm>>({});
 
@@ -49,17 +43,16 @@ export default function LoginPage() {
     }
   }, []);
 
-  const handleInputChange = (field: keyof LoginForm) => (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = e.target.value;
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Limpiar error del campo cuando el usuario empiece a escribir
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
-    }
-  };
+  const handleInputChange =
+    (field: keyof LoginForm) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setFormData(prev => ({ ...prev, [field]: value }));
+
+      // Limpiar error del campo cuando el usuario empiece a escribir
+      if (errors[field]) {
+        setErrors(prev => ({ ...prev, [field]: undefined }));
+      }
+    };
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
@@ -72,7 +65,7 @@ export default function LoginPage() {
         access_type: 'offline',
         prompt: 'consent',
       });
-    } catch (error) {
+    } catch {
       setError('Error inesperado');
       setIsLoading(false);
     }
@@ -87,7 +80,7 @@ export default function LoginPage() {
     try {
       // Validar con Zod
       const validatedData = loginSchema.parse(formData);
-      
+
       const result = await signIn('credentials', {
         email: validatedData.email,
         password: validatedData.password,
@@ -102,11 +95,11 @@ export default function LoginPage() {
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
-        // Convertir errores de Zod a formato de errores
+        // Convertir errores de Zod a formato de errores usando z.flattenError()
         const fieldErrors: Partial<LoginForm> = {};
-        (error as any).errors.forEach((err: any) => {
-          const field = err.path[0] as keyof LoginForm;
-          fieldErrors[field] = err.message;
+        const flattened = z.flattenError(error);
+        Object.entries(flattened.fieldErrors).forEach(([field, messages]) => {
+          fieldErrors[field as keyof LoginForm] = (messages as string[])[0];
         });
         setErrors(fieldErrors);
       } else {
@@ -242,7 +235,9 @@ export default function LoginPage() {
                     )}
                   </button>
                   {errors.password && (
-                    <p className="text-xs text-red-500 mt-1">{errors.password}</p>
+                    <p className="text-xs text-red-500 mt-1">
+                      {errors.password}
+                    </p>
                   )}
                 </div>
               </div>

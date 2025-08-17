@@ -128,11 +128,13 @@ export async function PUT(
       // Crear nuevas asignaciones
       if (asignaciones.length > 0) {
         await prisma.asignacionOA.createMany({
-          data: asignaciones.map((asignacion: any) => ({
-            planificacionId: planificacionId,
-            oaId: asignacion.oaId,
-            cantidadClases: asignacion.cantidadClases,
-          })),
+          data: asignaciones.map(
+            (asignacion: { oaId: number; cantidadClases: number }) => ({
+              planificacionId: planificacionId,
+              oaId: asignacion.oaId,
+              cantidadClases: asignacion.cantidadClases,
+            })
+          ),
         });
       }
     }

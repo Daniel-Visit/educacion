@@ -7,21 +7,14 @@ import {
   Users,
   TrendingUp,
   Award,
-  Eye,
   Download,
-  Calendar,
   Trash2,
   ChevronDown,
   ChevronRight,
-  AlertTriangle,
-  X,
 } from 'lucide-react';
 import GlobalDropdown from '@/components/ui/GlobalDropdown';
-import {
-  ResultadosHeader,
-  LoadingState,
-  ErrorState,
-} from '@/components/resultados';
+import LoadingState from '@/components/ui/LoadingState';
+import { ResultadosHeader } from '@/components/resultados';
 import {
   calcularNota,
   calcularEstadisticas,
@@ -29,16 +22,10 @@ import {
   descargarCSV,
 } from '@/lib/resultados-utils';
 
-// Estilos CSS para arreglar el problema del border-radius
-const accordionStyles = `
-  .accordion-button {
-    background-clip: padding-box;
-    border-radius: inherit;
-  }
-  .accordion-button:hover {
-    background-clip: padding-box;
-  }
-`;
+interface Evaluacion {
+  id: number;
+  titulo: string;
+}
 
 interface ResultadoEvaluacion {
   id: number;
@@ -66,6 +53,10 @@ interface ResultadoEvaluacion {
 }
 
 export default function ResultadosEvaluacionesPage() {
+  const [evaluaciones, setEvaluaciones] = useState<Evaluacion[]>([]);
+  const [evaluacionSeleccionada, setEvaluacionSeleccionada] = useState<
+    number | null
+  >(null);
   const [resultados, setResultados] = useState<ResultadoEvaluacion[]>([]);
   const [resultadoSeleccionado, setResultadoSeleccionado] = useState<
     number | null
@@ -87,12 +78,27 @@ export default function ResultadosEvaluacionesPage() {
 
     cargarDatos();
     return () => clearTimeout(timeoutId);
-  }, []);
+  }, [isLoading]);
+
+  // Limpiar resultado seleccionado cuando cambie la evaluación
+  useEffect(() => {
+    setResultadoSeleccionado(null);
+  }, [evaluacionSeleccionada]);
 
   const cargarDatos = async () => {
     try {
       console.log('Cargando datos...');
 
+      // Cargar evaluaciones primero
+      const responseEvaluaciones = await fetch('/api/evaluaciones');
+      if (responseEvaluaciones.ok) {
+        const dataEvaluaciones = await responseEvaluaciones.json();
+        setEvaluaciones(
+          Array.isArray(dataEvaluaciones) ? dataEvaluaciones : []
+        );
+      }
+
+      // Cargar resultados
       const responseResultados = await fetch('/api/resultados-evaluaciones');
       console.log('Respuesta resultados:', responseResultados.status);
 
@@ -150,15 +156,14 @@ export default function ResultadosEvaluacionesPage() {
   const handleDescargarCSV = (resultado: ResultadoEvaluacion) => {
     const csvContent = generarCSV(
       resultado.resultados,
-      parseInt(nivelExigencia),
-      resultado.evaluacion.titulo
+      parseInt(nivelExigencia)
     );
     descargarCSV(csvContent, resultado.evaluacion.titulo);
   };
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto">
         <LoadingState message="Cargando resultados..." />
       </div>
     );
@@ -229,18 +234,18 @@ export default function ResultadosEvaluacionesPage() {
       {/* Lista de Resultados */}
       {resultados.length > 0 ? (
         <div className="space-y-4">
-          {/* Selector de Resultado */}
+          {/* Selector de Evaluación */}
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-4">
             <div className="flex items-center gap-3 mb-4">
-              <div className="bg-emerald-100 p-2 rounded-lg">
-                <FileText className="h-5 w-5 text-emerald-600" />
+              <div className="bg-indigo-100 p-2 rounded-lg">
+                <FileText className="h-5 w-5 text-indigo-600" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-gray-900">
-                  Seleccionar Resultado
+                  Seleccionar Evaluación
                 </h3>
                 <p className="text-gray-600 text-sm">
-                  Elige un resultado guardado para analizar
+                  Elige una evaluación para ver sus resultados
                 </p>
               </div>
             </div>
@@ -248,26 +253,73 @@ export default function ResultadosEvaluacionesPage() {
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                  Resultado a Visualizar
+                  Evaluación
                 </label>
                 <GlobalDropdown
-                  value={resultadoSeleccionado?.toString() || ''}
+                  value={evaluacionSeleccionada?.toString() || ''}
                   onChange={value =>
-                    setResultadoSeleccionado(value ? parseInt(value) : null)
+                    setEvaluacionSeleccionada(value ? parseInt(value) : null)
                   }
                   options={[
-                    { value: '', label: 'Selecciona un resultado' },
-                    ...resultados.map(resultado => ({
-                      value: resultado.id.toString(),
-                      label: `${resultado.evaluacion.titulo} - ${resultado.evaluacion.matrizNombre} (${resultado.totalAlumnos} alumnos, ${new Date(resultado.fechaCarga).toLocaleDateString()})`,
+                    { value: '', label: 'Selecciona una evaluación' },
+                    ...evaluaciones.map(evaluacion => ({
+                      value: evaluacion.id.toString(),
+                      label: evaluacion.titulo,
                     })),
                   ]}
-                  placeholder="Selecciona un resultado"
+                  placeholder="Selecciona una evaluación"
                   className="h-12"
                 />
               </div>
             </div>
           </div>
+
+          {/* Selector de Resultado (solo si hay evaluación seleccionada) */}
+          {evaluacionSeleccionada && (
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-emerald-100 p-2 rounded-lg">
+                  <FileText className="h-5 w-5 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">
+                    Seleccionar Resultado
+                  </h3>
+                  <p className="text-gray-600 text-sm">
+                    Elige un resultado de esta evaluación para analizar
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                    Resultado a Visualizar
+                  </label>
+                  <GlobalDropdown
+                    value={resultadoSeleccionado?.toString() || ''}
+                    onChange={value =>
+                      setResultadoSeleccionado(value ? parseInt(value) : null)
+                    }
+                    options={[
+                      { value: '', label: 'Selecciona un resultado' },
+                      ...resultados
+                        .filter(
+                          resultado =>
+                            resultado.evaluacionId === evaluacionSeleccionada
+                        )
+                        .map(resultado => ({
+                          value: resultado.id.toString(),
+                          label: `${resultado.evaluacion.titulo} - ${resultado.evaluacion.matrizNombre} (${resultado.totalAlumnos} alumnos, ${new Date(resultado.fechaCarga).toLocaleDateString()})`,
+                        })),
+                    ]}
+                    placeholder="Selecciona un resultado"
+                    className="h-12"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Detalles del Resultado Seleccionado */}
           {resultadoSeleccionado &&
@@ -303,7 +355,7 @@ export default function ResultadosEvaluacionesPage() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleEliminarResultado(resultado)}
-                          className="bg-red-100 hover:bg-red-200 text-red-700 p-2 rounded-lg transition-colors"
+                          className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/80 backdrop-blur-sm border border-gray-200 hover:bg-white hover:border-gray-300 text-red-600 hover:text-red-700 transition-all duration-200 shadow-sm"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -538,27 +590,21 @@ export default function ResultadosEvaluacionesPage() {
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
             {/* Header del modal */}
-            <div className="bg-red-50 border-b border-red-200 p-4">
+            <div className="bg-gradient-to-r from-red-600 to-pink-600 rounded-t-2xl  p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="bg-red-100 p-2 rounded-lg">
-                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                  <div className="bg-white/20 p-2 rounded-lg">
+                    <Trash2 className="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900">
+                    <h2 className="text-xl font-bold text-white">
                       Confirmar Eliminación
-                    </h3>
-                    <p className="text-sm text-gray-600">
+                    </h2>
+                    <p className="text-red-100 text-sm">
                       Esta acción no se puede deshacer
                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={cancelarEliminacion}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <X className="h-5 w-5" />
-                </button>
               </div>
             </div>
 

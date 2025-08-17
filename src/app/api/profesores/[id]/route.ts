@@ -1,6 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+// Interfaces para tipar los datos de actualización
+interface ProfesorUpdateData {
+  rut?: string;
+  nombre?: string;
+  email?: string | null;
+  telefono?: string | null;
+  asignaturas?: {
+    create: Array<{
+      asignaturaId: number;
+    }>;
+  };
+  niveles?: {
+    create: Array<{
+      nivelId: number;
+    }>;
+  };
+}
+
 // GET /api/profesores/[id] - Obtener profesor por ID
 export async function GET(
   request: NextRequest,
@@ -45,7 +63,6 @@ export async function GET(
         }
       : {};
 
-    // @ts-ignore - Prisma client sync issue
     const profesor = await prisma.profesor.findUnique({
       where: { id: parseInt(params.id) },
       include: includeOptions,
@@ -89,7 +106,6 @@ export async function PUT(
     }
 
     // Verificar si el profesor existe
-    // @ts-ignore - Prisma client sync issue
     const profesorExistente = await prisma.profesor.findUnique({
       where: { id: parseInt(params.id) },
     });
@@ -102,7 +118,6 @@ export async function PUT(
     }
 
     // Verificar si el RUT ya existe en otro profesor
-    // @ts-ignore - Prisma client sync issue
     const rutExistente = await prisma.profesor.findFirst({
       where: {
         rut,
@@ -118,7 +133,7 @@ export async function PUT(
     }
 
     // Actualizar el profesor
-    const data: any = {
+    const data: ProfesorUpdateData = {
       rut,
       nombre,
       email: email || null,
@@ -128,7 +143,6 @@ export async function PUT(
     // Actualizar asignaturas si se proporcionan
     if (asignaturas && Array.isArray(asignaturas)) {
       // Eliminar asignaturas existentes
-      // @ts-ignore - Prisma client sync issue
       await prisma.profesorAsignatura.deleteMany({
         where: { profesorId: parseInt(params.id) },
       });
@@ -145,8 +159,7 @@ export async function PUT(
 
     // Actualizar niveles si se proporcionan
     if (niveles && Array.isArray(niveles)) {
-      // Eliminar niveles existentes
-      // @ts-ignore - Prisma client sync issue
+      // Eliminar asignaturas existentes
       await prisma.profesorNivel.deleteMany({
         where: { profesorId: parseInt(params.id) },
       });
@@ -161,7 +174,6 @@ export async function PUT(
       }
     }
 
-    // @ts-ignore - Prisma client sync issue
     const profesor = await prisma.profesor.update({
       where: { id: parseInt(params.id) },
       data,
@@ -202,7 +214,6 @@ export async function PATCH(
     const { rut, nombre, email, telefono, asignaturas, niveles } = body;
 
     // Verificar si el profesor existe
-    // @ts-ignore - Prisma client sync issue
     const profesorExistente = await prisma.profesor.findUnique({
       where: { id: parseInt(params.id) },
     });
@@ -215,11 +226,10 @@ export async function PATCH(
     }
 
     // Construir datos de actualización
-    const data: any = {};
+    const data: ProfesorUpdateData = {};
 
     if (rut !== undefined) {
       // Verificar si el RUT ya existe en otro profesor
-      // @ts-ignore - Prisma client sync issue
       const rutExistente = await prisma.profesor.findFirst({
         where: {
           rut,
@@ -242,7 +252,6 @@ export async function PATCH(
 
     // Actualizar asignaturas si se proporcionan
     if (asignaturas && Array.isArray(asignaturas)) {
-      // @ts-ignore - Prisma client sync issue
       await prisma.profesorAsignatura.deleteMany({
         where: { profesorId: parseInt(params.id) },
       });
@@ -258,7 +267,6 @@ export async function PATCH(
 
     // Actualizar niveles si se proporcionan
     if (niveles && Array.isArray(niveles)) {
-      // @ts-ignore - Prisma client sync issue
       await prisma.profesorNivel.deleteMany({
         where: { profesorId: parseInt(params.id) },
       });
@@ -272,7 +280,6 @@ export async function PATCH(
       }
     }
 
-    // @ts-ignore - Prisma client sync issue
     const profesor = await prisma.profesor.update({
       where: { id: parseInt(params.id) },
       data,
@@ -310,7 +317,6 @@ export async function DELETE(
 ) {
   try {
     // Verificar si el profesor existe
-    // @ts-ignore - Prisma client sync issue
     const profesor = await prisma.profesor.findUnique({
       where: { id: parseInt(params.id) },
       include: {
@@ -349,7 +355,6 @@ export async function DELETE(
     }
 
     // Eliminar el profesor (las relaciones se eliminan automáticamente por CASCADE)
-    // @ts-ignore - Prisma client sync issue
     await prisma.profesor.delete({
       where: { id: parseInt(params.id) },
     });

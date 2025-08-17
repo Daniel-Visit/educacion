@@ -248,12 +248,12 @@ export function EventDialog({
           </DialogDescription>
         </DialogHeader>
         {error && (
-          <div className="bg-destructive/15 text-destructive rounded-md px-3 py-2 text-sm">
+          <div className="bg-destructive/15 text-destructive rounded-md px-3 py-1 text-sm">
             {error}
           </div>
         )}
-        <div className="grid gap-4 py-4">
-          <div className="*:not-first:mt-1.5">
+        <div className="grid gap-4 px-6">
+          <div className="*:not-first:mt-1">
             <Label htmlFor="title">Título</Label>
             <Input
               id="title"
@@ -262,7 +262,7 @@ export function EventDialog({
             />
           </div>
 
-          <div className="*:not-first:mt-1.5">
+          <div className="*:not-first:mt-1">
             <Label htmlFor="description">Descripción</Label>
             <Textarea
               id="description"
@@ -273,7 +273,7 @@ export function EventDialog({
           </div>
 
           <div className="flex gap-4">
-            <div className="flex-1 *:not-first:mt-1.5">
+            <div className="flex-1 *:not-first:mt-1">
               <Label htmlFor="start-date">Fecha de inicio</Label>
               <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
                 <PopoverTrigger asChild>
@@ -324,7 +324,7 @@ export function EventDialog({
             </div>
 
             {!allDay && (
-              <div className="min-w-28 *:not-first:mt-1.5">
+              <div className="min-w-28 *:not-first:mt-1">
                 <Label htmlFor="start-time">Hora de inicio</Label>
                 <Select value={startTime} onValueChange={setStartTime}>
                   <SelectTrigger id="start-time">
@@ -343,7 +343,7 @@ export function EventDialog({
           </div>
 
           <div className="flex gap-4">
-            <div className="flex-1 *:not-first:mt-1.5">
+            <div className="flex-1 *:not-first:mt-1">
               <Label htmlFor="end-date">Fecha de fin</Label>
               <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
                 <PopoverTrigger asChild>
@@ -391,7 +391,7 @@ export function EventDialog({
             </div>
 
             {!allDay && (
-              <div className="min-w-28 *:not-first:mt-1.5">
+              <div className="min-w-28 *:not-first:mt-1">
                 <Label htmlFor="end-time">Hora de fin</Label>
                 <Select value={endTime} onValueChange={setEndTime}>
                   <SelectTrigger id="end-time">
@@ -418,7 +418,7 @@ export function EventDialog({
             <Label htmlFor="all-day">Todo el día</Label>
           </div>
 
-          <div className="*:not-first:mt-1.5">
+          <div className="*:not-first:mt-1">
             <Label htmlFor="location">Ubicación</Label>
             <Input
               id="location"
@@ -426,7 +426,7 @@ export function EventDialog({
               onChange={e => setLocation(e.target.value)}
             />
           </div>
-          <fieldset className="space-y-4">
+          <fieldset className="space-y-3">
             <legend className="text-foreground text-sm leading-none font-medium">
               Color
             </legend>

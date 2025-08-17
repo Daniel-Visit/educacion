@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Trash2,
@@ -10,18 +10,15 @@ import {
   BarChart3,
   Calendar,
   Target,
-  Users,
-  Clock,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import PrimaryButton from '@/components/ui/PrimaryButton';
-import SecondaryButton from '@/components/ui/SecondaryButton';
+
 import EstadoEvaluacion from '@/components/evaluacion/EstadoEvaluacion';
 import { useRouter } from 'next/navigation';
 import { Dialog } from '@headlessui/react';
 import type { EstadoEvaluacion as EstadoEvaluacionType } from '@/lib/evaluacion-utils';
-
+import LoadingState from '@/components/ui/LoadingState';
 interface Evaluacion {
   id: number;
   titulo: string;
@@ -33,7 +30,7 @@ interface Evaluacion {
 
 export default function EvaluacionesPage() {
   const [evaluaciones, setEvaluaciones] = useState<Evaluacion[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [eliminandoId, setEliminandoId] = useState<number | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
@@ -55,7 +52,7 @@ export default function EvaluacionesPage() {
         // Asegurar que data sea siempre un array
         const evaluacionesArray = Array.isArray(data) ? data : [];
         setEvaluaciones(evaluacionesArray);
-        setLoading(false);
+        setIsLoading(false);
       })
       .catch(error => {
         console.error('Error al cargar evaluaciones:', error);
@@ -63,7 +60,7 @@ export default function EvaluacionesPage() {
           type: 'error',
           message: 'Error al cargar las evaluaciones',
         });
-        setLoading(false);
+        setIsLoading(false);
       });
   }, []);
 
@@ -179,15 +176,10 @@ export default function EvaluacionesPage() {
     return pages;
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 font-medium">
-            Cargando evaluaciones...
-          </p>
-        </div>
+      <div className="container mx-auto">
+        <LoadingState message="Cargando evaluaciones..." />
       </div>
     );
   }
@@ -208,13 +200,13 @@ export default function EvaluacionesPage() {
               </p>
             </div>
           </div>
-          <PrimaryButton
+          <button
             onClick={() => router.push('/evaluaciones/crear')}
             className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
           >
             <Plus className="w-4 h-4" />
             Nueva Evaluación
-          </PrimaryButton>
+          </button>
         </div>
 
         {/* Stats compactas */}
@@ -293,10 +285,10 @@ export default function EvaluacionesPage() {
                 aprendizaje de tus estudiantes
               </p>
               <Link href="/evaluaciones/crear">
-                <PrimaryButton className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-3 text-lg">
+                <button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-3 text-lg rounded-lg font-semibold transition-all duration-200">
                   <Plus size={24} className="mr-2" />
                   Crear Primera Evaluación
-                </PrimaryButton>
+                </button>
               </Link>
             </div>
           </div>
@@ -486,39 +478,68 @@ export default function EvaluacionesPage() {
         )}
       </div>
 
-      {/* Modales de confirmación y alerta */}
-      <Dialog
-        open={showDeleteModal}
-        onClose={() => setShowDeleteModal(false)}
-        className="fixed z-50 inset-0 overflow-y-auto"
-      >
-        <div className="flex items-center justify-center min-h-screen px-4">
-          <div
-            className="fixed inset-0 bg-black opacity-30"
-            aria-hidden="true"
-          />
-          <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full mx-auto p-8 z-10">
-            <Dialog.Title className="text-lg font-bold mb-4">
-              ¿Eliminar evaluación?
-            </Dialog.Title>
-            <Dialog.Description className="mb-6 text-gray-600">
-              Esta acción no se puede deshacer. ¿Estás seguro de que quieres
-              eliminar esta evaluación?
-            </Dialog.Description>
-            <div className="flex gap-4 justify-end">
-              <SecondaryButton onClick={() => setShowDeleteModal(false)}>
-                Cancelar
-              </SecondaryButton>
-              <PrimaryButton
-                onClick={confirmDeleteEvaluacion}
-                disabled={eliminandoId !== null}
-              >
-                Eliminar
-              </PrimaryButton>
+      {/* Modal de confirmación de eliminación */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+            <div className="bg-gradient-to-r from-red-600 to-pink-600 rounded-t-2xl p-6 text-white">
+              <div className="flex items-center gap-4">
+                <div className="bg-white/20 p-2 rounded-lg">
+                  <Trash2 className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">
+                    Confirmar Eliminación
+                  </h2>
+                  <p className="text-red-100 text-sm">
+                    Esta acción no se puede deshacer
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <p className="text-gray-700 mb-6">
+                ¿Estás seguro de que quieres eliminar la evaluación{' '}
+                <strong className="text-gray-900">
+                  &ldquo;
+                  {evaluaciones.find(e => e.id === eliminandoId)?.titulo ||
+                    'esta evaluación'}
+                  &rdquo;
+                </strong>
+                ?
+              </p>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={eliminandoId !== null}
+                  className="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmDeleteEvaluacion}
+                  disabled={eliminandoId !== null}
+                  className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
+                >
+                  {eliminandoId !== null ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Eliminando...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4" />
+                      Eliminar
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </Dialog>
+      )}
 
       {alert && (
         <Dialog
@@ -539,9 +560,12 @@ export default function EvaluacionesPage() {
                 {alert.message}
               </Dialog.Description>
               <div className="flex gap-4 justify-end">
-                <PrimaryButton onClick={() => setAlert(null)}>
+                <button
+                  onClick={() => setAlert(null)}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors duration-200"
+                >
                   Cerrar
-                </PrimaryButton>
+                </button>
               </div>
             </div>
           </div>

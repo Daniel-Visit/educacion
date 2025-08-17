@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    // @ts-ignore - Prisma client sync issue
     const oas = await prisma.oa.findMany({
       orderBy: [
         { nivel_id: 'asc' },
@@ -17,11 +16,9 @@ export async function GET() {
     // Obtener los datos de nivel y asignatura manualmente
     const oasWithDetails = await Promise.all(
       oas.map(async oa => {
-        // @ts-ignore - Prisma client sync issue
         const nivel = await prisma.nivel.findUnique({
           where: { id: oa.nivel_id },
         });
-        // @ts-ignore - Prisma client sync issue
         const asignatura = await prisma.asignatura.findUnique({
           where: { id: oa.asignatura_id },
         });

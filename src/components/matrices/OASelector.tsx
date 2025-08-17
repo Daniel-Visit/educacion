@@ -2,7 +2,7 @@ import React from 'react';
 import { ChevronsUpDown, Check, X } from 'lucide-react';
 import { Listbox } from '@headlessui/react';
 import { OA, Eje } from '@/types/matrices';
-import { getGradient, getHoverGradient } from '@/utils/matrices';
+import { getGradient } from '@/utils/matrices';
 
 interface OASelectorProps {
   title: string;

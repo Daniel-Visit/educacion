@@ -28,7 +28,10 @@ interface ModalIAProps {
   onClose: () => void;
 }
 
-const metodologiaIcons: Record<string, React.ComponentType<any>> = {
+const metodologiaIcons: Record<
+  string,
+  React.ComponentType<React.SVGProps<SVGSVGElement>>
+> = {
   'Aprendizaje Basado en Proyectos (ABP)': Projector,
   'Aula Invertida (Flipped Classroom)': BookOpen,
   'Aprendizaje Cooperativo': Users,

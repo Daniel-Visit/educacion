@@ -83,6 +83,7 @@ export function FileUpload({
   const getFileIcon = (fileName: string) => {
     const extension = fileName.split('.').pop()?.toLowerCase();
     if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension || '')) {
+      // eslint-disable-next-line jsx-a11y/alt-text
       return <Image className="w-4 h-4" />;
     }
     if (['pdf', 'doc', 'docx', 'txt'].includes(extension || '')) {

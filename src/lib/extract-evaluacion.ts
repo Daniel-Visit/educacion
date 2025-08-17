@@ -11,12 +11,25 @@ export type PreguntaExtraida = {
   alternativas: AlternativaExtraida[];
 };
 
+// Tipos para la estructura del JSON de TipTap
+export interface TipTapNode {
+  type: string;
+  content?: TipTapNode[];
+  text?: string;
+}
+
+export interface TipTapJSON {
+  content: TipTapNode[];
+}
+
 /**
  * Extrae preguntas y alternativas desde un JSON TipTap de evaluación.
  * Soporta alternativas en taskList, bulletList o párrafos, y limpia el texto de la alternativa.
  * Ignora contenido después del header "Preguntas".
  */
-export function extraerPreguntasAlternativas(json: any): PreguntaExtraida[] {
+export function extraerPreguntasAlternativas(
+  json: TipTapJSON
+): PreguntaExtraida[] {
   const preguntas: PreguntaExtraida[] = [];
   const content = json.content || [];
   let preguntaNumero = 1;
@@ -52,7 +65,7 @@ export function extraerPreguntasAlternativas(json: any): PreguntaExtraida[] {
       node.type === 'paragraph' &&
       /^\d+\./.test(node.content?.[0]?.text || '')
     ) {
-      textoPregunta = node.content[0].text.replace(/^\d+\.\s*/, '');
+      textoPregunta = (node.content?.[0]?.text || '').replace(/^\d+\.\s*/, '');
     }
 
     if (textoPregunta) {
@@ -65,8 +78,8 @@ export function extraerPreguntasAlternativas(json: any): PreguntaExtraida[] {
 
         // TaskList o BulletList
         if (altNode.type === 'taskList' || altNode.type === 'bulletList') {
-          altTexts = altNode.content.map(
-            (item: any) => item.content?.[0]?.content?.[0]?.text || ''
+          altTexts = (altNode.content || []).map(
+            (item: TipTapNode) => item.content?.[0]?.content?.[0]?.text || ''
           );
         }
         // Párrafos sueltos

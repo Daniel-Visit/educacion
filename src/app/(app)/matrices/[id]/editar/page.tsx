@@ -12,6 +12,7 @@ import {
   BarChart3,
   Target,
 } from 'lucide-react';
+import LoadingState from '@/components/ui/LoadingState';
 import { Listbox } from '@headlessui/react';
 import { Dialog } from '@headlessui/react';
 import PrimaryButton from '@/components/ui/PrimaryButton';
@@ -60,15 +61,15 @@ interface MatrizEspecificacion {
 export default function EditarMatrizPage() {
   const router = useRouter();
   const params = useParams();
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [oas, setOAs] = useState<OA[]>([]);
-  const [ejes, setEjes] = useState<Eje[]>([]);
+
   const [asignaturas, setAsignaturas] = useState<
     { id: number; nombre: string }[]
   >([]);
   const [niveles, setNiveles] = useState<{ id: number; nombre: string }[]>([]);
-  const [selectedEje, setSelectedEje] = useState<number | null>(null);
+
   const [selectedOAs, setSelectedOAs] = useState<OA[]>([]);
   const [selectedEjeContenido, setSelectedEjeContenido] = useState<
     number | null
@@ -113,18 +114,6 @@ export default function EditarMatrizPage() {
     return gradients[index % gradients.length];
   };
 
-  const getHoverGradient = (index: number) => {
-    const hoverGradients = [
-      'hover:from-emerald-600 hover:to-teal-700', // 1. Verde
-      'hover:from-amber-600 hover:to-orange-700', // 2. Naranja
-      'hover:from-indigo-600 hover:to-purple-700', // 3. Índigo
-      'hover:from-cyan-600 hover:to-blue-700', // 4. Cyan
-      'hover:from-rose-600 hover:to-pink-700', // 5. Rose
-      'hover:from-violet-600 hover:to-fuchsia-700', // 6. Violet
-    ];
-    return hoverGradients[index % hoverGradients.length];
-  };
-
   useEffect(() => {
     if (params.id) {
       fetchMatrizAndOAs(Number(params.id));
@@ -164,19 +153,6 @@ export default function EditarMatrizPage() {
       if (oasResponse.ok) {
         const oasData = await oasResponse.json();
         setOAs(oasData);
-
-        // Extraer ejes únicos
-        const ejesUnicos = oasData.reduce((acc: Eje[], oa: OA) => {
-          const ejeExistente = acc.find(e => e.id === oa.eje_id);
-          if (!ejeExistente) {
-            acc.push({
-              id: oa.eje_id,
-              descripcion: oa.eje_descripcion,
-            });
-          }
-          return acc;
-        }, []);
-        setEjes(ejesUnicos);
       }
 
       // Cargar matriz existente
@@ -226,17 +202,12 @@ export default function EditarMatrizPage() {
           indicadoresPreCargados[matrizOA.oaId] = matrizOA.indicadores;
         });
         setOAIndicadores(indicadoresPreCargados);
-
-        // Establecer eje seleccionado (usar el primer OA como referencia)
-        if (oasSeleccionados.length > 0) {
-          setSelectedEje(oasSeleccionados[0].eje_id);
-        }
       }
     } catch (error) {
       console.error('Error al cargar datos:', error);
       setErrors({ submit: 'Error al cargar los datos de la matriz' });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -296,11 +267,6 @@ export default function EditarMatrizPage() {
     const oasCombinados = [...selectedOAsContenido, ...selectedOAsHabilidad];
     setSelectedOAs(oasCombinados);
   }, [selectedOAsContenido, selectedOAsHabilidad]);
-
-  // Filtrar OAs por eje seleccionado
-  const oasDelEje = selectedEje
-    ? oas.filter(oa => oa.eje_id === selectedEje)
-    : [];
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -416,11 +382,6 @@ export default function EditarMatrizPage() {
     }
   };
 
-  const isValid =
-    (selectedOAsContenido.length > 0 || selectedOAsHabilidad.length > 0) &&
-    matrizName.trim() &&
-    totalPreguntas > 0;
-
   const handleOaChange = (oas: OA[], tipo?: 'contenido' | 'habilidad') => {
     const hayIndicadores = Object.values(oaIndicadores).some(
       arr =>
@@ -514,13 +475,10 @@ export default function EditarMatrizPage() {
     ? totalPreguntasContenido
     : totalPreguntasIndicadores;
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#f7f8fd] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando matriz...</p>
-        </div>
+      <div className="container mx-auto">
+        <LoadingState message="Cargando matriz..." />
       </div>
     );
   }

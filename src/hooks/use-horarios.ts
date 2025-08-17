@@ -38,12 +38,12 @@ export function useHorarios() {
   const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
   const [niveles, setNiveles] = useState<Nivel[]>([]);
   const [profesores, setProfesores] = useState<Profesor[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const loadHorarios = useCallback(async () => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
 
       const response = await fetch('/api/horarios');
@@ -57,7 +57,7 @@ export function useHorarios() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }, []);
 
@@ -125,7 +125,7 @@ export function useHorarios() {
       }>;
     }) => {
       try {
-        setLoading(true);
+        setIsLoading(true);
         setError(null);
 
         const response = await fetch('/api/horarios', {
@@ -147,7 +147,7 @@ export function useHorarios() {
         setError(err instanceof Error ? err.message : 'Error desconocido');
         throw err;
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     },
     []
@@ -155,7 +155,7 @@ export function useHorarios() {
 
   const deleteHorario = useCallback(async (horarioId: number) => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
 
       const response = await fetch(`/api/horarios/${horarioId}`, {
@@ -171,14 +171,14 @@ export function useHorarios() {
       setError(err instanceof Error ? err.message : 'Error desconocido');
       throw err;
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }, []);
 
   const duplicateHorario = useCallback(
     async (horarioId: number) => {
       try {
-        setLoading(true);
+        setIsLoading(true);
         setError(null);
 
         const horario = horarios.find(h => h.id === horarioId);
@@ -208,7 +208,7 @@ export function useHorarios() {
         setError(err instanceof Error ? err.message : 'Error desconocido');
         throw err;
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     },
     [horarios, createHorario]
@@ -232,7 +232,7 @@ export function useHorarios() {
       }
     ) => {
       try {
-        setLoading(true);
+        setIsLoading(true);
         setError(null);
         const response = await fetch(`/api/horarios/${horarioId}`, {
           method: 'PUT',
@@ -251,7 +251,7 @@ export function useHorarios() {
         setError(err instanceof Error ? err.message : 'Error desconocido');
         throw err;
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     },
     []
@@ -266,7 +266,7 @@ export function useHorarios() {
     asignaturas,
     niveles,
     profesores,
-    loading,
+    isLoading,
     error,
     loadHorarios,
     createHorario,

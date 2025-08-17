@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { calcularEstadoEvaluacion } from '@/lib/evaluacion-utils';
+import { MatrizEspecificacion } from '@/types/evaluacion';
 
 export async function GET() {
   try {
@@ -22,7 +23,6 @@ export async function GET() {
       matrizNombre: evaluacion.matriz.nombre,
       preguntasCount: evaluacion.preguntas.length,
       createdAt: evaluacion.createdAt.toISOString(),
-      // @ts-ignore - Prisma client sync issue
       estado: evaluacion.estado,
     }));
 
@@ -46,6 +46,25 @@ export async function POST(request: NextRequest) {
       preguntas,
       respuestasCorrectas,
       indicadoresAsignados,
+    }: {
+      archivoId: number;
+      matrizId: number;
+      preguntas: Array<{
+        numero: number;
+        texto: string;
+        alternativas: Array<{
+          letra: string;
+          texto: string;
+        }>;
+      }>;
+      respuestasCorrectas?: Record<number, string>;
+      indicadoresAsignados?: Record<
+        string,
+        {
+          contenido?: number;
+          habilidad?: number;
+        }
+      >;
     } = body;
     if (!archivoId || !matrizId || !preguntas) {
       return NextResponse.json(
@@ -54,18 +73,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // @ts-ignore - Prisma client sync issue
     const evaluacion = await prisma.evaluacion.create({
-      // @ts-ignore - Prisma client sync issue
       data: {
         archivoId,
         matrizId,
+        updatedAt: new Date(),
         preguntas: {
-          create: preguntas.map((p: any) => ({
+          create: preguntas.map(p => ({
             numero: p.numero,
             texto: p.texto,
             alternativas: {
-              create: p.alternativas.map((a: any) => ({
+              create: p.alternativas.map(a => ({
                 letra: a.letra,
                 texto: a.texto,
                 esCorrecta: respuestasCorrectas?.[p.numero] === a.letra,
@@ -78,7 +96,6 @@ export async function POST(request: NextRequest) {
         preguntas: {
           include: {
             alternativas: true,
-            // @ts-ignore - Prisma client sync issue
             indicadores: true,
           },
         },
@@ -87,6 +104,12 @@ export async function POST(request: NextRequest) {
             oas: {
               include: {
                 indicadores: true,
+                oa: {
+                  include: {
+                    nivel: true,
+                    asignatura: true,
+                  },
+                },
               },
             },
           },
@@ -96,14 +119,17 @@ export async function POST(request: NextRequest) {
 
     // Guardar indicadores asignados si se proporcionan
     if (indicadoresAsignados) {
-      const indicadoresToCreate: any[] = [];
+      const indicadoresToCreate: {
+        preguntaId: number;
+        indicadorId: number;
+        tipo: 'Contenido' | 'Habilidad';
+      }[] = [];
 
       for (const [preguntaNumero, asignacion] of Object.entries(
         indicadoresAsignados
       )) {
-        // @ts-ignore - Prisma client sync issue
         const pregunta = evaluacion.preguntas.find(
-          (p: any) => p.numero === parseInt(preguntaNumero)
+          p => p.numero === parseInt(preguntaNumero)
         );
         if (pregunta) {
           const asignacionTyped = asignacion as {
@@ -128,7 +154,6 @@ export async function POST(request: NextRequest) {
       }
 
       if (indicadoresToCreate.length > 0) {
-        // @ts-ignore - Prisma client sync issue
         await prisma.preguntaIndicador.createMany({
           data: indicadoresToCreate,
         });
@@ -137,28 +162,27 @@ export async function POST(request: NextRequest) {
 
     // Calcular y actualizar el estado de la evaluación
     const estadoCalculado = calcularEstadoEvaluacion({
-      // @ts-ignore - Prisma client sync issue
       preguntas: evaluacion.preguntas,
-      // @ts-ignore - Prisma client sync issue
-      matriz: evaluacion.matriz,
+      matriz: {
+        id: evaluacion.matriz.id,
+        nombre: evaluacion.matriz.nombre,
+        total_preguntas: evaluacion.matriz.total_preguntas,
+        oas: evaluacion.matriz.oas,
+      } as MatrizEspecificacion,
     });
 
-    // @ts-ignore - Prisma client sync issue
     await prisma.evaluacion.update({
       where: { id: evaluacion.id },
-      // @ts-ignore - Prisma client sync issue
       data: { estado: estadoCalculado },
     });
 
     // Obtener la evaluación final con el estado actualizado
-    // @ts-ignore - Prisma client sync issue
     const evaluacionFinal = await prisma.evaluacion.findUnique({
       where: { id: evaluacion.id },
       include: {
         preguntas: {
           include: {
             alternativas: true,
-            // @ts-ignore - Prisma client sync issue
             indicadores: true,
           },
         },

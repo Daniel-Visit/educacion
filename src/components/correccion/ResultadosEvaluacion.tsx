@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -54,15 +54,6 @@ interface RespuestaAlumno {
   puntajeObtenido: number;
 }
 
-const COLORS = [
-  '#6366f1',
-  '#8b5cf6',
-  '#06b6d4',
-  '#10b981',
-  '#f59e0b',
-  '#ef4444',
-];
-
 export default function ResultadosEvaluacion({
   evaluacionId,
   evaluacionNombre,
@@ -75,9 +66,9 @@ export default function ResultadosEvaluacion({
 
   useEffect(() => {
     cargarResultados();
-  }, [evaluacionId]);
+  }, [evaluacionId, cargarResultados]);
 
-  const cargarResultados = async () => {
+  const cargarResultados = useCallback(async () => {
     try {
       const response = await fetch(
         `/api/evaluaciones/${evaluacionId}/resultados`
@@ -88,12 +79,12 @@ export default function ResultadosEvaluacion({
       } else {
         setError('Error al cargar los resultados');
       }
-    } catch (error) {
+    } catch {
       setError('Error de conexión');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [evaluacionId]);
 
   const calcularEstadisticas = () => {
     if (resultados.length === 0) return null;
