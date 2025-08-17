@@ -1,33 +1,33 @@
-"use client"
+'use client';
 
-import { useId, useState } from "react"
-import { RiMoonClearLine, RiSunLine } from "@remixicon/react"
-import { useTheme } from "next-themes"
+import { useId, useState } from 'react';
+import { RiMoonClearLine, RiSunLine } from '@remixicon/react';
+import { useTheme } from 'next-themes';
 
 export default function ThemeToggle() {
-  const id = useId()
-  const { theme, setTheme } = useTheme()
-  const [system, setSystem] = useState(false)
+  const id = useId();
+  const { theme, setTheme } = useTheme();
+  const [system, setSystem] = useState(false);
 
   const smartToggle = () => {
     /* The smart toggle by @nrjdalal */
     const prefersDarkScheme = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches
-    if (theme === "system") {
-      setTheme(prefersDarkScheme ? "light" : "dark")
-      setSystem(false)
+      '(prefers-color-scheme: dark)'
+    ).matches;
+    if (theme === 'system') {
+      setTheme(prefersDarkScheme ? 'light' : 'dark');
+      setSystem(false);
     } else if (
-      (theme === "light" && !prefersDarkScheme) ||
-      (theme === "dark" && prefersDarkScheme)
+      (theme === 'light' && !prefersDarkScheme) ||
+      (theme === 'dark' && prefersDarkScheme)
     ) {
-      setTheme(theme === "light" ? "dark" : "light")
-      setSystem(false)
+      setTheme(theme === 'light' ? 'dark' : 'light');
+      setSystem(false);
     } else {
-      setTheme("system")
-      setSystem(true)
+      setTheme('system');
+      setSystem(true);
     }
-  }
+  };
 
   return (
     <div className="flex flex-col justify-center">
@@ -54,5 +54,5 @@ export default function ThemeToggle() {
         <span className="sr-only">Switch to system/light/dark version</span>
       </label>
     </div>
-  )
+  );
 }

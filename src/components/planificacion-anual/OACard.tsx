@@ -1,5 +1,5 @@
-import { Clock } from "lucide-react";
-import { OA, OAClases } from "./types";
+import { Clock } from 'lucide-react';
+import { OA, OAClases } from './types';
 
 interface OACardProps {
   oa: OA;
@@ -20,16 +20,18 @@ export default function OACard({
   prevOA,
   nextOA,
 }: OACardProps) {
-  const prevOk = !prevOA || (oaClases[prevOA.oas_id] || 0) >= prevOA.minimo_clases;
+  const prevOk =
+    !prevOA || (oaClases[prevOA.oas_id] || 0) >= prevOA.minimo_clases;
   const isSkipped = skippedOAs.has(oa.id);
-  const canAdd = prevOk || isSkipped || oa.eje_descripcion.toLowerCase() === 'actitud';
-  const nextHasClases = nextOA && (oaClases[nextOA.oas_id] || 0) > 0;
+  const canAdd =
+    prevOk || isSkipped || oa.eje_descripcion.toLowerCase() === 'actitud';
+
   const currentClases = oaClases[oa.oas_id] || 0;
 
   return (
     <div
       className={`group flex items-center justify-between rounded-3xl border transition-all px-8 py-6 shadow-sm bg-white hover:shadow-lg ${
-        currentClases > 0 ? "border-violet-300" : "border-gray-200"
+        currentClases > 0 ? 'border-violet-300' : 'border-gray-200'
       }`}
       style={{ minHeight: 90 }}
     >
@@ -58,8 +60,8 @@ export default function OACard({
         <button
           className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-2xl transition-all shadow ${
             canAdd
-              ? "bg-gradient-to-r from-indigo-600 to-purple-500 hover:from-indigo-700 hover:to-purple-600"
-              : "bg-gray-200 cursor-not-allowed"
+              ? 'bg-gradient-to-r from-indigo-600 to-purple-500 hover:from-indigo-700 hover:to-purple-600'
+              : 'bg-gray-200 cursor-not-allowed'
           }`}
           onClick={() => onAddClase(oa, prevOA)}
           disabled={!canAdd}
@@ -73,8 +75,8 @@ export default function OACard({
         <button
           className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-2xl transition-all shadow ${
             currentClases > 0
-              ? "bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600"
-              : "bg-gray-200 cursor-not-allowed"
+              ? 'bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600'
+              : 'bg-gray-200 cursor-not-allowed'
           }`}
           onClick={() => onRemoveClase(oa, nextOA)}
           disabled={currentClases === 0}
@@ -85,4 +87,4 @@ export default function OACard({
       </div>
     </div>
   );
-} 
+}

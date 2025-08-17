@@ -1,6 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+// Interfaces para tipar los datos de actualización
+interface ProfesorUpdateData {
+  rut?: string;
+  nombre?: string;
+  email?: string | null;
+  telefono?: string | null;
+  asignaturas?: {
+    create: Array<{
+      asignaturaId: number;
+    }>;
+  };
+  niveles?: {
+    create: Array<{
+      nivelId: number;
+    }>;
+  };
+}
+
 // GET /api/profesores/[id] - Obtener profesor por ID
 export async function GET(
   request: NextRequest,
@@ -10,43 +28,44 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const includeRelations = searchParams.get('include') === 'true';
 
-    const includeOptions = includeRelations ? {
-      asignaturas: {
-        include: {
-          asignatura: true
-        }
-      },
-      niveles: {
-        include: {
-          nivel: true
-        }
-      },
-      horario: {
-        include: {
-          asignatura: true,
-          nivel: true
-        }
-      },
-      modulos: {
-        include: {
-          moduloHorario: {
+    const includeOptions = includeRelations
+      ? {
+          asignaturas: {
             include: {
-              horario: {
+              asignatura: true,
+            },
+          },
+          niveles: {
+            include: {
+              nivel: true,
+            },
+          },
+          horario: {
+            include: {
+              asignatura: true,
+              nivel: true,
+            },
+          },
+          modulos: {
+            include: {
+              moduloHorario: {
                 include: {
-                  asignatura: true,
-                  nivel: true
-                }
-              }
-            }
-          }
+                  horario: {
+                    include: {
+                      asignatura: true,
+                      nivel: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
         }
-      }
-    } : {};
+      : {};
 
-    // @ts-ignore - Prisma client sync issue
     const profesor = await prisma.profesor.findUnique({
       where: { id: parseInt(params.id) },
-      include: includeOptions
+      include: includeOptions,
     });
 
     if (!profesor) {
@@ -58,7 +77,7 @@ export async function GET(
 
     return NextResponse.json({
       data: profesor,
-      message: 'Profesor obtenido correctamente'
+      message: 'Profesor obtenido correctamente',
     });
   } catch (error) {
     console.error('Error al obtener profesor:', error);
@@ -87,9 +106,8 @@ export async function PUT(
     }
 
     // Verificar si el profesor existe
-    // @ts-ignore - Prisma client sync issue
     const profesorExistente = await prisma.profesor.findUnique({
-      where: { id: parseInt(params.id) }
+      where: { id: parseInt(params.id) },
     });
 
     if (!profesorExistente) {
@@ -100,12 +118,11 @@ export async function PUT(
     }
 
     // Verificar si el RUT ya existe en otro profesor
-    // @ts-ignore - Prisma client sync issue
     const rutExistente = await prisma.profesor.findFirst({
       where: {
         rut,
-        id: { not: parseInt(params.id) }
-      }
+        id: { not: parseInt(params.id) },
+      },
     });
 
     if (rutExistente) {
@@ -116,70 +133,67 @@ export async function PUT(
     }
 
     // Actualizar el profesor
-    const data: any = {
+    const data: ProfesorUpdateData = {
       rut,
       nombre,
       email: email || null,
-      telefono: telefono || null
+      telefono: telefono || null,
     };
 
     // Actualizar asignaturas si se proporcionan
     if (asignaturas && Array.isArray(asignaturas)) {
       // Eliminar asignaturas existentes
-      // @ts-ignore - Prisma client sync issue
       await prisma.profesorAsignatura.deleteMany({
-        where: { profesorId: parseInt(params.id) }
+        where: { profesorId: parseInt(params.id) },
       });
 
       // Crear nuevas asignaturas
       if (asignaturas.length > 0) {
         data.asignaturas = {
           create: asignaturas.map((asignaturaId: number) => ({
-            asignaturaId: parseInt(asignaturaId.toString())
-          }))
+            asignaturaId: parseInt(asignaturaId.toString()),
+          })),
         };
       }
     }
 
     // Actualizar niveles si se proporcionan
     if (niveles && Array.isArray(niveles)) {
-      // Eliminar niveles existentes
-      // @ts-ignore - Prisma client sync issue
+      // Eliminar asignaturas existentes
       await prisma.profesorNivel.deleteMany({
-        where: { profesorId: parseInt(params.id) }
+        where: { profesorId: parseInt(params.id) },
       });
 
       // Crear nuevos niveles
       if (niveles.length > 0) {
         data.niveles = {
           create: niveles.map((nivelId: number) => ({
-            nivelId: parseInt(nivelId.toString())
-          }))
+            nivelId: parseInt(nivelId.toString()),
+          })),
         };
       }
     }
 
-    // @ts-ignore - Prisma client sync issue
     const profesor = await prisma.profesor.update({
       where: { id: parseInt(params.id) },
       data,
       include: {
         asignaturas: {
           include: {
-            asignatura: true
-          }
+            asignatura: true,
+          },
         },
         niveles: {
           include: {
-            nivel: true
-          }
-        }
-      }
+            nivel: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json({
       data: profesor,
-      message: 'Profesor actualizado correctamente'
+      message: 'Profesor actualizado correctamente',
     });
   } catch (error) {
     console.error('Error al actualizar profesor:', error);
@@ -200,9 +214,8 @@ export async function PATCH(
     const { rut, nombre, email, telefono, asignaturas, niveles } = body;
 
     // Verificar si el profesor existe
-    // @ts-ignore - Prisma client sync issue
     const profesorExistente = await prisma.profesor.findUnique({
-      where: { id: parseInt(params.id) }
+      where: { id: parseInt(params.id) },
     });
 
     if (!profesorExistente) {
@@ -213,16 +226,15 @@ export async function PATCH(
     }
 
     // Construir datos de actualización
-    const data: any = {};
-    
+    const data: ProfesorUpdateData = {};
+
     if (rut !== undefined) {
       // Verificar si el RUT ya existe en otro profesor
-      // @ts-ignore - Prisma client sync issue
       const rutExistente = await prisma.profesor.findFirst({
         where: {
           rut,
-          id: { not: parseInt(params.id) }
-        }
+          id: { not: parseInt(params.id) },
+        },
       });
 
       if (rutExistente) {
@@ -240,57 +252,54 @@ export async function PATCH(
 
     // Actualizar asignaturas si se proporcionan
     if (asignaturas && Array.isArray(asignaturas)) {
-      // @ts-ignore - Prisma client sync issue
       await prisma.profesorAsignatura.deleteMany({
-        where: { profesorId: parseInt(params.id) }
+        where: { profesorId: parseInt(params.id) },
       });
 
       if (asignaturas.length > 0) {
         data.asignaturas = {
           create: asignaturas.map((asignaturaId: number) => ({
-            asignaturaId: parseInt(asignaturaId.toString())
-          }))
+            asignaturaId: parseInt(asignaturaId.toString()),
+          })),
         };
       }
     }
 
     // Actualizar niveles si se proporcionan
     if (niveles && Array.isArray(niveles)) {
-      // @ts-ignore - Prisma client sync issue
       await prisma.profesorNivel.deleteMany({
-        where: { profesorId: parseInt(params.id) }
+        where: { profesorId: parseInt(params.id) },
       });
 
       if (niveles.length > 0) {
         data.niveles = {
           create: niveles.map((nivelId: number) => ({
-            nivelId: parseInt(nivelId.toString())
-          }))
+            nivelId: parseInt(nivelId.toString()),
+          })),
         };
       }
     }
 
-    // @ts-ignore - Prisma client sync issue
     const profesor = await prisma.profesor.update({
       where: { id: parseInt(params.id) },
       data,
       include: {
         asignaturas: {
           include: {
-            asignatura: true
-          }
+            asignatura: true,
+          },
         },
         niveles: {
           include: {
-            nivel: true
-          }
-        }
-      }
+            nivel: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json({
       data: profesor,
-      message: 'Profesor actualizado correctamente'
+      message: 'Profesor actualizado correctamente',
     });
   } catch (error) {
     console.error('Error al actualizar profesor:', error);
@@ -308,13 +317,12 @@ export async function DELETE(
 ) {
   try {
     // Verificar si el profesor existe
-    // @ts-ignore - Prisma client sync issue
     const profesor = await prisma.profesor.findUnique({
       where: { id: parseInt(params.id) },
       include: {
         horario: true,
-        modulos: true
-      }
+        modulos: true,
+      },
     });
 
     if (!profesor) {
@@ -327,7 +335,10 @@ export async function DELETE(
     // Verificar si el profesor tiene horarios asignados
     if (profesor.horario.length > 0) {
       return NextResponse.json(
-        { error: 'No se puede eliminar el profesor porque tiene horarios asignados' },
+        {
+          error:
+            'No se puede eliminar el profesor porque tiene horarios asignados',
+        },
         { status: 400 }
       );
     }
@@ -335,19 +346,21 @@ export async function DELETE(
     // Verificar si el profesor tiene módulos asignados
     if (profesor.modulos.length > 0) {
       return NextResponse.json(
-        { error: 'No se puede eliminar el profesor porque tiene módulos asignados' },
+        {
+          error:
+            'No se puede eliminar el profesor porque tiene módulos asignados',
+        },
         { status: 400 }
       );
     }
 
     // Eliminar el profesor (las relaciones se eliminan automáticamente por CASCADE)
-    // @ts-ignore - Prisma client sync issue
     await prisma.profesor.delete({
-      where: { id: parseInt(params.id) }
+      where: { id: parseInt(params.id) },
     });
 
     return NextResponse.json({
-      message: 'Profesor eliminado correctamente'
+      message: 'Profesor eliminado correctamente',
     });
   } catch (error) {
     console.error('Error al eliminar profesor:', error);
@@ -356,4 +369,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-} 
+}

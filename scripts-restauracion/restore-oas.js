@@ -8,10 +8,14 @@ const prisma = new PrismaClient();
 async function restoreOAs() {
   try {
     console.log('=== Restaurando SOLO OAs ===');
-    
+
     const oasPath = path.join(__dirname, 'OAS.csv');
     const oasCSV = fs.readFileSync(oasPath, 'utf-8');
-    const oas = parse(oasCSV, { columns: true, delimiter: ';', skip_empty_lines: true });
+    const oas = parse(oasCSV, {
+      columns: true,
+      delimiter: ';',
+      skip_empty_lines: true,
+    });
 
     console.log('Columnas detectadas en OAS.csv:', Object.keys(oas[0] || {}));
     console.log('Total de filas en OAS.csv:', oas.length);
@@ -24,7 +28,7 @@ async function restoreOAs() {
       const asignatura_id = Number(row['asignatura_id']);
       const eje_id = Number(row['eje_id']);
       const minimo_clases = Number(row['minimo_clases']);
-      
+
       if (
         isNaN(nivel_id) ||
         isNaN(asignatura_id) ||
@@ -38,9 +42,9 @@ async function restoreOAs() {
         skippedCount++;
         continue;
       }
-      
+
       const basal = (row['basal'] || '').toString().toLowerCase() === 'true';
-      
+
       try {
         await prisma.oa.create({
           data: {
@@ -70,8 +74,10 @@ async function restoreOAs() {
         skippedCount++;
       }
     }
-    
-    console.log(`✅ OAs procesados: ${processedCount}, saltados: ${skippedCount}`);
+
+    console.log(
+      `✅ OAs procesados: ${processedCount}, saltados: ${skippedCount}`
+    );
   } catch (error) {
     console.error('Error al restaurar OAs:', error);
   } finally {
@@ -79,4 +85,4 @@ async function restoreOAs() {
   }
 }
 
-restoreOAs(); 
+restoreOAs();

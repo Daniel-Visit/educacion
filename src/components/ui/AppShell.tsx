@@ -1,10 +1,9 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import Sidebar from './Sidebar'
+import Sidebar from './Sidebar';
 
 interface AppShellProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export default function AppShell({ children }: AppShellProps) {
@@ -17,5 +16,5 @@ export default function AppShell({ children }: AppShellProps) {
         </main>
       </div>
     </div>
-  )
-} 
+  );
+}

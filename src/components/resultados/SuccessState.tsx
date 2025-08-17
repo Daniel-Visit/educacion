@@ -14,4 +14,4 @@ export default function SuccessState({ message }: SuccessStateProps) {
       </AlertDescription>
     </Alert>
   );
-} 
+}

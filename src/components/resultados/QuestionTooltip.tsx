@@ -12,4 +12,4 @@ export function QuestionTooltip({ numero, texto }: QuestionTooltipProps) {
       <div className="text-gray-600 break-words normal-case">{texto}</div>
     </div>
   );
-} 
+}

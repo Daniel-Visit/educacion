@@ -22,4 +22,4 @@ global.NextResponse = {
     json: () => data,
     status: init.status || 200,
   })),
-}; 
+};

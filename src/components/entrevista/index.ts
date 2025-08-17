@@ -11,4 +11,4 @@ export { useInterview } from './useInterview';
 export { useTTS } from './useTTS';
 
 // Constantes
-export { steps, preguntas, alternativas, preguntaToStep } from './constants'; 
+export { steps, preguntas, alternativas, preguntaToStep } from './constants';

@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -10,10 +10,10 @@ export async function GET(
   try {
     const { id } = await params;
     const planificacionId = parseInt(id);
-    
+
     if (isNaN(planificacionId)) {
       return NextResponse.json(
-        { error: "ID de planificación inválido" },
+        { error: 'ID de planificación inválido' },
         { status: 400 }
       );
     }
@@ -44,16 +44,16 @@ export async function GET(
 
     if (!planificacion) {
       return NextResponse.json(
-        { error: "Planificación no encontrada" },
+        { error: 'Planificación no encontrada' },
         { status: 404 }
       );
     }
 
     return NextResponse.json(planificacion);
   } catch (error) {
-    console.error("Error al obtener planificación:", error);
+    console.error('Error al obtener planificación:', error);
     return NextResponse.json(
-      { error: "Error interno del servidor" },
+      { error: 'Error interno del servidor' },
       { status: 500 }
     );
   }
@@ -66,10 +66,10 @@ export async function PUT(
   try {
     const { id } = await params;
     const planificacionId = parseInt(id);
-    
+
     if (isNaN(planificacionId)) {
       return NextResponse.json(
-        { error: "ID de planificación inválido" },
+        { error: 'ID de planificación inválido' },
         { status: 400 }
       );
     }
@@ -84,7 +84,7 @@ export async function PUT(
 
     if (!planificacionExistente) {
       return NextResponse.json(
-        { error: "Planificación no encontrada" },
+        { error: 'Planificación no encontrada' },
         { status: 404 }
       );
     }
@@ -128,20 +128,22 @@ export async function PUT(
       // Crear nuevas asignaciones
       if (asignaciones.length > 0) {
         await prisma.asignacionOA.createMany({
-          data: asignaciones.map((asignacion: any) => ({
-            planificacionId: planificacionId,
-            oaId: asignacion.oaId,
-            cantidadClases: asignacion.cantidadClases,
-          })),
+          data: asignaciones.map(
+            (asignacion: { oaId: number; cantidadClases: number }) => ({
+              planificacionId: planificacionId,
+              oaId: asignacion.oaId,
+              cantidadClases: asignacion.cantidadClases,
+            })
+          ),
         });
       }
     }
 
     return NextResponse.json(planificacionActualizada);
   } catch (error) {
-    console.error("Error al actualizar planificación:", error);
+    console.error('Error al actualizar planificación:', error);
     return NextResponse.json(
-      { error: "Error interno del servidor" },
+      { error: 'Error interno del servidor' },
       { status: 500 }
     );
   }
@@ -154,10 +156,10 @@ export async function DELETE(
   try {
     const { id } = await params;
     const planificacionId = parseInt(id);
-    
+
     if (isNaN(planificacionId)) {
       return NextResponse.json(
-        { error: "ID de planificación inválido" },
+        { error: 'ID de planificación inválido' },
         { status: 400 }
       );
     }
@@ -169,7 +171,7 @@ export async function DELETE(
 
     if (!planificacionExistente) {
       return NextResponse.json(
-        { error: "Planificación no encontrada" },
+        { error: 'Planificación no encontrada' },
         { status: 404 }
       );
     }
@@ -184,12 +186,14 @@ export async function DELETE(
       where: { id: planificacionId },
     });
 
-    return NextResponse.json({ message: "Planificación eliminada exitosamente" });
+    return NextResponse.json({
+      message: 'Planificación eliminada exitosamente',
+    });
   } catch (error) {
-    console.error("Error al eliminar planificación:", error);
+    console.error('Error al eliminar planificación:', error);
     return NextResponse.json(
-      { error: "Error interno del servidor" },
+      { error: 'Error interno del servidor' },
       { status: 500 }
     );
   }
-} 
+}

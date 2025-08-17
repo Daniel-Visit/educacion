@@ -25,47 +25,55 @@ export function FileUpload({
   maxSize = 50 * 1024 * 1024, // 50MB
   accept,
   className = '',
-  disabled = false
+  disabled = false,
 }: FileUploadProps) {
-  const [uploadedFiles, setUploadedFiles] = useState<Array<{
-    url: string;
-    path: string;
-    name: string;
-    size: number;
-  }>>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<
+    Array<{
+      url: string;
+      path: string;
+      name: string;
+      size: number;
+    }>
+  >([]);
 
   const { uploadFile, isUploading, progress, error } = useFileUpload({
     bucket: STORAGE_BUCKETS[bucket],
     onSuccess: (url, path) => {
       onFileUploaded?.(url, path);
     },
-    onError: (error) => {
+    onError: error => {
       onError?.(error);
-    }
+    },
   });
 
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    try {
-      for (const file of acceptedFiles) {
-        const result = await uploadFile(file);
-        setUploadedFiles(prev => [...prev, {
-          url: result.url,
-          path: result.path,
-          name: file.name,
-          size: file.size
-        }]);
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      try {
+        for (const file of acceptedFiles) {
+          const result = await uploadFile(file);
+          setUploadedFiles(prev => [
+            ...prev,
+            {
+              url: result.url,
+              path: result.path,
+              name: file.name,
+              size: file.size,
+            },
+          ]);
+        }
+      } catch (err) {
+        console.error('Error uploading files:', err);
       }
-    } catch (err) {
-      console.error('Error uploading files:', err);
-    }
-  }, [uploadFile]);
+    },
+    [uploadFile]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     maxFiles,
     maxSize,
     accept,
-    disabled: disabled || isUploading
+    disabled: disabled || isUploading,
   });
 
   const removeFile = (index: number) => {
@@ -75,6 +83,7 @@ export function FileUpload({
   const getFileIcon = (fileName: string) => {
     const extension = fileName.split('.').pop()?.toLowerCase();
     if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension || '')) {
+      // eslint-disable-next-line jsx-a11y/alt-text
       return <Image className="w-4 h-4" />;
     }
     if (['pdf', 'doc', 'docx', 'txt'].includes(extension || '')) {
@@ -98,27 +107,30 @@ export function FileUpload({
         {...getRootProps()}
         className={`
           border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
-          ${isDragActive 
-            ? 'border-blue-500 bg-blue-50' 
-            : 'border-gray-300 hover:border-gray-400'
+          ${
+            isDragActive
+              ? 'border-blue-500 bg-blue-50'
+              : 'border-gray-300 hover:border-gray-400'
           }
           ${disabled || isUploading ? 'opacity-50 cursor-not-allowed' : ''}
         `}
       >
         <input {...getInputProps()} />
-        
+
         <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-        
+
         {isDragActive ? (
-          <p className="text-blue-600 font-medium">Suelta los archivos aquí...</p>
+          <p className="text-blue-600 font-medium">
+            Suelta los archivos aquí...
+          </p>
         ) : (
           <div>
             <p className="text-gray-600 font-medium mb-2">
               Arrastra archivos aquí o haz clic para seleccionar
             </p>
             <p className="text-sm text-gray-500">
-              Máximo {maxFiles} archivo{maxFiles > 1 ? 's' : ''} • 
-              Tamaño máximo: {formatFileSize(maxSize)}
+              Máximo {maxFiles} archivo{maxFiles > 1 ? 's' : ''} • Tamaño
+              máximo: {formatFileSize(maxSize)}
             </p>
           </div>
         )}
@@ -159,8 +171,12 @@ export function FileUpload({
               <div className="flex items-center space-x-3">
                 {getFileIcon(file.name)}
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{file.name}</p>
-                  <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    {file.name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {formatFileSize(file.size)}
+                  </p>
                 </div>
               </div>
               <button
@@ -175,4 +191,4 @@ export function FileUpload({
       )}
     </div>
   );
-} 
+}

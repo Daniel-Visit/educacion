@@ -13,7 +13,6 @@ interface OAData {
 
 export async function GET() {
   try {
-    // @ts-ignore - Prisma client sync issue
     const matrices = await prisma.matrizEspecificacion.findMany({
       include: {
         oas: {
@@ -26,32 +25,27 @@ export async function GET() {
 
     // Obtener los OAs relacionados manualmente
     const matricesWithOAs = await Promise.all(
-      matrices.map(async (matriz) => {
+      matrices.map(async matriz => {
         const oasWithDetails = await Promise.all(
-          matriz.oas.map(async (matrizOA) => {
-            // @ts-ignore - Prisma client sync issue
+          matriz.oas.map(async matrizOA => {
             const oa = await prisma.oa.findUnique({
               where: { id: matrizOA.oaId },
             });
-            
+
             let nivel = null;
             let asignatura = null;
             if (oa) {
-              // @ts-ignore - Prisma client sync issue
               nivel = await prisma.nivel.findUnique({
                 where: { id: oa.nivel_id },
               });
-              // @ts-ignore - Prisma client sync issue
               asignatura = await prisma.asignatura.findUnique({
                 where: { id: oa.asignatura_id },
               });
             }
-            
+
             return {
               ...matrizOA,
-              oa: oa
-                ? { ...oa, nivel, asignatura }
-                : null,
+              oa: oa ? { ...oa, nivel, asignatura } : null,
             };
           })
         );
@@ -83,14 +77,23 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { nombre, total_preguntas, asignatura_id, nivel_id, oas } = body;
 
-    if (!nombre || !total_preguntas || !asignatura_id || !nivel_id || !oas || !Array.isArray(oas)) {
+    if (
+      !nombre ||
+      !total_preguntas ||
+      !asignatura_id ||
+      !nivel_id ||
+      !oas ||
+      !Array.isArray(oas)
+    ) {
       return NextResponse.json(
-        { error: 'Datos incompletos o inválidos. Se requiere nombre, total_preguntas, asignatura_id, nivel_id y oas' },
+        {
+          error:
+            'Datos incompletos o inválidos. Se requiere nombre, total_preguntas, asignatura_id, nivel_id y oas',
+        },
         { status: 400 }
       );
     }
 
-    // @ts-ignore - Prisma client sync issue
     const matriz = await prisma.matrizEspecificacion.create({
       data: {
         nombre,
@@ -101,7 +104,7 @@ export async function POST(request: NextRequest) {
           create: oas.map((oa: OAData) => ({
             oaId: oa.oaId,
             indicadores: {
-              create: oa.indicadores.map((indicador) => ({
+              create: oa.indicadores.map(indicador => ({
                 descripcion: indicador.descripcion,
                 preguntas: indicador.preguntas,
               })),
@@ -115,9 +118,7 @@ export async function POST(request: NextRequest) {
             indicadores: true,
           },
         },
-        // @ts-ignore - Prisma client sync issue
         asignatura: true,
-        // @ts-ignore - Prisma client sync issue
         nivel: true,
       },
     });
@@ -136,4 +137,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

@@ -1,1 +1,1 @@
-export { HorizontalRuleButton } from "./horizontal-rule-button" 
+export { HorizontalRuleButton } from './horizontal-rule-button';

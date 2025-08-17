@@ -5,9 +5,9 @@ const sqlite3 = require('sqlite3').verbose();
 const prismaPostgres = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.DATABASE_URL_POSTGRES
-    }
-  }
+      url: process.env.DATABASE_URL_POSTGRES,
+    },
+  },
 });
 
 // Conexión a SQLite
@@ -16,13 +16,13 @@ const db = new sqlite3.Database('./prisma/dev.db');
 async function migrarEvaluacion() {
   try {
     console.log('🚀 MIGRANDO TABLA EVALUACION A POSTGRESQL');
-    console.log('=' .repeat(50));
+    console.log('='.repeat(50));
 
     // 1. Obtener todos los datos de SQLite
     console.log('📖 Leyendo datos de SQLite...');
-    
+
     const evaluaciones = await new Promise((resolve, reject) => {
-      db.all("SELECT * FROM Evaluacion ORDER BY id", (err, rows) => {
+      db.all('SELECT * FROM Evaluacion ORDER BY id', (err, rows) => {
         if (err) reject(err);
         else resolve(rows);
       });
@@ -32,9 +32,10 @@ async function migrarEvaluacion() {
 
     // 2. Verificar si ya existen datos en PostgreSQL
     console.log('🔍 Verificando datos existentes en PostgreSQL...');
-    const existentes = await prismaPostgres.$queryRaw`SELECT COUNT(*) as total FROM "Evaluacion"`;
+    const existentes =
+      await prismaPostgres.$queryRaw`SELECT COUNT(*) as total FROM "Evaluacion"`;
     const totalExistentes = parseInt(existentes[0].total);
-    
+
     if (totalExistentes > 0) {
       console.log(`⚠️  Ya existen ${totalExistentes} registros en PostgreSQL`);
       console.log('🗑️  Eliminando datos existentes...');
@@ -44,27 +45,30 @@ async function migrarEvaluacion() {
 
     // 3. Insertar datos en PostgreSQL
     console.log('📝 Insertando datos en PostgreSQL...');
-    
+
     for (const evaluacion of evaluaciones) {
       // Convertir timestamps de milisegundos a Date para PostgreSQL
       const createdAt = new Date(evaluacion.createdAt);
       const updatedAt = new Date(evaluacion.updatedAt);
-      
+
       await prismaPostgres.$executeRaw`
         INSERT INTO "Evaluacion" (id, "archivoId", "matrizId", estado, "createdAt", "updatedAt")
         VALUES (${evaluacion.id}, ${evaluacion.archivoId}, ${evaluacion.matrizId}, ${evaluacion.estado}, ${createdAt}, ${updatedAt})
       `;
-      console.log(`✅ Insertado: Evaluación ID ${evaluacion.id} - Estado: ${evaluacion.estado}`);
+      console.log(
+        `✅ Insertado: Evaluación ID ${evaluacion.id} - Estado: ${evaluacion.estado}`
+      );
     }
 
     // 4. Verificar migración
     console.log('\n🔍 Verificando migración...');
-    const migrados = await prismaPostgres.$queryRaw`SELECT COUNT(*) as total FROM "Evaluacion"`;
+    const migrados =
+      await prismaPostgres.$queryRaw`SELECT COUNT(*) as total FROM "Evaluacion"`;
     const totalMigrados = parseInt(migrados[0].total);
-    
+
     console.log(`\n📊 Total registros en PostgreSQL: ${totalMigrados}`);
     console.log(`📊 Total registros en SQLite: ${evaluaciones.length}`);
-    
+
     if (totalMigrados === evaluaciones.length) {
       console.log('✅ Migración exitosa - Todos los registros migrados');
     } else {
@@ -73,8 +77,9 @@ async function migrarEvaluacion() {
 
     // 5. Mostrar datos migrados
     console.log('\n📋 Datos migrados:');
-    const datosMigrados = await prismaPostgres.$queryRaw`SELECT * FROM "Evaluacion" ORDER BY id`;
-    
+    const datosMigrados =
+      await prismaPostgres.$queryRaw`SELECT * FROM "Evaluacion" ORDER BY id`;
+
     datosMigrados.forEach(evaluacion => {
       console.log(`\nID: ${evaluacion.id}`);
       console.log(`  Archivo ID: ${evaluacion.archivoId}`);
@@ -86,7 +91,6 @@ async function migrarEvaluacion() {
     });
 
     console.log('\n✅ Migración de tabla Evaluacion completada');
-
   } catch (error) {
     console.error('❌ Error:', error);
   } finally {
@@ -95,4 +99,4 @@ async function migrarEvaluacion() {
   }
 }
 
-migrarEvaluacion(); 
+migrarEvaluacion();

@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  OA, 
-  Eje, 
-  Asignatura, 
-  Nivel, 
+import {
+  OA,
+  Eje,
+  Asignatura,
+  Nivel,
   MatrizEspecificacion,
   MatrizFormState,
-  ValidationResult 
+  ValidationResult,
 } from '@/types/matrices';
 import { validateMatrizForm, calculateTotalPreguntas } from '@/utils/matrices';
 
@@ -16,7 +16,7 @@ export const useMatricesData = () => {
   const [ejes, setEjes] = useState<Eje[]>([]);
   const [asignaturas, setAsignaturas] = useState<Asignatura[]>([]);
   const [niveles, setNiveles] = useState<Nivel[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchOAs = useCallback(async () => {
     try {
@@ -76,14 +76,14 @@ export const useMatricesData = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      setLoading(true);
+      setIsLoading(true);
       await Promise.all([
         fetchOAs(),
         fetchEjes(),
         fetchAsignaturas(),
-        fetchNiveles()
+        fetchNiveles(),
       ]);
-      setLoading(false);
+      setIsLoading(false);
     };
     loadData();
   }, [fetchOAs, fetchEjes, fetchAsignaturas, fetchNiveles]);
@@ -93,13 +93,13 @@ export const useMatricesData = () => {
     ejes,
     asignaturas,
     niveles,
-    loading,
+    isLoading,
     refetch: {
       fetchOAs,
       fetchEjes,
       fetchAsignaturas,
-      fetchNiveles
-    }
+      fetchNiveles,
+    },
   };
 };
 
@@ -114,7 +114,7 @@ export const useMatrizForm = (initialState?: Partial<MatrizFormState>) => {
     totalPreguntas: 0,
     oaIndicadores: {},
     errors: {},
-    ...initialState
+    ...initialState,
   });
 
   const updateFormState = useCallback((updates: Partial<MatrizFormState>) => {
@@ -131,16 +131,32 @@ export const useMatrizForm = (initialState?: Partial<MatrizFormState>) => {
 
   const validateForm = useCallback((): ValidationResult => {
     // Calcular valores necesarios para la validación
-    const totalPreguntasIndicadores = Object.values(formState.oaIndicadores).flat().reduce((sum, ind) => sum + (ind.preguntas || 0), 0);
-    const totalPreguntasContenido = formState.selectedOAsContenido.reduce((sum, oa) => {
-      const indicadores = formState.oaIndicadores[oa.id] || [];
-      return sum + indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0);
-    }, 0);
-    const totalPreguntasHabilidad = formState.selectedOAsHabilidad.reduce((sum, oa) => {
-      const indicadores = formState.oaIndicadores[oa.id] || [];
-      return sum + indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0);
-    }, 0);
-    const hasBothTypes = formState.selectedOAsContenido.length > 0 && formState.selectedOAsHabilidad.length > 0;
+    const totalPreguntasIndicadores = Object.values(formState.oaIndicadores)
+      .flat()
+      .reduce((sum, ind) => sum + (ind.preguntas || 0), 0);
+    const totalPreguntasContenido = formState.selectedOAsContenido.reduce(
+      (sum, oa) => {
+        const indicadores = formState.oaIndicadores[oa.id] || [];
+        return (
+          sum +
+          indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0)
+        );
+      },
+      0
+    );
+    const totalPreguntasHabilidad = formState.selectedOAsHabilidad.reduce(
+      (sum, oa) => {
+        const indicadores = formState.oaIndicadores[oa.id] || [];
+        return (
+          sum +
+          indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0)
+        );
+      },
+      0
+    );
+    const hasBothTypes =
+      formState.selectedOAsContenido.length > 0 &&
+      formState.selectedOAsHabilidad.length > 0;
 
     const errors = validateMatrizForm(
       formState.matrizName,
@@ -171,29 +187,29 @@ export const useMatrizForm = (initialState?: Partial<MatrizFormState>) => {
     updateErrors,
     clearErrors,
     validateForm,
-    updateTotalPreguntas
+    updateTotalPreguntas,
   };
 };
 
 // Hook para manejar la lista de matrices
 export const useMatricesList = () => {
   const [matrices, setMatrices] = useState<MatrizEspecificacion[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const fetchMatrices = useCallback(async () => {
     try {
-      setLoading(true);
+      setIsLoading(true);
       const response = await fetch('/api/matrices');
       if (response.ok) {
         const data = await response.json();
         setMatrices(data);
       }
-    } catch (error) {
-      console.error('Error fetching matrices:', error);
+    } catch {
+      console.error('Error fetching matrices');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }, []);
 
@@ -209,7 +225,7 @@ export const useMatricesList = () => {
       } else {
         return { success: false, error: 'Error al eliminar la matriz' };
       }
-    } catch (error) {
+    } catch {
       return { success: false, error: 'Error de conexión' };
     } finally {
       setDeletingId(null);
@@ -222,12 +238,12 @@ export const useMatricesList = () => {
 
   return {
     matrices,
-    loading,
+    isLoading,
     currentPage,
     setCurrentPage,
     deletingId,
     fetchMatrices,
-    deleteMatriz
+    deleteMatriz,
   };
 };
 
@@ -244,8 +260,8 @@ export const useMatriz = (matrizId: number) => {
         const data = await response.json();
         setMatriz(data);
       }
-    } catch (error) {
-      console.error('Error fetching matriz:', error);
+    } catch {
+      console.error('Error fetching matriz');
     } finally {
       setLoading(false);
     }
@@ -260,6 +276,6 @@ export const useMatriz = (matrizId: number) => {
   return {
     matriz,
     loading,
-    fetchMatriz
+    fetchMatriz,
   };
-}; 
+};

@@ -4,39 +4,44 @@ const { PrismaClient } = require('@prisma/client');
 const sqlitePrisma = new PrismaClient({
   datasources: {
     db: {
-      url: "file:./dev.db"
-    }
-  }
+      url: 'file:./dev.db',
+    },
+  },
 });
 
 // Cliente para PostgreSQL (destino) - usando esquema específico
 const postgresPrisma = new PrismaClient({
   datasources: {
     db: {
-      url: "postgresql://postgres.pchttmjsbxqaedszjaje:n2piyteoknP08FN6@aws-0-us-east-2.pooler.supabase.com:5432/postgres"
-    }
-  }
+      url: 'postgresql://postgres.pchttmjsbxqaedszjaje:n2piyteoknP08FN6@aws-0-us-east-2.pooler.supabase.com:5432/postgres',
+    },
+  },
 });
 
 async function migrarAsignatura() {
   console.log('🚀 MIGRACIÓN: asignatura (SQLite → PostgreSQL)');
-  console.log('=' .repeat(50));
+  console.log('='.repeat(50));
 
   try {
     // 1. Leer datos de SQLite
     console.log('📖 Leyendo datos de SQLite...');
     const asignaturasSQLite = await sqlitePrisma.asignatura.findMany({
-      orderBy: { id: 'asc' }
+      orderBy: { id: 'asc' },
     });
 
-    console.log(`✅ Encontradas ${asignaturasSQLite.length} asignaturas en SQLite`);
+    console.log(
+      `✅ Encontradas ${asignaturasSQLite.length} asignaturas en SQLite`
+    );
 
     // 2. Verificar PostgreSQL usando query raw
     console.log('\n🔍 Verificando PostgreSQL...');
-    const asignaturasPostgres = await postgresPrisma.$queryRaw`SELECT * FROM asignatura ORDER BY id`;
-    
+    const asignaturasPostgres =
+      await postgresPrisma.$queryRaw`SELECT * FROM asignatura ORDER BY id`;
+
     if (asignaturasPostgres.length > 0) {
-      console.log(`⚠️  PostgreSQL ya tiene ${asignaturasPostgres.length} asignaturas`);
+      console.log(
+        `⚠️  PostgreSQL ya tiene ${asignaturasPostgres.length} asignaturas`
+      );
       console.log('¿Continuar? (Ctrl+C para cancelar)');
       await new Promise(resolve => setTimeout(resolve, 3000));
     } else {
@@ -54,7 +59,7 @@ async function migrarAsignatura() {
         resultados.push({
           id: asignatura.id,
           nombre: asignatura.nombre,
-          status: '✅ Migrado'
+          status: '✅ Migrado',
         });
 
         console.log(`  ✅ ID ${asignatura.id}: "${asignatura.nombre}"`);
@@ -63,26 +68,33 @@ async function migrarAsignatura() {
         resultados.push({
           id: asignatura.id,
           nombre: asignatura.nombre,
-          status: `❌ Error: ${error.message}`
+          status: `❌ Error: ${error.message}`,
         });
       }
     }
 
     // 4. Verificación final
     console.log('\n🔍 Verificación final...');
-    const asignaturasFinales = await postgresPrisma.$queryRaw`SELECT * FROM asignatura ORDER BY id`;
+    const asignaturasFinales =
+      await postgresPrisma.$queryRaw`SELECT * FROM asignatura ORDER BY id`;
 
     console.log(`\n📊 RESUMEN:`);
     console.log(`  SQLite: ${asignaturasSQLite.length} registros`);
     console.log(`  PostgreSQL: ${asignaturasFinales.length} registros`);
-    console.log(`  Exitosos: ${resultados.filter(r => r.status.includes('✅')).length}`);
-    console.log(`  Errores: ${resultados.filter(r => r.status.includes('❌')).length}`);
+    console.log(
+      `  Exitosos: ${resultados.filter(r => r.status.includes('✅')).length}`
+    );
+    console.log(
+      `  Errores: ${resultados.filter(r => r.status.includes('❌')).length}`
+    );
 
     // Verificar que sean idénticos
-    const sonIdenticos = asignaturasSQLite.length === asignaturasFinales.length &&
-      asignaturasSQLite.every((sqlite, index) => 
-        sqlite.id === asignaturasFinales[index].id &&
-        sqlite.nombre === asignaturasFinales[index].nombre
+    const sonIdenticos =
+      asignaturasSQLite.length === asignaturasFinales.length &&
+      asignaturasSQLite.every(
+        (sqlite, index) =>
+          sqlite.id === asignaturasFinales[index].id &&
+          sqlite.nombre === asignaturasFinales[index].nombre
       );
 
     if (sonIdenticos) {
@@ -90,7 +102,6 @@ async function migrarAsignatura() {
     } else {
       console.log('\n⚠️  ADVERTENCIA: Los datos no son idénticos!');
     }
-
   } catch (error) {
     console.error('❌ Error en migración:', error);
   } finally {
@@ -99,4 +110,4 @@ async function migrarAsignatura() {
   }
 }
 
-migrarAsignatura(); 
+migrarAsignatura();

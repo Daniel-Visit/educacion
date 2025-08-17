@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
+// Interfaces para reemplazar tipos 'any'
+interface IndicadorInput {
+  descripcion: string;
+  preguntas: number;
+}
+
+interface OAInput {
+  oaId: number;
+  indicadores: IndicadorInput[];
+}
+
 const prisma = new PrismaClient();
 
 export async function GET(
@@ -10,15 +21,11 @@ export async function GET(
   try {
     const { id } = await params;
     const matrizId = parseInt(id);
-    
+
     if (isNaN(matrizId)) {
-      return NextResponse.json(
-        { error: 'ID inválido' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
-    // @ts-ignore - Prisma client sync issue
     const matriz = await prisma.matrizEspecificacion.findUnique({
       where: { id: matrizId },
       include: {
@@ -41,30 +48,25 @@ export async function GET(
 
     // Obtener los OAs relacionados manualmente
     const oasWithDetails = await Promise.all(
-      matriz.oas.map(async (matrizOA) => {
-        // @ts-ignore - Prisma client sync issue
+      matriz.oas.map(async matrizOA => {
         const oa = await prisma.oa.findUnique({
           where: { id: matrizOA.oaId },
         });
-        
+
         let nivel = null;
         let asignatura = null;
         if (oa) {
-          // @ts-ignore - Prisma client sync issue
           nivel = await prisma.nivel.findUnique({
             where: { id: oa.nivel_id },
           });
-          // @ts-ignore - Prisma client sync issue
           asignatura = await prisma.asignatura.findUnique({
             where: { id: oa.asignatura_id },
           });
         }
-        
+
         return {
           ...matrizOA,
-          oa: oa
-            ? { ...oa, nivel, asignatura }
-            : null,
+          oa: oa ? { ...oa, nivel, asignatura } : null,
         };
       })
     );
@@ -89,41 +91,46 @@ export async function PUT(
   try {
     const { id } = await params;
     const matrizId = parseInt(id);
-    
+
     if (isNaN(matrizId)) {
-      return NextResponse.json(
-        { error: 'ID inválido' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
     const body = await request.json();
     const { nombre, total_preguntas, asignatura_id, nivel_id, oas } = body;
 
-    if (!nombre || !total_preguntas || !asignatura_id || !nivel_id || !oas || !Array.isArray(oas)) {
+    if (
+      !nombre ||
+      !total_preguntas ||
+      !asignatura_id ||
+      !nivel_id ||
+      !oas ||
+      !Array.isArray(oas)
+    ) {
       return NextResponse.json(
-        { error: 'Datos incompletos o inválidos. Se requiere nombre, total_preguntas, asignatura_id, nivel_id y oas' },
+        {
+          error:
+            'Datos incompletos o inválidos. Se requiere nombre, total_preguntas, asignatura_id, nivel_id y oas',
+        },
         { status: 400 }
       );
     }
 
     // 1. Buscar todos los MatrizOA de la matriz
-    // @ts-ignore - Prisma client sync issue
     const matrizOAs = await prisma.matrizOA.findMany({ where: { matrizId } });
     const matrizOAIds = matrizOAs.map(oa => oa.id);
 
     // 2. Eliminar todos los Indicadores de esos MatrizOA
     if (matrizOAIds.length > 0) {
-      // @ts-ignore - Prisma client sync issue
-      await prisma.indicador.deleteMany({ where: { matrizOAId: { in: matrizOAIds } } });
+      await prisma.indicador.deleteMany({
+        where: { matrizOAId: { in: matrizOAIds } },
+      });
     }
 
     // 3. Eliminar los MatrizOA
-    // @ts-ignore - Prisma client sync issue
     await prisma.matrizOA.deleteMany({ where: { matrizId } });
 
     // 4. Actualizar matriz y crear nuevos OAs
-    // @ts-ignore - Prisma client sync issue
     const matriz = await prisma.matrizEspecificacion.update({
       where: { id: matrizId },
       data: {
@@ -132,10 +139,10 @@ export async function PUT(
         asignatura_id,
         nivel_id,
         oas: {
-          create: oas.map((oa: any) => ({
+          create: oas.map((oa: OAInput) => ({
             oaId: oa.oaId,
             indicadores: {
-              create: oa.indicadores.map((indicador: any) => ({
+              create: oa.indicadores.map((indicador: IndicadorInput) => ({
                 descripcion: indicador.descripcion,
                 preguntas: indicador.preguntas,
               })),
@@ -171,31 +178,26 @@ export async function DELETE(
   try {
     const { id } = await params;
     const matrizId = parseInt(id);
-    
+
     if (isNaN(matrizId)) {
-      return NextResponse.json(
-        { error: 'ID inválido' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
     // 1. Buscar todos los MatrizOA de la matriz
-    // @ts-ignore
     const matrizOAs = await prisma.matrizOA.findMany({ where: { matrizId } });
     const matrizOAIds = matrizOAs.map(oa => oa.id);
 
     // 2. Eliminar todos los Indicadores de esos MatrizOA
     if (matrizOAIds.length > 0) {
-      // @ts-ignore
-      await prisma.indicador.deleteMany({ where: { matrizOAId: { in: matrizOAIds } } });
+      await prisma.indicador.deleteMany({
+        where: { matrizOAId: { in: matrizOAIds } },
+      });
     }
 
     // 3. Eliminar los MatrizOA
-    // @ts-ignore
     await prisma.matrizOA.deleteMany({ where: { matrizId } });
 
     // 4. Eliminar la MatrizEspecificacion
-    // @ts-ignore
     await prisma.matrizEspecificacion.delete({ where: { id: matrizId } });
 
     return NextResponse.json({ message: 'Matriz eliminada correctamente' });
@@ -206,4 +208,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-} 
+}

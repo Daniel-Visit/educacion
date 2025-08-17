@@ -11,7 +11,10 @@ export async function GET(request: NextRequest) {
     const asignaturaIds = searchParams.get('asignaturaIds'); // Para múltiples asignaturas
 
     // Construir filtros
-    const where: any = {};
+    const where: {
+      asignatura_id?: number | { in: number[] };
+      nivel_id?: number;
+    } = {};
     if (asignaturaIds) {
       // Si se proporcionan múltiples asignaturas
       const ids = asignaturaIds.split(',').map(id => parseInt(id));
@@ -27,10 +30,7 @@ export async function GET(request: NextRequest) {
     // Obtener OAs con filtros
     const oas = await prisma.oa.findMany({
       where,
-      orderBy: [
-        { eje_id: 'asc' },
-        { oas_id: 'asc' },
-      ],
+      orderBy: [{ eje_id: 'asc' }, { oas_id: 'asc' }],
     });
 
     // Agrupar OAs por eje_id y eje_descripcion
@@ -56,4 +56,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

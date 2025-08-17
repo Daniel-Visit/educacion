@@ -1,42 +1,61 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+// Interfaz para los datos de creación del profesor
+interface ProfesorCreateData {
+  rut: string;
+  nombre: string;
+  email: string | null;
+  telefono: string | null;
+  asignaturas?: {
+    create: Array<{
+      asignaturaId: number;
+    }>;
+  };
+  niveles?: {
+    create: Array<{
+      nivelId: number;
+    }>;
+  };
+}
+
 // GET /api/profesores - Listar profesores
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const includeRelations = searchParams.get('include') === 'true';
 
-    const includeOptions = includeRelations ? {
-      asignaturas: {
-        include: {
-          asignatura: true
+    const includeOptions = includeRelations
+      ? {
+          asignaturas: {
+            include: {
+              asignatura: true,
+            },
+          },
+          niveles: {
+            include: {
+              nivel: true,
+            },
+          },
+          horario: {
+            include: {
+              asignatura: true,
+              nivel: true,
+            },
+          },
         }
-      },
-      niveles: {
-        include: {
-          nivel: true
-        }
-      },
-      horario: {
-        include: {
-          asignatura: true,
-          nivel: true
-        }
-      }
-    } : {};
+      : {};
 
-    // @ts-ignore - Prisma client sync issue
     const profesores = await prisma.profesor.findMany({
       include: includeOptions,
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     });
 
     return NextResponse.json({
       data: profesores,
-      message: 'Profesores obtenidos correctamente'
+      message: 'Profesores obtenidos correctamente',
     });
   } catch (error) {
     console.error('Error al obtener profesores:', error);
@@ -62,9 +81,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar si el RUT ya existe
-    // @ts-ignore - Prisma client sync issue
     const profesorExistente = await prisma.profesor.findUnique({
-      where: { rut }
+      where: { rut },
     });
 
     if (profesorExistente) {
@@ -75,19 +93,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear el profesor con sus relaciones
-    const data: any = {
+    const data: ProfesorCreateData = {
       rut,
       nombre,
       email: email || null,
-      telefono: telefono || null
+      telefono: telefono || null,
     };
 
     // Agregar asignaturas si se proporcionan
     if (asignaturas && Array.isArray(asignaturas) && asignaturas.length > 0) {
       data.asignaturas = {
         create: asignaturas.map((asignaturaId: number) => ({
-          asignaturaId: parseInt(asignaturaId.toString())
-        }))
+          asignaturaId: parseInt(asignaturaId.toString()),
+        })),
       };
     }
 
@@ -95,32 +113,34 @@ export async function POST(request: NextRequest) {
     if (niveles && Array.isArray(niveles) && niveles.length > 0) {
       data.niveles = {
         create: niveles.map((nivelId: number) => ({
-          nivelId: parseInt(nivelId.toString())
-        }))
+          nivelId: parseInt(nivelId.toString()),
+        })),
       };
     }
 
-    // @ts-ignore - Prisma client sync issue
     const profesor = await prisma.profesor.create({
       data,
       include: {
         asignaturas: {
           include: {
-            asignatura: true
-          }
+            asignatura: true,
+          },
         },
         niveles: {
           include: {
-            nivel: true
-          }
-        }
-      }
+            nivel: true,
+          },
+        },
+      },
     });
 
-    return NextResponse.json({
-      data: profesor,
-      message: 'Profesor creado correctamente'
-    }, { status: 201 });
+    return NextResponse.json(
+      {
+        data: profesor,
+        message: 'Profesor creado correctamente',
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Error al crear profesor:', error);
     return NextResponse.json(
@@ -128,4 +148,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

@@ -7,9 +7,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // @ts-ignore - Prisma client sync issue
+    const id = parseInt((await params).id);
     const horario = await prisma.horario.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id },
       include: {
         asignatura: true,
         nivel: true,
@@ -18,15 +18,15 @@ export async function GET(
           include: {
             profesores: {
               include: {
-                profesor: true
-              }
-            }
+                profesor: true,
+              },
+            },
           },
           orderBy: {
-            orden: 'asc'
-          }
-        }
-      }
+            orden: 'asc',
+          },
+        },
+      },
     });
 
     if (!horario) {
@@ -38,7 +38,7 @@ export async function GET(
 
     return NextResponse.json({
       data: horario,
-      message: 'Horario obtenido correctamente'
+      message: 'Horario obtenido correctamente',
     });
   } catch (error) {
     console.error('Error al obtener horario:', error);
@@ -55,13 +55,20 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    const id = parseInt((await params).id);
     const body = await request.json();
-    const { nombre, docenteId, asignaturaId, nivelId, fechaPrimeraClase, modulos } = body;
+    const {
+      nombre,
+      docenteId,
+      asignaturaId,
+      nivelId,
+      fechaPrimeraClase,
+      modulos,
+    } = body;
 
     // Verificar si el horario existe
-    // @ts-ignore - Prisma client sync issue
     const horarioExistente = await prisma.horario.findUnique({
-      where: { id: parseInt(params.id) }
+      where: { id },
     });
 
     if (!horarioExistente) {
@@ -72,9 +79,18 @@ export async function PUT(
     }
 
     // Validaciones básicas
-    if (!nombre || !docenteId || !asignaturaId || !nivelId || !fechaPrimeraClase) {
+    if (
+      !nombre ||
+      !docenteId ||
+      !asignaturaId ||
+      !nivelId ||
+      !fechaPrimeraClase
+    ) {
       return NextResponse.json(
-        { error: 'Nombre, docente, asignatura, nivel y fecha de primera clase son obligatorios' },
+        {
+          error:
+            'Nombre, docente, asignatura, nivel y fecha de primera clase son obligatorios',
+        },
         { status: 400 }
       );
     }
@@ -87,9 +103,8 @@ export async function PUT(
     }
 
     // Validar que el docente existe
-    // @ts-ignore - Prisma client sync issue
     const docente = await prisma.profesor.findUnique({
-      where: { id: parseInt(docenteId) }
+      where: { id: parseInt(docenteId) },
     });
 
     if (!docente) {
@@ -100,9 +115,8 @@ export async function PUT(
     }
 
     // Validar que la asignatura existe
-    // @ts-ignore - Prisma client sync issue
     const asignatura = await prisma.asignatura.findUnique({
-      where: { id: parseInt(asignaturaId) }
+      where: { id: parseInt(asignaturaId) },
     });
 
     if (!asignatura) {
@@ -113,9 +127,8 @@ export async function PUT(
     }
 
     // Validar que el nivel existe
-    // @ts-ignore - Prisma client sync issue
     const nivel = await prisma.nivel.findUnique({
-      where: { id: parseInt(nivelId) }
+      where: { id: parseInt(nivelId) },
     });
 
     if (!nivel) {
@@ -126,111 +139,109 @@ export async function PUT(
     }
 
     // Actualizar horario con módulos en una transacción
-    // @ts-ignore - Prisma client sync issue
-    const horario = await prisma.$transaction(async (tx) => {
-      // Actualizar el horario
-      // @ts-ignore - Prisma client sync issue
-      await tx.horario.update({
-        where: { id: parseInt(params.id) },
-        data: {
-          nombre: nombre.trim(),
-          docenteId: parseInt(docenteId),
-          asignaturaId: parseInt(asignaturaId),
-          nivelId: parseInt(nivelId),
-          fechaPrimeraClase: new Date(fechaPrimeraClase)
-        }
-      });
-
-      // Eliminar módulos existentes
-      // @ts-ignore - Prisma client sync issue
-      await tx.moduloHorarioProfesor.deleteMany({
-        where: {
-          moduloHorario: {
-            horarioId: parseInt(params.id)
-          }
-        }
-      });
-
-      // @ts-ignore - Prisma client sync issue
-      await tx.moduloHorario.deleteMany({
-        where: { horarioId: parseInt(params.id) }
-      });
-
-      // Crear los nuevos módulos
-      for (let i = 0; i < modulos.length; i++) {
-        const modulo = modulos[i];
-        
-        // Validar módulo
-        if (!modulo.dia || !modulo.horaInicio || !modulo.duracion) {
-          throw new Error('Cada módulo debe tener día, hora de inicio y duración');
-        }
-
-        // Validar que la duración esté en el rango permitido
-        if (modulo.duracion < 30 || modulo.duracion > 240) {
-          throw new Error('La duración debe estar entre 30 y 240 minutos');
-        }
-
-        // Crear el módulo
-        // @ts-ignore - Prisma client sync issue
-        const nuevoModulo = await tx.moduloHorario.create({
+    const horario = await prisma.$transaction(
+      async tx => {
+        // Actualizar el horario
+        await tx.horario.update({
+          where: { id },
           data: {
-            horarioId: parseInt(params.id),
-            dia: modulo.dia,
-            horaInicio: modulo.horaInicio,
-            duracion: modulo.duracion,
-            orden: i + 1
-          }
+            nombre: nombre.trim(),
+            docenteId: parseInt(docenteId),
+            asignaturaId: parseInt(asignaturaId),
+            nivelId: parseInt(nivelId),
+            fechaPrimeraClase: new Date(fechaPrimeraClase),
+          },
         });
 
-        // Asignar el profesor titular al módulo
-        // @ts-ignore - Prisma client sync issue
-        await tx.moduloHorarioProfesor.create({
-          data: {
-            moduloHorarioId: nuevoModulo.id,
-            profesorId: parseInt(docenteId),
-            rol: 'titular'
-          }
-        });
-      }
-
-      // Retornar el horario actualizado con sus módulos
-      // @ts-ignore - Prisma client sync issue
-      return await tx.horario.findUnique({
-        where: { id: parseInt(params.id) },
-        include: {
-          asignatura: true,
-          nivel: true,
-          profesor: true,
-          modulos: {
-            include: {
-              profesores: {
-                include: {
-                  profesor: true
-                }
-              }
+        // Eliminar módulos existentes
+        await tx.moduloHorarioProfesor.deleteMany({
+          where: {
+            moduloHorario: {
+              horarioId: id,
             },
-            orderBy: {
-              orden: 'asc'
-            }
+          },
+        });
+
+        await tx.moduloHorario.deleteMany({
+          where: { horarioId: id },
+        });
+
+        // Crear los nuevos módulos
+        for (let i = 0; i < modulos.length; i++) {
+          const modulo = modulos[i];
+
+          // Validar módulo
+          if (!modulo.dia || !modulo.horaInicio || !modulo.duracion) {
+            throw new Error(
+              'Cada módulo debe tener día, hora de inicio y duración'
+            );
           }
+
+          // Validar que la duración esté en el rango permitido
+          if (modulo.duracion < 30 || modulo.duracion > 240) {
+            throw new Error('La duración debe estar entre 30 y 240 minutos');
+          }
+
+          // Crear el módulo
+          const nuevoModulo = await tx.moduloHorario.create({
+            data: {
+              horarioId: id,
+              dia: modulo.dia,
+              horaInicio: modulo.horaInicio,
+              duracion: modulo.duracion,
+              orden: i + 1,
+            },
+          });
+
+          // Asignar el profesor titular al módulo
+          await tx.moduloHorarioProfesor.create({
+            data: {
+              moduloHorarioId: nuevoModulo.id,
+              profesorId: parseInt(docenteId),
+              rol: 'titular',
+            },
+          });
         }
-      });
-    });
+
+        // Retornar el horario actualizado con sus módulos
+        return await tx.horario.findUnique({
+          where: { id },
+          include: {
+            asignatura: true,
+            nivel: true,
+            profesor: true,
+            modulos: {
+              include: {
+                profesores: {
+                  include: {
+                    profesor: true,
+                  },
+                },
+              },
+              orderBy: {
+                orden: 'asc',
+              },
+            },
+          },
+        });
+      },
+      {
+        timeout: 10000, // Aumentar timeout a 10 segundos
+        maxWait: 10000, // Máximo tiempo de espera
+      }
+    );
 
     return NextResponse.json({
       data: horario,
-      message: 'Horario actualizado correctamente'
+      message: 'Horario actualizado correctamente',
     });
   } catch (error) {
     console.error('Error al actualizar horario:', error);
-    
+
     if (error instanceof Error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
-    
+
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }
@@ -244,10 +255,10 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    const id = parseInt((await params).id);
     // Verificar si el horario existe
-    // @ts-ignore - Prisma client sync issue
     const horario = await prisma.horario.findUnique({
-      where: { id: parseInt(params.id) }
+      where: { id },
     });
 
     if (!horario) {
@@ -258,33 +269,35 @@ export async function DELETE(
     }
 
     // Eliminar horario y sus módulos en una transacción
-    // @ts-ignore - Prisma client sync issue
-    await prisma.$transaction(async (tx) => {
-      // Eliminar profesores de módulos
-      // @ts-ignore - Prisma client sync issue
-      await tx.moduloHorarioProfesor.deleteMany({
-        where: {
-          moduloHorario: {
-            horarioId: parseInt(params.id)
-          }
-        }
-      });
+    await prisma.$transaction(
+      async tx => {
+        // Eliminar profesores de módulos
+        await tx.moduloHorarioProfesor.deleteMany({
+          where: {
+            moduloHorario: {
+              horarioId: id,
+            },
+          },
+        });
 
-      // Eliminar módulos
-      // @ts-ignore - Prisma client sync issue
-      await tx.moduloHorario.deleteMany({
-        where: { horarioId: parseInt(params.id) }
-      });
+        // Eliminar módulos
+        await tx.moduloHorario.deleteMany({
+          where: { horarioId: id },
+        });
 
-      // Eliminar horario
-      // @ts-ignore - Prisma client sync issue
-      await tx.horario.delete({
-        where: { id: parseInt(params.id) }
-      });
-    });
+        // Eliminar horario
+        await tx.horario.delete({
+          where: { id },
+        });
+      },
+      {
+        timeout: 10000, // Aumentar timeout a 10 segundos
+        maxWait: 10000, // Máximo tiempo de espera
+      }
+    );
 
     return NextResponse.json({
-      message: 'Horario eliminado correctamente'
+      message: 'Horario eliminado correctamente',
     });
   } catch (error) {
     console.error('Error al eliminar horario:', error);
@@ -293,4 +306,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-} 
+}

@@ -1,46 +1,42 @@
-import { OA, Indicador, ValidationResult, MatrizFormState } from '@/types/matrices';
+import { OA, Indicador } from '@/types/matrices';
 
 // Configuración de gradientes
 export const GRADIENT_CONFIGS = [
   {
     gradient: 'from-emerald-500 to-teal-600',
-    hoverGradient: 'hover:from-emerald-600 hover:to-teal-700'
+    hoverGradient: 'hover:from-emerald-600 hover:to-teal-700',
   },
   {
     gradient: 'from-amber-500 to-orange-600',
-    hoverGradient: 'hover:from-amber-600 hover:to-orange-700'
+    hoverGradient: 'hover:from-amber-600 hover:to-orange-700',
   },
   {
     gradient: 'from-indigo-500 to-purple-600',
-    hoverGradient: 'hover:from-indigo-600 hover:to-purple-700'
+    hoverGradient: 'hover:from-indigo-600 hover:to-purple-700',
   },
   {
     gradient: 'from-cyan-500 to-blue-600',
-    hoverGradient: 'hover:from-cyan-600 hover:to-blue-700'
+    hoverGradient: 'hover:from-cyan-600 hover:to-blue-700',
   },
   {
     gradient: 'from-rose-500 to-pink-600',
-    hoverGradient: 'hover:from-rose-600 hover:to-pink-700'
+    hoverGradient: 'hover:from-rose-600 hover:to-pink-700',
   },
   {
     gradient: 'from-violet-500 to-fuchsia-600',
-    hoverGradient: 'hover:from-violet-600 hover:to-fuchsia-700'
-  }
+    hoverGradient: 'hover:from-violet-600 hover:to-fuchsia-700',
+  },
 ];
 
 export const getGradient = (index: number): string => {
   return GRADIENT_CONFIGS[index % GRADIENT_CONFIGS.length].gradient;
 };
 
-export const getHoverGradient = (index: number): string => {
-  return GRADIENT_CONFIGS[index % GRADIENT_CONFIGS.length].hoverGradient;
-};
-
 // Pasos del formulario
 export const MATRIZ_STEPS = [
   { n: 1, label: 'Datos básicos' },
   { n: 2, label: 'Seleccionar OA' },
-  { n: 3, label: 'Indicadores' }
+  { n: 3, label: 'Indicadores' },
 ];
 
 // Validaciones
@@ -80,23 +76,32 @@ export const validateMatrizForm = (
   }
 
   // Validar que cada OA tenga al menos un indicador con al menos 1 pregunta
-  const allOAsHaveIndicators = [...selectedOAsContenido, ...selectedOAsHabilidad].every(oa => {
+  const allOAsHaveIndicators = [
+    ...selectedOAsContenido,
+    ...selectedOAsHabilidad,
+  ].every(oa => {
     const indicadores = oaIndicadores[oa.id] || [];
     return indicadores.length > 0 && indicadores.some(ind => ind.preguntas > 0);
   });
 
   if (!allOAsHaveIndicators) {
     // Encontrar OAs específicos que no tienen indicadores
-    const oasWithoutIndicators = [...selectedOAsContenido, ...selectedOAsHabilidad].filter(oa => {
+    const oasWithoutIndicators = [
+      ...selectedOAsContenido,
+      ...selectedOAsHabilidad,
+    ].filter(oa => {
       const indicadores = oaIndicadores[oa.id] || [];
-      return indicadores.length === 0 || !indicadores.some(ind => ind.preguntas > 0);
+      return (
+        indicadores.length === 0 || !indicadores.some(ind => ind.preguntas > 0)
+      );
     });
-    
+
     if (oasWithoutIndicators.length > 0) {
       const oaNames = oasWithoutIndicators.map(oa => oa.oas_id).join(', ');
       errors.indicadores = `Los siguientes OAs deben tener al menos un indicador con al menos 1 pregunta: ${oaNames}`;
     } else {
-      errors.indicadores = 'Cada OA debe tener al menos un indicador con al menos 1 pregunta';
+      errors.indicadores =
+        'Cada OA debe tener al menos un indicador con al menos 1 pregunta';
     }
   }
 
@@ -120,14 +125,22 @@ export const validateMatrizForm = (
 };
 
 // Funciones de cálculo
-export const calculateTotalPreguntas = (oaIndicadores: { [oaId: number]: Indicador[] }): number => {
+export const calculateTotalPreguntas = (oaIndicadores: {
+  [oaId: number]: Indicador[];
+}): number => {
   return Object.values(oaIndicadores).reduce((total, indicadores) => {
-    return total + indicadores.reduce((sum, indicador) => sum + indicador.preguntas, 0);
+    return (
+      total +
+      indicadores.reduce((sum, indicador) => sum + indicador.preguntas, 0)
+    );
   }, 0);
 };
 
 // Funciones de filtrado
-export const filterOAsByType = (oas: OA[], tipo: 'Contenido' | 'Habilidad'): OA[] => {
+export const filterOAsByType = (
+  oas: OA[],
+  tipo: 'Contenido' | 'Habilidad'
+): OA[] => {
   return oas.filter(oa => oa.tipo_eje === tipo);
 };
 
@@ -136,7 +149,10 @@ export const filterOAsByEje = (oas: OA[], ejeId: number): OA[] => {
 };
 
 // Funciones de transformación
-export const transformOAsForAPI = (oasContenido: OA[], oasHabilidad: OA[]): OA[] => {
+export const transformOAsForAPI = (
+  oasContenido: OA[],
+  oasHabilidad: OA[]
+): OA[] => {
   return [...oasContenido, ...oasHabilidad];
 };
 
@@ -148,15 +164,18 @@ export const formatDate = (dateString: string): string => {
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   });
 };
 
 // Funciones de paginación
-export const getPageNumbers = (currentPage: number, totalPages: number): number[] => {
+export const getPageNumbers = (
+  currentPage: number,
+  totalPages: number
+): number[] => {
   const pages: number[] = [];
   const maxVisible = 5;
-  
+
   if (totalPages <= maxVisible) {
     for (let i = 1; i <= totalPages; i++) {
       pages.push(i);
@@ -180,6 +199,6 @@ export const getPageNumbers = (currentPage: number, totalPages: number): number[
       pages.push(totalPages);
     }
   }
-  
+
   return pages;
-}; 
+};

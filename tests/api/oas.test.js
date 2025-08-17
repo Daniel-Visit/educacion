@@ -17,7 +17,7 @@ jest.mock('../../src/lib/prisma', () => ({
 
 // Mock de NextResponse
 global.NextResponse = {
-  json: jest.fn((data) => ({ json: () => data })),
+  json: jest.fn(data => ({ json: () => data })),
 };
 
 describe('API OAs', () => {
@@ -50,7 +50,7 @@ describe('API OAs', () => {
   describe('GET /api/oas', () => {
     it('debería retornar lista de OAs', async () => {
       const { GET } = require('../../src/app/api/oas/route');
-      
+
       mockPrisma.oa.findMany.mockResolvedValue([oaResponse]);
 
       const request = new NextRequest('http://localhost:3000/api/oas');
@@ -71,7 +71,7 @@ describe('API OAs', () => {
   describe('POST /api/oas', () => {
     it('debería crear un OA exitosamente', async () => {
       const { POST } = require('../../src/app/api/oas/route');
-      
+
       mockPrisma.oa.create.mockResolvedValue(oaResponse);
 
       const request = new NextRequest('http://localhost:3000/api/oas', {
@@ -94,7 +94,7 @@ describe('API OAs', () => {
 
     it('debería validar datos requeridos', async () => {
       const { POST } = require('../../src/app/api/oas/route');
-      
+
       const invalidData = { codigo: '', descripcion: '' };
       const request = new NextRequest('http://localhost:3000/api/oas', {
         method: 'POST',
@@ -110,7 +110,7 @@ describe('API OAs', () => {
 
     it('debería validar longitud del código', async () => {
       const { POST } = require('../../src/app/api/oas/route');
-      
+
       const invalidData = { ...oaData, codigo: 'A'.repeat(51) };
       const request = new NextRequest('http://localhost:3000/api/oas', {
         method: 'POST',
@@ -126,7 +126,7 @@ describe('API OAs', () => {
 
     it('debería validar longitud de la descripción', async () => {
       const { POST } = require('../../src/app/api/oas/route');
-      
+
       const invalidData = { ...oaData, descripcion: 'A'.repeat(1001) };
       const request = new NextRequest('http://localhost:3000/api/oas', {
         method: 'POST',
@@ -136,8 +136,10 @@ describe('API OAs', () => {
       const response = await POST(request);
       const result = await response.json();
 
-      expect(result.error).toBe('La descripción no puede exceder 1000 caracteres');
+      expect(result.error).toBe(
+        'La descripción no puede exceder 1000 caracteres'
+      );
       expect(result.status).toBe(400);
     });
   });
-}); 
+});

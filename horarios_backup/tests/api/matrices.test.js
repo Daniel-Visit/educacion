@@ -45,11 +45,11 @@ global.NextRequest = class {
   constructor(url = 'http://localhost:3000/api/matrices') {
     this._url = url;
   }
-  
+
   get url() {
     return this._url;
   }
-  
+
   json() {
     return Promise.resolve(this._body || {});
   }
@@ -57,7 +57,11 @@ global.NextRequest = class {
 
 // Importar las funciones después de los mocks
 const { GET, POST } = require('../../src/app/api/matrices/route');
-const { GET: GET_BY_ID, PUT, DELETE } = require('../../src/app/api/matrices/[id]/route');
+const {
+  GET: GET_BY_ID,
+  PUT,
+  DELETE,
+} = require('../../src/app/api/matrices/[id]/route');
 
 describe('Matrices API', () => {
   beforeEach(() => {
@@ -77,11 +81,11 @@ describe('Matrices API', () => {
               id: 1,
               oaId: 1,
               indicadores: [
-                { id: 1, descripcion: 'Indicador 1', preguntas: 10 }
-              ]
-            }
-          ]
-        }
+                { id: 1, descripcion: 'Indicador 1', preguntas: 10 },
+              ],
+            },
+          ],
+        },
       ];
 
       const mockOA = {
@@ -93,7 +97,7 @@ describe('Matrices API', () => {
         oas_id: 'OA1',
         descripcion_oas: 'Descripción OA',
         basal: true,
-        minimo_clases: 5
+        minimo_clases: 5,
       };
 
       const mockNivel = { id: 1, nombre: '2° Básico' };
@@ -128,7 +132,9 @@ describe('Matrices API', () => {
     });
 
     it('should handle database errors', async () => {
-      mockPrisma.matrizEspecificacion.findMany.mockRejectedValue(new Error('Database error'));
+      mockPrisma.matrizEspecificacion.findMany.mockRejectedValue(
+        new Error('Database error')
+      );
 
       const request = new NextRequest();
       const response = await GET(request);
@@ -149,10 +155,10 @@ describe('Matrices API', () => {
             oaId: 1,
             indicadores: [
               { descripcion: 'Indicador 1', preguntas: 8 },
-              { descripcion: 'Indicador 2', preguntas: 7 }
-            ]
-          }
-        ]
+              { descripcion: 'Indicador 2', preguntas: 7 },
+            ],
+          },
+        ],
       };
 
       const mockCreatedMatrix = {
@@ -166,17 +172,19 @@ describe('Matrices API', () => {
             oaId: 1,
             indicadores: [
               { id: 1, descripcion: 'Indicador 1', preguntas: 8 },
-              { id: 2, descripcion: 'Indicador 2', preguntas: 7 }
-            ]
-          }
-        ]
+              { id: 2, descripcion: 'Indicador 2', preguntas: 7 },
+            ],
+          },
+        ],
       };
 
-      mockPrisma.matrizEspecificacion.create.mockResolvedValue(mockCreatedMatrix);
+      mockPrisma.matrizEspecificacion.create.mockResolvedValue(
+        mockCreatedMatrix
+      );
 
       const request = new NextRequest();
       request._body = requestData;
-      
+
       const response = await POST(request);
       const data = await response.json();
 
@@ -191,12 +199,12 @@ describe('Matrices API', () => {
                 indicadores: {
                   create: [
                     { descripcion: 'Indicador 1', preguntas: 8 },
-                    { descripcion: 'Indicador 2', preguntas: 7 }
-                  ]
-                }
-              }
-            ]
-          }
+                    { descripcion: 'Indicador 2', preguntas: 7 },
+                  ],
+                },
+              },
+            ],
+          },
         },
         include: {
           oas: {
@@ -215,12 +223,12 @@ describe('Matrices API', () => {
       const invalidData = {
         nombre: '',
         total_preguntas: 0,
-        oas: []
+        oas: [],
       };
 
       const request = new NextRequest();
       request._body = invalidData;
-      
+
       const response = await POST(request);
       const data = await response.json();
 
@@ -232,12 +240,12 @@ describe('Matrices API', () => {
       const invalidData = {
         nombre: 'Matriz',
         total_preguntas: 10,
-        oas: 'not an array'
+        oas: 'not an array',
       };
 
       const request = new NextRequest();
       request._body = invalidData;
-      
+
       const response = await POST(request);
       const data = await response.json();
 
@@ -249,14 +257,16 @@ describe('Matrices API', () => {
       const requestData = {
         nombre: 'Matriz',
         total_preguntas: 10,
-        oas: [{ oaId: 1, indicadores: [] }]
+        oas: [{ oaId: 1, indicadores: [] }],
       };
 
-      mockPrisma.matrizEspecificacion.create.mockRejectedValue(new Error('Creation failed'));
+      mockPrisma.matrizEspecificacion.create.mockRejectedValue(
+        new Error('Creation failed')
+      );
 
       const request = new NextRequest();
       request._body = requestData;
-      
+
       const response = await POST(request);
       const data = await response.json();
 
@@ -276,11 +286,9 @@ describe('Matrices API', () => {
           {
             id: 1,
             oaId: 1,
-            indicadores: [
-              { id: 1, descripcion: 'Indicador 1', preguntas: 10 }
-            ]
-          }
-        ]
+            indicadores: [{ id: 1, descripcion: 'Indicador 1', preguntas: 10 }],
+          },
+        ],
       };
 
       const mockOA = {
@@ -292,7 +300,7 @@ describe('Matrices API', () => {
         oas_id: 'OA1',
         descripcion_oas: 'Descripción OA',
         basal: true,
-        minimo_clases: 5
+        minimo_clases: 5,
       };
 
       const mockNivel = { id: 1, nombre: '2° Básico' };
@@ -305,7 +313,7 @@ describe('Matrices API', () => {
 
       const request = new NextRequest();
       const params = Promise.resolve({ id: '1' });
-      
+
       const response = await GET_BY_ID(request, { params });
       const data = await response.json();
 
@@ -328,7 +336,7 @@ describe('Matrices API', () => {
     it('should handle invalid ID', async () => {
       const request = new NextRequest();
       const params = Promise.resolve({ id: 'invalid' });
-      
+
       const response = await GET_BY_ID(request, { params });
       const data = await response.json();
 
@@ -341,7 +349,7 @@ describe('Matrices API', () => {
 
       const request = new NextRequest();
       const params = Promise.resolve({ id: '999' });
-      
+
       const response = await GET_BY_ID(request, { params });
       const data = await response.json();
 
@@ -358,11 +366,9 @@ describe('Matrices API', () => {
         oas: [
           {
             oaId: 1,
-            indicadores: [
-              { descripcion: 'Nuevo Indicador', preguntas: 15 }
-            ]
-          }
-        ]
+            indicadores: [{ descripcion: 'Nuevo Indicador', preguntas: 15 }],
+          },
+        ],
       };
 
       const mockMatrizOAs = [{ id: 1 }, { id: 2 }];
@@ -375,27 +381,33 @@ describe('Matrices API', () => {
             id: 1,
             oaId: 1,
             indicadores: [
-              { id: 1, descripcion: 'Nuevo Indicador', preguntas: 15 }
-            ]
-          }
-        ]
+              { id: 1, descripcion: 'Nuevo Indicador', preguntas: 15 },
+            ],
+          },
+        ],
       };
 
       mockPrisma.matrizOA.findMany.mockResolvedValue(mockMatrizOAs);
-      mockPrisma.matrizEspecificacion.update.mockResolvedValue(mockUpdatedMatrix);
+      mockPrisma.matrizEspecificacion.update.mockResolvedValue(
+        mockUpdatedMatrix
+      );
 
       const request = new NextRequest();
       request._body = requestData;
       const params = Promise.resolve({ id: '1' });
-      
+
       const response = await PUT(request, { params });
       const data = await response.json();
 
-      expect(mockPrisma.matrizOA.findMany).toHaveBeenCalledWith({ where: { matrizId: 1 } });
-      expect(mockPrisma.indicador.deleteMany).toHaveBeenCalledWith({ 
-        where: { matrizOAId: { in: [1, 2] } } 
+      expect(mockPrisma.matrizOA.findMany).toHaveBeenCalledWith({
+        where: { matrizId: 1 },
       });
-      expect(mockPrisma.matrizOA.deleteMany).toHaveBeenCalledWith({ where: { matrizId: 1 } });
+      expect(mockPrisma.indicador.deleteMany).toHaveBeenCalledWith({
+        where: { matrizOAId: { in: [1, 2] } },
+      });
+      expect(mockPrisma.matrizOA.deleteMany).toHaveBeenCalledWith({
+        where: { matrizId: 1 },
+      });
       expect(mockPrisma.matrizEspecificacion.update).toHaveBeenCalled();
 
       expect(data).toEqual(mockUpdatedMatrix);
@@ -405,13 +417,13 @@ describe('Matrices API', () => {
       const invalidData = {
         nombre: '',
         total_preguntas: 0,
-        oas: []
+        oas: [],
       };
 
       const request = new NextRequest();
       request._body = invalidData;
       const params = Promise.resolve({ id: '1' });
-      
+
       const response = await PUT(request, { params });
       const data = await response.json();
 
@@ -423,13 +435,13 @@ describe('Matrices API', () => {
       const requestData = {
         nombre: 'Matriz',
         total_preguntas: 10,
-        oas: [{ oaId: 1, indicadores: [] }]
+        oas: [{ oaId: 1, indicadores: [] }],
       };
 
       const request = new NextRequest();
       request._body = requestData;
       const params = Promise.resolve({ id: 'invalid' });
-      
+
       const response = await PUT(request, { params });
       const data = await response.json();
 
@@ -446,16 +458,22 @@ describe('Matrices API', () => {
 
       const request = new NextRequest();
       const params = Promise.resolve({ id: '1' });
-      
+
       const response = await DELETE(request, { params });
       const data = await response.json();
 
-      expect(mockPrisma.matrizOA.findMany).toHaveBeenCalledWith({ where: { matrizId: 1 } });
-      expect(mockPrisma.indicador.deleteMany).toHaveBeenCalledWith({ 
-        where: { matrizOAId: { in: [1, 2] } } 
+      expect(mockPrisma.matrizOA.findMany).toHaveBeenCalledWith({
+        where: { matrizId: 1 },
       });
-      expect(mockPrisma.matrizOA.deleteMany).toHaveBeenCalledWith({ where: { matrizId: 1 } });
-      expect(mockPrisma.matrizEspecificacion.delete).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(mockPrisma.indicador.deleteMany).toHaveBeenCalledWith({
+        where: { matrizOAId: { in: [1, 2] } },
+      });
+      expect(mockPrisma.matrizOA.deleteMany).toHaveBeenCalledWith({
+        where: { matrizId: 1 },
+      });
+      expect(mockPrisma.matrizEspecificacion.delete).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
 
       expect(data.message).toBe('Matriz eliminada correctamente');
     });
@@ -463,7 +481,7 @@ describe('Matrices API', () => {
     it('should handle invalid ID for deletion', async () => {
       const request = new NextRequest();
       const params = Promise.resolve({ id: 'invalid' });
-      
+
       const response = await DELETE(request, { params });
       const data = await response.json();
 
@@ -472,11 +490,13 @@ describe('Matrices API', () => {
     });
 
     it('should handle database errors during deletion', async () => {
-      mockPrisma.matrizOA.findMany.mockRejectedValue(new Error('Deletion failed'));
+      mockPrisma.matrizOA.findMany.mockRejectedValue(
+        new Error('Deletion failed')
+      );
 
       const request = new NextRequest();
       const params = Promise.resolve({ id: '1' });
-      
+
       const response = await DELETE(request, { params });
       const data = await response.json();
 
@@ -484,4 +504,4 @@ describe('Matrices API', () => {
       expect(response.status).toBe(500);
     });
   });
-}); 
+});

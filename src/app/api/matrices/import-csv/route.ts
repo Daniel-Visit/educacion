@@ -1,55 +1,79 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+// Interfaces para tipar los datos del CSV
+interface CSVRowData {
+  oa_identificador: string;
+  tipo_oa: string;
+  indicador: string;
+  preguntas_por_indicador: string;
+  [key: string]: string; // Para otros campos que puedan existir
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const asignaturaId = formData.get('asignaturaId') as string;
     const nivelId = formData.get('nivelId') as string;
-    
+
     // Verificar que los IDs sean números válidos
-    const asignaturaIdNum = parseInt(asignaturaId);
-    const nivelIdNum = parseInt(nivelId);
 
     if (!file || !asignaturaId || !nivelId) {
-      return NextResponse.json({ 
-        error: 'Archivo, asignatura y nivel son requeridos' 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: 'Archivo, asignatura y nivel son requeridos',
+        },
+        { status: 400 }
+      );
     }
 
     // Verificar que sea un archivo CSV
     if (!file.name.endsWith('.csv') && file.type !== 'text/csv') {
-      return NextResponse.json({ error: 'El archivo debe ser un CSV válido' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'El archivo debe ser un CSV válido' },
+        { status: 400 }
+      );
     }
 
     // Leer el contenido del archivo
     const csvText = await file.text();
-    const lines = csvText.split('\n').filter(line => line.trim() && !line.startsWith('#'));
-    
+    const lines = csvText
+      .split('\n')
+      .filter(line => line.trim() && !line.startsWith('#'));
+
     if (lines.length < 2) {
-      return NextResponse.json({ error: 'El archivo CSV debe tener al menos una fila de datos' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'El archivo CSV debe tener al menos una fila de datos' },
+        { status: 400 }
+      );
     }
 
     // Parsear headers
     const firstLine = lines[0];
     const separator = firstLine.includes(';') ? ';' : ',';
     const headers = firstLine.split(separator).map(h => h.trim().toLowerCase());
-    
-
 
     // Verificar headers requeridos
-    const requiredHeaders = ['oa_identificador', 'tipo_oa', 'indicador', 'preguntas_por_indicador'];
+    const requiredHeaders = [
+      'oa_identificador',
+      'tipo_oa',
+      'indicador',
+      'preguntas_por_indicador',
+    ];
     for (const header of requiredHeaders) {
       if (!headers.includes(header)) {
-        return NextResponse.json({ 
-          error: `El archivo debe contener la columna "${header}"` 
-        }, { status: 400 });
+        return NextResponse.json(
+          {
+            error: `El archivo debe contener la columna "${header}"`,
+          },
+          { status: 400 }
+        );
       }
     }
 
     // Procesar todas las filas de datos
-    const matrizData: any[] = [];
+    const matrizData: CSVRowData[] = [];
     let tieneContenido = false;
     let tieneHabilidad = false;
 
@@ -60,16 +84,24 @@ export async function POST(request: NextRequest) {
         // Remover comillas dobles del inicio y final si existen
         return trimmed.replace(/^"|"$/g, '');
       });
-      const rowData = headers.reduce((obj, header, index) => {
+      const rowData = headers.reduce((obj: CSVRowData, header, index) => {
         obj[header] = values[index] || '';
         return obj;
-      }, {} as any);
+      }, {} as CSVRowData);
 
       // Validar datos básicos
-      if (!rowData.oa_identificador || !rowData.tipo_oa || !rowData.indicador || !rowData.preguntas_por_indicador) {
-        return NextResponse.json({ 
-          error: `Fila ${i + 1}: Datos incompletos. Todos los campos son obligatorios` 
-        }, { status: 400 });
+      if (
+        !rowData.oa_identificador ||
+        !rowData.tipo_oa ||
+        !rowData.indicador ||
+        !rowData.preguntas_por_indicador
+      ) {
+        return NextResponse.json(
+          {
+            error: `Fila ${i + 1}: Datos incompletos. Todos los campos son obligatorios`,
+          },
+          { status: 400 }
+        );
       }
 
       // Validar tipo de OA
@@ -78,80 +110,97 @@ export async function POST(request: NextRequest) {
       } else if (rowData.tipo_oa === 'Habilidad') {
         tieneHabilidad = true;
       } else {
-        return NextResponse.json({ 
-          error: `Fila ${i + 1}: tipo_oa debe ser "Contenido" o "Habilidad"` 
-        }, { status: 400 });
+        return NextResponse.json(
+          {
+            error: `Fila ${i + 1}: tipo_oa debe ser "Contenido" o "Habilidad"`,
+          },
+          { status: 400 }
+        );
       }
 
       // Validar preguntas por indicador
       const preguntasPorIndicador = parseInt(rowData.preguntas_por_indicador);
       if (isNaN(preguntasPorIndicador) || preguntasPorIndicador <= 0) {
-        return NextResponse.json({ 
-          error: `Fila ${i + 1}: preguntas_por_indicador debe ser un número positivo` 
-        }, { status: 400 });
+        return NextResponse.json(
+          {
+            error: `Fila ${i + 1}: preguntas_por_indicador debe ser un número positivo`,
+          },
+          { status: 400 }
+        );
       }
 
       matrizData.push(rowData);
     }
 
-
-
     // Verificar que todos los OAs existen y pertenecen a la asignatura y nivel
-    const oaIdentificadores = [...new Set(matrizData.map(row => row.oa_identificador))]; // Obtener OAs únicos
-    
-        const oas = await prisma.oa.findMany({
+    const oaIdentificadores = [
+      ...new Set(matrizData.map(row => row.oa_identificador)),
+    ]; // Obtener OAs únicos
+
+    const oas = await prisma.oa.findMany({
       where: {
         oas_id: { in: oaIdentificadores },
         asignatura_id: parseInt(asignaturaId),
-        nivel_id: parseInt(nivelId)
+        nivel_id: parseInt(nivelId),
       },
       include: {
         nivel: true,
-        asignatura: true
-      }
+        asignatura: true,
+      },
     });
-    
+
     if (oas.length !== oaIdentificadores.length) {
       // Buscar todos los OAs disponibles para esta asignatura/nivel para dar mejor información
       const todosLosOAs = await prisma.oa.findMany({
         where: {
           asignatura_id: parseInt(asignaturaId),
-          nivel_id: parseInt(nivelId)
+          nivel_id: parseInt(nivelId),
         },
         select: {
           oas_id: true,
-          tipo_eje: true
-        }
+          tipo_eje: true,
+        },
       });
-      
-      const oasNoEncontrados = oaIdentificadores.filter(id => !oas.some(oa => oa.oas_id === id));
-      
-      return NextResponse.json({ 
-        error: `Los siguientes OAs no existen o no pertenecen a la asignatura y nivel seleccionados: ${oaIdentificadores.join(', ')}. OAs disponibles: ${todosLosOAs.map(oa => oa.oas_id).join(', ')}` 
-      }, { status: 400 });
+
+      return NextResponse.json(
+        {
+          error: `Los siguientes OAs no existen o no pertenecen a la asignatura y nivel seleccionados: ${oaIdentificadores.join(', ')}. OAs disponibles: ${todosLosOAs.map(oa => oa.oas_id).join(', ')}`,
+        },
+        { status: 400 }
+      );
     }
 
     // Verificar si hay OAs de habilidad disponibles para esta asignatura/nivel
     const oasDisponibles = await prisma.oa.findMany({
       where: {
         asignatura_id: parseInt(asignaturaId),
-        nivel_id: parseInt(nivelId)
-      }
+        nivel_id: parseInt(nivelId),
+      },
     });
 
-    const tieneOAsHabilidadDisponibles = oasDisponibles.some(oa => oa.tipo_eje === 'Habilidad');
-    const tieneOAsContenidoDisponibles = oasDisponibles.some(oa => oa.tipo_eje === 'Contenido');
+    const tieneOAsHabilidadDisponibles = oasDisponibles.some(
+      oa => oa.tipo_eje === 'Habilidad'
+    );
+    const tieneOAsContenidoDisponibles = oasDisponibles.some(
+      oa => oa.tipo_eje === 'Contenido'
+    );
 
     // Validar que hay al menos un OA de cada tipo disponible
     if (tieneOAsContenidoDisponibles && !tieneContenido) {
-      return NextResponse.json({ 
-        error: 'Debe haber al menos un OA de tipo "Contenido"' 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: 'Debe haber al menos un OA de tipo "Contenido"',
+        },
+        { status: 400 }
+      );
     }
     if (tieneOAsHabilidadDisponibles && !tieneHabilidad) {
-      return NextResponse.json({ 
-        error: 'Debe haber al menos un OA de tipo "Habilidad"' 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: 'Debe haber al menos un OA de tipo "Habilidad"',
+        },
+        { status: 400 }
+      );
     }
 
     // Preparar respuesta con los datos procesados
@@ -175,17 +224,19 @@ export async function POST(request: NextRequest) {
           nivel: oa.nivel,
           asignatura: oa.asignatura,
           indicador: row.indicador,
-          preguntas_por_indicador: parseInt(row.preguntas_por_indicador)
+          preguntas_por_indicador: parseInt(row.preguntas_por_indicador),
         };
-      })
+      }),
     };
 
     return NextResponse.json(response);
-
   } catch (error) {
     console.error('Error al procesar CSV:', error);
-    return NextResponse.json({ 
-      error: 'Error al procesar el archivo CSV' 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Error al procesar el archivo CSV',
+      },
+      { status: 500 }
+    );
   }
-} 
+}

@@ -15,10 +15,12 @@ export default function ModalHeader({
   subtitle,
   icon,
   onClose,
-  gradient = "from-indigo-600 to-purple-600"
+  gradient = 'from-indigo-600 to-purple-600',
 }: ModalHeaderProps) {
   return (
-    <div className={`bg-gradient-to-r ${gradient} text-white p-6 rounded-t-2xl flex-shrink-0`}>
+    <div
+      className={`bg-gradient-to-r ${gradient} text-white p-6 rounded-t-2xl flex-shrink-0`}
+    >
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl">
@@ -26,15 +28,11 @@ export default function ModalHeader({
           </div>
           <div>
             <h3 className="text-2xl font-bold">{title}</h3>
-            {subtitle && (
-              <p className="text-indigo-100">
-                {subtitle}
-              </p>
-            )}
+            {subtitle && <p className="text-indigo-100">{subtitle}</p>}
           </div>
         </div>
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           onClick={onClose}
           className="text-white hover:bg-white/20 p-2"
         >
@@ -43,4 +41,4 @@ export default function ModalHeader({
       </div>
     </div>
   );
-} 
+}

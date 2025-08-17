@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 async function restoreAllData() {
   try {
     console.log('=== Restaurando TODOS los datos ===');
-    
+
     // 1. Restaurar Asignaturas
     console.log('\n1. Restaurando Asignaturas...');
     const asignaturas = await loadCSV('Asignaturas.csv', ',');
@@ -15,11 +15,11 @@ async function restoreAllData() {
       await prisma.asignatura.upsert({
         where: { nombre: row.nombre },
         update: {},
-        create: { nombre: row.nombre }
+        create: { nombre: row.nombre },
       });
     }
     console.log(`✅ ${asignaturas.length} asignaturas restauradas`);
-    
+
     // 2. Restaurar Niveles
     console.log('\n2. Restaurando Niveles...');
     const niveles = await loadCSV('Niveles.csv', ';');
@@ -27,11 +27,11 @@ async function restoreAllData() {
       await prisma.nivel.upsert({
         where: { nombre: row.Nivel },
         update: {},
-        create: { nombre: row.Nivel }
+        create: { nombre: row.Nivel },
       });
     }
     console.log(`✅ ${niveles.length} niveles restaurados`);
-    
+
     // 3. Restaurar Metodologías
     console.log('\n3. Restaurando Metodologías...');
     const metodologias = await loadCSV('metodologias.csv', ';');
@@ -43,21 +43,25 @@ async function restoreAllData() {
           nombre_metodologia: row.nombre_metodologia,
           descripcion: row.descripcion,
           nivel_recomendado: row.nivel_recomendado,
-          fuentes_literatura: row.fuentes_literatura
-        }
+          fuentes_literatura: row.fuentes_literatura,
+        },
       });
     }
     console.log(`✅ ${metodologias.length} metodologías restauradas`);
-    
+
     // 4. Restaurar OAs
     console.log('\n4. Restaurando OAs...');
     const oas = await loadCSV('OAS.csv', ',');
     let oasCreados = 0;
     for (const row of oas) {
       // Buscar nivel y asignatura
-      const nivel = await prisma.nivel.findFirst({ where: { nombre: row.nivel } });
-      const asignatura = await prisma.asignatura.findFirst({ where: { nombre: row.asignatura } });
-      
+      const nivel = await prisma.nivel.findFirst({
+        where: { nombre: row.nivel },
+      });
+      const asignatura = await prisma.asignatura.findFirst({
+        where: { nombre: row.asignatura },
+      });
+
       if (nivel && asignatura) {
         try {
           await prisma.oa.create({
@@ -69,8 +73,8 @@ async function restoreAllData() {
               oas_id: row.oas_id,
               descripcion_oas: row.descripcion_oas,
               basal: row.basal === 'true',
-              minimo_clases: parseInt(row.minimo_clases)
-            }
+              minimo_clases: parseInt(row.minimo_clases),
+            },
           });
           oasCreados++;
         } catch (e) {
@@ -82,9 +86,8 @@ async function restoreAllData() {
       }
     }
     console.log(`✅ ${oasCreados} OAs restaurados`);
-    
+
     console.log('\n🎉 ¡TODOS los datos han sido restaurados exitosamente!');
-    
   } catch (error) {
     console.error('Error al restaurar datos:', error);
   } finally {
@@ -97,10 +100,10 @@ function loadCSV(filename, separator = ',') {
     const results = [];
     fs.createReadStream(filename)
       .pipe(csv({ separator }))
-      .on('data', (data) => results.push(data))
+      .on('data', data => results.push(data))
       .on('end', () => resolve(results))
       .on('error', reject);
   });
 }
 
-restoreAllData(); 
+restoreAllData();

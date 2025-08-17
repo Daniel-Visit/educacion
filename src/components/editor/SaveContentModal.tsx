@@ -1,17 +1,17 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { X, Save, FileText, BookOpen } from 'lucide-react'
-import { useContentSave, SavedContent } from '@/hooks/use-content-save'
-import { Editor } from '@tiptap/react'
+import { useState, useEffect } from 'react';
+import { X, Save, FileText, BookOpen } from 'lucide-react';
+import { useContentSave, SavedContent } from '@/hooks/use-content-save';
+import { Editor } from '@tiptap/react';
 
 interface SaveContentModalProps {
-  open: boolean
-  onClose: () => void
-  editor: Editor | null
-  tipoContenido: 'planificacion' | 'material'
-  onSave?: (savedContent: SavedContent) => void
-  currentFile?: SavedContent | null
+  open: boolean;
+  onClose: () => void;
+  editor: Editor | null;
+  tipoContenido: 'planificacion' | 'material';
+  onSave?: (savedContent: SavedContent) => void;
+  currentFile?: SavedContent | null;
 }
 
 export default function SaveContentModal({
@@ -20,58 +20,84 @@ export default function SaveContentModal({
   editor,
   tipoContenido,
   onSave,
-  currentFile
+  currentFile,
 }: SaveContentModalProps) {
-  const [titulo, setTitulo] = useState('')
-  const [tipo, setTipo] = useState<'planificacion' | 'material'>(tipoContenido)
-  const { saveContent, updateContent, isSaving } = useContentSave()
+  const [titulo, setTitulo] = useState('');
+  const [tipo, setTipo] = useState<'planificacion' | 'material'>(tipoContenido);
+  const { saveContent, updateContent, isSaving } = useContentSave();
 
   useEffect(() => {
     if (open) {
-      setTipo(tipoContenido)
+      setTipo(tipoContenido);
       // Pre-cargar el título si ya existe un archivo
       if (currentFile) {
-        setTitulo(currentFile.titulo)
+        setTitulo(currentFile.titulo);
       } else {
-        setTitulo('')
+        setTitulo('');
       }
     }
-  }, [open, tipoContenido, currentFile])
+  }, [open, tipoContenido, currentFile]);
 
   const handleSave = async () => {
-    if (!editor || !titulo.trim()) {
-      return
+    console.log('🔵 [Modal] handleSave - Iniciando guardado');
+
+    if (!editor) {
+      console.log('❌ [Modal] handleSave - No hay editor');
+      return;
+    }
+
+    // Para archivos nuevos, validar que tenga título
+    if (!currentFile && !titulo.trim()) {
+      console.log('❌ [Modal] handleSave - No hay título para archivo nuevo');
+      return;
+    }
+
+    // Prevenir múltiples llamadas
+    if (isSaving) {
+      console.log('⚠️ [Modal] handleSave - Ya se está guardando');
+      return;
     }
 
     try {
-      let savedContent: SavedContent | null = null
+      console.log('🔵 [Modal] handleSave - Ejecutando guardado:', {
+        isUpdate: !!currentFile,
+        titulo: currentFile ? currentFile.titulo : titulo,
+      });
+
+      let savedContent: SavedContent | null = null;
 
       if (currentFile) {
-        // Actualizar archivo existente
-        savedContent = await updateContent(currentFile.id!, editor, titulo)
+        // Actualizar archivo existente - usar el título original
+        savedContent = await updateContent(
+          currentFile.id!,
+          editor,
+          currentFile.titulo
+        );
       } else {
         // Crear nuevo archivo
-        savedContent = await saveContent(editor, titulo, tipo)
+        savedContent = await saveContent(editor, titulo, tipo);
       }
 
+      console.log('✅ [Modal] handleSave - Guardado exitoso:', savedContent);
+
       if (savedContent && onSave) {
-        onSave(savedContent)
+        onSave(savedContent);
       }
-      onClose()
+      onClose();
     } catch (error) {
-      console.error('Error saving content:', error)
+      console.error('❌ [Modal] handleSave - Error:', error);
       // Aquí podrías mostrar un toast de error
     }
-  }
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSave()
+      e.preventDefault();
+      handleSave();
     }
-  }
+  };
 
-  if (!open) return null
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
@@ -101,15 +127,23 @@ export default function SaveContentModal({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Título del documento
             </label>
-            <input
-              type="text"
-              value={titulo}
-              onChange={(e) => setTitulo(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Ingresa un título descriptivo..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-              autoFocus
-            />
+            {currentFile ? (
+              // Para archivos existentes, mostrar el título como texto no editable
+              <div className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700">
+                {currentFile.titulo}
+              </div>
+            ) : (
+              // Para archivos nuevos, permitir editar el título
+              <input
+                type="text"
+                value={titulo}
+                onChange={e => setTitulo(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Ingresa un título descriptivo..."
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                autoFocus
+              />
+            )}
           </div>
 
           {/* Tipo de contenido - solo mostrar si es un archivo nuevo */}
@@ -158,7 +192,7 @@ export default function SaveContentModal({
           </button>
           <button
             onClick={handleSave}
-            disabled={!titulo.trim() || isSaving}
+            disabled={(!currentFile && !titulo.trim()) || isSaving}
             className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-500 text-white rounded-lg hover:from-indigo-700 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium flex items-center justify-center gap-2"
           >
             {isSaving ? (
@@ -176,5 +210,5 @@ export default function SaveContentModal({
         </div>
       </div>
     </div>
-  )
-} 
+  );
+}

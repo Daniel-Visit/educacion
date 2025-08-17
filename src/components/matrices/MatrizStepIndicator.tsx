@@ -5,15 +5,11 @@ import { Step } from '@/types/matrices';
 interface MatrizStepIndicatorProps {
   steps: Step[];
   currentStep: number;
-  onStepClick?: (step: number) => void;
-  className?: string;
 }
 
 export default function MatrizStepIndicator({
   steps,
   currentStep,
-  onStepClick,
-  className = ''
 }: MatrizStepIndicatorProps) {
   return (
     <div className="flex justify-center items-center gap-0 mb-12 mt-8">
@@ -36,15 +32,21 @@ export default function MatrizStepIndicator({
               </div>
             )}
             {/* Texto del paso */}
-            <span className={`mt-3 text-sm font-medium text-center ${currentStep === stepObj.n ? 'text-indigo-700 font-bold' : currentStep > stepObj.n ? 'text-emerald-600' : 'text-gray-500'}`}>{stepObj.label}</span>
+            <span
+              className={`mt-3 text-sm font-medium text-center ${currentStep === stepObj.n ? 'text-indigo-700 font-bold' : currentStep > stepObj.n ? 'text-emerald-600' : 'text-gray-500'}`}
+            >
+              {stepObj.label}
+            </span>
           </div>
-          
+
           {/* Línea entre pasos */}
           {idx < steps.length - 1 && (
-            <div className={`h-px w-32 mb-8 rounded-full ${currentStep > stepObj.n ? 'bg-gradient-to-r from-emerald-400 to-teal-500' : 'bg-gray-200'} mx-8 transition-all duration-300`}></div>
+            <div
+              className={`h-px w-32 mb-8 rounded-full ${currentStep > stepObj.n ? 'bg-gradient-to-r from-emerald-400 to-teal-500' : 'bg-gray-200'} mx-8 transition-all duration-300`}
+            ></div>
           )}
         </div>
       ))}
     </div>
   );
-} 
+}

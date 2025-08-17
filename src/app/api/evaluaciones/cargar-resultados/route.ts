@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+interface AlumnoData {
+  rut: string;
+  nombre: string;
+  apellido: string;
+  puntajeTotal: number;
+  puntajeMaximo: number;
+  respuestas: RespuestaData[];
+}
+
+interface RespuestaData {
+  preguntaId: number;
+  alternativaDada: string;
+  esCorrecta: boolean;
+  puntajeObtenido: number;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -37,7 +53,7 @@ export async function POST(request: NextRequest) {
     // Leer el archivo CSV
     const text = await file.text();
     const lines = text.split('\n').filter(line => line.trim());
-    
+
     if (lines.length < 2) {
       return NextResponse.json(
         { error: 'El archivo CSV debe tener al menos una fila de datos' },
@@ -47,26 +63,30 @@ export async function POST(request: NextRequest) {
 
     // Procesar las líneas (ignorar la primera que es header)
     const dataLines = lines.slice(1);
-    const alumnosMap = new Map<string, any>();
-    const respuestasMap = new Map<string, any[]>();
+    const alumnosMap = new Map<string, AlumnoData>();
+    const respuestasMap = new Map<string, RespuestaData[]>();
 
     for (const line of dataLines) {
-      const [rut, nombre, apellido, preguntaIdStr, alternativaDada] = line.split(',').map(cell => cell.trim());
-      
+      const [rut, nombre, apellido, preguntaIdStr, alternativaDada] = line
+        .split(',')
+        .map(cell => cell.trim());
+
       if (!rut || !nombre || !apellido || !preguntaIdStr || !alternativaDada) {
         continue; // Saltar líneas incompletas
       }
 
       const preguntaId = parseInt(preguntaIdStr);
       const pregunta = evaluacion.preguntas.find(p => p.id === preguntaId);
-      
+
       if (!pregunta) {
         continue; // Saltar si la pregunta no existe
       }
 
       // Buscar la alternativa correcta
       const alternativaCorrecta = pregunta.alternativas.find(a => a.esCorrecta);
-      const esCorrecta = alternativaCorrecta?.letra.toUpperCase() === alternativaDada.toUpperCase();
+      const esCorrecta =
+        alternativaCorrecta?.letra.toUpperCase() ===
+        alternativaDada.toUpperCase();
       const puntajeObtenido = esCorrecta ? 1 : 0;
 
       // Agrupar por alumno
@@ -77,19 +97,19 @@ export async function POST(request: NextRequest) {
           apellido,
           puntajeTotal: 0,
           puntajeMaximo: evaluacion.preguntas.length,
-          respuestas: []
+          respuestas: [],
         });
         respuestasMap.set(rut, []);
       }
 
       const alumno = alumnosMap.get(rut);
       alumno.puntajeTotal += puntajeObtenido;
-      
+
       respuestasMap.get(rut)!.push({
         preguntaId,
         alternativaDada,
         esCorrecta,
-        puntajeObtenido
+        puntajeObtenido,
       });
     }
 
@@ -106,7 +126,7 @@ export async function POST(request: NextRequest) {
     for (const [rut, alumnoData] of alumnosMap) {
       // Crear o encontrar el alumno
       let alumno = await prisma.alumno.findUnique({
-        where: { rut }
+        where: { rut },
       });
 
       if (!alumno) {
@@ -120,7 +140,8 @@ export async function POST(request: NextRequest) {
       }
 
       // Calcular porcentaje y nota
-      const porcentaje = (alumnoData.puntajeTotal / alumnoData.puntajeMaximo) * 100;
+      const porcentaje =
+        (alumnoData.puntajeTotal / alumnoData.puntajeMaximo) * 100;
       const nota = (porcentaje / 100) * 7.0; // Escala 1-7
 
       // Crear resultado del alumno
@@ -155,7 +176,6 @@ export async function POST(request: NextRequest) {
       totalAlumnos: alumnosMap.size,
       resultadoEvaluacionId: resultadoEvaluacion.id,
     });
-
   } catch (error) {
     console.error('Error processing CSV:', error);
     return NextResponse.json(
@@ -163,4 +183,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

@@ -1,36 +1,41 @@
-"use client";
-import { useState, useEffect, useRef, Suspense } from "react";
-import { EventCalendar } from "@/components/event-calendar";
-import "@/styles/calendar.css";
-import Drawer from "@/components/ui/Drawer";
-import DrawerToggle from "@/components/ui/DrawerToggle";
-import OADrawerContent from "@/components/planificacion-anual/OADrawerContent";
-import ImportarCSVModal from "@/components/planificacion-anual/ImportarCSVModal";
-import { usePlanificacionAnual } from "@/hooks/use-planificacion-anual";
-import { useHorarios } from "@/hooks/use-horarios";
-import GlobalDropdown from "@/components/ui/GlobalDropdown";
-import { useSearchParams } from "next/navigation";
-import { CloudUpload, Save, Calendar, FileText, Clock } from "lucide-react";
-import PrimaryButton from "@/components/ui/PrimaryButton";
+'use client';
+import { useState, useEffect, useRef, Suspense } from 'react';
+import { EventCalendar } from '@/components/event-calendar';
+import '@/styles/calendar.css';
+import Drawer from '@/components/ui/Drawer';
+import DrawerToggle from '@/components/ui/DrawerToggle';
+import OADrawerContent from '@/components/planificacion-anual/OADrawerContent';
+import ImportarCSVModal from '@/components/planificacion-anual/ImportarCSVModal';
+import { usePlanificacionAnual } from '@/hooks/use-planificacion-anual';
+import { useHorarios } from '@/hooks/use-horarios';
+import GlobalDropdown from '@/components/ui/GlobalDropdown';
+import { useSearchParams } from 'next/navigation';
+import { CloudUpload, Save, Calendar, FileText } from 'lucide-react';
+import PrimaryButton from '@/components/ui/PrimaryButton';
+import SecondaryButton from '@/components/ui/SecondaryButton';
+import LoadingState from '@/components/ui/LoadingState';
 
 function PlanificacionAnualContent() {
   const [oaDrawerOpen, setOaDrawerOpen] = useState(false);
-  const [horarioId, setHorarioId] = useState<string>("");
+  const [horarioId, setHorarioId] = useState<string>('');
   const [showHorarioMsg, setShowHorarioMsg] = useState(false);
   const [bloquearDropdown, setBloquearDropdown] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
-  const [planificacionNombre, setPlanificacionNombre] = useState("");
+  const [planificacionNombre, setPlanificacionNombre] = useState('');
   const [importing, setImporting] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [notification, setNotification] = useState<{
+    type: 'success' | 'error';
+    message: string;
+  } | null>(null);
   const initialHorarioId = useRef<string | null>(null);
-  const { horarios, loadHorarios } = useHorarios();
+  const { horarios, loadHorarios, isLoading } = useHorarios();
   const searchParams = useSearchParams();
 
   // Obtener planificacionId de la URL
-  const planificacionId = searchParams.get("planificacionId");
+  const planificacionId = searchParams.get('planificacionId');
 
   // Cargar horarios solo una vez al montar
   useEffect(() => {
@@ -39,19 +44,15 @@ function PlanificacionAnualContent() {
 
   // Preseleccionar horario si viene en la URL o si se carga una planificación existente
   useEffect(() => {
-    const idFromUrl = searchParams.get("horarioId");
-    if (idFromUrl && horarios.some((h) => h.id.toString() === idFromUrl)) {
+    const idFromUrl = searchParams.get('horarioId');
+    if (idFromUrl && horarios.some(h => h.id.toString() === idFromUrl)) {
       setHorarioId(idFromUrl);
       setBloquearDropdown(true);
       initialHorarioId.current = idFromUrl;
     }
   }, [searchParams, horarios]);
 
-
-
-  const horarioSeleccionado = horarios.find(
-    (h) => h.id.toString() === horarioId
-  );
+  const horarioSeleccionado = horarios.find(h => h.id.toString() === horarioId);
 
   // Handler para seleccionar horario
   const handleHorarioChange = (v: string) => {
@@ -79,26 +80,28 @@ function PlanificacionAnualContent() {
 
     setImporting(true);
     try {
-      console.log("Importando OA:", oas);
-      console.log("Horario seleccionado:", horarioSeleccionado);
+      console.log('Importando OA:', oas);
+      console.log('Horario seleccionado:', horarioSeleccionado);
 
       // Usar la función del hook para importar
       const resultado = await handleImportCSV(oas);
-      
-      console.log(`Importación completada: ${resultado.eventosCreados} eventos creados`);
+
+      console.log(
+        `Importación completada: ${resultado.eventosCreados} eventos creados`
+      );
       setShowImportModal(false);
-      
+
       // Mostrar mensaje de éxito
       setNotification({
         type: 'success',
-        message: `Importación completada exitosamente. ${resultado.eventosCreados} eventos creados.`
+        message: `Importación completada exitosamente. ${resultado.eventosCreados} eventos creados.`,
       });
-      
     } catch (error) {
-      console.error("Error al importar:", error);
+      console.error('Error al importar:', error);
       setNotification({
         type: 'error',
-        message: "Error al importar el CSV. Por favor, verifica el formato del archivo."
+        message:
+          'Error al importar el CSV. Por favor, verifica el formato del archivo.',
       });
     } finally {
       setImporting(false);
@@ -116,12 +119,12 @@ function PlanificacionAnualContent() {
         await guardarPlanificacion(planificacionNombre, horarioId);
       }
       setShowSaveModal(false);
-      setPlanificacionNombre("");
+      setPlanificacionNombre('');
     } catch (error) {
-      console.error("Error al guardar planificación:", error);
+      console.error('Error al guardar planificación:', error);
       setNotification({
         type: 'error',
-        message: "Error al guardar la planificación"
+        message: 'Error al guardar la planificación',
       });
     } finally {
       setSaving(false);
@@ -156,8 +159,9 @@ function PlanificacionAnualContent() {
   // Preseleccionar horario cuando se carga una planificación existente
   useEffect(() => {
     if (planificacionActual?.horario?.id && horarios.length > 0) {
-      const horarioIdFromPlanificacion = planificacionActual.horario.id.toString();
-      if (horarios.some((h) => h.id.toString() === horarioIdFromPlanificacion)) {
+      const horarioIdFromPlanificacion =
+        planificacionActual.horario.id.toString();
+      if (horarios.some(h => h.id.toString() === horarioIdFromPlanificacion)) {
         setHorarioId(horarioIdFromPlanificacion);
         setBloquearDropdown(true);
         initialHorarioId.current = horarioIdFromPlanificacion;
@@ -165,12 +169,21 @@ function PlanificacionAnualContent() {
     }
   }, [planificacionActual, horarios]);
 
-  const horarioOptions = horarios.map((h) => ({
+  const horarioOptions = horarios.map(h => ({
     value: h.id.toString(),
-    label: `${h.nombre} (${h.asignatura?.nombre || "-"}, ${
-      h.nivel?.nombre || "-"
+    label: `${h.nombre} (${h.asignatura?.nombre || '-'}, ${
+      h.nivel?.nombre || '-'
     })`,
   }));
+
+  // Loading state temprano siguiendo el patrón establecido
+  if (isLoading) {
+    return (
+      <div>
+        <LoadingState message="Cargando planificación..." />
+      </div>
+    );
+  }
 
   return (
     <div className="p-8">
@@ -190,7 +203,7 @@ function PlanificacionAnualContent() {
               </p>
             </div>
           </div>
-          
+
           {/* Botones de acción */}
           {horarioSeleccionado && (
             <div className="flex gap-3">
@@ -204,7 +217,7 @@ function PlanificacionAnualContent() {
               {planificacionActual ? (
                 <button
                   onClick={() => {
-                    setPlanificacionNombre(planificacionActual.nombre);
+                    setPlanificacionNombre(planificacionActual.nombre || '');
                     setShowSaveModal(true);
                   }}
                   className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
@@ -224,7 +237,7 @@ function PlanificacionAnualContent() {
             </div>
           )}
         </div>
-        
+
         {/* Stats y información */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white/10 rounded-lg p-3">
@@ -238,23 +251,24 @@ function PlanificacionAnualContent() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white/10 rounded-lg p-3">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-indigo-200" />
               <div>
                 <p className="text-indigo-200 text-xs">Planificación</p>
                 <p className="text-lg font-bold">
-                  {planificacionActual ? planificacionActual.nombre : 'Sin guardar'}
+                  {planificacionActual
+                    ? planificacionActual.nombre
+                    : 'Sin guardar'}
                 </p>
               </div>
             </div>
           </div>
         </div>
-        
-
       </div>
-      
+
+      {/* Selección de horario */}
       <div className="mb-6">
         <label
           className="block text-sm font-medium text-gray-700 mb-2"
@@ -276,28 +290,41 @@ function PlanificacionAnualContent() {
 
       {/* Modal de confirmación de selección de horario */}
       {showConfirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 ">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full min-w-[450px]">
-            <h2 className="text-lg font-bold mb-2 text-gray-800">
-              Confirmar selección de horario
-            </h2>
-            <p className="mb-6 text-gray-600">
-              ¿Estás seguro de seleccionar este horario? <br />
-              No podrás cambiarlo después.
-            </p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={cancelarSeleccion}
-                className="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmarSeleccion}
-                className="px-4 py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700"
-              >
-                Confirmar
-              </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+            {/* Header con gradiente */}
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-2xl p-6 text-white">
+              <div className="flex items-center gap-4">
+                <div className="bg-white/20 p-2 rounded-lg">
+                  <Calendar className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">
+                    Confirmar Horario
+                  </h2>
+                  <p className="text-indigo-100 text-sm">
+                    No podrás cambiarlo después
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Contenido del modal */}
+            <div className="p-6">
+              <p className="text-gray-700 mb-6">
+                ¿Estás seguro de que quieres seleccionar este horario? Esta
+                acción no se puede deshacer.
+              </p>
+
+              {/* Botones */}
+              <div className="flex gap-3">
+                <SecondaryButton onClick={cancelarSeleccion} className="flex-1">
+                  Cancelar
+                </SecondaryButton>
+                <PrimaryButton onClick={confirmarSeleccion} className="flex-1">
+                  Confirmar
+                </PrimaryButton>
+              </div>
             </div>
           </div>
         </div>
@@ -384,8 +411,8 @@ function PlanificacionAnualContent() {
           <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
             <h2 className="text-lg font-bold mb-4 text-gray-800">
               {planificacionActual
-                ? "Actualizar Planificación"
-                : "Guardar Planificación"}
+                ? 'Actualizar Planificación'
+                : 'Guardar Planificación'}
             </h2>
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -394,7 +421,7 @@ function PlanificacionAnualContent() {
               <input
                 type="text"
                 value={planificacionNombre}
-                onChange={(e) => setPlanificacionNombre(e.target.value)}
+                onChange={e => setPlanificacionNombre(e.target.value)}
                 placeholder="Ej: Planificación Matemáticas 2025"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 autoFocus
@@ -404,7 +431,7 @@ function PlanificacionAnualContent() {
               <button
                 onClick={() => {
                   setShowSaveModal(false);
-                  setPlanificacionNombre("");
+                  setPlanificacionNombre('');
                 }}
                 className="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
                 disabled={saving}
@@ -414,34 +441,52 @@ function PlanificacionAnualContent() {
               <PrimaryButton
                 onClick={handleGuardarPlanificacion}
                 disabled={!planificacionNombre.trim() || saving}
-                >
+              >
                 {saving
-                  ? "Guardando..."
+                  ? 'Guardando...'
                   : planificacionActual
-                  ? "Actualizar"
-                  : "Guardar"}
+                    ? 'Actualizar'
+                    : 'Guardar'}
               </PrimaryButton>
             </div>
           </div>
         </div>
       )}
-      
+
       {/* Notificaciones */}
       {notification && (
-        <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-md ${
-          notification.type === 'success' 
-            ? 'bg-green-500 text-white' 
-            : 'bg-red-500 text-white'
-        }`}>
+        <div
+          className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-md ${
+            notification.type === 'success'
+              ? 'bg-green-500 text-white'
+              : 'bg-red-500 text-white'
+          }`}
+        >
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0">
               {notification.type === 'success' ? (
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <svg
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               ) : (
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                <svg
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               )}
             </div>
@@ -452,8 +497,18 @@ function PlanificacionAnualContent() {
               onClick={() => setNotification(null)}
               className="flex-shrink-0 text-white/80 hover:text-white"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>

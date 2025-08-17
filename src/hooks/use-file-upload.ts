@@ -30,10 +30,10 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
 
     try {
       const bucket = customBucket || options.bucket || STORAGE_BUCKETS.ARCHIVOS;
-      
+
       // Generar path único si no se proporciona
       const path = customPath || `${Date.now()}-${file.name}`;
-      
+
       // Simular progreso (Supabase no tiene progreso nativo)
       const simulateProgress = () => {
         let currentProgress = 0;
@@ -43,25 +43,25 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
             clearInterval(interval);
             return;
           }
-          
+
           const progressData = {
             loaded: (currentProgress / 100) * file.size,
             total: file.size,
-            percentage: currentProgress
+            percentage: currentProgress,
           };
-          
+
           setProgress(progressData);
           options.onProgress?.(progressData);
         }, 100);
-        
+
         return interval;
       };
 
       const progressInterval = simulateProgress();
 
       // Subir archivo
-      const result = await storageUtils.uploadFile(bucket, path, file, {
-        upsert: true
+      await storageUtils.uploadFile(bucket, path, file, {
+        upsert: true,
       });
 
       clearInterval(progressInterval);
@@ -70,21 +70,21 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
       const finalProgress = {
         loaded: file.size,
         total: file.size,
-        percentage: 100
+        percentage: 100,
       };
-      
+
       setProgress(finalProgress);
       options.onProgress?.(finalProgress);
 
       // Obtener URL
       const url = storageUtils.getPublicUrl(bucket, path);
-      
-      options.onSuccess?.(url, path);
-      
-      return { url, path, bucket };
 
+      options.onSuccess?.(url, path);
+
+      return { url, path, bucket };
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Error desconocido';
       setError(errorMessage);
       options.onError?.(errorMessage);
       throw err;
@@ -93,50 +93,41 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
     }
   };
 
-  const uploadImage = async (
-    file: File,
-    customPath?: string
-  ) => {
+  const uploadImage = async (file: File, customPath?: string) => {
     // Validar que sea una imagen
     if (!file.type.startsWith('image/')) {
       throw new Error('El archivo debe ser una imagen');
     }
-    
+
     return uploadFile(file, customPath, STORAGE_BUCKETS.IMAGENES);
   };
 
-  const uploadDocument = async (
-    file: File,
-    customPath?: string
-  ) => {
+  const uploadDocument = async (file: File, customPath?: string) => {
     // Validar tipos de documento permitidos
     const allowedTypes = [
       'application/pdf',
       'application/msword',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'text/plain'
+      'text/plain',
     ];
-    
+
     if (!allowedTypes.includes(file.type)) {
       throw new Error('Tipo de documento no permitido');
     }
-    
+
     return uploadFile(file, customPath, STORAGE_BUCKETS.DOCUMENTOS);
   };
 
-  const uploadAvatar = async (
-    file: File,
-    userId: string
-  ) => {
+  const uploadAvatar = async (file: File, userId: string) => {
     // Validar que sea una imagen
     if (!file.type.startsWith('image/')) {
       throw new Error('El archivo debe ser una imagen');
     }
-    
+
     // Generar path con userId
     const extension = file.name.split('.').pop();
     const path = `avatars/${userId}.${extension}`;
-    
+
     return uploadFile(file, path, STORAGE_BUCKETS.AVATARES);
   };
 
@@ -148,6 +139,6 @@ export function useFileUpload(options: UseFileUploadOptions = {}) {
     isUploading,
     progress,
     error,
-    resetError: () => setError(null)
+    resetError: () => setError(null),
   };
-} 
+}

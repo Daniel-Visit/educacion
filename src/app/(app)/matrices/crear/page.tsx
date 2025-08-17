@@ -2,18 +2,15 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ChevronsUpDown, Check, X, Plus, CloudUpload, BarChart3, Target, BookOpen, Zap } from 'lucide-react';
-import { Listbox } from '@headlessui/react';
-import { Dialog } from '@headlessui/react';
-import { getGradient, getHoverGradient, MATRIZ_STEPS, validateMatrizForm } from '@/utils/matrices';
-import { useMatricesData } from '@/hooks/useMatrices';
+
+import { MATRIZ_STEPS, validateMatrizForm } from '@/utils/matrices';
+
 import MatrizBasicForm from '@/components/matrices/MatrizBasicForm';
 import MatrizHeader from '@/components/matrices/MatrizHeader';
 import MatrizStepIndicator from '@/components/matrices/MatrizStepIndicator';
 import MatrizOASelector from '@/components/matrices/MatrizOASelector';
 import MatrizIndicadoresSection from '@/components/matrices/MatrizIndicadoresSection';
-import PrimaryButton from '@/components/ui/PrimaryButton';
-import SecondaryButton from '@/components/ui/SecondaryButton';
+
 import ImportarMatrizModal from '@/components/matrices/ImportarMatrizModal';
 
 interface OA {
@@ -44,44 +41,45 @@ export default function CrearMatrizPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [oas, setOAs] = useState<OA[]>([]);
-  const [ejes, setEjes] = useState<Eje[]>([]);
-  const [asignaturas, setAsignaturas] = useState<{id: number, nombre: string}[]>([]);
-  const [niveles, setNiveles] = useState<{id: number, nombre: string}[]>([]);
-  const [dataLoading, setDataLoading] = useState(true);
 
-  const [selectedAsignatura, setSelectedAsignatura] = useState<number | null>(null);
+  const [asignaturas, setAsignaturas] = useState<
+    { id: number; nombre: string }[]
+  >([]);
+  const [niveles, setNiveles] = useState<{ id: number; nombre: string }[]>([]);
+
+  const [selectedAsignatura, setSelectedAsignatura] = useState<number | null>(
+    null
+  );
   const [selectedNivel, setSelectedNivel] = useState<number | null>(null);
-  
+
   // Estados para ejes de contenido
-  const [selectedEjeContenido, setSelectedEjeContenido] = useState<number | null>(null);
+  const [selectedEjeContenido, setSelectedEjeContenido] = useState<
+    number | null
+  >(null);
   const [selectedOAsContenido, setSelectedOAsContenido] = useState<OA[]>([]);
-  
+
   // Estados para ejes de habilidad
-  const [selectedEjeHabilidad, setSelectedEjeHabilidad] = useState<number | null>(null);
+  const [selectedEjeHabilidad, setSelectedEjeHabilidad] = useState<
+    number | null
+  >(null);
   const [selectedOAsHabilidad, setSelectedOAsHabilidad] = useState<OA[]>([]);
-  
+
   // Estado combinado para la API (se mantiene para compatibilidad)
   const [selectedOAs, setSelectedOAs] = useState<OA[]>([]);
-  
-  const [totalPreguntas, setTotalPreguntas] = useState(0);
-  const [oaIndicadores, setOAIndicadores] = useState<{[oaId:number]: Indicador[]}>({});
-  const [matrizName, setMatrizName] = useState('');
-  const [errors, setErrors] = useState<{[key: string]: string}>({});
-  const [step, setStep] = useState(1);
-  const [showOaChangeModal, setShowOaChangeModal] = useState(false);
-  const [pendingOAs, setPendingOAs] = useState<OA[]>([]);
-  const [showImportModal, setShowImportModal] = useState(false);
-  const [importSuccess, setImportSuccess] = useState(false);
 
+  const [totalPreguntas, setTotalPreguntas] = useState(0);
+  const [oaIndicadores, setOAIndicadores] = useState<{
+    [oaId: number]: Indicador[];
+  }>({});
+  const [matrizName, setMatrizName] = useState('');
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [step, setStep] = useState(1);
+  const [showImportModal, setShowImportModal] = useState(false);
+
+  // Cargar datos al montar el componente
   useEffect(() => {
     const loadData = async () => {
-      setDataLoading(true);
-      await Promise.all([
-        fetchOAs(),
-        fetchAsignaturas(),
-        fetchNiveles()
-      ]);
-      setDataLoading(false);
+      await Promise.all([fetchOAs(), fetchAsignaturas(), fetchNiveles()]);
     };
     loadData();
   }, []);
@@ -131,7 +129,10 @@ export default function CrearMatrizPage() {
   // Filtrar OAs por asignatura y nivel seleccionados usando useMemo
   const oasDeAsignaturaNivel = useMemo(() => {
     if (!selectedAsignatura || !selectedNivel) return [];
-    return oas.filter(oa => oa.asignatura_id === selectedAsignatura && oa.nivel_id === selectedNivel);
+    return oas.filter(
+      oa =>
+        oa.asignatura_id === selectedAsignatura && oa.nivel_id === selectedNivel
+    );
   }, [oas, selectedAsignatura, selectedNivel]);
 
   // Separar OAs por tipo_eje
@@ -150,7 +151,7 @@ export default function CrearMatrizPage() {
       if (!ejeExistente) {
         acc.push({
           id: oa.eje_id,
-          descripcion: oa.eje_descripcion
+          descripcion: oa.eje_descripcion,
         });
       }
       return acc;
@@ -164,7 +165,7 @@ export default function CrearMatrizPage() {
       if (!ejeExistente) {
         acc.push({
           id: oa.eje_id,
-          descripcion: oa.eje_descripcion
+          descripcion: oa.eje_descripcion,
         });
       }
       return acc;
@@ -200,7 +201,10 @@ export default function CrearMatrizPage() {
 
   // Limpiar eje de contenido si no está disponible
   useEffect(() => {
-    if (selectedEjeContenido && !ejesContenido.find(e => e.id === selectedEjeContenido)) {
+    if (
+      selectedEjeContenido &&
+      !ejesContenido.find(e => e.id === selectedEjeContenido)
+    ) {
       setSelectedEjeContenido(null);
       setSelectedOAsContenido([]);
     }
@@ -208,13 +212,14 @@ export default function CrearMatrizPage() {
 
   // Limpiar eje de habilidad si no está disponible
   useEffect(() => {
-    if (selectedEjeHabilidad && !ejesHabilidad.find(e => e.id === selectedEjeHabilidad)) {
+    if (
+      selectedEjeHabilidad &&
+      !ejesHabilidad.find(e => e.id === selectedEjeHabilidad)
+    ) {
       setSelectedEjeHabilidad(null);
       setSelectedOAsHabilidad([]);
     }
   }, [ejesHabilidad, selectedEjeHabilidad]);
-
-
 
   const validateForm = () => {
     const newErrors = validateMatrizForm(
@@ -242,19 +247,19 @@ export default function CrearMatrizPage() {
 
     setLoading(true);
     try {
-          const matrizData = {
-      nombre: matrizName,
-      total_preguntas: totalPreguntas,
-      asignatura_id: selectedAsignatura,
-      nivel_id: selectedNivel,
-      oas: selectedOAs.map(oa => ({
-        oaId: oa.id,
-        indicadores: (oaIndicadores[oa.id] || []).map(ind => ({
-          descripcion: ind.descripcion,
-          preguntas: ind.preguntas
-        }))
-      }))
-    };
+      const matrizData = {
+        nombre: matrizName,
+        total_preguntas: totalPreguntas,
+        asignatura_id: selectedAsignatura,
+        nivel_id: selectedNivel,
+        oas: selectedOAs.map(oa => ({
+          oaId: oa.id,
+          indicadores: (oaIndicadores[oa.id] || []).map(ind => ({
+            descripcion: ind.descripcion,
+            preguntas: ind.preguntas,
+          })),
+        })),
+      };
 
       const response = await fetch('/api/matrices', {
         method: 'POST',
@@ -278,24 +283,33 @@ export default function CrearMatrizPage() {
     }
   };
 
-  const isValid = selectedAsignatura && selectedNivel && (selectedEjeContenido || selectedEjeHabilidad) && (selectedOAsContenido.length > 0 || selectedOAsHabilidad.length > 0) && matrizName.trim() && totalPreguntas > 0;
-
   // Calcula el total de preguntas de los indicadores por tipo de eje
-  const totalPreguntasIndicadores = Object.values(oaIndicadores).flat().reduce((sum, ind) => sum + (ind.preguntas || 0), 0);
-  
+  const totalPreguntasIndicadores = Object.values(oaIndicadores)
+    .flat()
+    .reduce((sum, ind) => sum + (ind.preguntas || 0), 0);
+
   // Calcular totales separados por tipo de eje
   const totalPreguntasContenido = selectedOAsContenido.reduce((sum, oa) => {
     const indicadores = oaIndicadores[oa.id] || [];
-    return sum + indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0);
+    return (
+      sum +
+      indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0)
+    );
   }, 0);
-  
+
   const totalPreguntasHabilidad = selectedOAsHabilidad.reduce((sum, oa) => {
     const indicadores = oaIndicadores[oa.id] || [];
-    return sum + indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0);
+    return (
+      sum +
+      indicadores.reduce((indSum, ind) => indSum + (ind.preguntas || 0), 0)
+    );
   }, 0);
-  
+
   // Validar que cada OA tenga al menos un indicador con al menos 1 pregunta
-  const allOAsHaveIndicators = [...selectedOAsContenido, ...selectedOAsHabilidad].every(oa => {
+  const allOAsHaveIndicators = [
+    ...selectedOAsContenido,
+    ...selectedOAsHabilidad,
+  ].every(oa => {
     const indicadores = oaIndicadores[oa.id] || [];
     return indicadores.length > 0 && indicadores.some(ind => ind.preguntas > 0);
   });
@@ -311,19 +325,19 @@ export default function CrearMatrizPage() {
     const indicadores = oaIndicadores[oa.id] || [];
     return indicadores.length > 0 && indicadores.some(ind => ind.preguntas > 0);
   });
-  
+
   // Determinar si hay ambos tipos de eje
-  const hasBothTypes = selectedOAsContenido.length > 0 && selectedOAsHabilidad.length > 0;
-  
-  // Validación final: 
+  const hasBothTypes =
+    selectedOAsContenido.length > 0 && selectedOAsHabilidad.length > 0;
+
+  // Validación final:
   // - Si hay ambos tipos: ambos deben sumar el total Y cada OA debe tener indicadores
   // - Si solo hay un tipo: el total debe ser correcto Y cada OA debe tener indicadores
-  const isStep3Valid = hasBothTypes 
-    ? (totalPreguntasContenido === totalPreguntas && totalPreguntasHabilidad === totalPreguntas && allOAsHaveIndicators)
-    : (totalPreguntasIndicadores === totalPreguntas && allOAsHaveIndicators);
-  
-  // Para mostrar el total correcto en el contador
-  const totalPreguntasToShow = hasBothTypes ? totalPreguntasContenido : totalPreguntasIndicadores;
+  const isStep3Valid = hasBothTypes
+    ? totalPreguntasContenido === totalPreguntas &&
+      totalPreguntasHabilidad === totalPreguntas &&
+      allOAsHaveIndicators
+    : totalPreguntasIndicadores === totalPreguntas && allOAsHaveIndicators;
 
   return (
     <>
@@ -336,7 +350,6 @@ export default function CrearMatrizPage() {
 
       {/* Form */}
       <div className="max-w-6xl mx-auto space-y-8">
-        
         <MatrizStepIndicator steps={MATRIZ_STEPS} currentStep={step} />
 
         {/* Sección 1: Datos básicos */}
@@ -355,7 +368,14 @@ export default function CrearMatrizPage() {
               niveles={niveles}
               errors={errors}
               onNext={() => setStep(2)}
-              canProceed={!!(matrizName.trim() && totalPreguntas > 0 && selectedAsignatura && selectedNivel)}
+              canProceed={
+                !!(
+                  matrizName.trim() &&
+                  totalPreguntas > 0 &&
+                  selectedAsignatura &&
+                  selectedNivel
+                )
+              }
             />
           </div>
         )}
@@ -418,49 +438,81 @@ export default function CrearMatrizPage() {
         onClose={() => setShowImportModal(false)}
         asignaturaId={selectedAsignatura}
         nivelId={selectedNivel}
-        onMatrizImportada={(data) => {
+        onMatrizImportada={data => {
           // Procesar OAs con sus indicadores y preguntas
           if (data.oas && data.oas.length > 0) {
             // Separar OAs únicos por tipo (usar tipo_eje que es el campo real de la BD)
             const oasContenido = data.oas
-              .filter((oa: any) => oa.tipo_eje === 'Contenido')
-              .filter((oa: any, index: number, self: any[]) => 
-                index === self.findIndex((o: any) => o.id === oa.id)
+              .filter(oa => oa.tipo_eje === 'Contenido')
+              .filter(
+                (oa, index, self) =>
+                  index === self.findIndex(o => o.id === oa.id)
+              )
+              .map(
+                (oa): OA => ({
+                  id: oa.id,
+                  oas_id: `OA ${oa.id}`,
+                  descripcion_oas: oa.indicador,
+                  eje_id: 1,
+                  eje_descripcion: 'Eje importado',
+                  nivel_id: selectedNivel!,
+                  asignatura_id: selectedAsignatura!,
+                  nivel: { nombre: 'Nivel importado' },
+                  asignatura: { nombre: 'Asignatura importada' },
+                  tipo_eje: oa.tipo_eje as
+                    | 'Contenido'
+                    | 'Habilidad'
+                    | 'Actitud',
+                })
               );
             const oasHabilidad = data.oas
-              .filter((oa: any) => oa.tipo_eje === 'Habilidad')
-              .filter((oa: any, index: number, self: any[]) => 
-                index === self.findIndex((o: any) => o.id === oa.id)
+              .filter(oa => oa.tipo_eje === 'Habilidad')
+              .filter(
+                (oa, index, self) =>
+                  index === self.findIndex(o => o.id === oa.id)
+              )
+              .map(
+                (oa): OA => ({
+                  id: oa.id,
+                  oas_id: `OA ${oa.id}`,
+                  descripcion_oas: oa.indicador,
+                  eje_id: 1,
+                  eje_descripcion: 'Eje importado',
+                  nivel_id: selectedNivel!,
+                  asignatura_id: selectedAsignatura!,
+                  nivel: { nombre: 'Nivel importado' },
+                  asignatura: { nombre: 'Asignatura importada' },
+                  tipo_eje: oa.tipo_eje as
+                    | 'Contenido'
+                    | 'Habilidad'
+                    | 'Actitud',
+                })
               );
-            
+
             setSelectedOAsContenido(oasContenido);
             setSelectedOAsHabilidad(oasHabilidad);
-            
+
             // Procesar indicadores por OA
             const indicadoresPorOA: { [key: number]: Indicador[] } = {};
-            
-            data.oas.forEach((oa: any) => {
+
+            data.oas.forEach(oa => {
               // Crear objeto Indicador con la estructura correcta
               const indicador = {
                 descripcion: oa.indicador,
-                preguntas: oa.preguntas_por_indicador
+                preguntas: oa.preguntas_por_indicador,
               };
-              
+
               if (!indicadoresPorOA[oa.id]) {
                 indicadoresPorOA[oa.id] = [];
               }
               indicadoresPorOA[oa.id].push(indicador);
             });
-            
+
             setOAIndicadores(prev => ({ ...prev, ...indicadoresPorOA }));
           }
-          
-          setImportSuccess(true);
-          setTimeout(() => {
-            setImportSuccess(false);
-            // Avanzar al paso 3 después de importar exitosamente
-            setStep(3);
-          }, 2000);
+
+          // Avanzar al paso 3 después de importar exitosamente
+          setStep(3);
         }}
       />
     </>

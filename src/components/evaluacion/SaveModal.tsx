@@ -1,16 +1,16 @@
-import { Dialog } from '@headlessui/react'
-import { Save, AlertCircle } from 'lucide-react'
-import PrimaryButton from '@/components/ui/PrimaryButton'
-import SecondaryButton from '@/components/ui/SecondaryButton'
+import { Dialog } from '@headlessui/react';
+import { Save, AlertCircle } from 'lucide-react';
+import PrimaryButton from '@/components/ui/PrimaryButton';
+import SecondaryButton from '@/components/ui/SecondaryButton';
 
 interface SaveModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSave: () => void
-  titulo: string
-  onTituloChange: (titulo: string) => void
-  saving: boolean
-  error?: string
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: () => void;
+  titulo: string;
+  onTituloChange: (titulo: string) => void;
+  saving: boolean;
+  error?: string;
 }
 
 export default function SaveModal({
@@ -20,13 +20,17 @@ export default function SaveModal({
   titulo,
   onTituloChange,
   saving,
-  error
+  error,
 }: SaveModalProps) {
   return (
-    <Dialog open={isOpen} onClose={onClose} className="fixed z-50 inset-0 overflow-y-auto">
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      className="fixed z-50 inset-0 overflow-y-auto"
+    >
       <div className="flex items-center justify-center min-h-screen px-4">
         <div className="fixed inset-0 bg-black opacity-30" />
-        
+
         <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-indigo-100 rounded-lg">
@@ -50,7 +54,7 @@ export default function SaveModal({
               <input
                 type="text"
                 value={titulo}
-                onChange={(e) => onTituloChange(e.target.value)}
+                onChange={e => onTituloChange(e.target.value)}
                 placeholder="Ej: Evaluación de Matemáticas - Números Naturales"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 disabled={saving}
@@ -94,5 +98,5 @@ export default function SaveModal({
         </div>
       </div>
     </Dialog>
-  )
-} 
+  );
+}

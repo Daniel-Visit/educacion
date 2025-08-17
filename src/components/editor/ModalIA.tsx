@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Projector, 
-  BookOpen, 
-  Users, 
-  Gamepad2, 
-  Palette, 
-  Brain, 
-  Lightbulb, 
-  Search, 
-  Presentation, 
-  Zap, 
-  Heart, 
-  UserCheck, 
-  Sparkles 
+import {
+  Projector,
+  BookOpen,
+  Users,
+  Gamepad2,
+  Palette,
+  Brain,
+  Lightbulb,
+  Search,
+  Presentation,
+  Zap,
+  Heart,
+  UserCheck,
+  Sparkles,
 } from 'lucide-react';
 
 interface Metodologia {
@@ -28,11 +28,14 @@ interface ModalIAProps {
   onClose: () => void;
 }
 
-const metodologiaIcons: Record<string, React.ComponentType<any>> = {
+const metodologiaIcons: Record<
+  string,
+  React.ComponentType<React.SVGProps<SVGSVGElement>>
+> = {
   'Aprendizaje Basado en Proyectos (ABP)': Projector,
   'Aula Invertida (Flipped Classroom)': BookOpen,
   'Aprendizaje Cooperativo': Users,
-  'Gamificación': Gamepad2,
+  Gamificación: Gamepad2,
   'Design Thinking (Pensamiento de Diseño)': Palette,
   'Aprendizaje Basado en el Pensamiento (TBL)': Brain,
   'Aprendizaje Basado en Problemas (ABP)': Lightbulb,
@@ -54,7 +57,7 @@ const useMetodologias = (open: boolean) => {
     const fetchMetodologias = async () => {
       setLoading(true);
       setError(null);
-      
+
       try {
         const response = await fetch('/api/metodologias');
         if (!response.ok) {
@@ -103,8 +106,12 @@ export default function ModalIA({ open, onClose }: ModalIAProps) {
             <Sparkles size={28} />
           </div>
           <div>
-            <div className="text-2xl font-bold text-gray-900 leading-tight">Generar con IA</div>
-            <div className="text-sm text-gray-400 font-medium mt-1">Planificación de Clase</div>
+            <div className="text-2xl font-bold text-gray-900 leading-tight">
+              Generar con IA
+            </div>
+            <div className="text-sm text-gray-400 font-medium mt-1">
+              Planificación de Clase
+            </div>
           </div>
           <button
             className="absolute top-5 right-6 text-gray-400 hover:text-gray-700 transition-colors text-2xl"
@@ -117,27 +124,34 @@ export default function ModalIA({ open, onClose }: ModalIAProps) {
 
         {/* Body */}
         <div className="px-8 pt-6 pb-2">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Metodologías Pedagógicas</h3>
-          
+          <h3 className="text-lg font-bold text-gray-900 mb-4">
+            Metodologías Pedagógicas
+          </h3>
+
           {loading && (
-            <div className="text-center py-8 text-gray-500">Cargando metodologías...</div>
+            <div className="text-center py-8 text-gray-500">
+              Cargando metodologías...
+            </div>
           )}
-          
+
           {error && (
             <div className="text-center py-8 text-red-500">Error: {error}</div>
           )}
-          
+
           {!loading && !error && (
             <div className="space-y-4 max-h-72 overflow-y-auto">
-              {metodologias.map((metodologia) => {
-                const Icon = metodologiaIcons[metodologia.nombre_metodologia] || BookOpen;
+              {metodologias.map(metodologia => {
+                const Icon =
+                  metodologiaIcons[metodologia.nombre_metodologia] || BookOpen;
                 const isActive = selected === metodologia.id;
-                
+
                 return (
                   <div
                     key={metodologia.id}
                     className={`border rounded-xl p-5 flex flex-row gap-4 items-start cursor-pointer transition-all duration-200 bg-white ${
-                      isActive ? 'border-violet-400 shadow-md' : 'border-gray-200 hover:border-violet-200'
+                      isActive
+                        ? 'border-violet-400 shadow-md'
+                        : 'border-gray-200 hover:border-violet-200'
                     } ${isActive ? 'ring-2 ring-violet-100' : ''}`}
                     onClick={() => handleMetodologiaSelect(metodologia.id)}
                   >
@@ -186,4 +200,4 @@ export default function ModalIA({ open, onClose }: ModalIAProps) {
       </div>
     </div>
   );
-} 
+}

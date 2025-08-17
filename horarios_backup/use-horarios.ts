@@ -44,12 +44,12 @@ export function useHorarios() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await fetch('/api/horarios');
       if (!response.ok) {
         throw new Error('Error al cargar horarios');
       }
-      
+
       const result = await response.json();
       console.log('Respuesta cruda de la API de horarios:', result);
       setHorarios(result.data || []);
@@ -66,7 +66,7 @@ export function useHorarios() {
       if (!response.ok) {
         throw new Error('Error al cargar asignaturas');
       }
-      
+
       const result = await response.json();
       setAsignaturas(result.data || []);
     } catch (err) {
@@ -81,7 +81,7 @@ export function useHorarios() {
       if (!response.ok) {
         throw new Error('Error al cargar niveles');
       }
-      
+
       const result = await response.json();
       setNiveles(result || []);
     } catch (err) {
@@ -96,7 +96,7 @@ export function useHorarios() {
       if (!response.ok) {
         throw new Error('Error al cargar profesores');
       }
-      
+
       const result = await response.json();
       setProfesores(result.data || []);
     } catch (err) {
@@ -106,65 +106,64 @@ export function useHorarios() {
   }, []);
 
   const loadInitialData = useCallback(async () => {
-    await Promise.all([
-      fetchAsignaturas(),
-      fetchNiveles(),
-      fetchProfesores()
-    ]);
+    await Promise.all([fetchAsignaturas(), fetchNiveles(), fetchProfesores()]);
   }, [fetchAsignaturas, fetchNiveles, fetchProfesores]);
 
-  const createHorario = useCallback(async (horarioData: {
-    nombre: string;
-    asignaturaId: number;
-    nivelId: number;
-    docenteId: number;
-    modulos: Array<{
-      dia: string;
-      horaInicio: string;
-      duracion: number;
-      orden: number;
-    }>;
-  }) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const response = await fetch('/api/horarios', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(horarioData),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Error al crear horario');
+  const createHorario = useCallback(
+    async (horarioData: {
+      nombre: string;
+      asignaturaId: number;
+      nivelId: number;
+      docenteId: number;
+      modulos: Array<{
+        dia: string;
+        horaInicio: string;
+        duracion: number;
+        orden: number;
+      }>;
+    }) => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetch('/api/horarios', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(horarioData),
+        });
+
+        if (!response.ok) {
+          throw new Error('Error al crear horario');
+        }
+
+        const newHorario = await response.json();
+        setHorarios(prev => [...prev, newHorario]);
+        return newHorario;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Error desconocido');
+        throw err;
+      } finally {
+        setLoading(false);
       }
-      
-      const newHorario = await response.json();
-      setHorarios(prev => [...prev, newHorario]);
-      return newHorario;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    []
+  );
 
   const deleteHorario = useCallback(async (horarioId: number) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await fetch(`/api/horarios/${horarioId}`, {
         method: 'DELETE',
       });
-      
+
       if (!response.ok) {
         throw new Error('Error al eliminar horario');
       }
-      
+
       setHorarios(prev => prev.filter(h => h.id !== horarioId));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
@@ -174,38 +173,41 @@ export function useHorarios() {
     }
   }, []);
 
-  const duplicateHorario = useCallback(async (horarioId: number) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const horario = horarios.find(h => h.id === horarioId);
-      if (!horario) {
-        throw new Error('Horario no encontrado');
+  const duplicateHorario = useCallback(
+    async (horarioId: number) => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const horario = horarios.find(h => h.id === horarioId);
+        if (!horario) {
+          throw new Error('Horario no encontrado');
+        }
+
+        const horarioData = {
+          nombre: `${horario.nombre} (Copia)`,
+          asignaturaId: horario.asignatura.id,
+          nivelId: horario.nivel.id,
+          docenteId: horario.profesor.id,
+          modulos: horario.modulos.map(modulo => ({
+            dia: modulo.dia,
+            horaInicio: modulo.horaInicio,
+            duracion: modulo.duracion,
+            orden: 1, // Se ajustará automáticamente
+          })),
+        };
+
+        const newHorario = await createHorario(horarioData);
+        return newHorario;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Error desconocido');
+        throw err;
+      } finally {
+        setLoading(false);
       }
-      
-      const horarioData = {
-        nombre: `${horario.nombre} (Copia)`,
-        asignaturaId: horario.asignatura.id,
-        nivelId: horario.nivel.id,
-        docenteId: horario.profesor.id,
-        modulos: horario.modulos.map(modulo => ({
-          dia: modulo.dia,
-          horaInicio: modulo.horaInicio,
-          duracion: modulo.duracion,
-          orden: 1, // Se ajustará automáticamente
-        })),
-      };
-      
-      const newHorario = await createHorario(horarioData);
-      return newHorario;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [horarios, createHorario]);
+    },
+    [horarios, createHorario]
+  );
 
   useEffect(() => {
     loadInitialData();
@@ -224,4 +226,4 @@ export function useHorarios() {
     duplicateHorario,
     loadInitialData,
   };
-} 
+}

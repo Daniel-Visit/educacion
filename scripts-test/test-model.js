@@ -9,4 +9,4 @@ if (prisma.matrizEspecificacion) {
   console.log('Métodos del modelo:', Object.keys(prisma.matrizEspecificacion));
 } else {
   console.log('El modelo matrizEspecificacion NO está disponible');
-} 
+}

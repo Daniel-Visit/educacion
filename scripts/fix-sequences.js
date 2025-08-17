@@ -5,11 +5,11 @@ const prisma = new PrismaClient();
 async function fixAllSequences() {
   try {
     console.log('=== ARREGLANDO SECUENCIAS ===');
-    
+
     // Obtener todas las tablas con secuencias
     const tables = [
       'alumno',
-      'asignatura', 
+      'asignatura',
       'nivel',
       'asignatura_nivel',
       'metodologia',
@@ -34,21 +34,21 @@ async function fixAllSequences() {
       'pregunta_indicador',
       'resultado_evaluacion',
       'resultado_alumno',
-      'respuesta_alumno'
+      'respuesta_alumno',
     ];
-    
+
     for (const table of tables) {
       try {
         // Verificar si la tabla existe y tiene una secuencia
         const sequenceName = `${table}_id_seq`;
-        
+
         // Obtener el máximo ID de la tabla
         const maxIdResult = await prisma.$queryRaw`
           SELECT COALESCE(MAX(id), 0) as max_id FROM ${table}
         `;
-        
+
         const maxId = maxIdResult[0]?.max_id || 0;
-        
+
         if (maxId > 0) {
           // Resetear la secuencia
           await prisma.$executeRaw`
@@ -58,14 +58,12 @@ async function fixAllSequences() {
         } else {
           console.log(`- ${table}: sin datos`);
         }
-        
       } catch (error) {
         console.log(`✗ ${table}: ${error.message}`);
       }
     }
-    
+
     console.log('=== SECUENCIAS ARREGLADAS ===');
-    
   } catch (error) {
     console.error('Error arreglando secuencias:', error);
   } finally {
@@ -73,4 +71,4 @@ async function fixAllSequences() {
   }
 }
 
-fixAllSequences(); 
+fixAllSequences();

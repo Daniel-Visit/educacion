@@ -15,6 +15,7 @@ Esta documentación describe todos los hooks personalizados utilizados en la pla
 ## 📝 Hooks del Editor
 
 ### useTiptapEditor
+
 **Ubicación:** `src/hooks/use-tiptap-editor.ts`
 
 Hook para configurar y gestionar el editor TipTap.
@@ -35,11 +36,13 @@ const {
 ```
 
 **Props:**
+
 - `extensions`: Array de extensiones TipTap
 - `content`: Contenido inicial
 - `onUpdate`: Callback cuando cambia el contenido
 
 **Retorna:**
+
 - `editor`: Instancia del editor TipTap
 - `isReady`: Estado de inicialización
 - `content`: Contenido actual
@@ -48,44 +51,38 @@ const {
 - `loadContent`: Función para cargar contenido
 
 ### useImageUpload
+
 **Ubicación:** `src/hooks/use-image-upload.ts`
 
 Hook para manejar la subida de imágenes al editor.
 
 ```tsx
-const {
-  uploadImage,
-  isUploading,
-  uploadProgress,
-  error
-} = useImageUpload({
+const { uploadImage, isUploading, uploadProgress, error } = useImageUpload({
   onSuccess: handleSuccess,
-  onError: handleError
-})
+  onError: handleError,
+});
 ```
 
 **Funcionalidades:**
+
 - Subida de archivos con drag & drop
 - Progreso de carga
 - Manejo de errores
 - Integración con API de imágenes
 
 ### useContentSave
+
 **Ubicación:** `src/hooks/use-content-save.ts`
 
 Hook para guardar y cargar contenido del editor.
 
 ```tsx
-const {
-  savedContents,
-  saveContent,
-  loadContent,
-  deleteContent,
-  isLoading
-} = useContentSave()
+const { savedContents, saveContent, loadContent, deleteContent, isLoading } =
+  useContentSave();
 ```
 
 **Funcionalidades:**
+
 - Guardado automático de contenido
 - Lista de contenidos guardados
 - Carga de contenido existente
@@ -94,6 +91,7 @@ const {
 ## 🎯 Hooks de Evaluaciones
 
 ### useEvaluacionForm
+
 **Ubicación:** `src/hooks/use-evaluacion-form.ts`
 
 Hook principal para el formulario de evaluaciones.
@@ -101,6 +99,7 @@ Hook principal para el formulario de evaluaciones.
 ## 🎯 Hooks de Matrices
 
 ### useMatrices
+
 **Ubicación:** `src/hooks/useMatrices.ts`
 
 Hook principal para la gestión de matrices de especificación, refactorizado para mejorar la modularidad y reutilización.
@@ -113,26 +112,27 @@ const {
   asignaturas,
   niveles,
   dataLoading,
-  
+
   // Funciones de carga
   fetchOAs,
   fetchEjes,
   fetchAsignaturas,
   fetchNiveles,
-  
+
   // Estado del formulario
   formState,
   updateFormState,
   validateForm,
-  
+
   // Validaciones
   errors,
   updateErrors,
-  clearErrors
-} = useMatrices()
+  clearErrors,
+} = useMatrices();
 ```
 
 **Funcionalidades:**
+
 - **Gestión de datos**: Carga y manejo de OAs, ejes, asignaturas y niveles
 - **Estado del formulario**: Control centralizado del estado de creación/edición
 - **Validaciones**: Validación automática de formularios con mensajes de error
@@ -140,12 +140,14 @@ const {
 - **Carga asíncrona**: Estados de carga y manejo de respuestas API
 
 **Características técnicas:**
+
 - Manejo robusto de respuestas API (soporte para `{ data: [...] }` y arrays directos)
 - Fallbacks automáticos a arrays vacíos en caso de error
 - Validación centralizada con todos los parámetros requeridos
 - Estados de carga para mejor UX
 
 **Ejemplo de uso:**
+
 ```tsx
 function CrearMatrizPage() {
   const {
@@ -156,22 +158,22 @@ function CrearMatrizPage() {
     formState,
     updateFormState,
     validateForm,
-    errors
-  } = useMatrices()
+    errors,
+  } = useMatrices();
 
   useEffect(() => {
     // Cargar datos iniciales
-    fetchOAs()
-    fetchAsignaturas()
-    fetchNiveles()
-  }, [])
+    fetchOAs();
+    fetchAsignaturas();
+    fetchNiveles();
+  }, []);
 
   const handleSave = async () => {
-    const validation = validateForm()
+    const validation = validateForm();
     if (validation.isValid) {
       // Guardar matriz
     }
-  }
+  };
 
   return (
     <div>
@@ -183,28 +185,41 @@ function CrearMatrizPage() {
         errors={errors}
       />
     </div>
-  )
+  );
 }
 ```
 
 ```tsx
 const {
   // Estado
-  loading, saving, matrices, selectedMatriz,
-  preguntasExtraidas, formData, showSaveModal,
-  titulo, errors, showSuccess, evaluacionId,
-  
+  loading,
+  saving,
+  matrices,
+  selectedMatriz,
+  preguntasExtraidas,
+  formData,
+  showSaveModal,
+  titulo,
+  errors,
+  showSuccess,
+  evaluacionId,
+
   // Handlers
-  handleEditorReady, handleMatrizSelect,
-  handleRespuestaCorrectaChange, handleSave,
-  handleLoadContent, clearErrors, updateFormData,
-  
+  handleEditorReady,
+  handleMatrizSelect,
+  handleRespuestaCorrectaChange,
+  handleSave,
+  handleLoadContent,
+  clearErrors,
+  updateFormData,
+
   // Utilidades
-  validateForm
-} = useEvaluacionForm()
+  validateForm,
+} = useEvaluacionForm();
 ```
 
 **Características:**
+
 - Gestión completa del estado del formulario
 - Sincronización con editor TipTap
 - Validaciones automáticas
@@ -212,6 +227,7 @@ const {
 - Carga de datos desde API
 
 **Ejemplo de uso:**
+
 ```tsx
 function CrearEvaluacionPage() {
   const {
@@ -219,14 +235,14 @@ function CrearEvaluacionPage() {
     selectedMatriz,
     handleMatrizSelect,
     handleSave,
-    validateForm
-  } = useEvaluacionForm()
+    validateForm,
+  } = useEvaluacionForm();
 
   const handleSubmit = () => {
     if (validateForm()) {
-      handleSave()
+      handleSave();
     }
-  }
+  };
 
   return (
     <div>
@@ -237,11 +253,12 @@ function CrearEvaluacionPage() {
       />
       <button onClick={handleSubmit}>Guardar</button>
     </div>
-  )
+  );
 }
 ```
 
 ### usePreguntasEditor
+
 **Ubicación:** `src/hooks/use-preguntas-editor.ts`
 
 Hook para editar preguntas y alternativas.
@@ -258,11 +275,12 @@ const {
   handleDeletePregunta,
   handleDeleteAlternativa,
   handleToggleDropdown,
-  handleDropdownAction
-} = usePreguntasEditor()
+  handleDropdownAction,
+} = usePreguntasEditor();
 ```
 
 **Funcionalidades:**
+
 - Edición inline de preguntas y alternativas
 - Gestión de dropdowns de acciones
 - Eliminación de elementos
@@ -270,6 +288,7 @@ const {
 - Validaciones de teclado
 
 **Ejemplo de uso:**
+
 ```tsx
 function PreguntasSidebar({ preguntas, onPreguntasChange }) {
   const {
@@ -277,8 +296,8 @@ function PreguntasSidebar({ preguntas, onPreguntasChange }) {
     editValue,
     handleStartEdit,
     handleSaveEdit,
-    handleKeyPress
-  } = usePreguntasEditor()
+    handleKeyPress,
+  } = usePreguntasEditor();
 
   return (
     <div>
@@ -287,7 +306,7 @@ function PreguntasSidebar({ preguntas, onPreguntasChange }) {
           {editingPregunta?.numero === pregunta.numero ? (
             <input
               value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
+              onChange={e => setEditValue(e.target.value)}
               onKeyDown={handleKeyPress}
               onBlur={handleSaveEdit}
             />
@@ -299,11 +318,12 @@ function PreguntasSidebar({ preguntas, onPreguntasChange }) {
         </div>
       ))}
     </div>
-  )
+  );
 }
 ```
 
 ### useEvaluacionData
+
 **Ubicación:** `src/hooks/use-evaluacion-data.ts`
 
 Hook personalizado para manejar la carga de datos de evaluaciones y preguntas.
@@ -311,9 +331,11 @@ Hook personalizado para manejar la carga de datos de evaluaciones y preguntas.
 **Propósito:** Centralizar la lógica de carga de datos de evaluaciones, incluyendo resultados y preguntas.
 
 **Parámetros:**
+
 - `evaluacionId` (string | number): ID de la evaluación a cargar
 
 **Retorna:**
+
 ```typescript
 {
   resultadoData: ResultadoAlumno[] | null;
@@ -324,6 +346,7 @@ Hook personalizado para manejar la carga de datos de evaluaciones y preguntas.
 ```
 
 **Tipos:**
+
 ```typescript
 interface ResultadoAlumno {
   id: number;
@@ -355,6 +378,7 @@ interface RespuestaAlumno {
 ```
 
 **Características:**
+
 - ✅ **Carga paralela:** Resultados y preguntas se cargan simultáneamente
 - ✅ **Error handling:** Manejo robusto de errores sin romper UI
 - ✅ **Transformación de datos:** Convierte datos al formato esperado
@@ -362,29 +386,31 @@ interface RespuestaAlumno {
 - ✅ **Reutilizable:** Se puede usar en múltiples componentes
 
 **Ejemplo de uso:**
+
 ```tsx
 import { useEvaluacionData } from '@/hooks/use-evaluacion-data';
 
 function GraficosPage({ params }: { params: { id: string } }) {
-  const { resultadoData, preguntas, loading, error } = useEvaluacionData(params.id);
+  const { resultadoData, preguntas, loading, error } = useEvaluacionData(
+    params.id
+  );
 
   if (loading) return <LoadingState />;
   if (error) return <ErrorDisplay message={error} />;
-  if (!resultadoData || !preguntas) return <ErrorDisplay message="No se encontraron datos" />;
+  if (!resultadoData || !preguntas)
+    return <ErrorDisplay message="No se encontraron datos" />;
 
-  return (
-    <div>
-      {/* Renderizar tabla con resultadoData y preguntas */}
-    </div>
-  );
+  return <div>{/* Renderizar tabla con resultadoData y preguntas */}</div>;
 }
 ```
 
 **APIs utilizadas:**
+
 - `GET /api/evaluaciones/:id/resultados` - Para obtener resultados
 - `GET /api/evaluaciones/:id/preguntas` - Para obtener preguntas
 
 **Beneficios:**
+
 - **Separación de responsabilidades:** Lógica de datos separada de UI
 - **Reutilización:** Se puede usar en múltiples páginas
 - **Testing:** Fácil de testear de forma aislada
@@ -393,6 +419,7 @@ function GraficosPage({ params }: { params: { id: string } }) {
 ## 🎤 Hooks de Entrevista
 
 ### useInterview
+
 **Ubicación:** `src/hooks/use-interview.ts`
 
 Hook para gestionar el estado de la entrevista interactiva.
@@ -406,37 +433,33 @@ const {
   nextQuestion,
   previousQuestion,
   submitAnswer,
-  resetInterview
-} = useInterview(questions)
+  resetInterview,
+} = useInterview(questions);
 ```
 
 **Funcionalidades:**
+
 - Navegación entre preguntas
 - Almacenamiento de respuestas
 - Cálculo de progreso
 - Validación de completitud
 
 ### useTTS
+
 **Ubicación:** `src/hooks/use-tts.ts`
 
 Hook para Text-to-Speech.
 
 ```tsx
-const {
-  speak,
-  stop,
-  isSpeaking,
-  voices,
-  selectedVoice,
-  setVoice
-} = useTTS({
+const { speak, stop, isSpeaking, voices, selectedVoice, setVoice } = useTTS({
   rate: 1.0,
   pitch: 1.0,
-  volume: 1.0
-})
+  volume: 1.0,
+});
 ```
 
 **Funcionalidades:**
+
 - Síntesis de voz
 - Control de velocidad, tono y volumen
 - Lista de voces disponibles
@@ -445,60 +468,66 @@ const {
 ## 🛠️ Hooks de Utilidades
 
 ### useWindowSize
+
 **Ubicación:** `src/hooks/use-window-size.ts`
 
 Hook para detectar cambios en el tamaño de la ventana.
 
 ```tsx
-const { width, height } = useWindowSize()
+const { width, height } = useWindowSize();
 ```
 
 **Retorna:**
+
 - `width`: Ancho de la ventana
 - `height`: Alto de la ventana
 
 ### useMobile
+
 **Ubicación:** `src/hooks/use-mobile.ts`
 
 Hook para detectar dispositivos móviles.
 
 ```tsx
-const { isMobile, isTablet, isDesktop } = useMobile()
+const { isMobile, isTablet, isDesktop } = useMobile();
 ```
 
 **Retorna:**
+
 - `isMobile`: true si es dispositivo móvil
 - `isTablet`: true si es tablet
 - `isDesktop`: true si es desktop
 
 ### useCursorVisibility
+
 **Ubicación:** `src/hooks/use-cursor-visibility.ts`
 
 Hook para detectar la visibilidad del cursor.
 
 ```tsx
-const { isVisible, showCursor, hideCursor } = useCursorVisibility()
+const { isVisible, showCursor, hideCursor } = useCursorVisibility();
 ```
 
 **Funcionalidades:**
+
 - Detección de movimiento del mouse
 - Ocultar/mostrar cursor automáticamente
 - Configuración de timeouts
 
 ### useMenuNavigation
+
 **Ubicación:** `src/hooks/use-menu-navigation.ts`
 
 Hook para navegación por teclado en menús.
 
 ```tsx
-const {
-  activeIndex,
-  handleKeyDown,
-  setActiveIndex
-} = useMenuNavigation(items.length)
+const { activeIndex, handleKeyDown, setActiveIndex } = useMenuNavigation(
+  items.length
+);
 ```
 
 **Funcionalidades:**
+
 - Navegación con flechas
 - Selección con Enter
 - Escape para cerrar
@@ -507,76 +536,81 @@ const {
 ## 🔄 Patrones de Uso
 
 ### Patrón de Formulario Complejo
+
 ```tsx
 function ComplexForm() {
   // Hook principal del formulario
-  const formHook = useMainForm()
-  
+  const formHook = useMainForm();
+
   // Hooks específicos para secciones
-  const editorHook = useEditor()
-  const validationHook = useValidation()
-  
+  const editorHook = useEditor();
+  const validationHook = useValidation();
+
   // Hook de utilidades
-  const { isMobile } = useMobile()
-  
+  const { isMobile } = useMobile();
+
   return (
     <form onSubmit={formHook.handleSubmit}>
       <EditorSection hook={editorHook} />
       <ValidationSection hook={validationHook} />
       <SubmitButton disabled={!validationHook.isValid} />
     </form>
-  )
+  );
 }
 ```
 
 ### Patrón de Estado Compartido
+
 ```tsx
 function ParentComponent() {
-  const sharedState = useSharedState()
-  
+  const sharedState = useSharedState();
+
   return (
     <div>
       <ChildA state={sharedState} />
       <ChildB state={sharedState} />
       <ChildC state={sharedState} />
     </div>
-  )
+  );
 }
 ```
 
 ### Patrón de Composición de Hooks
+
 ```tsx
 function useComplexFeature() {
-  const baseHook = useBaseFeature()
-  const enhancementHook = useEnhancement()
-  const utilityHook = useUtility()
-  
+  const baseHook = useBaseFeature();
+  const enhancementHook = useEnhancement();
+  const utilityHook = useUtility();
+
   return {
     ...baseHook,
     ...enhancementHook,
-    utility: utilityHook
-  }
+    utility: utilityHook,
+  };
 }
 ```
 
 ## ✅ Mejores Prácticas
 
 ### 1. Nomenclatura
+
 - Usar prefijo `use` para todos los hooks
 - Nombres descriptivos y específicos
 - Evitar nombres genéricos como `useData` o `useState`
 
 ```tsx
 // ✅ Bueno
-const { data } = useEvaluacionForm()
-const { upload } = useImageUpload()
+const { data } = useEvaluacionForm();
+const { upload } = useImageUpload();
 
 // ❌ Malo
-const { data } = useData()
-const { upload } = useUpload()
+const { data } = useData();
+const { upload } = useUpload();
 ```
 
 ### 2. Estructura de Retorno
+
 - Agrupar valores relacionados
 - Usar objetos para múltiples valores
 - Mantener consistencia en el orden
@@ -585,47 +619,48 @@ const { upload } = useUpload()
 // ✅ Bueno
 return {
   // Estado
-  loading, data, error,
-  
+  loading,
+  data,
+  error,
+
   // Handlers
-  handleSubmit, handleReset,
-  
+  handleSubmit,
+  handleReset,
+
   // Utilidades
-  validate, format
-}
+  validate,
+  format,
+};
 ```
 
 ### 3. Manejo de Errores
+
 - Incluir estado de error en todos los hooks
 - Proporcionar funciones de manejo de errores
 - Logging automático de errores
 
 ```tsx
-const {
-  data,
-  error,
-  isLoading,
-  retry,
-  clearError
-} = useDataFetching()
+const { data, error, isLoading, retry, clearError } = useDataFetching();
 ```
 
 ### 4. Performance
+
 - Usar `useMemo` para cálculos costosos
 - Usar `useCallback` para funciones que se pasan como props
 - Evitar recrear objetos en cada render
 
 ```tsx
 const memoizedValue = useMemo(() => {
-  return expensiveCalculation(data)
-}, [data])
+  return expensiveCalculation(data);
+}, [data]);
 
 const memoizedHandler = useCallback(() => {
-  handleAction(data)
-}, [data])
+  handleAction(data);
+}, [data]);
 ```
 
 ### 5. Testing
+
 - Hooks deben ser testables
 - Proporcionar mocks para dependencias externas
 - Incluir casos de error y edge cases
@@ -633,48 +668,52 @@ const memoizedHandler = useCallback(() => {
 ```tsx
 // Test example
 test('useEvaluacionForm should handle validation', () => {
-  const { result } = renderHook(() => useEvaluacionForm())
-  
+  const { result } = renderHook(() => useEvaluacionForm());
+
   act(() => {
-    result.current.validateForm()
-  })
-  
-  expect(result.current.errors).toBeDefined()
-})
+    result.current.validateForm();
+  });
+
+  expect(result.current.errors).toBeDefined();
+});
 ```
 
 ## 🔧 Debugging
 
 ### React DevTools
+
 - Usar React DevTools para inspeccionar hooks
 - Verificar valores de estado
 - Monitorear re-renders
 
 ### Console Logging
+
 ```tsx
 function useDebugHook() {
-  const state = useState(initialValue)
-  
+  const state = useState(initialValue);
+
   useEffect(() => {
-    console.log('Hook state changed:', state)
-  }, [state])
-  
-  return state
+    console.log('Hook state changed:', state);
+  }, [state]);
+
+  return state;
 }
 ```
 
 ### Custom Debug Hook
+
 ```tsx
 function useDebug(identifier, value) {
   useEffect(() => {
-    console.log(`${identifier}:`, value)
-  }, [identifier, value])
+    console.log(`${identifier}:`, value);
+  }, [identifier, value]);
 }
 ```
 
 ## 🚀 Próximas Mejoras
 
 ### Hooks Planificados
+
 - [ ] `useOffline` - Detección de estado offline
 - [ ] `useLocalStorage` - Persistencia local
 - [ ] `useDebounce` - Debounce para inputs
@@ -682,6 +721,7 @@ function useDebug(identifier, value) {
 - [ ] `useWebSocket` - Conexiones WebSocket
 
 ### Mejoras Técnicas
+
 - [ ] **TypeScript strict mode** para todos los hooks
 - [ ] **Testing automático** con Jest y React Testing Library
 - [ ] **Documentación automática** con JSDoc
@@ -692,4 +732,4 @@ function useDebug(identifier, value) {
 
 **Última actualización:** Julio 2025  
 **Versión de hooks:** 1.0  
-**Mantenido por:** Equipo de Desarrollo 
+**Mantenido por:** Equipo de Desarrollo

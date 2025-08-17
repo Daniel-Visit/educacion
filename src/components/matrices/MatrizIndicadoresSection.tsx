@@ -25,24 +25,24 @@ interface MatrizIndicadoresSectionProps {
   // OAs seleccionados
   selectedOAsContenido: OA[];
   selectedOAsHabilidad: OA[];
-  
+
   // Indicadores por OA
   oaIndicadores: { [oaId: number]: Indicador[] };
   onOAIndicadoresChange: (indicadores: { [oaId: number]: Indicador[] }) => void;
-  
+
   // Totales y validaciones
   totalPreguntas: number;
   totalPreguntasContenido: number;
   totalPreguntasHabilidad: number;
   allOAsContenidoHaveIndicators: boolean;
   allOAsHabilidadHaveIndicators: boolean;
-  
+
   // Navegación
   onBack: () => void;
   onCreateMatriz: () => void;
   isStep3Valid: boolean;
   loading: boolean;
-  
+
   // Errores
   errors: { [key: string]: string };
   onClearError: () => void;
@@ -63,29 +63,36 @@ export default function MatrizIndicadoresSection({
   isStep3Valid,
   loading,
   errors,
-  onClearError
+  onClearError,
 }: MatrizIndicadoresSectionProps) {
-
-  const handleIndicadorChange = (oaId: number, index: number, field: 'descripcion' | 'preguntas', value: string | number) => {
+  const handleIndicadorChange = (
+    oaId: number,
+    index: number,
+    field: 'descripcion' | 'preguntas',
+    value: string | number
+  ) => {
     onOAIndicadoresChange({
       ...oaIndicadores,
-      [oaId]: oaIndicadores[oaId].map((ind, i) => 
+      [oaId]: oaIndicadores[oaId].map((ind, i) =>
         i === index ? { ...ind, [field]: value } : ind
-      )
+      ),
     });
   };
 
   const handleAddIndicador = (oaId: number) => {
     onOAIndicadoresChange({
       ...oaIndicadores,
-      [oaId]: [...(oaIndicadores[oaId] || []), { descripcion: '', preguntas: 0 }]
+      [oaId]: [
+        ...(oaIndicadores[oaId] || []),
+        { descripcion: '', preguntas: 0 },
+      ],
     });
   };
 
   const handleRemoveIndicador = (oaId: number, index: number) => {
     onOAIndicadoresChange({
       ...oaIndicadores,
-      [oaId]: oaIndicadores[oaId].filter((_, i) => i !== index)
+      [oaId]: oaIndicadores[oaId].filter((_, i) => i !== index),
     });
   };
 
@@ -102,16 +109,25 @@ export default function MatrizIndicadoresSection({
                   <BookOpen className="w-6 h-6" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold">Indicadores de Contenido</h2>
-                  <p className="text-blue-100">Define los indicadores para los OAs de contenido</p>
+                  <h2 className="text-2xl font-bold">
+                    Indicadores de Contenido
+                  </h2>
+                  <p className="text-blue-100">
+                    Define los indicadores para los OAs de contenido
+                  </p>
                 </div>
               </div>
               <div className="text-right">
-                <div className={`text-lg font-bold ${(totalPreguntasContenido === totalPreguntas && allOAsContenidoHaveIndicators) ? 'text-emerald-200' : 'text-gray-200'}`}>
+                <div
+                  className={`text-lg font-bold ${totalPreguntasContenido === totalPreguntas && allOAsContenidoHaveIndicators ? 'text-emerald-200' : 'text-gray-200'}`}
+                >
                   {totalPreguntasContenido} / {totalPreguntas}
                 </div>
                 <div className="text-sm text-blue-100">
-                  {(totalPreguntasContenido === totalPreguntas && allOAsContenidoHaveIndicators) ? '✓ Válido' : '✗ Incompleto'}
+                  {totalPreguntasContenido === totalPreguntas &&
+                  allOAsContenidoHaveIndicators
+                    ? '✓ Válido'
+                    : '✗ Incompleto'}
                 </div>
               </div>
             </div>
@@ -119,23 +135,34 @@ export default function MatrizIndicadoresSection({
 
           {/* OAs de Contenido */}
           {selectedOAsContenido.map((oa, index) => (
-            <div key={`${oa.id}-${index}`} className="bg-white rounded-2xl shadow border border-gray-100 overflow-hidden">
+            <div
+              key={`${oa.id}-${index}`}
+              className="bg-white rounded-2xl shadow border border-gray-100 overflow-hidden"
+            >
               {/* Header sobrio */}
               <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br ${getGradient(index)}`}>
+                  <div
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br ${getGradient(index)}`}
+                  >
                     <Target className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-800">Indicadores para {oa.oas_id}</h3>
+                    <h3 className="text-xl font-bold text-gray-800">
+                      Indicadores para {oa.oas_id}
+                    </h3>
                     {oa.descripcion_oas && (
-                      <p className="text-gray-500 text-sm mt-1">{oa.descripcion_oas.substring(0, 60)}...</p>
+                      <p className="text-gray-500 text-sm mt-1">
+                        {oa.descripcion_oas.substring(0, 60)}...
+                      </p>
                     )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   {oa.basal && (
-                    <span className="bg-gray-100 text-gray-700 rounded-full px-3 py-1 text-xs font-semibold">Basal</span>
+                    <span className="bg-gray-100 text-gray-700 rounded-full px-3 py-1 text-xs font-semibold">
+                      Basal
+                    </span>
                   )}
                 </div>
               </div>
@@ -147,14 +174,28 @@ export default function MatrizIndicadoresSection({
                     <input
                       type="text"
                       value={indicador.descripcion}
-                      onChange={e => handleIndicadorChange(oa.id, idx, 'descripcion', e.target.value)}
+                      onChange={e =>
+                        handleIndicadorChange(
+                          oa.id,
+                          idx,
+                          'descripcion',
+                          e.target.value
+                        )
+                      }
                       className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm transition-all duration-200"
                       placeholder="Descripción del indicador"
                     />
                     <input
                       type="number"
                       value={indicador.preguntas}
-                      onChange={e => handleIndicadorChange(oa.id, idx, 'preguntas', Number(e.target.value))}
+                      onChange={e =>
+                        handleIndicadorChange(
+                          oa.id,
+                          idx,
+                          'preguntas',
+                          Number(e.target.value)
+                        )
+                      }
                       className="w-24 px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm text-center transition-all duration-200"
                       min={0}
                       placeholder="0"
@@ -172,7 +213,7 @@ export default function MatrizIndicadoresSection({
                     )}
                   </div>
                 ))}
-                
+
                 {/* Botón agregar indicador */}
                 <button
                   type="button"
@@ -199,16 +240,25 @@ export default function MatrizIndicadoresSection({
                   <Zap className="w-6 h-6" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold">Indicadores de Habilidad</h2>
-                  <p className="text-green-100">Define los indicadores para los OAs de habilidad</p>
+                  <h2 className="text-2xl font-bold">
+                    Indicadores de Habilidad
+                  </h2>
+                  <p className="text-green-100">
+                    Define los indicadores para los OAs de habilidad
+                  </p>
                 </div>
               </div>
               <div className="text-right">
-                <div className={`text-lg font-bold ${(totalPreguntasHabilidad === totalPreguntas && allOAsHabilidadHaveIndicators) ? 'text-emerald-200' : 'text-gray-200'}`}>
+                <div
+                  className={`text-lg font-bold ${totalPreguntasHabilidad === totalPreguntas && allOAsHabilidadHaveIndicators ? 'text-emerald-200' : 'text-gray-200'}`}
+                >
                   {totalPreguntasHabilidad} / {totalPreguntas}
                 </div>
                 <div className="text-sm text-green-100">
-                  {(totalPreguntasHabilidad === totalPreguntas && allOAsHabilidadHaveIndicators) ? '✓ Válido' : '✗ Incompleto'}
+                  {totalPreguntasHabilidad === totalPreguntas &&
+                  allOAsHabilidadHaveIndicators
+                    ? '✓ Válido'
+                    : '✗ Incompleto'}
                 </div>
               </div>
             </div>
@@ -216,23 +266,34 @@ export default function MatrizIndicadoresSection({
 
           {/* OAs de Habilidad */}
           {selectedOAsHabilidad.map((oa, index) => (
-            <div key={`${oa.id}-${index}`} className="bg-white rounded-2xl shadow border border-gray-100 overflow-hidden">
+            <div
+              key={`${oa.id}-${index}`}
+              className="bg-white rounded-2xl shadow border border-gray-100 overflow-hidden"
+            >
               {/* Header sobrio */}
               <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br ${getGradient(index)}`}>
+                  <div
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br ${getGradient(index)}`}
+                  >
                     <Target className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-800">Indicadores para {oa.oas_id}</h3>
+                    <h3 className="text-xl font-bold text-gray-800">
+                      Indicadores para {oa.oas_id}
+                    </h3>
                     {oa.descripcion_oas && (
-                      <p className="text-gray-500 text-sm mt-1">{oa.descripcion_oas.substring(0, 60)}...</p>
+                      <p className="text-gray-500 text-sm mt-1">
+                        {oa.descripcion_oas.substring(0, 60)}...
+                      </p>
                     )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   {oa.basal && (
-                    <span className="bg-gray-100 text-gray-700 rounded-full px-3 py-1 text-xs font-semibold">Basal</span>
+                    <span className="bg-gray-100 text-gray-700 rounded-full px-3 py-1 text-xs font-semibold">
+                      Basal
+                    </span>
                   )}
                 </div>
               </div>
@@ -244,14 +305,28 @@ export default function MatrizIndicadoresSection({
                     <input
                       type="text"
                       value={indicador.descripcion}
-                      onChange={e => handleIndicadorChange(oa.id, idx, 'descripcion', e.target.value)}
+                      onChange={e =>
+                        handleIndicadorChange(
+                          oa.id,
+                          idx,
+                          'descripcion',
+                          e.target.value
+                        )
+                      }
                       className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm transition-all duration-200"
                       placeholder="Descripción del indicador"
                     />
                     <input
                       type="number"
                       value={indicador.preguntas}
-                      onChange={e => handleIndicadorChange(oa.id, idx, 'preguntas', Number(e.target.value))}
+                      onChange={e =>
+                        handleIndicadorChange(
+                          oa.id,
+                          idx,
+                          'preguntas',
+                          Number(e.target.value)
+                        )
+                      }
                       className="w-24 px-4 py-3 border border-gray-200 rounded-xl text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm text-center transition-all duration-200"
                       min={0}
                       placeholder="0"
@@ -269,7 +344,7 @@ export default function MatrizIndicadoresSection({
                     )}
                   </div>
                 ))}
-                
+
                 {/* Botón agregar indicador */}
                 <button
                   type="button"
@@ -287,9 +362,7 @@ export default function MatrizIndicadoresSection({
 
       {/* Resumen de preguntas */}
       <div className="flex justify-end gap-4 mt-8">
-        <SecondaryButton onClick={onBack}>
-          Atrás
-        </SecondaryButton>
+        <SecondaryButton onClick={onBack}>Atrás</SecondaryButton>
         <button
           onClick={onCreateMatriz}
           disabled={!isStep3Valid || loading}
@@ -298,23 +371,25 @@ export default function MatrizIndicadoresSection({
           {loading ? 'Creando...' : 'Continuar'}
         </button>
       </div>
-      
+
       <div className="flex justify-end items-center mb-2">
-        <span className={
-          `text-base font-semibold ${
-            isStep3Valid
-              ? 'text-green-500'
-              : 'text-gray-500'
-          }`
-        }>
-          Total preguntas: {totalPreguntasContenido + totalPreguntasHabilidad} / {totalPreguntas}
+        <span
+          className={`text-base font-semibold ${
+            isStep3Valid ? 'text-green-500' : 'text-gray-500'
+          }`}
+        >
+          Total preguntas: {totalPreguntasContenido + totalPreguntasHabilidad} /{' '}
+          {totalPreguntas}
         </span>
       </div>
-      
+
       {errors.submit && (
         <div className="fixed z-50 inset-0 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen px-4">
-            <div className="fixed inset-0 bg-black opacity-30" aria-hidden="true" />
+            <div
+              className="fixed inset-0 bg-black opacity-30"
+              aria-hidden="true"
+            />
             <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full mx-auto p-8 z-10">
               <h3 className="text-lg font-bold mb-4">Error</h3>
               <p className="mb-6 text-gray-600">{errors.submit}</p>
@@ -332,4 +407,4 @@ export default function MatrizIndicadoresSection({
       )}
     </div>
   );
-} 
+}

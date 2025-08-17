@@ -7,7 +7,7 @@ async function testMatrices() {
     console.log('Probando obtener matrices...');
     const matrices = await prisma.matrizEspecificacion.findMany();
     console.log('Matrices encontradas:', matrices);
-    
+
     console.log('Probando crear una matriz...');
     const nuevaMatriz = await prisma.matrizEspecificacion.create({
       data: {
@@ -16,7 +16,6 @@ async function testMatrices() {
       },
     });
     console.log('Matriz creada:', nuevaMatriz);
-    
   } catch (error) {
     console.error('Error:', error);
   } finally {
@@ -24,4 +23,4 @@ async function testMatrices() {
   }
 }
 
-testMatrices(); 
+testMatrices();

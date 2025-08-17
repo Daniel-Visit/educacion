@@ -1,5 +1,5 @@
-import Dropdown from "@/components/entrevista/Dropdown";
-import { Switch } from "@headlessui/react";
+import Dropdown from '@/components/entrevista/Dropdown';
+import { Switch } from '@headlessui/react';
 
 interface FiltrosDrawerProps {
   selectedEjeId: string;
@@ -30,7 +30,7 @@ export default function FiltrosDrawer({
       {/* Switch OA asignables */}
       <div className="flex items-center gap-3">
         <span className="text-sm font-medium text-gray-700">
-          Solo OA asignables
+          Solo OA con clases asignadas
         </span>
         <Switch
           checked={showOnlyAssignable}
@@ -45,4 +45,4 @@ export default function FiltrosDrawer({
       </div>
     </div>
   );
-} 
+}
