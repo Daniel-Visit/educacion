@@ -172,8 +172,7 @@ export function useEvaluacionData(resultadoId: string | null) {
         setResultadoData(resultadoTransformado);
         setPreguntas(preguntasData);
         console.log('DEBUG: Estado establecido, finalizando carga');
-      } catch (error) {
-        console.error('Error al cargar datos:', error);
+      } catch {
         setError('Error al cargar los datos');
       } finally {
         setIsLoading(false);

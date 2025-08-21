@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useState, useEffect, Suspense, useCallback } from 'react';
+import { signOut } from 'next-auth/react';
 import {
   Home,
   MessageSquare,
@@ -12,15 +13,26 @@ import {
   CheckCircle2,
   Sparkles,
   ClipboardList,
+  Users,
+  CircleMinus,
 } from 'lucide-react';
 
 // Importar constantes de la entrevista
 import { steps } from '@/components/entrevista/constants';
+import { Avatar } from '@/components/ui/Avatar';
+
+interface User {
+  id?: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+  role?: string;
+}
 
 const navigation = [
   { name: 'Inicio', href: '/', icon: Home },
   {
-    name: 'Planificación',
+    name: 'Planificación IA',
     href: '/planificacion-anual',
     icon: Calendar,
     submenu: [
@@ -30,17 +42,17 @@ const navigation = [
     ],
   },
   {
-    name: 'Editor IA',
+    name: 'Clases IA',
     href: '/editor',
     icon: Sparkles,
     submenu: [
       { name: 'Planificación de Clase', href: '/editor?tipo=planificacion' },
-      { name: 'Material de Apoyo', href: '/editor?tipo=material' },
+      { name: 'Recursos Pedagógicos', href: '/editor?tipo=material' },
     ],
   },
 
   {
-    name: 'Evaluación',
+    name: 'Evaluación IA',
     href: '/evaluaciones',
     icon: ClipboardList,
     submenu: [
@@ -66,11 +78,15 @@ const navigation = [
   },
 ];
 
-function SidebarContent() {
+function SidebarContent({ userRole, user }: { userRole: string; user?: User }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
   const [currentInterviewStep, setCurrentInterviewStep] = useState(0);
+
+  console.log('🔍 DEBUG SIDEBAR - userRole recibido:', userRole);
+  console.log('🔍 DEBUG SIDEBAR - ¿Es admin?', userRole === 'admin');
 
   const toggleMenu = (menuName: string) => {
     setExpandedMenus(prev =>
@@ -100,7 +116,7 @@ function SidebarContent() {
 
   return (
     <aside className="w-80 h-full min-h-0 flex flex-col bg-white/70 backdrop-blur-md py-10 px-6 border-r border-[#f0f0fa] overflow-hidden transition-all">
-      <div className="flex items-center gap-4 mb-10">
+      <div className="flex items-center gap-4 mb-6">
         <div className="bg-gradient-to-br from-indigo-600 to-purple-500 w-14 h-14 flex items-center justify-center rounded-2xl">
           <BookOpen className="text-white" size={32} />
         </div>
@@ -111,6 +127,19 @@ function SidebarContent() {
           </div>
         </div>
       </div>
+
+      {/* Avatar del usuario */}
+      {user && (
+        <div className="flex items-center gap-3 px-4 py-3 mb-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl border border-indigo-100">
+          <Avatar user={user} size="md" />
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-indigo-900 truncate">
+              {user.name || 'Usuario'}
+            </div>
+            <div className="text-sm text-indigo-600 truncate">{user.email}</div>
+          </div>
+        </div>
+      )}
 
       <nav className="flex-1 space-y-2 min-h-0 overflow-y-auto">
         {navigation.map(item => {
@@ -312,23 +341,78 @@ function SidebarContent() {
             </div>
           );
         })}
+
+        {/* Botón de gestión de usuarios (solo para admins) */}
+        {userRole === 'admin' && (
+          <div className="mt-2">
+            <Link
+              href="/admin/users"
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all font-semibold text-base text-left focus:outline-none ${pathname === '/admin/users' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg' : 'text-indigo-900 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50'}`}
+            >
+              <Users
+                className={
+                  pathname === '/admin/users' ? 'text-white' : 'text-indigo-500'
+                }
+                size={22}
+              />
+              <span>Gestión de Usuarios</span>
+              {pathname === '/admin/users' && (
+                <span className="ml-auto w-2 h-2 bg-white/80 rounded-full" />
+              )}
+            </Link>
+          </div>
+        )}
       </nav>
 
-      <div className="mt-auto pt-8 text-xs text-gray-500 border-t border-gray-100 flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <span className="inline-block w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-          Sistema activo
-        </div>
-        <div className="text-green-600 font-semibold mt-1">● Conectado</div>
+      <div className="mt-auto pt-2 border-t border-gray-100 flex-shrink-0">
+        <button
+          onClick={async () => {
+            try {
+              console.log('🔍 Iniciando logout completo...');
+
+              // Llamar a nuestra API de logout completo
+              const response = await fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              });
+
+              if (response.ok) {
+                console.log('✅ Logout completo exitoso');
+                // Cerrar sesión de NextAuth y redirigir
+                await signOut({ callbackUrl: '/auth/login' });
+              } else {
+                console.error('❌ Error en API de logout:', response.status);
+                // Fallback: solo cerrar sesión de NextAuth
+                await signOut({ callbackUrl: '/auth/login' });
+              }
+            } catch (error) {
+              console.error('❌ Error en logout:', error);
+              // Fallback: solo cerrar sesión de NextAuth
+              await signOut({ callbackUrl: '/auth/login' });
+            }
+          }}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all font-semibold text-base text-left focus:outline-none text-indigo-900 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50"
+        >
+          <CircleMinus className="text-indigo-500" size={22} />
+          <span>Cerrar sesión</span>
+        </button>
       </div>
     </aside>
   );
 }
 
-export default function Sidebar() {
+export default function Sidebar({
+  userRole,
+  user,
+}: {
+  userRole: string;
+  user?: User;
+}) {
   return (
     <Suspense fallback={<div>Cargando...</div>}>
-      <SidebarContent />
+      <SidebarContent userRole={userRole} user={user} />
     </Suspense>
   );
 }

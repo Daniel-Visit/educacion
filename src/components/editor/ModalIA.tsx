@@ -13,6 +13,7 @@ import {
   Heart,
   UserCheck,
   Sparkles,
+  X,
 } from 'lucide-react';
 
 interface Metodologia {
@@ -99,27 +100,31 @@ export default function ModalIA({ open, onClose }: ModalIAProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl p-0 relative">
-        {/* Header */}
-        <div className="flex items-center gap-4 px-8 pt-8 pb-4 border-b border-gray-100">
-          <div className="bg-violet-100 text-violet-600 rounded-xl p-3 flex items-center justify-center">
-            <Sparkles size={28} />
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-gray-900 leading-tight">
-              Generar con IA
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl p-0 relative flex flex-col">
+        {/* Header consistente con la plataforma */}
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-2xl p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-white/20 p-2 rounded-lg">
+                <Sparkles className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">
+                  Generar Clase con IA
+                </h2>
+                <p className="text-indigo-100 text-sm mt-2">
+                  Planificación de Clase
+                </p>
+              </div>
             </div>
-            <div className="text-sm text-gray-400 font-medium mt-1">
-              Planificación de Clase
-            </div>
+            <button
+              onClick={onClose}
+              aria-label="Cerrar"
+              className="text-white/80 hover:text-white hover:bg-white/20 rounded-full p-2 transition-colors"
+            >
+              <X className="h-6 w-6" />
+            </button>
           </div>
-          <button
-            className="absolute top-5 right-6 text-gray-400 hover:text-gray-700 transition-colors text-2xl"
-            onClick={onClose}
-            aria-label="Cerrar"
-          >
-            ×
-          </button>
         </div>
 
         {/* Body */}
@@ -156,7 +161,9 @@ export default function ModalIA({ open, onClose }: ModalIAProps) {
                     onClick={() => handleMetodologiaSelect(metodologia.id)}
                   >
                     <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-violet-50 text-violet-600 mt-1">
-                      <Icon size={28} />
+                      <div className="w-7 h-7">
+                        <Icon />
+                      </div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -182,7 +189,7 @@ export default function ModalIA({ open, onClose }: ModalIAProps) {
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-2 px-8 py-5 border-t border-gray-100 bg-white rounded-b-2xl">
+        <div className="flex justify-end gap-2 px-8 py-5 bg-white rounded-b-2xl">
           <button
             className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 font-bold hover:shadow-sm transition-colors"
             onClick={onClose}

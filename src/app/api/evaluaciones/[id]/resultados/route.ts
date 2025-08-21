@@ -102,7 +102,7 @@ export async function DELETE(
     console.log('Eliminando resultado ID:', resultadoId);
 
     // Eliminar en orden: respuestas -> resultados de alumnos -> archivo de resultados
-    await prisma.respuesta.deleteMany({
+    await prisma.respuestaAlumno.deleteMany({
       where: {
         resultadoAlumno: {
           resultadoEvaluacionId: resultadoId,

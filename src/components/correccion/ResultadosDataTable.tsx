@@ -199,12 +199,10 @@ export default function ResultadosDataTable({
                 className="hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-colors"
               >
                 <td className="px-4 py-3">
-                  <div className="font-medium text-gray-900">
-                    {archivo.nombre}
-                  </div>
+                  <div className="text-sm text-gray-900">{archivo.nombre}</div>
                 </td>
                 <td className="px-4 py-3">
-                  <div className="text-gray-700 font-medium">
+                  <div className="text-gray-700 text-sm">
                     {new Date(archivo.fechaCarga).toLocaleDateString('es-ES', {
                       year: 'numeric',
                       month: 'short',
@@ -220,7 +218,7 @@ export default function ResultadosDataTable({
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-gray-600">Promedio:</span>
                       <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
+                        className={`inline-flex items-center px-3  rounded-full text-sm font-semibold ${
                           archivo.estadisticas.promedioNota >= 4.0
                             ? 'bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-800 border border-emerald-200'
                             : 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border border-red-200'
@@ -231,7 +229,8 @@ export default function ResultadosDataTable({
                     </div>
 
                     <div className="text-sm text-gray-600">
-                      Total: {archivo.estadisticas.totalAlumnos} alumno
+                      <span className="text-sm text-gray-600">Total: </span>
+                      {archivo.estadisticas.totalAlumnos} alumno
                       {archivo.estadisticas.totalAlumnos !== 1 ? 's' : ''}
                     </div>
                   </div>

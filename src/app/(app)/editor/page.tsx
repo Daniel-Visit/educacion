@@ -91,7 +91,7 @@ function EditorPageContent() {
     content => content.tipo === tipoContenido
   );
 
-  // Formatear fecha (igual que FabPlanificaciones)
+  // Formatear fecha
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -195,7 +195,7 @@ function EditorPageContent() {
         )}
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-start items-stretch">
+      <div className="flex-1 flex flex-col items-center justify-start">
         <div className="bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] w-full max-w-3xl flex-1 flex flex-col items-center min-h-[600px] max-h-[calc(100vh-220px)] mx-auto h-fit p-10 self-start transition-all overflow-y-auto mt-5">
           {loadError && (
             <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg border border-red-200 text-center">
@@ -203,7 +203,7 @@ function EditorPageContent() {
             </div>
           )}
           <SimpleEditor
-            initialContent={currentContent}
+            initialContent={currentContent || undefined}
             onEditorReady={handleEditorReady}
           />
         </div>
@@ -227,84 +227,143 @@ function EditorPageContent() {
       {openFab && (
         <div
           data-fab-panel
-          className="fixed top-24 right-22 w-[380px] bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] border border-gray-100 z-40 px-8 pt-8 pb-4 flex flex-col gap-4 animate-fade-in"
-          style={{ minWidth: 340, maxHeight: 'calc(100vh - 120px)' }}
+          className="fixed top-24 right-22 w-[480px] bg-white/95 backdrop-blur-xl rounded-3xl shadow-[0_20px_60px_-12px_rgba(99,102,241,0.25)] border border-white/20 z-40 overflow-hidden animate-fade-in"
+          style={{ minWidth: 440, maxHeight: 'calc(100vh - 120px)' }}
         >
-          <h2 className="text-lg font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            {tipoContenido === 'planificacion'
-              ? 'Planificaciones Guardadas'
-              : 'Materiales Guardados'}
-          </h2>
-          {isLoading ? (
-            <div className="text-center py-8">
-              <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-              <p className="text-sm text-gray-500">Cargando...</p>
+          {/* Header con gradiente */}
+          <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 px-8 py-6 relative overflow-hidden">
+            <div className="absolute inset-0 bg-black/10"></div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                  {tipoContenido === 'planificacion' ? (
+                    <FileText className="w-5 h-5 text-white" />
+                  ) : (
+                    <BookOpen className="w-5 h-5 text-white" />
+                  )}
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">
+                    {tipoContenido === 'planificacion'
+                      ? 'Planificaciones Guardadas'
+                      : 'Materiales Guardados'}
+                  </h2>
+                  <p className="text-indigo-100 text-sm">
+                    {filteredContents.length} archivo
+                    {filteredContents.length !== 1 ? 's' : ''} disponible
+                    {filteredContents.length !== 1 ? 's' : ''}
+                  </p>
+                </div>
+              </div>
             </div>
-          ) : filteredContents.length === 0 ? (
-            <div className="text-center py-8">
-              <svg
-                className="w-8 h-8 text-gray-400 mx-auto mb-2"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 16V8a2 2 0 012-2h8a2 2 0 012 2v8m-2 4h-4a2 2 0 01-2-2v-4a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2z"
-                />
-              </svg>
-              <p className="text-sm text-gray-500">No hay archivos guardados</p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-2 overflow-y-auto max-h-96">
-              {filteredContents.map(content => (
-                <div
-                  key={content.id}
-                  className="flex items-center gap-4 p-4 rounded-xl cursor-pointer border border-transparent hover:bg-indigo-50 transition-all group"
-                  onClick={() => handleLoadContent(content)}
-                >
-                  <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600">
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M4 16V8a2 2 0 012-2h8a2 2 0 012 2v8m-2 4h-4a2 2 0 01-2-2v-4a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2z"
-                      />
-                    </svg>
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-gray-900 text-sm truncate group-hover:underline">
-                      {content.titulo}
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                      <svg
-                        className="w-3 h-3 text-gray-300 mr-1"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 8v4l3 3"
-                        />
-                      </svg>
-                      {formatDate(content.createdAt || '')}
+            {/* Decoración de fondo */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+          </div>
+
+          {/* Contenido */}
+          <div className="px-8 py-6">
+            {isLoading ? (
+              <div className="text-center py-12">
+                <div className="w-12 h-12 border-3 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-gray-600 font-medium">
+                  Cargando archivos...
+                </p>
+                <p className="text-gray-400 text-sm mt-1">
+                  Buscando en tu biblioteca
+                </p>
+              </div>
+            ) : filteredContents.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                  <svg
+                    className="w-10 h-10 text-indigo-400"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M4 16V8a2 2 0 012-2h8a2 2 0 012 2v8m-2 4h-4a2 2 0 01-2-2v-4a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  No hay archivos guardados
+                </h3>
+                <p className="text-gray-500 text-sm">
+                  Crea tu primera{' '}
+                  {tipoContenido === 'planificacion'
+                    ? 'planificación'
+                    : 'material'}{' '}
+                  para comenzar
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3 max-h-96 overflow-y-auto pr-2 pt-3 pb-3">
+                {filteredContents.map(content => (
+                  <div
+                    key={content.id}
+                    className="group relative bg-gradient-to-r from-gray-50 to-white hover:from-indigo-50 hover:to-purple-50 rounded-2xl p-4 cursor-pointer border border-gray-100 hover:border-indigo-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                    onClick={() => handleLoadContent(content)}
+                  >
+                    {/* Indicador de hover */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-purple-500/0 to-indigo-500/0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                    <div className="relative z-10 flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-indigo-100 to-purple-100 group-hover:from-indigo-200 group-hover:to-purple-200 rounded-2xl flex items-center justify-center transition-all duration-300">
+                        {tipoContenido === 'planificacion' ? (
+                          <FileText className="w-6 h-6 text-indigo-600" />
+                        ) : (
+                          <BookOpen className="w-6 h-6 text-indigo-600" />
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-gray-900 text-sm truncate group-hover:text-indigo-700 transition-colors duration-200">
+                          {content.titulo}
+                        </h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="flex items-center gap-1 text-gray-400 group-hover:text-indigo-500 transition-colors duration-200">
+                            <Clock className="w-3 h-3" />
+                            <span className="text-xs font-medium">
+                              {formatDate(content.createdAt || '')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Badge del tipo a la derecha */}
+                      {content.tipo && (
+                        <span className="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-medium rounded-full group-hover:bg-indigo-200 transition-colors duration-200 whitespace-nowrap">
+                          {content.tipo}
+                        </span>
+                      )}
+
+                      {/* Flecha de acción */}
+                      <div className="w-8 h-8 bg-white/80 group-hover:bg-indigo-100 rounded-xl flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100 group-hover:scale-110">
+                        <svg
+                          className="w-4 h-4 text-gray-400 group-hover:text-indigo-600 transition-colors duration-200"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </>

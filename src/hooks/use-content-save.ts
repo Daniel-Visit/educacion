@@ -150,7 +150,9 @@ export function useContentSave() {
         console.log('🔵 [Hook] saveContent - Procesando imágenes...');
         let processedContent;
         try {
-          processedContent = await processImagesInContent(content);
+          processedContent = await processImagesInContent(
+            content as TipTapNode
+          );
           console.log('✅ [Hook] saveContent - Imágenes procesadas');
         } catch (imageError) {
           console.log(
@@ -267,7 +269,9 @@ export function useContentSave() {
 
         // Procesar imágenes base64 antes de guardar
         console.log('🔵 [Hook] updateContent - Procesando imágenes...');
-        const processedContent = await processImagesInContent(content);
+        const processedContent = await processImagesInContent(
+          content as TipTapNode
+        );
         console.log('✅ [Hook] updateContent - Imágenes procesadas');
 
         const tipo =

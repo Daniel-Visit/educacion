@@ -1,0 +1,2560 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 TimesNewRomanPSMT;\f1\fswiss\fcharset0 Helvetica;\f2\froman\fcharset0 TimesNewRomanPS-BoldMT;
+\f3\fnil\fcharset0 AppleColorEmoji;\f4\fmodern\fcharset0 CourierNewPSMT;\f5\fmodern\fcharset0 CourierNewPS-BoldMT;
+\f6\froman\fcharset0 TimesNewRomanPS-ItalicMT;\f7\ftech\fcharset77 Symbol;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red109\green109\blue109;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c50196\c50196\c50196;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid201\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid3}
+{\list\listtemplateid4\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid301\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid4}
+{\list\listtemplateid5\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid401\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid5}
+{\list\listtemplateid6\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid501\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid6}
+{\list\listtemplateid7\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid601\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid7}
+{\list\listtemplateid8\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid701\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid8}
+{\list\listtemplateid9\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid801\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid9}
+{\list\listtemplateid10\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid901\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid10}
+{\list\listtemplateid11\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1001\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid11}
+{\list\listtemplateid12\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid12}
+{\list\listtemplateid13\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid1201\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid13}
+{\list\listtemplateid14\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat9\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid1301\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid14}
+{\list\listtemplateid15\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat16\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid1401\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid15}
+{\list\listtemplateid16\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1501\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid16}
+{\list\listtemplateid17\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1601\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid17}
+{\list\listtemplateid18\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1701\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid18}
+{\list\listtemplateid19\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1801\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid19}
+{\list\listtemplateid20\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1901\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{circle\}}{\leveltext\leveltemplateid1902\'01\uc0\u9702 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listname ;}\listid20}
+{\list\listtemplateid21\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid2001\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{circle\}}{\leveltext\leveltemplateid2002\'01\uc0\u9702 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listname ;}\listid21}
+{\list\listtemplateid22\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid2101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid22}
+{\list\listtemplateid23\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid2201\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid23}
+{\list\listtemplateid24\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid2301\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid24}
+{\list\listtemplateid25\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid2401\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{circle\}}{\leveltext\leveltemplateid2402\'01\uc0\u9702 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listname ;}\listid25}
+{\list\listtemplateid26\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid2501\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid26}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}{\listoverride\listid4\listoverridecount0\ls4}{\listoverride\listid5\listoverridecount0\ls5}{\listoverride\listid6\listoverridecount0\ls6}{\listoverride\listid7\listoverridecount0\ls7}{\listoverride\listid8\listoverridecount0\ls8}{\listoverride\listid9\listoverridecount0\ls9}{\listoverride\listid10\listoverridecount0\ls10}{\listoverride\listid11\listoverridecount0\ls11}{\listoverride\listid12\listoverridecount0\ls12}{\listoverride\listid13\listoverridecount0\ls13}{\listoverride\listid14\listoverridecount0\ls14}{\listoverride\listid15\listoverridecount0\ls15}{\listoverride\listid16\listoverridecount0\ls16}{\listoverride\listid17\listoverridecount0\ls17}{\listoverride\listid18\listoverridecount0\ls18}{\listoverride\listid19\listoverridecount0\ls19}{\listoverride\listid20\listoverridecount0\ls20}{\listoverride\listid21\listoverridecount0\ls21}{\listoverride\listid22\listoverridecount0\ls22}{\listoverride\listid23\listoverridecount0\ls23}{\listoverride\listid24\listoverridecount0\ls24}{\listoverride\listid25\listoverridecount0\ls25}{\listoverride\listid26\listoverridecount0\ls26}}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs32 \cf2 \expnd0\expndtw0\kerning0
+Estoy usando next auth necesito que convivan oauth de Google con usuario y contrase\'f1a normales por un lado y tambi\'e9n que los usuarios tengan roles y poder controlar accesos estoy entre jwt y database pensando que me sirve m\'e1s para mi plataforma
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs20 \cf2 ChatGPT dijo:
+\f1\b0\fs32 \
+\pard\pardeftab720\partightenfactor0
+
+\f0 \cf2 Pensado durante 24s
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 \'a1Vamos por partes, Daniel! Con 
+\f2\b Auth.js / NextAuth
+\f0\b0  puedes tener 
+\f2\b Google OAuth + usuario/contrase\'f1a
+\f0\b0  sin problema y adem\'e1s 
+\f2\b RBAC
+\f0\b0  (roles) limpio. La gran decisi\'f3n es el 
+\f2\b tipo de sesi\'f3n
+\f0\b0 :
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 \'bfJWT o Database?
+\f1\b0\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b \cf2 JWT (strategy: 'jwt')
+\f1\b0 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls1\ilvl0
+\f3 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\uc0\u9989 
+\f0  Escala super bien en Vercel/Serverless (sin lecturas al DB por request).
+\f1 \
+\ls1\ilvl0
+\f3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\uc0\u9989 
+\f0  Funciona en 
+\f2\b Middleware (Edge)
+\f0\b0  con 
+\f4\fs26\fsmilli13333 getToken()
+\f0\fs32  para proteger rutas por rol antes de llegar al server.
+\f1 \
+\ls1\ilvl0
+\f3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\uc0\u10060 
+\f0  
+\f2\b Revocaci\'f3n
+\f0\b0 /cierre de sesi\'f3n inmediata es m\'e1s compleja (necesitas lista de revocaci\'f3n o rotaci\'f3n corta).
+\f1 \
+\ls1\ilvl0
+\f3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\uc0\u10060 
+\f0  No tienes \'93sesiones\'94 administrables en DB (dif\'edcil auditar y forzar logout).
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b \cf2 Database (strategy: 'database' con Prisma Adapter)
+\f1\b0 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls2\ilvl0
+\f3 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\uc0\u9989 
+\f0  Puedes 
+\f2\b invalidar
+\f0\b0  sesiones al toque (borrar filas), ver dispositivos, auditar.
+\f1 \
+\ls2\ilvl0
+\f3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\uc0\u9989 
+\f0  Sesiones largas seguras (server-side state).
+\f1 \
+\ls2\ilvl0
+\f3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\uc0\u10060 
+\f0  No funciona con 
+\f4\fs26\fsmilli13333 getToken()
+\f0\fs32  en Middleware (Edge) por defecto.
+\f1 \
+\ls2\ilvl0
+\f3 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\uc0\u10060 
+\f0  Hit al DB por verificaci\'f3n de sesi\'f3n (puedes mitigar con cache).
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b \cf2 Regla pr\'e1ctica:
+\f1\b0 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls3\ilvl0
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Si tu prioridad es 
+\f2\b cortar acceso inmediatamente
+\f0\b0 , ver sesiones, auditor\'eda \uc0\u8594  
+\f2\b Database
+\f0\b0 .
+\f1 \
+\ls3\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Si quieres 
+\f2\b protecci\'f3n a nivel de Edge/Middleware
+\f0\b0  (por ejemplo, bloquear por rol est\'e1ticamente en CDN) y m\'e1xima performance \uc0\u8594  
+\f2\b JWT
+\f0\b0  (y agrega revocaci\'f3n con Redis).
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 Con tu stack (Next.js + Prisma + Postgres en Supabase/Neon + Vercel + Upstash Redis), dos caminos s\'f3lidos:
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls4\ilvl0
+\f2\b \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Opci\'f3n A (recomendada si necesitas Edge/Middleware fuerte):
+\f0\b0  
+\f4\fs26\fsmilli13333 strategy: 'jwt'
+\f0\fs32  + 
+\f2\b revocaci\'f3n con Redis
+\f0\b0  (guardar 
+\f4\fs26\fsmilli13333 jti
+\f0\fs32  y TTL; invalidar agregando a una denylist).
+\f1 \
+\ls4\ilvl0
+\f2\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Opci\'f3n B (recomendada si necesitas control total de sesiones):
+\f0\b0  
+\f4\fs26\fsmilli13333 strategy: 'database'
+\f0\fs32  + proteger en 
+\f2\b Route Handlers / RSC / Server Actions
+\f0\b0  (sin Middleware), o emitir un 
+\f2\b JWT adicional
+\f0\b0  solo para Middleware (peque\'f1o custom).
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 Abajo te dejo ambos setups listos.
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 Prisma: modelo con roles y credenciales
+\f1\b0\fs32 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 // schema.prisma
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 enum Role \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 ADMIN
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 MANAGER
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 USER
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 model User \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 id\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 String\'a0 @id @default(cuid())
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 name\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 String?
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 email\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 String? @unique
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 emailVerified DateTime?
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 image\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 String?
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 role\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 Role\'a0\'a0\'a0 @default(USER)
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 // credenciales
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 passwordHash\'a0 String?
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 accounts\'a0\'a0\'a0\'a0\'a0 Account[]
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 sessions\'a0\'a0\'a0\'a0\'a0 Session[]
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 createdAt\'a0\'a0\'a0\'a0 DateTime @default(now())
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 updatedAt\'a0\'a0\'a0\'a0 DateTime @updatedAt
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 model Account \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 id\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 String\'a0 @id @default(cuid())
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 userId\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 String
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 type\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 String
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 provider\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 String
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 providerAccountId String
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 refresh_token\'a0\'a0\'a0\'a0 String?
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 access_token\'a0\'a0\'a0\'a0\'a0 String?
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 expires_at\'a0\'a0\'a0\'a0\'a0\'a0\'a0 Int?
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 token_type\'a0\'a0\'a0\'a0\'a0\'a0\'a0 String?
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 scope\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 String?
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 id_token\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 String?
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 session_state\'a0\'a0\'a0\'a0 String?
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 user\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 User\'a0\'a0\'a0 @relation(fields: [userId], references: [id], onDelete: Cascade)
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 @@unique([provider, providerAccountId])
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 model Session \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 id\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 String\'a0\'a0 @id @default(cuid())
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 sessionToken String\'a0\'a0 @unique
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 userId\'a0\'a0\'a0\'a0\'a0\'a0 String
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 expires\'a0\'a0\'a0\'a0\'a0 DateTime
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 user\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 User\'a0\'a0\'a0\'a0 @relation(fields: [userId], references: [id], onDelete: Cascade)
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 Providers: Google + Credentials
+\f1\b0\fs32 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 // auth.ts (Auth.js v5 estilo) o [...nextauth].ts (v4)
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import NextAuth, \{ type NextAuthConfig \} from "next-auth";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import Google from "next-auth/providers/google";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import Credentials from "next-auth/providers/credentials";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ PrismaAdapter \} from "@auth/prisma-adapter";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ prisma \} from "@/lib/prisma";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import bcrypt from "bcryptjs";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 export const authConfig: NextAuthConfig = \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 adapter: PrismaAdapter(prisma), // Database para users/accounts (y sesiones si usas strategy 'database')
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 session: \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 strategy: "jwt", // <-- cambia a "database" para Opci\'f3n B
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 // maxAge: 30 * 24 * 60 * 60, // 30 d\'edas (ajusta)
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \},
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 providers: [
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 Google(\{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 clientId: process.env.GOOGLE_CLIENT_ID!,
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 clientSecret: process.env.GOOGLE_CLIENT_SECRET!
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 \}),
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 Credentials(\{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 name: "Credentials",
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 credentials: \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 email: \{ label: "Email", type: "text" \},
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 password: \{ label: "Password", type: "password" \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 \},
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 async authorize(creds) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 if (!creds?.email || !creds?.password) return null;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 const user = await prisma.user.findUnique(\{ where: \{ email: creds.email \} \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 if (!user?.passwordHash) return null;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 const ok = await bcrypt.compare(creds.password, user.passwordHash);
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 return ok ? user : null;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 \})
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 ],
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 callbacks: \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 // Incluye rol en el token (JWT) y en la session
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 async jwt(\{ token, user, trigger \}) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 if (user) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 token.role = (user as any).role ?? "USER";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 \} else \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 // refetch role por si cambi\'f3 en DB
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 const dbUser = await prisma.user.findUnique(\{ where: \{ email: token.email! \}, select: \{ role: true \} \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 if (dbUser) token.role = dbUser.role;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 // Opcional: a\'f1ade jti para revocaci\'f3n
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 if (!token.jti) token.jti = crypto.randomUUID();
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 return token;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 \},
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 async session(\{ session, token \}) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 if (session.user) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 (session.user as any).role = token.role;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 return session;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \},
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 pages: \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 signIn: "/login"
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \};
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 export const \{ handlers, auth, signIn, signOut \} = NextAuth(authConfig);
+\f1\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b \cf2 Registro (hash de password):
+\f1\b0 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 // ejemplo de signup server action / API route
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ prisma \} from "@/lib/prisma";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import bcrypt from "bcryptjs";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 export async function register(\{ name, email, password \}: \{ name: string; email: string; password: string; \}) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 const hash = await bcrypt.hash(password, 12);
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 await prisma.user.create(\{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 data: \{ name, email, passwordHash: hash \} // rol por defecto: USER
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 Protecci\'f3n por roles
+\f1\b0\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs36 \cf2 1) Con Middleware (Edge) \uc0\u8594  requiere 
+\f5\fs26\fsmilli13333 strategy: 'jwt'
+\f1\b0\fs32 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 // middleware.ts
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ NextResponse \} from "next/server";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ getToken \} from "next-auth/jwt";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 export async function middleware(req: Request) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 const token = await getToken(\{ req, secret: process.env.NEXTAUTH_SECRET \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 const url = new URL(req.url);
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 // Rutas p\'fablicas
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 if (url.pathname.startsWith("/login") || url.pathname.startsWith("/public")) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 return NextResponse.next();
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0// Requiere auth
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 if (!token) return NextResponse.redirect(new URL("/login", req.url));
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 // Ejemplo: zona admin
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 if (url.pathname.startsWith("/admin")) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 if (token.role !== "ADMIN") return NextResponse.redirect(new URL("/403", req.url));
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 return NextResponse.next();
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 // Matcher para qu\'e9 rutas pasan por middleware
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 export const config = \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 matcher: ["/admin/:path*", "/app/:path*"]
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \};
+\f1\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs36 \cf2 2) En Route Handlers / Server Components (sirve con cualquier estrategia)
+\f1\b0\fs32 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 // app/admin/page.tsx (Server Component)
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ auth \} from "@/auth";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 export default async function AdminPage() \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 const session = await auth();
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 if (!session?.user || (session.user as any).role !== "ADMIN") \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 // puedes throw new Error o redirigir
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 return null;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 return <div>Panel Admin</div>;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs36 \cf2 3) En API routes
+\f1\b0\fs32 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 // app/api/secure/route.ts
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ auth \} from "@/auth";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ NextResponse \} from "next/server";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 export async function GET() \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 const session = await auth();
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 if (!session?.user || (session.user as any).role !== "MANAGER") \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 return new NextResponse("Forbidden", \{ status: 403 \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 return NextResponse.json(\{ ok: true \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 Revocaci\'f3n con JWT (si eliges JWT)
+\f1\b0\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 Como tienes 
+\f2\b Upstash Redis
+\f0\b0 , a\'f1ade una 
+\f2\b denylist
+\f0\b0  por 
+\f4\fs26\fsmilli13333 jti
+\f0\fs32 :
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls5\ilvl0
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+En 
+\f4\fs26\fsmilli13333 jwt()
+\f0\fs32  callback agrega 
+\f4\fs26\fsmilli13333 token.jti
+\f0\fs32 .
+\f1 \
+\ls5\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+En 
+\f4\fs26\fsmilli13333 signOut
+\f0\fs32  o al banear usuario: 
+\f2\b guarda 
+\f5\fs26\fsmilli13333 jti
+\f2\fs32  en Redis
+\f0\b0  con un TTL igual al 
+\f4\fs26\fsmilli13333 maxAge
+\f0\fs32 .
+\f1 \
+\ls5\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+En 
+\f4\fs26\fsmilli13333 middleware
+\f0\fs32  verifica si 
+\f4\fs26\fsmilli13333 jti
+\f0\fs32  est\'e1 en denylist \uc0\u8594  si s\'ed, redirige a 
+\f4\fs26\fsmilli13333 /login
+\f0\fs32 .
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 Pseudoc\'f3digo:
+\f1 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 // lib/session-revocation.ts
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ redis \} from "@/lib/redis"; // Upstash client
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 export async function revokeJti(jti: string, ttlSec: number) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 await redis.set(`revoked:$\{jti\}`, "1", \{ ex: ttlSec \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 export async function isRevoked(jti: string) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 return (await redis.get(`revoked:$\{jti\}`)) === "1";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 // middleware.ts
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 const token = await getToken(\{ req, secret: process.env.NEXTAUTH_SECRET \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 if (token?.jti && await isRevoked(token.jti as string)) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 return NextResponse.redirect(new URL("/login", req.url));
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 \'bfQu\'e9 te conviene?
+\f1\b0\fs32 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls6\ilvl0
+\f2\b \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Si vas a controlar acceso finamente en Edge (middleware), y quieres la mejor latencia en Vercel:
+\f0\b0 \uc0\u8232 
+\f2\b JWT
+\f0\b0  + denylist en Redis.\uc0\u8232 
+\f6\i Tip:
+\f0\i0  acorta 
+\f4\fs26\fsmilli13333 session.maxAge
+\f0\fs32  (p.ej. 7 d\'edas) y exige re-login sensible.
+\f1 \
+\ls6\ilvl0
+\f2\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Si tu prioridad es administraci\'f3n de sesiones (auditor\'eda, cerrar sesiones activas, ver dispositivos) y no necesitas middleware fuerte:
+\f0\b0 \uc0\u8232 
+\f2\b Database sessions
+\f0\b0  con Prisma Adapter. Proteges en server (RSC/Route Handlers).\uc0\u8232 
+\f6\i Puedes cachear lecturas de sesi\'f3n con Redis si hace falta.
+\f1\i0 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 Ambas opciones combinan 
+\f2\b Google OAuth + Credentials
+\f0\b0  sin fricci\'f3n. El 
+\f2\b RBAC
+\f0\b0  va siempre en el 
+\f2\b User.role
+\f0\b0  (o tabla 
+\f4\fs26\fsmilli13333 UserRole
+\f0\fs32  si necesitas roles m\'faltiples por usuario) y lo inyectas en 
+\f4\fs26\fsmilli13333 jwt/session
+\f0\fs32  via callbacks.
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 Extras \'fatiles
+\f1\b0\fs32 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls7\ilvl0
+\f2\b \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Roles m\'faltiples / permisos finos
+\f0\b0 : crea 
+\f4\fs26\fsmilli13333 Role
+\f0\fs32 , 
+\f4\fs26\fsmilli13333 Permission
+\f0\fs32  y 
+\f4\fs26\fsmilli13333 RolePermission
+\f0\fs32 , o un campo 
+\f4\fs26\fsmilli13333 permissions
+\f0\fs32  en el token (derivado de DB) para checks r\'e1pidos.
+\f1 \
+\ls7\ilvl0
+\f2\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+2FA
+\f0\b0 : agrega TOTP (p. ej., 
+\f4\fs26\fsmilli13333 otplib
+\f0\fs32 ) y un 
+\f4\fs26\fsmilli13333 twoFactorEnabled
+\f0\fs32  en 
+\f4\fs26\fsmilli13333 User
+\f0\fs32 ; verifica durante el flujo de Credentials.
+\f1 \
+\ls7\ilvl0
+\f2\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Account linking
+\f0\b0 : NextAuth enlaza autom\'e1ticamente la cuenta Google al 
+\f4\fs26\fsmilli13333 User
+\f0\fs32  existente si coincide el mail (o maneja el merge t\'fa en 
+\f4\fs26\fsmilli13333 signIn
+\f0\fs32  callback).
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+\cf2 Si me dices qu\'e9 priorizas (Edge/Middleware vs. control de sesiones), te dejo el 
+\f2\b set de archivos exacto
+\f0\b0  y un 
+\f2\b checklist de env vars
+\f0\b0  listo para copiar/pegar.
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs26\fsmilli13333 \cf2 Dijiste:
+\f1\b0\fs32 \
+\pard\pardeftab720\partightenfactor0
+
+\f0 \cf2 Osea actualmente tengo redis middleware jwt y oauth andando pero no me reconoce el role del usuario 
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs20 \cf2 ChatGPT dijo:
+\f1\b0\fs32 \
+\pard\pardeftab720\partightenfactor0
+
+\f0 \cf2 Pensado durante 31s
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 Perfecto \'97 si 
+\f2\b JWT + Middleware + OAuth
+\f0\b0  ya est\'e1n andando pero 
+\f5\b\fs26\fsmilli13333 role
+\f2\fs32  llega 
+\f5\fs26\fsmilli13333 undefined
+\f0\b0\fs32  en el token/middleware, casi siempre es por una de estas causas:
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls8\ilvl0
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	1.	}\expnd0\expndtw0\kerning0
+el 
+\f4\fs26\fsmilli13333 role
+\f0\fs32  no existe (o es 
+\f4\fs26\fsmilli13333 NULL
+\f0\fs32 ) en la tabla 
+\f4\fs26\fsmilli13333 User
+\f0\fs32 ,
+\f1 \
+\ls8\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	2.	}\expnd0\expndtw0\kerning0
+el 
+\f4\fs26\fsmilli13333 role
+\f0\fs32  no se 
+\f2\b inyecta
+\f0\b0  al JWT en el callback,
+\f1 \
+\ls8\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	3.	}\expnd0\expndtw0\kerning0
+el JWT en 
+\f2\b Middleware
+\f0\b0  no se actualiza tras cambios de rol,
+\f1 \
+\ls8\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	4.	}\expnd0\expndtw0\kerning0
+falta 
+\f4\fs26\fsmilli13333 NEXTAUTH_SECRET
+\f0\fs32  (el 
+\f4\fs26\fsmilli13333 getToken()
+\f0\fs32  no decodifica bien),
+\f1 \
+\ls8\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	5.	}\expnd0\expndtw0\kerning0
+est\'e1s en 
+\f2\b Auth.js v5
+\f0\b0  y el archivo/config no est\'e1 cableando los callbacks como crees.
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 Te dejo un 
+\f2\b checklist de diagn\'f3stico r\'e1pido
+\f0\b0  + 
+\f2\b parches concretos
+\f0\b0 .
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 1) Asegura 
+\f5\fs26\fsmilli13333 role
+\f2\fs64  en DB (no nulo + default)
+\f1\b0\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 En Prisma:
+\f1 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 enum Role \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 ADMIN
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 MANAGER
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 USER
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 model User \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 id\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 String\'a0 @id @default(cuid())
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 email\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 String? @unique
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 name\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 String?
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 image\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 String?
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 emailVerified DateTime?
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 role\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 Role\'a0\'a0\'a0 @default(USER) // <- default real en DB
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 passwordHash\'a0 String?
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 accounts\'a0\'a0\'a0\'a0\'a0 Account[]
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 sessions\'a0\'a0\'a0\'a0\'a0 Session[]
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 createdAt\'a0\'a0\'a0\'a0 DateTime @default(now())
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 updatedAt\'a0\'a0\'a0\'a0 DateTime @updatedAt
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b \cf2 Migraci\'f3n para backfill
+\f0\b0  (si ya tienes usuarios sin rol):
+\f1 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 -- Asegura default
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 ALTER TABLE "User" ALTER COLUMN "role" SET DEFAULT 'USER';
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 -- Backfill nulos
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 UPDATE "User" SET "role" = 'USER' WHERE "role" IS NULL;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 -- Haz NOT NULL si quieres forzarlo:
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 ALTER TABLE "User" ALTER COLUMN "role" SET NOT NULL;
+\f1\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 Google OAuth v\'eda Prisma Adapter respetar\'e1 el default si el campo tiene default real en DB.
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 2) Inyecta el 
+\f5\fs26\fsmilli13333 role
+\f2\fs64  al JWT y a la session
+\f1\b0\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs36 \cf2 Auth.js v5 (archivo 
+\f5\fs26\fsmilli13333 auth.ts
+\f2\fs36 )
+\f1\b0\fs32 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 import NextAuth, \{ type NextAuthConfig \} from "next-auth";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import Google from "next-auth/providers/google";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import Credentials from "next-auth/providers/credentials";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ PrismaAdapter \} from "@auth/prisma-adapter";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ prisma \} from "@/lib/prisma";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import bcrypt from "bcryptjs";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 declare module "next-auth" \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 interface Session \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 user: \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 id: string;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 role: "ADMIN" | "MANAGER" | "USER";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 name?: string | null;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 email?: string | null;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 image?: string | null;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 \};
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 declare module "next-auth/jwt" \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 interface JWT \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 role?: "ADMIN" | "MANAGER" | "USER";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 jti?: string;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 export const authConfig: NextAuthConfig = \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 adapter: PrismaAdapter(prisma),
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 session: \{ strategy: "jwt" \}, // IMPORTANTE para Middleware
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 providers: [
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 Google(\{ clientId: process.env.GOOGLE_CLIENT_ID!, clientSecret: process.env.GOOGLE_CLIENT_SECRET! \}),
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 Credentials(\{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 name: "Credentials",
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 credentials: \{ email: \{ label: "Email" \}, password: \{ label: "Password", type: "password" \} \},
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 async authorize(c) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 if (!c?.email || !c?.password) return null;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 \'a0\'a0\'a0\'a0const user = await prisma.user.findUnique(\{ where: \{ email: c.email \} \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 if (!user?.passwordHash) return null;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 const ok = await bcrypt.compare(c.password, user.passwordHash);
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 return ok ? user : null;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 \})
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 ],
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 callbacks: \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 async jwt(\{ token, user, trigger \}) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 // En primer login (OAuth o Credentials), 'user' viene poblado:
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 if (user) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 token.role = (user as any).role ?? "USER";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 if (!token.jti) token.jti = crypto.randomUUID();
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 return token;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 // Si el token ya exist\'eda pero no tiene role (o cambi\'f3 en DB)
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 if (!token.role) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 const db = await prisma.user.findUnique(\{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 where: \{ email: token.email! \},
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 select: \{ role: true \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 if (db?.role) token.role = db.role;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 // Opcional: refrescar rol si t\'fa lo cambiaste en DB y llamas a update() client-side
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 if (trigger === "update") \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 const db = await prisma.user.findUnique(\{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 where: \{ email: token.email! \},
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0\'a0 select: \{ role: true \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 if (db?.role) token.role = db.role;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 return token;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 \},
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 async session(\{ session, token \}) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 if (session.user) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0\'a0\'a0 (session.user as any).role = (token.role as any) ?? "USER";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 return session;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \},
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 pages: \{ signIn: "/login" \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \};
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 export const \{ handlers, auth, signIn, signOut \} = NextAuth(authConfig);
+\f1\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 En v4 el concepto es igual, solo cambia la forma de exportar. Lo esencial: 
+\f2\b en 
+\f5\fs26\fsmilli13333 jwt()
+\f2\fs32  pones 
+\f5\fs26\fsmilli13333 token.role
+\f0\b0\fs32  y en 
+\f4\fs26\fsmilli13333 session()
+\f0\fs32  lo copias a 
+\f4\fs26\fsmilli13333 session.user.role
+\f0\fs32 .
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 3) Middleware que realmente lea el 
+\f5\fs26\fsmilli13333 role
+\f1\b0\fs32 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 // middleware.ts
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ NextResponse \} from "next/server";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ getToken \} from "next-auth/jwt";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 export async function middleware(req: Request) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 const token = await getToken(\{ req, secret: process.env.NEXTAUTH_SECRET \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 const url = new URL(req.url);
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 // rutas p\'fablicas
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 if (url.pathname.startsWith("/login") || url.pathname.startsWith("/public")) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 return NextResponse.next();
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 if (!token) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 return NextResponse.redirect(new URL("/login", req.url));
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 // Ejemplo: /admin requiere ADMIN
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 if (url.pathname.startsWith("/admin") && token.role !== "ADMIN") \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 return NextResponse.redirect(new URL("/403", req.url));
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 return NextResponse.next();
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 export const config = \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 matcher: ["/app/:path*", "/admin/:path*"]
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \};
+\f1\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b \cf2 Claves:
+\f1\b0 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls9\ilvl0
+\f4\fs26\fsmilli13333 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+process.env.NEXTAUTH_SECRET
+\f0\fs32  
+\f2\b debe
+\f0\b0  estar seteado (en Vercel y local).
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls9\ilvl0
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+La estrategia 
+\f2\b debe
+\f0\b0  ser 
+\f4\fs26\fsmilli13333 'jwt'
+\f0\fs32 .
+\f1 \
+\ls9\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Comprueba en el navegador las cookies: 
+\f4\fs26\fsmilli13333 __Secure-next-auth.session-token
+\f0\fs32  (o 
+\f4\fs26\fsmilli13333 next-auth.session-token
+\f0\fs32  local).
+\f1 \
+\ls9\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Si 
+\f4\fs26\fsmilli13333 getToken()
+\f0\fs32  devuelve token pero sin tu 
+\f4\fs26\fsmilli13333 role
+\f0\fs32 , es que 
+\f2\b no lo metiste
+\f0\b0  en 
+\f4\fs26\fsmilli13333 callbacks.jwt
+\f0\fs32 .
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 4) \'93Cambio de rol\'94 no se refleja en Middleware
+\f1\b0\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 El Middleware 
+\f2\b no vuelve a llamar
+\f0\b0  tus callbacks. Si cambias el rol en DB y quieres que el JWT/middleware lo refleje:
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls10\ilvl0
+\f2\b \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+v5
+\f0\b0 : desde el cliente, tras cambiar el rol, llama:
+\f1 \
+\pard\pardeftab720\li960\fi-480\partightenfactor0
+
+\f7\fs26\fsmilli13333 \cf2 \'e1
+\f0\fs18\fsmilli9333 \'a0\'a0\'a0\'a0\'a0\'a0 
+\f4\fs26\fsmilli13333 import \{ update \} from "next-auth/react";
+\f1\fs32 \
+
+\f7\fs26\fsmilli13333 \'e1
+\f0\fs18\fsmilli9333 \'a0\'a0\'a0\'a0\'a0\'a0 
+\f4\fs26\fsmilli13333 await update(); // trigger === "update" en jwt(), refresca desde DB
+\f1\fs32 \
+\pard\pardeftab720\li960\sa213\partightenfactor0
+
+\f0 \cf2 (si usas el helper 
+\f4\fs26\fsmilli13333 auth().update()
+\f0\fs32  en server actions, tambi\'e9n sirve)
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls11\ilvl0
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+O fuerza 
+\f2\b re-login
+\f0\b0  (
+\f4\fs26\fsmilli13333 signOut
+\f0\fs32  + 
+\f4\fs26\fsmilli13333 signIn
+\f0\fs32 ), que recrea el token.
+\f1 \
+\ls11\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Si usas 
+\f2\b denylist
+\f0\b0  en Redis por 
+\f4\fs26\fsmilli13333 jti
+\f0\fs32 , puedes \'93invalidar\'94 al usuario y obligar re-auth.
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 5) Errores comunes que causan 
+\f5\fs26\fsmilli13333 role = undefined
+\f1\b0\fs32 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls12\ilvl0
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+El campo 
+\f4\fs26\fsmilli13333 role
+\f0\fs32  en Prisma es 
+\f4\fs26\fsmilli13333 String?
+\f0\fs32  en lugar de 
+\f4\fs26\fsmilli13333 Role @default(USER)
+\f0\fs32  \uc0\u8594  queda 
+\f4\fs26\fsmilli13333 NULL
+\f0\fs32 .
+\f1 \
+\ls12\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+El 
+\f2\b adapter
+\f0\b0  crea el usuario OAuth y el default 
+\f2\b no
+\f0\b0  est\'e1 definido en la DB (solo en Prisma sin migraci\'f3n).
+\f1 \
+\ls12\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+El archivo de config est\'e1 pero tu app usa 
+\f2\b otra instancia
+\f0\b0  (import equivocado o doble config).
+\f1 \
+\ls12\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Falta 
+\f4\fs26\fsmilli13333 NEXTAUTH_SECRET
+\f0\fs32  \uc0\u8594  
+\f4\fs26\fsmilli13333 getToken()
+\f0\fs32  no decodifica y devuelve un objeto m\'ednimo.
+\f1 \
+\ls12\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Tipo de 
+\f4\fs26\fsmilli13333 Session
+\f0\fs32  no extendido y en el cliente haces 
+\f4\fs26\fsmilli13333 session.user.role
+\f0\fs32  sin que jam\'e1s lo hayas copiado en 
+\f4\fs26\fsmilli13333 callbacks.session
+\f0\fs32 .
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 6) Test r\'e1pido (confirma en 2 minutos)
+\f1\b0\fs32 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls13\ilvl0
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	1.	}\expnd0\expndtw0\kerning0
+Corre en una 
+\f2\b API route
+\f0\b0  temporal:
+\f1 \
+\pard\pardeftab720\li960\fi-480\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 2.
+\f0\fs18\fsmilli9333 \'a0 
+\f4\fs26\fsmilli13333 // app/api/debug-session/route.ts
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 3.
+\f0\fs18\fsmilli9333 \'a0 
+\f4\fs26\fsmilli13333 import \{ auth \} from "@/auth";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 4.
+\f0\fs18\fsmilli9333 \'a0 
+\f4\fs26\fsmilli13333 import \{ NextResponse \} from "next/server";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 5.
+\f0\fs18\fsmilli9333 \'a0 
+\f4\fs26\fsmilli13333 export async function GET() \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 6.
+\f0\fs18\fsmilli9333 \'a0 
+\f4\fs26\fsmilli13333 \'a0\'a0const session = await auth();
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 7.
+\f0\fs18\fsmilli9333 \'a0 
+\f4\fs26\fsmilli13333 \'a0\'a0return NextResponse.json(session);
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 8.
+\f0\fs18\fsmilli9333 \'a0 
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+\pard\pardeftab720\li960\sa213\partightenfactor0
+
+\f0 \cf2 Abre 
+\f4\fs26\fsmilli13333 /api/debug-session
+\f0\fs32 : \'bfves 
+\f4\fs26\fsmilli13333 session.user.role
+\f0\fs32 ?
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls14\ilvl0
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	9.	}\expnd0\expndtw0\kerning0
+Crea p\'e1gina protegida:
+\f1 \
+\pard\pardeftab720\li960\fi-480\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 10.// app/admin/page.tsx
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 11.import \{ auth \} from "@/auth";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 12.export default async function Admin() \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 13.\'a0 const session = await auth();
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 14.\'a0 return <pre>\{JSON.stringify(session, null, 2)\}</pre>;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 15.\}
+\f1\fs32 \
+\pard\pardeftab720\li960\sa213\partightenfactor0
+
+\f0 \cf2 \'bfTe redirige el middleware si no tienes 
+\f4\fs26\fsmilli13333 ADMIN
+\f0\fs32 ?
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls15\ilvl0
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	16.	}\expnd0\expndtw0\kerning0
+En DB, ejecuta:
+\f1 \
+\pard\pardeftab720\li960\fi-480\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 17.SELECT id, email, role FROM "User" ORDER BY createdAt DESC LIMIT 5;
+\f1\fs32 \
+\pard\pardeftab720\li960\sa213\partightenfactor0
+
+\f0 \cf2 \'bfTienen 
+\f4\fs26\fsmilli13333 role
+\f0\fs32 ?
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 7) Si usas Credentials y Google a la vez
+\f1\b0\fs32 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls16\ilvl0
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Para 
+\f2\b mergear cuentas
+\f0\b0  por email, NextAuth lo maneja solo con el Adapter; si creaste un usuario manual con 
+\f4\fs26\fsmilli13333 passwordHash
+\f0\fs32  y luego entra por Google, caer\'e1 en el mismo 
+\f4\fs26\fsmilli13333 User
+\f0\fs32  si el email coincide.
+\f1 \
+\ls16\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Si quieres forzar un rol inicial distinto por dominio (p.ej. 
+\f4\fs26\fsmilli13333 @tuempresa.com
+\f0\fs32 ) agrega l\'f3gica en 
+\f4\fs26\fsmilli13333 events.createUser
+\f0\fs32  o en 
+\f4\fs26\fsmilli13333 signIn
+\f0\fs32  callback.
+\f1 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 events: \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 async createUser(\{ user \}) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 // ejemplo: dar MANAGER por dominio corporativo
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 if (user.email?.endsWith("@tuempresa.com")) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 await prisma.user.update(\{ where: \{ id: user.id \}, data: \{ role: "MANAGER" \} \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs48 \cf2 Resumen operativo
+\f1\b0\fs32 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls17\ilvl0
+\f2\b \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+DB
+\f0\b0 : asegura 
+\f4\fs26\fsmilli13333 role
+\f0\fs32  con default + backfill.
+\f1 \
+\ls17\ilvl0
+\f2\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Auth config
+\f0\b0 : en 
+\f4\fs26\fsmilli13333 callbacks.jwt
+\f0\fs32  mete 
+\f4\fs26\fsmilli13333 token.role
+\f0\fs32  (y opcionalmente 
+\f4\fs26\fsmilli13333 jti
+\f0\fs32 ). En 
+\f4\fs26\fsmilli13333 callbacks.session
+\f0\fs32  copia 
+\f4\fs26\fsmilli13333 role
+\f0\fs32  a 
+\f4\fs26\fsmilli13333 session.user.role
+\f0\fs32 .
+\f1 \
+\ls17\ilvl0
+\f2\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Middleware
+\f0\b0 : usa 
+\f4\fs26\fsmilli13333 getToken(secret)
+\f0\fs32 , verifica 
+\f4\fs26\fsmilli13333 token.role
+\f0\fs32 .
+\f1 \
+\ls17\ilvl0
+\f2\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Cambios de rol
+\f0\b0 : usa 
+\f4\fs26\fsmilli13333 update()
+\f0\fs32  o re-login para refrescar el JWT.
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 Si quieres, p\'e9game aqu\'ed tu 
+\f4\fs26\fsmilli13333 auth.ts
+\f0\fs32 /
+\f4\fs26\fsmilli13333 [...nextauth].ts
+\f0\fs32 , tu 
+\f4\fs26\fsmilli13333 middleware.ts
+\f0\fs32  y el 
+\f4\fs26\fsmilli13333 schema.prisma
+\f0\fs32  de 
+\f4\fs26\fsmilli13333 User
+\f0\fs32  y te lo ajusto in situ.
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs26\fsmilli13333 \cf2 Dijiste:
+\f1\b0\fs32 \
+\pard\pardeftab720\partightenfactor0
+
+\f0 \cf2 Osea con jwt es normal que la tabla sessions est\'e9 vac\'eda cierto?
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs20 \cf2 ChatGPT dijo:
+\f1\b0\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 Exacto 
+\f3 \uc0\u9989 
+\f0 .\uc0\u8232 Si est\'e1s usando 
+\f2\b NextAuth con 
+\f5\fs26\fsmilli13333 session.strategy = "jwt"
+\f0\b0\fs32 , entonces:
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls18\ilvl0
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+La tabla 
+\f4\fs26\fsmilli13333 Session
+\f0\fs32  de Prisma/DB 
+\f2\b queda vac\'eda
+\f0\b0 .
+\f1 \
+\ls18\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+NextAuth 
+\f2\b no guarda sesiones en DB
+\f0\b0 , solo crea el 
+\f4\fs26\fsmilli13333 User
+\f0\fs32  y los 
+\f4\fs26\fsmilli13333 Account
+\f0\fs32  (para OAuth).
+\f1 \
+\ls18\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Toda la info de sesi\'f3n (incluido tu 
+\f4\fs26\fsmilli13333 role
+\f0\fs32 ) vive en el 
+\f2\b JWT
+\f0\b0  que viaja en la cookie 
+\f4\fs26\fsmilli13333 next-auth.session-token
+\f0\fs32 .
+\f1 \
+\ls18\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Eso es lo que usas en 
+\f2\b middleware
+\f0\b0  con 
+\f4\fs26\fsmilli13333 getToken()
+\f0\fs32 .
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f3 \cf2 \uc0\u55357 \u56393 
+\f0  En cambio, si cambiaras a 
+\f4\fs26\fsmilli13333 session.strategy = "database"
+\f0\fs32 , ah\'ed s\'ed NextAuth llenar\'eda la tabla 
+\f4\fs26\fsmilli13333 Session
+\f0\fs32  con 
+\f4\fs26\fsmilli13333 sessionToken
+\f0\fs32 , 
+\f4\fs26\fsmilli13333 expires
+\f0\fs32 , etc., y cada request valida contra la DB.
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f3 \cf2 \uc0\u55357 \u56524 
+\f0  En tu caso (Redis + Middleware + JWT), lo correcto es que la tabla 
+\f4\fs26\fsmilli13333 Session
+\f0\fs32  est\'e9 vac\'eda, y no hay problema:
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls19\ilvl0
+\f4\fs26\fsmilli13333 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+User
+\f0\fs32  y 
+\f4\fs26\fsmilli13333 Account
+\f0\fs32  guardan los datos persistentes.
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls19\ilvl0
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Los 
+\f2\b tokens
+\f0\b0  llevan 
+\f4\fs26\fsmilli13333 role
+\f0\fs32  y cualquier otro dato que metas en el callback 
+\f4\fs26\fsmilli13333 jwt
+\f0\fs32 .
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 \'bfQuieres que te muestre c\'f3mo probar en consola (con 
+\f4\fs26\fsmilli13333 getToken
+\f0\fs32 ) qu\'e9 contiene tu JWT y confirmar que el 
+\f4\fs26\fsmilli13333 role
+\f0\fs32  est\'e1 pasando bien?
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs26\fsmilli13333 \cf2 Dijiste:
+\f1\b0\fs32 \
+\pard\pardeftab720\partightenfactor0
+
+\f0 \cf2 Qu\'e9 es lo que hacemos en redis 
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs20 \cf2 ChatGPT dijo:
+\f1\b0\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 Buena pregunta \'97 porque con 
+\f2\b JWT strategy
+\f0\b0  ya no hay tabla 
+\f4\fs26\fsmilli13333 Session
+\f0\fs32  en la base de datos, entonces Redis entra a jugar para suplir lo que pierdes al no tener sesiones \'93server-side\'94.\uc0\u8232 En tu stack (Vercel + Next.js + NextAuth + JWT), Redis cumple 2 funciones t\'edpicas:
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f3\fs48 \cf2 \uc0\u55357 \u56593 
+\f2\b  1. Revocaci\'f3n / invalidaci\'f3n de tokens
+\f1\b0\fs32 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls20\ilvl0
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Problema: un JWT es v\'e1lido hasta que expira. No puedes borrarlo de la DB porque 
+\f2\b no est\'e1 en DB
+\f0\b0 .
+\f1 \
+\ls20\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Soluci\'f3n: cuando un usuario cierra sesi\'f3n, o le cambias rol/lo bloqueas, 
+\f2\b guardas su 
+\f5\fs26\fsmilli13333 jti
+\f2\fs32  (JWT ID)
+\f0\b0  en Redis con un TTL = tiempo de vida restante del token.
+\f1 \
+\ls20\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+En el 
+\f4\fs26\fsmilli13333 middleware.ts
+\f0\fs32 , cada request:
+\f1 \
+\pard\tx940\tx1440\pardeftab720\li1440\fi-1440\sa213\partightenfactor0
+\ls20\ilvl1
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+Decodificas el token con 
+\f4\fs26\fsmilli13333 getToken()
+\f0\fs32 .
+\f1 \
+\ls20\ilvl1
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+Preguntas en Redis si ese 
+\f4\fs26\fsmilli13333 jti
+\f0\fs32  est\'e1 en la lista de revocados.
+\f1 \
+\ls20\ilvl1
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+Si s\'ed \uc0\u8594  rechazas/rediriges a login.
+\f1 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 // lib/session-revocation.ts
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ redis \} from "@/lib/redis"; // Upstash client
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 export async function revokeJti(jti: string, ttl: number) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 await redis.set(`revoked:$\{jti\}`, "1", \{ ex: ttl \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 export async function isRevoked(jti: string) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 return (await redis.get(`revoked:$\{jti\}`)) === "1";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f3\fs48 \cf2 \uc0\u55357 \u56593 
+\f2\b  2. Cache de roles / claims
+\f1\b0\fs32 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls21\ilvl0
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+A veces no quieres ir a Postgres en cada request para verificar permisos.
+\f1 \
+\ls21\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Entonces, cuando generas el JWT, guardas en Redis un mapping 
+\f4\fs26\fsmilli13333 userId \uc0\u8594  role/permisos
+\f0\fs32 .
+\f1 \
+\ls21\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+El middleware puede validar:
+\f1 \
+\pard\tx940\tx1440\pardeftab720\li1440\fi-1440\sa213\partightenfactor0
+\ls21\ilvl1
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+Token v\'e1lido.
+\f1 \
+\ls21\ilvl1
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+\'bfCoincide rol en Redis? (\'fatil si cambiaste el rol en DB y quieres que tome efecto sin re-login).
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f3\fs48 \cf2 \uc0\u55357 \u56593 
+\f2\b  3. Session store extendido (opcional)
+\f1\b0\fs32 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls22\ilvl0
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Aunque uses JWT, puedes usar Redis para llevar un \'93shadow session store\'94: guardar cu\'e1ndo fue la \'faltima actividad del usuario, en qu\'e9 dispositivos est\'e1 conectado, etc.
+\f1 \
+\ls22\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Esto te da m\'e9tricas y control m\'e1s parecido a 
+\f4\fs26\fsmilli13333 strategy: "database"
+\f0\fs32 , pero sin pegarle a Postgres en cada request.
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f3\fs48 \cf2 \uc0\u55358 \u56809 
+\f2\b  En resumen
+\f1\b0\fs32 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls23\ilvl0
+\f2\b \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Redis = control de estado ef\'edmero
+\f0\b0  que JWT por s\'ed solo no te da.
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls23\ilvl0
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+M\'ednimo, \'fasalo para 
+\f2\b revocaci\'f3n de tokens
+\f0\b0 .
+\f1 \
+\ls23\ilvl0
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Opcionalmente, \'fasalo para cachear 
+\f2\b roles/permisos
+\f0\b0  o para 
+\f2\b auditor\'eda de sesiones
+\f0\b0 .
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+\cf2 \'bfQuieres que te arme un ejemplo end-to-end de flujo 
+\f2\b signOut \uc0\u8594  revocar en Redis \u8594  middleware detecta y expulsa
+\f0\b0  para que quede plug-and-play en tu proyecto?
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs26\fsmilli13333 \cf2 Dijiste:
+\f1\b0\fs32 \
+\pard\pardeftab720\partightenfactor0
+
+\f0 \cf2 Osea tengo todo lo que podr\'eda tener con la estrategia database pero moderno
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs20 \cf2 ChatGPT dijo:
+\f1\b0\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 Casi: con 
+\f2\b JWT + Middleware + Redis
+\f0\b0  puedes cubrir 
+\f2\b 80\'9690%
+\f0\b0  de lo que da 
+\f4\fs26\fsmilli13333 strategy: "database"
+\f0\fs32  y, en varios casos, hacerlo 
+\f2\b mejor
+\f0\b0  (edge, latencia, escalabilidad). Te dejo el mapa r\'e1pido de 
+\f2\b paridad vs. extras
+\f0\b0  y qu\'e9 faltar\'eda \'93codificar\'94 para estar 1:1.
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 Qu\'e9 ya tienes (o puedes tener) con JWT+Redis
+\f1\b0\fs32 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls24\ilvl0
+\f2\b \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Auth universal
+\f0\b0 : OAuth (Google) + Credentials conviven perfecto.
+\f1 \
+\ls24\ilvl0
+\f2\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+RBAC
+\f0\b0 : 
+\f4\fs26\fsmilli13333 role
+\f0\fs32  en el 
+\f2\b JWT
+\f0\b0  (y opcionalmente cache en Redis).
+\f1 \
+\ls24\ilvl0
+\f2\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Protecci\'f3n en Edge
+\f0\b0 : 
+\f4\fs26\fsmilli13333 middleware
+\f0\fs32  con 
+\f4\fs26\fsmilli13333 getToken()
+\f0\fs32  (ventaja sobre DB).
+\f1 \
+\ls24\ilvl0
+\f2\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Cierre de sesi\'f3n inmediato
+\f0\b0 : 
+\f2\b denylist por 
+\f5\fs26\fsmilli13333 jti
+\f0\b0\fs32  en Redis (equivale a borrar 
+\f4\fs26\fsmilli13333 Session
+\f0\fs32  en DB).
+\f1 \
+\ls24\ilvl0
+\f2\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Forzar re-login por cambio de rol
+\f0\b0 : 
+\f4\fs26\fsmilli13333 update()
+\f0\fs32  (Auth.js v5) + \'93token version\'94 o revoke por 
+\f4\fs26\fsmilli13333 jti
+\f0\fs32 .
+\f1 \
+\ls24\ilvl0
+\f2\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Escalado serverless
+\f0\b0 : sin lecturas a Postgres por request.
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 Lo que no viene \'93de f\'e1brica\'94 (pero puedes implementar en Redis)
+\f1\b0\fs32 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls25\ilvl0
+\f2\b \cf2 \kerning1\expnd0\expndtw0 {\listtext	1.	}\expnd0\expndtw0\kerning0
+Lista de sesiones activas / dispositivos
+\f1\b0 \
+\pard\tx940\tx1440\pardeftab720\li1440\fi-1440\sa213\partightenfactor0
+\ls25\ilvl1
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+En DB strategy te viene listo.
+\f1 \
+\ls25\ilvl1
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+Con JWT: guarda en Redis un 
+\f4\fs26\fsmilli13333 SET
+\f0\fs32  por usuario (p.ej. 
+\f4\fs26\fsmilli13333 user:\{id\}:sessions
+\f0\fs32 ) con objetos 
+\f4\fs26\fsmilli13333 \{ jti, ua, ip, lastSeen \}
+\f0\fs32 .
+\f1 \
+\ls25\ilvl1
+\f0 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+Permite: ver dispositivos, cerrar sesi\'f3n por dispositivo \uc0\u8594  revocar 
+\f4\fs26\fsmilli13333 jti
+\f0\fs32 .
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls25\ilvl0
+\f2\b \cf2 \kerning1\expnd0\expndtw0 {\listtext	2.	}\expnd0\expndtw0\kerning0
+L\'edmite de sesiones concurrentes
+\f1\b0 \
+\pard\tx940\tx1440\pardeftab720\li1440\fi-1440\sa213\partightenfactor0
+\ls25\ilvl1
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+En login, cuenta 
+\f4\fs26\fsmilli13333 SCARD user:\{id\}:sessions
+\f0\fs32  y si supera el l\'edmite, revoca la m\'e1s antigua.
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls25\ilvl0
+\f2\b \cf2 \kerning1\expnd0\expndtw0 {\listtext	3.	}\expnd0\expndtw0\kerning0
+Auditor\'eda ligera (\'faltimo acceso, IP, UA)
+\f1\b0 \
+\pard\tx940\tx1440\pardeftab720\li1440\fi-1440\sa213\partightenfactor0
+\ls25\ilvl1
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+Actualiza 
+\f4\fs26\fsmilli13333 lastSeen
+\f0\fs32  en Redis en cada request (o cada X minutos para no saturar).
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls25\ilvl0
+\f2\b \cf2 \kerning1\expnd0\expndtw0 {\listtext	4.	}\expnd0\expndtw0\kerning0
+Rotaci\'f3n / refresh de JWT
+\f0\b0  (si quieres caducidades cortas con UX suave)
+\f1 \
+\pard\tx940\tx1440\pardeftab720\li1440\fi-1440\sa213\partightenfactor0
+\ls25\ilvl1
+\f0 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+Mant\'e9n 
+\f4\fs26\fsmilli13333 maxAge
+\f0\fs32  corto y renueva token en background (silent refresh) o con 
+\f4\fs26\fsmilli13333 update()
+\f0\fs32 .
+\f1 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 Snippets m\'ednimos (plug-and-play)
+\f1\b0\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b \cf2 1) Guardar y revocar sesiones
+\f1\b0 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 // Al emitir login/signIn (server action o callback):
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 await redis.hset(`sess:$\{jti\}`, \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 userId, ua, ip, createdAt: Date.now(), lastSeen: Date.now()
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 await redis.sadd(`user:$\{userId\}:sessions`, jti);
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 // Sign out espec\'edfico:
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 await redis.del(`sess:$\{jti\}`);
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 await redis.srem(`user:$\{userId\}:sessions`, jti);
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 // Y a\'f1ade a denylist por el tiempo de vida restante:
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 await redis.set(`revoked:$\{jti\}`, "1", \{ ex: ttlSec \});
+\f1\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b \cf2 2) Middleware: bloqueo por revoke + \'93token version\'94
+\f1\b0 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 import \{ getToken \} from "next-auth/jwt";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ NextResponse \} from "next/server";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ redis \} from "@/lib/redis";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 export async function middleware(req: Request) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 const token = await getToken(\{ req, secret: process.env.NEXTAUTH_SECRET \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 const url = new URL(req.url);
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 if (!token) return NextResponse.redirect(new URL("/login", req.url));
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 // Denylist por jti
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 if (token.jti && await redis.get(`revoked:$\{token.jti\}`)) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 return NextResponse.redirect(new URL("/login", req.url));
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 // Versionado de rol/permisos (opcional)
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 // Guarda en DB/Redis user.version y comp\'e1rala:
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 const v = await redis.get(`user:$\{token.sub\}:ver`);
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 if (v && token.ver && v !== String(token.ver)) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 return NextResponse.redirect(new URL("/login", req.url));
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 // Check de rol
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 if (url.pathname.startsWith("/admin") && token.role !== "ADMIN") \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 return NextResponse.redirect(new URL("/403", req.url));
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 return NextResponse.next();
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b \cf2 3) Callbacks para inyectar 
+\f5\fs26\fsmilli13333 role
+\f2\fs32  + 
+\f5\fs26\fsmilli13333 jti
+\f2\fs32  + 
+\f5\fs26\fsmilli13333 ver
+\f1\b0\fs32 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 callbacks: \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 async jwt(\{ token, user, trigger \}) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 if (user) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 token.role = (user as any).role ?? "USER";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 token.jti = crypto.randomUUID();
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 // lee versionado (incrementa cuando cambias rol/permiso):
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 const ver = await redis.get(`user:$\{user.id\}:ver`);
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 token.ver = ver ? Number(ver) : 1;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 return token;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 // refresco en update() o si no hay role:
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 if (!token.role || trigger === "update") \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 const db = await prisma.user.findUnique(\{ where: \{ email: token.email! \}, select: \{ role: true \} \});
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0\'a0\'a0 if (db?.role) token.role = db.role;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 return token;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \},
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 async session(\{ session, token \}) \{
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 (session.user as any).role = token.role;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0\'a0\'a0 return session;
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \'a0 \}
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 \}
+\f1\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b \cf2 4) Cambio de rol \'93en caliente\'94
+\f1\b0 \
+\pard\pardeftab720\partightenfactor0
+
+\f4\fs26\fsmilli13333 \cf2 // Despu\'e9s de cambiar role en DB:
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 await redis.incr(`user:$\{userId\}:ver`); // invalida tokens previos via middleware
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 // En el cliente:
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 import \{ update \} from "next-auth/react";
+\f1\fs32 \
+
+\f4\fs26\fsmilli13333 await update(); // refresca JWT con nuevo role
+\f1\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs64 \cf2 Buenas pr\'e1cticas (resumen)
+\f1\b0\fs32 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls26\ilvl0
+\f5\b\fs26\fsmilli13333 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+maxAge
+\f2\fs32  razonable
+\f0\b0  (p. ej., 7\'9614 d\'edas) + 
+\f4\fs26\fsmilli13333 update()
+\f0\fs32  para refrescar.
+\f1 \
+\ls26\ilvl0
+\f5\b\fs26\fsmilli13333 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+jti
+\f2\fs32  siempre en JWT
+\f0\b0  + denylist en Redis.
+\f1 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sa213\partightenfactor0
+\ls26\ilvl0
+\f2\b \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Versionado de usuario
+\f0\b0  para invalidar tokens tras cambios cr\'edticos (rol, permisos, bloqueo).
+\f1 \
+\ls26\ilvl0
+\f2\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+TLS + Secure cookies
+\f0\b0  en producci\'f3n (Vercel ya ayuda).
+\f1 \
+\ls26\ilvl0
+\f2\b \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Scopes de OAuth
+\f0\b0  m\'ednimos; si guardas 
+\f4\fs26\fsmilli13333 id_token
+\f0\fs32 , tr\'e1talo como secreto.
+\f1 \
+\pard\pardeftab720\sa160\qc\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f2\b\fs48 \cf2 Conclusi\'f3n
+\f1\b0\fs32 \
+\pard\pardeftab720\sa213\partightenfactor0
+
+\f0 \cf2 S\'ed: con JWT + Redis + Middleware tienes 
+\f2\b lo \'93moderno\'94
+\f0\b0  (edge, performance, menos DB) y puedes alcanzar la 
+\f2\b paridad funcional
+\f0\b0  con 
+\f4\fs26\fsmilli13333 strategy: "database"
+\f0\fs32  a\'f1adiendo 2\'963 piezas peque\'f1as (denylist, tracking en Redis y versionado). Si quieres, te armo un 
+\f2\b mini m\'f3dulo 
+\f5\fs26\fsmilli13333 lib/auth-state.ts
+\f0\b0\fs32  con estas utilidades y los hooks de NextAuth ya cableados a tu c\'f3digo.
+\f1 \
+\pard\pardeftab720\sl368\sa213\partightenfactor0
+\cf2 \'a0\
+}

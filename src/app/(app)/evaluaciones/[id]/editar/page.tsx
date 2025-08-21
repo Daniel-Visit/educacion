@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import EvaluacionForm from '@/components/evaluacion/EvaluacionForm';
 import EstadoEvaluacion from '@/components/evaluacion/EstadoEvaluacion';
+import type { EstadoEvaluacion as EstadoEvaluacionType } from '@/lib/evaluacion-utils';
 
 interface Evaluacion {
   id: number;
@@ -42,10 +43,13 @@ export default function EditarEvaluacionPage() {
   useEffect(() => {
     const handleEstadoActualizado = (event: CustomEvent) => {
       if (event.detail.evaluacionId === parseInt(id as string)) {
-        setEvaluacion((prev: Evaluacion | null) => ({
-          ...prev,
-          estado: event.detail.estado,
-        }));
+        setEvaluacion((prev: Evaluacion | null) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            estado: event.detail.estado,
+          };
+        });
       }
     };
 
@@ -94,7 +98,9 @@ export default function EditarEvaluacionPage() {
       {evaluacion.estado && (
         <div className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="max-w-7xl mx-auto">
-            <EstadoEvaluacion estado={evaluacion.estado} />
+            <EstadoEvaluacion
+              estado={evaluacion.estado as EstadoEvaluacionType}
+            />
           </div>
         </div>
       )}

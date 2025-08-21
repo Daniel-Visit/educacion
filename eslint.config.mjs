@@ -31,15 +31,9 @@ const eslintConfig = [
       '**/*.config.js',
       '**/*.config.ts',
       
-      // Scripts y utilidades (JavaScript puro, no TypeScript)
-      'scripts/**/*.js',
-      'scripts-restauracion/**/*.js',
-      'scripts-test/**/*.js',
-      'migraciones-postgresql/**/*.js',
-      'utilidades/**/*.js',
-      'backups/**/*.js',
-      'horarios_backup/**/*.js',
-      'horarios_backup/**/*.ts',
+      // Scripts organizados (herramientas de desarrollo)
+      'scripts-organized/**/*.js',
+      'scripts-organized/**/*.ts',
       
       // Archivos de test que usan require()
       'tests/**/*.js',

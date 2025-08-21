@@ -73,17 +73,35 @@ export default function LoginPage() {
 
   const handleCredentialsLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validar ANTES de hacer cualquier cosa
+    try {
+      const validatedData = loginSchema.parse(formData);
+      console.log('✅ Validación exitosa:', validatedData);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        console.log('❌ Errores de validación:', error.issues);
+        // Convertir errores de Zod a formato de errores
+        const fieldErrors: Partial<LoginForm> = {};
+        error.issues.forEach(issue => {
+          const field = issue.path[0] as keyof LoginForm;
+          fieldErrors[field] = issue.message;
+        });
+        setErrors(fieldErrors);
+        setError('Por favor, completa todos los campos requeridos');
+        return; // NO continuar si hay errores de validación
+      }
+    }
+
+    // Solo continuar si la validación pasó
     setIsLoading(true);
     setError('');
     setErrors({});
 
     try {
-      // Validar con Zod
-      const validatedData = loginSchema.parse(formData);
-
       const result = await signIn('credentials', {
-        email: validatedData.email,
-        password: validatedData.password,
+        email: formData.email,
+        password: formData.password,
         callbackUrl: '/dashboard',
         redirect: false,
       });
@@ -94,17 +112,8 @@ export default function LoginPage() {
         router.push('/dashboard');
       }
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        // Convertir errores de Zod a formato de errores usando z.flattenError()
-        const fieldErrors: Partial<LoginForm> = {};
-        const flattened = z.flattenError(error);
-        Object.entries(flattened.fieldErrors).forEach(([field, messages]) => {
-          fieldErrors[field as keyof LoginForm] = (messages as string[])[0];
-        });
-        setErrors(fieldErrors);
-      } else {
-        setError('Error inesperado');
-      }
+      console.error('❌ Error en login:', error);
+      setError('Error inesperado');
     } finally {
       setIsLoading(false);
     }
@@ -197,7 +206,6 @@ export default function LoginPage() {
                     value={formData.email}
                     onChange={handleInputChange('email')}
                     className="pl-10 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
-                    required
                   />
                   {errors.email && (
                     <p className="text-xs text-red-500 mt-1">{errors.email}</p>
@@ -221,7 +229,6 @@ export default function LoginPage() {
                     value={formData.password}
                     onChange={handleInputChange('password')}
                     className="pl-10 pr-10 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
-                    required
                   />
                   <button
                     type="button"

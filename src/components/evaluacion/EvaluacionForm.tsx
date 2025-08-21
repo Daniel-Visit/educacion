@@ -13,8 +13,6 @@ import {
 import { SimpleEditor } from '@/components/tiptap-templates/simple/simple-editor';
 import { Editor } from '@tiptap/react';
 
-import PrimaryButton from '@/components/ui/PrimaryButton';
-
 import { useEvaluacionForm } from '@/hooks/use-evaluacion-form';
 
 import MatrizSelector from '@/components/evaluacion/MatrizSelector';
@@ -22,7 +20,6 @@ import PreguntasSidebarContent from '@/components/evaluacion/PreguntasSidebar';
 import SaveModal from '@/components/evaluacion/SaveModal';
 import Drawer from '@/components/ui/Drawer';
 import DrawerToggle from '@/components/ui/DrawerToggle';
-import Fab from '@/components/ui/Fab';
 
 interface EvaluacionInicial {
   id: number;
@@ -46,18 +43,6 @@ interface EvaluacionInicial {
   }>;
 }
 
-interface EvaluacionListItem {
-  id: number;
-  titulo?: string;
-  archivo?: {
-    id: number;
-    titulo: string;
-    createdAt?: string;
-  };
-  createdAt?: string;
-  matrizId?: number;
-}
-
 export default function EvaluacionForm({
   modoEdicion = false,
   evaluacionInicial = null,
@@ -71,9 +56,6 @@ export default function EvaluacionForm({
   const [editorReady, setEditorReady] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const [openFab, setOpenFab] = useState(false);
-  const [evaluaciones, setEvaluaciones] = useState<EvaluacionListItem[]>([]);
-  const [loadingEvals, setLoadingEvals] = useState(false);
   const [shouldSetInitialContent, setShouldSetInitialContent] = useState(false);
   const lastEvaluacionId = useRef<number | null>(null);
 
@@ -115,13 +97,75 @@ export default function EvaluacionForm({
         evaluacionInicial
       );
 
-      // Cargar el título inicial
-      if (evaluacionInicial.archivo?.titulo) {
-        setTitulo(evaluacionInicial.archivo.titulo);
-      }
+      // Cargar la evaluación completa desde la API para obtener todos los datos
+      const cargarEvaluacionCompleta = async () => {
+        // Cargar el título inicial
+        if (evaluacionInicial.archivo?.titulo) {
+          setTitulo(evaluacionInicial.archivo.titulo);
+        }
 
-      // Usar handleLoadContent para cargar todos los datos incluyendo indicadores
-      handleLoadContent(evaluacionInicial);
+        try {
+          const response = await fetch(
+            `/api/evaluaciones/${evaluacionInicial.id}`
+          );
+          if (response.ok) {
+            const evaluacionCompleta = await response.json();
+            console.log(
+              '🔍 [EvaluacionForm] Evaluación completa cargada:',
+              evaluacionCompleta
+            );
+
+            // Usar handleLoadContent con los datos completos
+            handleLoadContent(evaluacionCompleta);
+          } else {
+            console.error(
+              'Error al cargar evaluación completa, usando datos iniciales'
+            );
+            // Fallback a datos iniciales si falla la API
+            const contentData = {
+              id: evaluacionInicial.id,
+              preguntas: (evaluacionInicial.preguntas || []).map(pregunta => ({
+                numero: pregunta.numero,
+                texto: pregunta.texto,
+                alternativas: pregunta.alternativas.map(alt => ({
+                  letra: alt.letra,
+                  texto: alt.texto,
+                  esCorrecta: alt.esCorrecta,
+                })),
+              })),
+              archivo: {
+                contenido: evaluacionInicial.archivo?.contenido || '',
+                titulo: evaluacionInicial.archivo?.titulo || '',
+              },
+              matriz: evaluacionInicial.matriz,
+            };
+            handleLoadContent(contentData);
+          }
+        } catch (error) {
+          console.error('Error al cargar evaluación completa:', error);
+          // Fallback a datos iniciales si falla la API
+          const contentData = {
+            id: evaluacionInicial.id,
+            preguntas: (evaluacionInicial.preguntas || []).map(pregunta => ({
+              numero: pregunta.numero,
+              texto: pregunta.texto,
+              alternativas: pregunta.alternativas.map(alt => ({
+                letra: alt.letra,
+                texto: alt.texto,
+                esCorrecta: alt.esCorrecta,
+              })),
+            })),
+            archivo: {
+              contenido: evaluacionInicial.archivo?.contenido || '',
+              titulo: evaluacionInicial.archivo?.titulo || '',
+            },
+            matriz: evaluacionInicial.matriz,
+          };
+          handleLoadContent(contentData);
+        }
+      };
+
+      cargarEvaluacionCompleta();
       setDataPreloaded(true);
     }
   }, [
@@ -230,7 +274,7 @@ export default function EvaluacionForm({
           try {
             currentEditor.commands.setContent(fallbackContent);
             updateFormData({
-              contenido: fallbackContent,
+              contenido: JSON.stringify(fallbackContent),
             });
             console.log('[EvaluacionForm] Contenido fallback cargado');
           } catch (fallbackError) {
@@ -241,53 +285,6 @@ export default function EvaluacionForm({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editorReady, modoEdicion, evaluacionInicial, dataPreloaded]);
-
-  // Cargar evaluaciones cuando se abre el FAB y hay una matriz seleccionada
-  useEffect(() => {
-    if (selectedMatriz && openFab) {
-      setLoadingEvals(true);
-      fetch(`/api/evaluaciones`)
-        .then(res => res.json())
-        .then(data => {
-          setEvaluaciones(
-            Array.isArray(data)
-              ? data.filter(e => e.matrizId === selectedMatriz.id)
-              : []
-          );
-        })
-        .finally(() => setLoadingEvals(false));
-    }
-  }, [selectedMatriz, openFab]);
-
-  // Formatear fecha (igual que FabPlanificaciones)
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 1) return 'hoy';
-    if (diffDays === 2) return 'hace 1 día';
-    if (diffDays <= 7) return `hace ${diffDays - 1} días`;
-    if (diffDays <= 30) return `hace ${Math.floor(diffDays / 7)} semanas`;
-    if (diffDays <= 365) return `hace ${Math.floor(diffDays / 30)} meses`;
-    return `hace ${Math.floor(diffDays / 365)} años`;
-  };
-
-  const handleLoadEvaluacion = async (evaluacion: EvaluacionListItem) => {
-    try {
-      const response = await fetch(`/api/evaluaciones/${evaluacion.id}`);
-      if (response.ok) {
-        const evaluacionCompleta = await response.json();
-        handleLoadContent(evaluacionCompleta);
-      } else {
-        console.error('Error al cargar evaluación completa');
-      }
-    } catch (error) {
-      console.error('Error al cargar evaluación:', error);
-    }
-    setOpenFab(false);
-  };
 
   const handleSaveWithValidation = () => {
     console.log('[EvaluacionForm] handleSaveWithValidation llamado', {
@@ -353,7 +350,7 @@ export default function EvaluacionForm({
                     value={titulo}
                     onChange={e => setTitulo(e.target.value)}
                     placeholder="Título de la evaluación"
-                    className="px-3 py-1.5 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:ring-2 focus:ring-white/40 focus:border-white/50 transition-colors text-sm"
+                    className="px-3 py-1.5 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:ring-2 focus:ring-white/40 focus:border-white/50 transition-colors text-sm min-w-[300px]"
                   />
                 </div>
               ) : (
@@ -365,7 +362,7 @@ export default function EvaluacionForm({
           </div>
 
           {/* Botón de acción */}
-          <PrimaryButton
+          <button
             onMouseEnter={() => setIsSaveHovered(true)}
             onMouseLeave={() => setIsSaveHovered(false)}
             onClick={() => {
@@ -407,7 +404,7 @@ export default function EvaluacionForm({
                 p => !formData.respuestasCorrectas[p.numero]
               )
             }
-            className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
+            className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save className="w-4 h-4" />
             {modoEdicion || evaluacionId ? 'Actualizar' : 'Guardar'} Evaluación
@@ -430,7 +427,7 @@ export default function EvaluacionForm({
                   las respuestas correctas para poder guardar.
                 </div>
               )}
-          </PrimaryButton>
+          </button>
         </div>
 
         {/* Stats y información */}
@@ -547,108 +544,6 @@ export default function EvaluacionForm({
         />
       </div>
 
-      {/* Nuevo Fab global */}
-      {selectedMatriz && (
-        <>
-          <Fab
-            onClick={() => setOpenFab(!openFab)}
-            open={openFab}
-            onClose={() => setOpenFab(false)}
-            ariaLabel={
-              openFab ? 'Cerrar archivos' : 'Abrir evaluaciones guardadas'
-            }
-            className="z-10 fixed bottom-8 right-8"
-          />
-          {/* Panel flotante de evaluaciones guardadas */}
-          {openFab && (
-            <div
-              data-fab-panel
-              className="fixed top-24 right-22 w-[380px] bg-white rounded-3xl shadow-[0_8px_32px_0_rgba(99,102,241,0.10)] border border-gray-100 z-40 px-8 pt-8 pb-4 flex flex-col gap-4 animate-fade-in"
-              style={{ minWidth: 340, maxHeight: 'calc(100vh - 120px)' }}
-            >
-              <h2 className="text-lg font-bold text-indigo-700 mb-4">
-                Evaluaciones Guardadas
-              </h2>
-              {loadingEvals ? (
-                <div className="text-center py-8">
-                  <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                  <p className="text-sm text-gray-500">Cargando...</p>
-                </div>
-              ) : evaluaciones.length === 0 ? (
-                <div className="text-center py-8">
-                  <svg
-                    className="w-8 h-8 text-gray-400 mx-auto mb-2"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M4 16V8a2 2 0 012-2h8a2 2 0 012 2v8m-2 4h-4a2 2 0 01-2-2v-4a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                  <p className="text-sm text-gray-500">
-                    No hay evaluaciones guardadas
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-2 overflow-y-auto max-h-96">
-                  {evaluaciones.map(evaluacion => (
-                    <div
-                      key={evaluacion.id}
-                      className="flex items-center gap-4 p-4 rounded-xl cursor-pointer border border-transparent hover:bg-indigo-50 transition-all group"
-                      onClick={() => handleLoadEvaluacion(evaluacion)}
-                    >
-                      <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600">
-                        <svg
-                          className="w-6 h-6"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M4 16V8a2 2 0 012-2h8a2 2 0 012 2v8m-2 4h-4a2 2 0 01-2-2v-4a2 2 0 012-2h4a2 2 0 012 2v4a2 2 0 01-2 2z"
-                          />
-                        </svg>
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-gray-900 text-sm truncate group-hover:underline">
-                          {evaluacion.archivo?.titulo || evaluacion.titulo}
-                        </div>
-                        <div className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                          <svg
-                            className="w-3 h-3 text-gray-300 mr-1"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M12 8v4l3 3"
-                            />
-                          </svg>
-                          {formatDate(
-                            evaluacion.createdAt ||
-                              evaluacion.archivo?.createdAt ||
-                              ''
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </>
-      )}
       {/* Modal de Guardado */}
       {!modoEdicion && !evaluacionId && (
         <SaveModal

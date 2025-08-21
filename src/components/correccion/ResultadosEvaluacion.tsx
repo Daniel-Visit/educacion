@@ -64,10 +64,6 @@ export default function ResultadosEvaluacion({
   const [selectedResultado, setSelectedResultado] =
     useState<ResultadoAlumno | null>(null);
 
-  useEffect(() => {
-    cargarResultados();
-  }, [evaluacionId, cargarResultados]);
-
   const cargarResultados = useCallback(async () => {
     try {
       const response = await fetch(
@@ -85,6 +81,10 @@ export default function ResultadosEvaluacion({
       setIsLoading(false);
     }
   }, [evaluacionId]);
+
+  useEffect(() => {
+    cargarResultados();
+  }, [evaluacionId, cargarResultados]);
 
   const calcularEstadisticas = () => {
     if (resultados.length === 0) return null;

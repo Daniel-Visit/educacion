@@ -12,8 +12,6 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  AreaChart,
-  Area,
 } from 'recharts';
 import {
   TrendingUp,
@@ -26,7 +24,7 @@ import {
 } from 'lucide-react';
 import LoadingState from '@/components/ui/LoadingState';
 import { ResultadosHeader } from '@/components/resultados';
-import { QuestionTooltip } from '@/components/resultados/QuestionTooltip';
+import { TablaResultadosTranspuesta } from '@/components/resultados/TablaResultadosTranspuesta';
 import { useEvaluacionData } from '@/hooks/use-evaluacion-data';
 import {
   calcularRangosPorcentajes,
@@ -189,26 +187,6 @@ export default function GraficosPage() {
     label?: string;
   }
 
-  interface AreaChartTooltipProps {
-    active?: boolean;
-    payload?: Array<{
-      payload: {
-        nombre: string;
-        nota: number;
-        porcentaje: number;
-      };
-    }>;
-  }
-
-  // Preparar datos para el gráfico de área - notas ordenadas por alumno
-  const areaChartData = resultadoData.respuestasAlumnos
-    .map(respuesta => ({
-      nombre: `${respuesta.alumno.nombre} ${respuesta.alumno.apellido}`,
-      nota: respuesta.nota || 0,
-      porcentaje: respuesta.porcentaje,
-    }))
-    .sort((a, b) => a.nota - b.nota); // Ordenar de menor a mayor nota
-
   const CustomTooltip = ({ active, payload }: PieChartTooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -262,26 +240,6 @@ export default function GraficosPage() {
               </div>
             </div>
           </div>
-        </div>
-      );
-    }
-    return null;
-  };
-
-  const CustomAreaTooltip = ({ active, payload }: AreaChartTooltipProps) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-
-      return (
-        <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
-          <p className="font-semibold text-gray-900">{data.nombre}</p>
-          <p className="text-sm text-gray-600">
-            Nota: <span className="font-medium">{data.nota.toFixed(2)}</span>
-          </p>
-          <p className="text-sm text-gray-600">
-            Porcentaje:{' '}
-            <span className="font-medium">{data.porcentaje.toFixed(1)}%</span>
-          </p>
         </div>
       );
     }
@@ -502,68 +460,7 @@ export default function GraficosPage() {
             </ResponsiveContainer>
           </div>
         </div>
-
-        {/* Gráfico de Área - Notas de Estudiantes */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-4 mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="bg-green-100 p-2 rounded-lg">
-              <FileText className="h-4 w-4 text-green-600" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">
-                Notas de Estudiantes
-              </h2>
-              <p className="text-gray-600 text-sm">
-                Desempeño de estudiantes por nota
-              </p>
-            </div>
-          </div>
-
-          <div className="h-60">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={areaChartData}
-                margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
-              >
-                <defs>
-                  <linearGradient id="fillNotas" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#60a5fa" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#60a5fa" stopOpacity={0.1} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#f1f5f9"
-                  horizontal={true}
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="nombre"
-                  tickLine={false}
-                  axisLine={false}
-                  tick={false}
-                />
-                <YAxis
-                  tick={{ fontSize: 11, fill: '#64748b' }}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip content={<CustomAreaTooltip />} cursor={false} />
-                <Area
-                  type="monotone"
-                  dataKey="nota"
-                  stroke="#60a5fa"
-                  fill="url(#fillNotas)"
-                  strokeWidth={2}
-                  animationDuration={450}
-                  animationEasing="ease"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
       </div>
-      <div className="h-16"></div>
 
       {/* Tabla de Resultados Detallada */}
       <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
@@ -581,45 +478,41 @@ export default function GraficosPage() {
           </div>
         </div>
 
-        {/* Datos de ejemplo para las preguntas */}
+        {/* Datos reales para las preguntas */}
         {(() => {
-          // Usar las preguntas cargadas desde la API o fallback
-          const preguntasParaTabla =
-            preguntas.length > 0
-              ? preguntas
-              : Array.from({ length: 20 }, (_, i) => ({
-                  id: i + 1,
-                  numero: i + 1,
-                  texto: `Pregunta ${i + 1}`,
-                }));
+          // Usar las preguntas cargadas desde la API
+          if (preguntas.length === 0) {
+            return (
+              <div className="text-center py-8 text-gray-500">
+                <p>No hay preguntas disponibles para esta evaluación</p>
+              </div>
+            );
+          }
 
           // Usar datos reales de respuestas
           const respuestasEstudiantes = resultadoData.respuestasAlumnos.map(
             respuestaAlumno => {
               // Mapear respuestas reales a todas las preguntas
-              const respuestas = preguntasParaTabla.map(pregunta => {
+              const respuestas = preguntas.map(pregunta => {
                 const respuestaReal = respuestaAlumno.respuestas?.find(
-                  r => r.preguntaId === pregunta.numero
+                  r => r.preguntaId === pregunta.id
                 );
 
                 if (respuestaReal) {
                   return {
-                    preguntaId: pregunta.numero,
+                    preguntaId: pregunta.numero, // Mantener numero para mostrar
+                    preguntaIdReal: pregunta.id, // Agregar ID real para debug
                     esCorrecta: respuestaReal.esCorrecta,
-                    alternativaDada: respuestaReal.esCorrecta
-                      ? null
-                      : respuestaReal.alternativaDada,
+                    alternativaDada: respuestaReal.alternativaDada,
+                    tieneDatos: true,
                   };
                 } else {
-                  // Si no hay respuesta para esta pregunta, generar basado en el porcentaje
-                  const porcentajeCorrectas = respuestaAlumno.porcentaje / 100;
-                  const esCorrecta = Math.random() < porcentajeCorrectas;
+                  // Si no hay respuesta para esta pregunta, mostrar sin datos
                   return {
                     preguntaId: pregunta.numero,
-                    esCorrecta,
-                    alternativaDada: esCorrecta
-                      ? null
-                      : ['A', 'B', 'C'][Math.floor(Math.random() * 3)],
+                    esCorrecta: false,
+                    alternativaDada: null,
+                    tieneDatos: false,
                   };
                 }
               });
@@ -632,9 +525,22 @@ export default function GraficosPage() {
             }
           );
 
-          // Calcular porcentaje de aciertos por pregunta
-          const porcentajePorPregunta = preguntasParaTabla.map(pregunta => {
-            const respuestasCorrectas = respuestasEstudiantes.filter(
+          // Calcular porcentaje de aciertos por pregunta (solo con datos reales)
+          const porcentajePorPregunta = preguntas.map(pregunta => {
+            const respuestasConDatos = respuestasEstudiantes.filter(
+              estudiante => {
+                const respuesta = estudiante.respuestas.find(
+                  r => r.preguntaId === pregunta.numero
+                );
+                return respuesta?.tieneDatos;
+              }
+            );
+
+            if (respuestasConDatos.length === 0) {
+              return 0; // No hay datos para esta pregunta
+            }
+
+            const respuestasCorrectas = respuestasConDatos.filter(
               estudiante => {
                 const respuesta = estudiante.respuestas.find(
                   r => r.preguntaId === pregunta.numero
@@ -644,100 +550,20 @@ export default function GraficosPage() {
             ).length;
 
             return Math.round(
-              (respuestasCorrectas / respuestasEstudiantes.length) * 100
+              (respuestasCorrectas / respuestasConDatos.length) * 100
             );
           });
 
           return (
-            <div className="overflow-x-auto">
-              <div className="max-h-[500px] overflow-y-auto overflow-visible">
-                <table className="w-full text-sm">
-                  <thead className="sticky top-0 z-30">
-                    <tr className="border-b border-gray-200 bg-white">
-                      <th className="sticky left-0 z-40 bg-white px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 min-w-[200px]">
-                        Estudiante
-                      </th>
-                      {preguntasParaTabla.map(pregunta => (
-                        <th
-                          key={pregunta.id}
-                          className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[60px] bg-white relative group"
-                        >
-                          <div className="cursor-pointer relative">
-                            {pregunta.numero}
-                            <QuestionTooltip
-                              numero={pregunta.numero}
-                              texto={pregunta.texto}
-                            />
-                          </div>
-                        </th>
-                      ))}
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border border-gray-200 min-w-[80px] bg-white">
-                        % Aciertos
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {respuestasEstudiantes.map(estudiante => (
-                      <tr
-                        key={estudiante.alumno.id}
-                        className="border-b border-gray-100 hover:bg-gray-50"
-                      >
-                        <td className="sticky left-0 z-10 bg-white px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-200">
-                          {estudiante.alumno.nombre}{' '}
-                          {estudiante.alumno.apellido}
-                        </td>
-                        {estudiante.respuestas.map((respuesta, respIndex) => (
-                          <td key={respIndex} className="px-2 py-2 text-center">
-                            {respuesta.esCorrecta ? (
-                              <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-semibold text-white bg-green-400 shadow-sm">
-                                ✓
-                              </div>
-                            ) : respuesta.alternativaDada ? (
-                              <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-semibold text-white bg-rose-500 shadow-sm">
-                                {respuesta.alternativaDada}
-                              </div>
-                            ) : null}
-                          </td>
-                        ))}
-                        <td className="px-4 py-3 text-center text-sm font-medium text-gray-900 border-l border-gray-200">
-                          <div className="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
-                            {Math.round(estudiante.porcentajeCorrectas)}%
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                    {/* Fila de porcentajes por pregunta */}
-                    <tr className="border-t border-gray-300 bg-white-50">
-                      <td className="sticky left-0 z-10 bg-white px-4 py-3 text-sm font-bold text-gray-900 border-r border-gray-200">
-                        % Aciertos
-                      </td>
-                      {porcentajePorPregunta.map((porcentaje, index) => (
-                        <td key={index} className="px-2 py-3 text-center">
-                          <div className="inline-flex items-center justify-center px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-800">
-                            {porcentaje}%
-                          </div>
-                        </td>
-                      ))}
-                      <td className="px-4 py-3 text-center text-sm font-bold text-gray-900 border-l border-gray-200">
-                        <div className="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
-                          {Math.round(
-                            respuestasEstudiantes.reduce(
-                              (sum, estudiante) =>
-                                sum + estudiante.porcentajeCorrectas,
-                              0
-                            ) / respuestasEstudiantes.length
-                          )}
-                          %
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <TablaResultadosTranspuesta
+              preguntas={preguntas}
+              respuestasEstudiantes={respuestasEstudiantes}
+              porcentajePorPregunta={porcentajePorPregunta}
+            />
           );
         })()}
       </div>
+      <div className="h-16"></div>
     </div>
   );
 }

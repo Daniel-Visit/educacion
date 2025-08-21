@@ -380,7 +380,14 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  
+  // Campos adicionales para tracking
+  loginAt      DateTime @default(now())  // Cuándo se logueó
+  loginMethod  String   // "oauth" | "credentials"
+  provider     String?  // "google" | null
+  ipAddress    String?  // IP del usuario
+  userAgent    String?  // User agent del navegador
+  
   @@map("sessions")
 }
 
@@ -395,6 +402,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   password            String?   // Hash de contraseña
   forcePasswordChange Boolean   @default(false)   // Forzar cambio de contraseña
+
   accounts      Account[]
   sessions      Session[]
 
@@ -408,4 +416,43 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+// Sistema de Avatares
+model AvailableAvatar {
+  id          String   @id @default(cuid())
+  name        String   // Nombre descriptivo del avatar
+  imageUrl    String   // URL de la imagen en Supabase
+  category    String?  // Categoría opcional (ej: "profesional", "creativo")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("available_avatars")
+}
+
+model AvatarBackgroundColor {
+  id          String   @id @default(cuid())
+  name        String   // Nombre descriptivo del color
+  hexCode     String   // Código hexadecimal del color
+  category    String?  // Categoría opcional (ej: "neutro", "vibrante")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("avatar_background_colors")
+}
+
+// Roles de la plataforma
+model Role {
+  id          String   @id @default(cuid())
+  slug        String   @unique // admin, profesor, user
+  name        String   // Admin, Profesor, Usuario
+  description String?  // Descripción opcional
+  isActive    Boolean  @default(true)
+  priority    Int      @default(0) // Para jerarquía futura
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("roles")
 }

@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
     // Enviar email usando Resend
     try {
       const result = await resend.emails.send({
-        from: 'onboarding@resend.dev',
+        from: 'welcome@notifications.goodly.cl',
         to: email,
         subject: 'Recupera tu contraseña',
         html: emailHtml,

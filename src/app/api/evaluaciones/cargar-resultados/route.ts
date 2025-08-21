@@ -103,7 +103,9 @@ export async function POST(request: NextRequest) {
       }
 
       const alumno = alumnosMap.get(rut);
-      alumno.puntajeTotal += puntajeObtenido;
+      if (alumno) {
+        alumno.puntajeTotal += puntajeObtenido;
+      }
 
       respuestasMap.get(rut)!.push({
         preguntaId,
