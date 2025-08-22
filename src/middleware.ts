@@ -35,6 +35,13 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
+    // Logs de debug para diagnosticar el problema en Vercel
+    console.log(
+      '🔍 MIDDLEWARE - Headers:',
+      Object.fromEntries(request.headers)
+    );
+    console.log('🔍 MIDDLEWARE - Cookies:', request.cookies.getAll());
+
     // Obtener el token usando getToken (más eficiente que auth())
     const token = (await getToken({
       req: request,
