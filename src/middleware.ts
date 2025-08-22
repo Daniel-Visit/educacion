@@ -64,9 +64,36 @@ export async function middleware(request: NextRequest) {
         (process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET)?.length
       );
 
+      // ----- antes del try de getToken() añade esto si quieres ver qué cookies llegan -----
+      const allCookies = request.cookies.getAll().map(c => c.name);
+      const hasAuthJsSecure = allCookies.includes(
+        '__Secure-authjs.session-token'
+      );
+      const hasAuthJs =
+        hasAuthJsSecure || allCookies.includes('authjs.session-token');
+      const hasNextAuthSecure = allCookies.includes(
+        '__Secure-next-auth.session-token'
+      );
+
+      // Elegimos el nombre de cookie que realmente está presente
+      const cookieName = hasAuthJsSecure
+        ? '__Secure-authjs.session-token'
+        : hasAuthJs
+          ? 'authjs.session-token'
+          : hasNextAuthSecure
+            ? '__Secure-next-auth.session-token'
+            : 'next-auth.session-token';
+
+      // ----- y ahora llama getToken especificando cookieName -----
+      console.log(
+        '🔍 MIDDLEWARE - cookieName usado para getToken:',
+        cookieName
+      );
+
       token = (await getToken({
         req: request,
         secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+        cookieName, // 👈 CLAVE: forzamos a leer la cookie correcta
       })) as ExtendedToken | null;
 
       console.log('🔍 MIDDLEWARE - getToken resultado:', token ? 'SÍ' : 'NO');
