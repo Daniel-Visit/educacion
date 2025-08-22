@@ -43,10 +43,22 @@ export async function middleware(request: NextRequest) {
     console.log('🔍 MIDDLEWARE - Cookies:', request.cookies.getAll());
 
     // Obtener el token usando getToken (más eficiente que auth())
-    const token = (await getToken({
-      req: request,
-      secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
-    })) as ExtendedToken | null;
+    let token: ExtendedToken | null = null;
+    try {
+      token = (await getToken({
+        req: request,
+        secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+      })) as ExtendedToken | null;
+
+      console.log('🔍 MIDDLEWARE - getToken resultado:', token ? 'SÍ' : 'NO');
+      console.log(
+        '🔍 MIDDLEWARE - Secret usado:',
+        process.env.AUTH_SECRET ? 'AUTH_SECRET' : 'NEXTAUTH_SECRET'
+      );
+    } catch (error) {
+      console.error('❌ MIDDLEWARE - Error en getToken:', error);
+      token = null;
+    }
 
     console.log('🔍 MIDDLEWARE - Token:', token ? 'SÍ' : 'NO');
     console.log('🔍 MIDDLEWARE - User:', token?.email);
