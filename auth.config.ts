@@ -90,6 +90,18 @@ export default {
     error: '/auth/login',
   },
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      // 🚀 Asegurar redirecciones al mismo origen
+      // rutas internas
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // mismo origen permitido
+      try {
+        const u = new URL(url);
+        if (u.origin === baseUrl) return url;
+      } catch {}
+      // fallback seguro
+      return baseUrl;
+    },
     async jwt({ token, user, account, trigger }) {
       console.log('🔍 JWT callback ejecutado');
       console.log('Provider:', account?.provider);

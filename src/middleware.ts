@@ -19,6 +19,19 @@ interface ExtendedToken {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const url = request.nextUrl.clone();
+
+  // ⛔️ No tocar rutas de NextAuth - evitar loops y conflictos
+  if (pathname.startsWith('/api/auth')) {
+    return NextResponse.next();
+  }
+
+  // 🚀 En producción, forzar dominio personal y NO usar vercel.app
+  const isProd = process.env.VERCEL_ENV === 'production';
+  if (isProd && url.hostname.endsWith('.vercel.app')) {
+    url.hostname = 'www.goodly.cl'; // <-- tu dominio
+    return NextResponse.redirect(url, 308);
+  }
 
   // Rutas públicas que no requieren autenticación
   const publicRoutes = [
