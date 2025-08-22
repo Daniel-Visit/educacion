@@ -45,6 +45,12 @@ export async function middleware(request: NextRequest) {
     // Obtener el token usando getToken (más eficiente que auth())
     let token: ExtendedToken | null = null;
     try {
+      console.log('🔍 MIDDLEWARE - Intentando getToken...');
+      console.log(
+        '🔍 MIDDLEWARE - Secret length:',
+        (process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET)?.length
+      );
+
       token = (await getToken({
         req: request,
         secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
