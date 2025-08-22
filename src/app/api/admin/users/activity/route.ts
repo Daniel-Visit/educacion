@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '../../../../../../auth.config';
+import { auth } from '../../../../../../auth';
 import { getAllUsersActivity } from '@/lib/auth-redis';
 
 export async function GET() {

@@ -76,8 +76,8 @@ export default function LoginPage() {
 
     // Validar ANTES de hacer cualquier cosa
     try {
-      const validatedData = loginSchema.parse(formData);
-      console.log('✅ Validación exitosa:', validatedData);
+      loginSchema.parse(formData);
+      // Validación exitosa - no loggeamos datos sensibles
     } catch (error) {
       if (error instanceof z.ZodError) {
         console.log('❌ Errores de validación:', error.issues);

@@ -82,8 +82,8 @@ export default function SetPasswordPage() {
 
     // Validar formulario
     try {
-      const validatedData = setPasswordSchema.parse(formData);
-      console.log('✅ Validación exitosa:', validatedData);
+      setPasswordSchema.parse(formData);
+      // Validación exitosa - no loggeamos datos sensibles
     } catch (error) {
       if (error instanceof z.ZodError) {
         console.log('❌ Errores de validación:', error.issues);
