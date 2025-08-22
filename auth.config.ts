@@ -34,6 +34,7 @@ declare module 'next-auth' {
 }
 
 export default {
+  trustHost: true,  // Aceptar hosts dinámicos de Vercel (preview deployments)
   session: {
     strategy: 'jwt',
     maxAge: 7 * 24 * 60 * 60, // 7 días como especifica Auth.txt
