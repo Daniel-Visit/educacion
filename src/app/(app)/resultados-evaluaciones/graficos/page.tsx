@@ -78,11 +78,12 @@ export default function GraficosPage() {
     );
   }
 
-  // Mostrar error si no hay datos después de la carga
+  // Mostrar error si no hay datos después de la carga (solo si no está cargando)
   if (
-    !resultadoData ||
-    !resultadoData.respuestasAlumnos ||
-    resultadoData.respuestasAlumnos.length === 0
+    !isLoading &&
+    (!resultadoData ||
+      !resultadoData.respuestasAlumnos ||
+      resultadoData.respuestasAlumnos.length === 0)
   ) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
@@ -106,6 +107,11 @@ export default function GraficosPage() {
         </div>
       </div>
     );
+  }
+
+  // Asegurar que resultadoData existe antes de continuar
+  if (!resultadoData) {
+    return null;
   }
 
   const rangosData = calcularRangosPorcentajes(
