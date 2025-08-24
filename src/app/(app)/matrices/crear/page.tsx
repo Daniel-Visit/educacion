@@ -331,13 +331,13 @@ export default function CrearMatrizPage() {
     selectedOAsContenido.length > 0 && selectedOAsHabilidad.length > 0;
 
   // Validación final:
-  // - Si hay ambos tipos: ambos deben sumar el total Y cada OA debe tener indicadores
-  // - Si solo hay un tipo: el total debe ser correcto Y cada OA debe tener indicadores
+  // - Si hay ambos tipos: ambos deben cumplir sus criterios Y cada OA debe tener indicadores
+  // - Si solo hay un tipo: debe cumplir su criterio Y cada OA debe tener indicadores
   const isStep3Valid = hasBothTypes
-    ? totalPreguntasContenido === totalPreguntas &&
-      totalPreguntasHabilidad === totalPreguntas &&
+    ? allOAsContenidoHaveIndicators &&
+      allOAsHabilidadHaveIndicators &&
       allOAsHaveIndicators
-    : totalPreguntasIndicadores === totalPreguntas && allOAsHaveIndicators;
+    : allOAsHaveIndicators;
 
   return (
     <>
@@ -346,6 +346,7 @@ export default function CrearMatrizPage() {
         selectedOAsCount={selectedOAs.length}
         currentStep={step}
         totalSteps={MATRIZ_STEPS.length}
+        mode="create"
       />
 
       {/* Form */}
@@ -367,6 +368,7 @@ export default function CrearMatrizPage() {
               asignaturas={asignaturas}
               niveles={niveles}
               errors={errors}
+              mode="create"
               onNext={() => setStep(2)}
               canProceed={
                 !!(
@@ -404,7 +406,14 @@ export default function CrearMatrizPage() {
               niveles={niveles}
               onBack={() => setStep(1)}
               onNext={() => setStep(3)}
-              canProceed={selectedOAs.length > 0}
+              canProceed={
+                // Siempre se requiere: eje de contenido + al menos un OA de contenido
+                !!(selectedEjeContenido && selectedOAsContenido.length > 0) &&
+                // Solo si existen ejes de habilidad: también se requiere eje de habilidad + al menos un OA de habilidad
+                (ejesHabilidad.length === 0 ||
+                  (!!selectedEjeHabilidad && selectedOAsHabilidad.length > 0))
+              }
+              mode="create"
               onImportClick={() => setShowImportModal(true)}
             />
           </div>

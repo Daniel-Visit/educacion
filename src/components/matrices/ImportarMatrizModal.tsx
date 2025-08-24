@@ -3,7 +3,8 @@
 import { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ModalHeader, SuccessState, ErrorState } from '@/components/resultados';
+import ModalHeader from '@/components/ui/modal-header';
+import { SuccessState, ErrorState } from '@/components/resultados';
 
 import { CloudUpload, Download, Info, BarChart3 } from 'lucide-react';
 

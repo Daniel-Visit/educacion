@@ -25,6 +25,7 @@ import {
 import LoadingState from '@/components/ui/LoadingState';
 import { ResultadosHeader } from '@/components/resultados';
 import { TablaResultadosTranspuesta } from '@/components/resultados/TablaResultadosTranspuesta';
+import EducationalHierarchicalTable from '@/components/resultados/EducationalHierarchicalTable';
 import { useEvaluacionData } from '@/hooks/use-evaluacion-data';
 import {
   calcularRangosPorcentajes,
@@ -563,6 +564,22 @@ export default function GraficosPage() {
           );
         })()}
       </div>
+      <div className="h-8"></div>
+      {/* Nueva Card: Análisis Jerárquico de Resultados */}
+      <EducationalHierarchicalTable
+        evaluacionId={resultadoData?.evaluacion?.id?.toString()}
+        resultadoId={evaluacionId}
+        preguntas={preguntas}
+        respuestasAlumnos={resultadoData.respuestasAlumnos.map(alumno => ({
+          id: parseInt(alumno.id),
+          respuestas:
+            alumno.respuestas?.map(respuesta => ({
+              preguntaId: respuesta.preguntaId,
+              esCorrecta: respuesta.esCorrecta,
+            })) || [],
+        }))}
+      />
+
       <div className="h-16"></div>
     </div>
   );

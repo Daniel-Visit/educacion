@@ -4,10 +4,17 @@ import { useState } from 'react';
 import { Calendar, Clock, Trash2, Save } from 'lucide-react';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import SecondaryButton from '@/components/ui/SecondaryButton';
-import GlobalDropdown from '@/components/ui/GlobalDropdown';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
 import { DatePicker } from '@/components/ui/datepicker/datepicker';
 import { useHorarios } from '@/hooks/use-horarios';
-import { ModalHeader } from '@/components/resultados';
+import ModalHeader from '@/components/ui/modal-header';
 
 import React from 'react';
 
@@ -597,9 +604,9 @@ export default function CrearHorarioModal({
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Profesor Titular *
                 </label>
-                <GlobalDropdown
+                <Select
                   value={docenteId}
-                  onChange={value => {
+                  onValueChange={(value: string) => {
                     console.log(
                       '🔍 [Horarios] Dropdown Profesor onChange:',
                       value,
@@ -608,17 +615,26 @@ export default function CrearHorarioModal({
                     );
                     setDocenteId(value);
                   }}
-                  options={profesorOptions}
-                  placeholder="Selecciona un profesor"
-                />
+                >
+                  <SelectTrigger className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                    <SelectValue placeholder="Selecciona un profesor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {profesorOptions.map(profesor => (
+                      <SelectItem key={profesor.value} value={profesor.value}>
+                        {profesor.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Asignatura *
                 </label>
-                <GlobalDropdown
+                <Select
                   value={asignaturaId}
-                  onChange={value => {
+                  onValueChange={(value: string) => {
                     console.log(
                       '🔍 [Horarios] Dropdown Asignatura onChange:',
                       value,
@@ -627,17 +643,29 @@ export default function CrearHorarioModal({
                     );
                     setAsignaturaId(value);
                   }}
-                  options={asignaturaOptions}
-                  placeholder="Selecciona una asignatura"
-                />
+                >
+                  <SelectTrigger className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                    <SelectValue placeholder="Selecciona una asignatura" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {asignaturaOptions.map(asignatura => (
+                      <SelectItem
+                        key={asignatura.value}
+                        value={asignatura.value}
+                      >
+                        {asignatura.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nivel *
                 </label>
-                <GlobalDropdown
+                <Select
                   value={nivelId}
-                  onChange={value => {
+                  onValueChange={(value: string) => {
                     console.log(
                       '🔍 [Horarios] Dropdown Nivel onChange:',
                       value,
@@ -646,9 +674,18 @@ export default function CrearHorarioModal({
                     );
                     setNivelId(value);
                   }}
-                  options={nivelOptions}
-                  placeholder="Selecciona un nivel"
-                />
+                >
+                  <SelectTrigger className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                    <SelectValue placeholder="Selecciona un nivel" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {nivelOptions.map(nivel => (
+                      <SelectItem key={nivel.value} value={nivel.value}>
+                        {nivel.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -700,9 +737,9 @@ export default function CrearHorarioModal({
                     <span className="text-xs text-gray-500 font-semibold min-w-[70px]">
                       Módulo {idx + 1}
                     </span>
-                    <GlobalDropdown
+                    <Select
                       value={modulo.dia}
-                      onChange={(v: string) => {
+                      onValueChange={(v: string) => {
                         console.log(
                           '🔍 [Horarios] Dropdown Módulo Día onChange:',
                           v,
@@ -713,28 +750,73 @@ export default function CrearHorarioModal({
                         );
                         handleModuloChange(modulo.id, 'dia', v);
                       }}
-                      options={getAvailableOptions(idx, 'dia')}
-                      placeholder="Día"
-                      className="min-w-[140px]"
-                    />
-                    <GlobalDropdown
+                    >
+                      <SelectTrigger className="min-w-[140px] border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                        <SelectValue placeholder="Día" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getAvailableOptions(idx, 'dia').map(option => (
+                          <SelectItem
+                            key={option.value}
+                            value={option.value}
+                            disabled={option.disabled}
+                            className={
+                              option.disabled
+                                ? 'opacity-50 cursor-not-allowed'
+                                : ''
+                            }
+                          >
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select
                       value={modulo.horaInicio}
-                      onChange={(v: string) =>
+                      onValueChange={(v: string) =>
                         handleModuloChange(modulo.id, 'horaInicio', v)
                       }
-                      options={getAvailableOptions(idx, 'horaInicio')}
-                      placeholder="Hora inicio"
-                      className="min-w-[130px]"
-                    />
-                    <GlobalDropdown
+                    >
+                      <SelectTrigger className="min-w-[130px] border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                        <SelectValue placeholder="Hora inicio" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getAvailableOptions(idx, 'horaInicio').map(option => (
+                          <SelectItem
+                            key={option.value}
+                            value={option.value}
+                            disabled={option.disabled}
+                            className={
+                              option.disabled
+                                ? 'opacity-50 cursor-not-allowed'
+                                : ''
+                            }
+                          >
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select
                       value={modulo.duracion.toString()}
-                      onChange={(v: string) =>
+                      onValueChange={(v: string) =>
                         handleModuloChange(modulo.id, 'duracion', parseInt(v))
                       }
-                      options={DURACIONES}
-                      placeholder="Duración"
-                      className="min-w-[140px]"
-                    />
+                    >
+                      <SelectTrigger className="min-w-[140px] border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                        <SelectValue placeholder="Duración" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {DURACIONES.map(duracion => (
+                          <SelectItem
+                            key={duracion.value}
+                            value={duracion.value}
+                          >
+                            {duracion.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <button
                     type="button"
@@ -757,14 +839,16 @@ export default function CrearHorarioModal({
           <div className="my-4 px-8 bg-white rounded-b-3xl flex justify-end gap-3 shadow-[0_-2px_16px_-8px_rgba(80,80,120,0.06)]">
             <SecondaryButton
               onClick={onClose}
-              className="min-w-[120px] h-12 flex items-center justify-center text-base font-medium border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
+              variant="subtle"
+              className="min-w-[120px] flex items-center justify-center text-base font-medium border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
             >
               Cancelar
             </SecondaryButton>
             <PrimaryButton
               onClick={handleSubmit}
               disabled={isSubmitting || !isFormValid()}
-              className="min-w-[160px] h-12 flex items-center justify-center text-sm font-semibold"
+              variant="subtle"
+              className="min-w-[160px] flex items-center justify-center text-sm font-semibold"
             >
               <Save className="w-5 h-5 mr-2" />{' '}
               {modoEdicion ? 'Guardar Cambios' : 'Crear Horario'}

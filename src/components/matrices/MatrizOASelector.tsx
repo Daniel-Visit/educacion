@@ -1,6 +1,14 @@
 import { Listbox } from '@headlessui/react';
 import { Check, ChevronsUpDown, X } from 'lucide-react';
 import SecondaryButton from '@/components/ui/SecondaryButton';
+import PrimaryButton from '@/components/ui/PrimaryButton';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface OA {
   id: number;
@@ -53,8 +61,11 @@ interface MatrizOASelectorProps {
   onNext: () => void;
   canProceed: boolean;
 
-  // Importación
-  onImportClick: () => void;
+  // Importación (opcional para modo edición)
+  onImportClick?: () => void;
+
+  // Nuevas props para modo edición
+  mode?: 'create' | 'edit';
 }
 
 export default function MatrizOASelector({
@@ -80,9 +91,12 @@ export default function MatrizOASelector({
   onNext,
   canProceed,
   onImportClick,
+  mode = 'create',
 }: MatrizOASelectorProps) {
-  // Verificar si hay OAs disponibles
-  if (oasContenido.length === 0 && oasHabilidad.length === 0) {
+  const isEditMode = mode === 'edit';
+
+  // Verificar si hay OAs disponibles (solo en modo creación)
+  if (!isEditMode && oasContenido.length === 0 && oasHabilidad.length === 0) {
     return (
       <div className="bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 border border-amber-200 rounded-3xl p-8 shadow-lg">
         <div className="text-center">
@@ -171,73 +185,50 @@ export default function MatrizOASelector({
   }
 
   return (
-    <div className="space-y-6">
-      {/* Botón de importación */}
-      <div className="flex justify-end">
-        <button
-          onClick={onImportClick}
-          className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-        >
-          Importar OAs desde CSV
-        </button>
-      </div>
+    <div className="space-y-4">
+      {/* Botón de importación (solo en modo creación) */}
+      {!isEditMode && onImportClick && (
+        <div className="flex justify-end">
+          <button
+            onClick={onImportClick}
+            className="px-6 py-2 bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            Importar CSV
+          </button>
+        </div>
+      )}
 
       <div className="space-y-4">
         {/* Fila 1: Eje de Contenido + OAs de Contenido */}
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
-            <Listbox
-              value={selectedEjeContenido}
-              onChange={onEjeContenidoChange}
-            >
-              <div className="relative mt-1">
-                <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">
-                  Eje de Contenido
-                </Listbox.Label>
-                <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                  <span className="block truncate">
-                    {selectedEjeContenido
-                      ? ejesContenido.find(e => e.id === selectedEjeContenido)
-                          ?.descripcion
-                      : 'Selecciona un eje de contenido'}
-                  </span>
-                  <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                    <ChevronsUpDown
-                      className="h-5 h-5 text-gray-400"
-                      aria-hidden="true"
-                    />
-                  </span>
-                </Listbox.Button>
-                <div className="relative">
-                  <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    {ejesContenido.map(eje => (
-                      <Listbox.Option
-                        key={eje.id}
-                        value={eje.id}
-                        className={({ active }) =>
-                          `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'}`
-                        }
-                      >
-                        {({ selected }) => (
-                          <>
-                            <span
-                              className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}
-                            >
-                              {eje.descripcion}
-                            </span>
-                            {selected ? (
-                              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
-                                <Check className="h-5 w-5" aria-hidden="true" />
-                              </span>
-                            ) : null}
-                          </>
-                        )}
-                      </Listbox.Option>
-                    ))}
-                  </Listbox.Options>
-                </div>
-              </div>
-            </Listbox>
+            <div className="relative mt-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Eje de Contenido
+              </label>
+              <Select
+                value={selectedEjeContenido?.toString() || 'none'}
+                onValueChange={value =>
+                  onEjeContenidoChange(
+                    value === 'none' ? null : parseInt(value)
+                  )
+                }
+              >
+                <SelectTrigger className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                  <SelectValue placeholder="Selecciona un eje de contenido" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">
+                    Selecciona un eje de contenido
+                  </SelectItem>
+                  {ejesContenido.map(eje => (
+                    <SelectItem key={eje.id} value={eje.id.toString()}>
+                      {eje.descripcion}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="flex-1">
@@ -250,7 +241,7 @@ export default function MatrizOASelector({
                 <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">
                   OAs de Contenido
                 </Listbox.Label>
-                <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <Listbox.Button className="relative w-full cursor-default rounded-md bg-white py-2.25 pl-3 pr-8 text-left border border-gray-300 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                   <span className="block truncate">
                     {selectedOAsContenido.length === 0
                       ? 'Selecciona OAs de contenido'
@@ -258,7 +249,7 @@ export default function MatrizOASelector({
                   </span>
                   <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                     <ChevronsUpDown
-                      className="h-5 w-5 text-gray-400"
+                      className="h-4 w-4 text-gray-400"
                       aria-hidden="true"
                     />
                   </span>
@@ -288,26 +279,24 @@ export default function MatrizOASelector({
                   </div>
                 )}
                 <div className="relative">
-                  <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                  <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border bg-popover text-popover-foreground shadow-md">
                     {oasDelEjeContenido.map(oa => (
                       <Listbox.Option
                         key={oa.id}
                         value={oa}
                         className={({ active }) =>
-                          `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-blue-100 text-blue-900' : 'text-gray-900'}`
+                          `relative cursor-default text-sm select-none mx-1 my-1 rounded-sm py-2 pl-10 pr-4 ${active ? 'bg-gray-100 text-gray-900' : 'text-gray-900'}`
                         }
                       >
                         {({ selected }) => (
                           <>
-                            <span
-                              className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}
-                            >
+                            <span className={`block truncate`}>
                               {oa.oas_id} -{' '}
                               {oa.descripcion_oas.substring(0, 50)}...
                             </span>
                             {selected ? (
-                              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-600">
-                                <Check className="h-5 w-5" aria-hidden="true" />
+                              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-900">
+                                <Check className="h-4 w-4" aria-hidden="true" />
                               </span>
                             ) : null}
                           </>
@@ -325,61 +314,33 @@ export default function MatrizOASelector({
         {ejesHabilidad.length > 0 && (
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <Listbox
-                value={selectedEjeHabilidad}
-                onChange={onEjeHabilidadChange}
-              >
-                <div className="relative mt-1">
-                  <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">
-                    Eje de Habilidad
-                  </Listbox.Label>
-                  <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <span className="block truncate">
-                      {selectedEjeHabilidad
-                        ? ejesHabilidad.find(e => e.id === selectedEjeHabilidad)
-                            ?.descripcion
-                        : 'Selecciona un eje de habilidad'}
-                    </span>
-                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                      <ChevronsUpDown
-                        className="h-5 h-5 text-gray-400"
-                        aria-hidden="true"
-                      />
-                    </span>
-                  </Listbox.Button>
-                  <div className="relative">
-                    <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      {ejesHabilidad.map(eje => (
-                        <Listbox.Option
-                          key={eje.id}
-                          value={eje.id}
-                          className={({ active }) =>
-                            `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'}`
-                          }
-                        >
-                          {({ selected }) => (
-                            <>
-                              <span
-                                className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}
-                              >
-                                {eje.descripcion}
-                              </span>
-                              {selected ? (
-                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-indigo-600">
-                                  <Check
-                                    className="h-5 w-5"
-                                    aria-hidden="true"
-                                  />
-                                </span>
-                              ) : null}
-                            </>
-                          )}
-                        </Listbox.Option>
-                      ))}
-                    </Listbox.Options>
-                  </div>
-                </div>
-              </Listbox>
+              <div className="relative mt-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Eje de Habilidad
+                </label>
+                <Select
+                  value={selectedEjeHabilidad?.toString() || 'none'}
+                  onValueChange={value =>
+                    onEjeHabilidadChange(
+                      value === 'none' ? null : parseInt(value)
+                    )
+                  }
+                >
+                  <SelectTrigger className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                    <SelectValue placeholder="Selecciona un eje de habilidad" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">
+                      Selecciona un eje de habilidad
+                    </SelectItem>
+                    {ejesHabilidad.map(eje => (
+                      <SelectItem key={eje.id} value={eje.id.toString()}>
+                        {eje.descripcion}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="flex-1">
@@ -392,7 +353,7 @@ export default function MatrizOASelector({
                   <Listbox.Label className="block text-sm font-medium text-gray-700 mb-1">
                     OAs de Habilidad
                   </Listbox.Label>
-                  <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <Listbox.Button className="relative w-full cursor-default rounded-md bg-white py-2.25 pl-3 pr-8 text-left border border-gray-300 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                     <span className="block truncate">
                       {selectedOAsHabilidad.length === 0
                         ? 'Selecciona OAs de habilidad'
@@ -400,7 +361,7 @@ export default function MatrizOASelector({
                     </span>
                     <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                       <ChevronsUpDown
-                        className="h-5 w-5 text-gray-400"
+                        className="h-4 w-4 text-gray-400"
                         aria-hidden="true"
                       />
                     </span>
@@ -430,27 +391,25 @@ export default function MatrizOASelector({
                     </div>
                   )}
                   <div className="relative">
-                    <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-xl bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full text-sm overflow-auto rounded-md border bg-popover text-popover-foreground shadow-md">
                       {oasDelEjeHabilidad.map(oa => (
                         <Listbox.Option
                           key={oa.id}
                           value={oa}
                           className={({ active }) =>
-                            `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-green-100 text-green-900' : 'text-gray-900'}`
+                            `relative cursor-default select-none mx-1 my-1 rounded-sm py-2 pl-10 pr-4 ${active ? 'bg-gray-100 text-gray-900' : 'text-gray-900'}`
                           }
                         >
                           {({ selected }) => (
                             <>
-                              <span
-                                className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}
-                              >
+                              <span className={`block truncate`}>
                                 {oa.oas_id} -{' '}
                                 {oa.descripcion_oas.substring(0, 50)}...
                               </span>
                               {selected ? (
-                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-green-600">
+                                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-900">
                                   <Check
-                                    className="h-5 w-5"
+                                    className="h-4 w-4"
                                     aria-hidden="true"
                                   />
                                 </span>
@@ -470,14 +429,12 @@ export default function MatrizOASelector({
 
       {/* Botones de navegación */}
       <div className="flex justify-between gap-4 mt-6">
-        <SecondaryButton onClick={onBack}>Anterior</SecondaryButton>
-        <button
-          onClick={onNext}
-          disabled={!canProceed}
-          className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        <SecondaryButton variant="large" onClick={onBack}>
+          Anterior
+        </SecondaryButton>
+        <PrimaryButton variant="large" onClick={onNext} disabled={!canProceed}>
           Siguiente
-        </button>
+        </PrimaryButton>
       </div>
     </div>
   );

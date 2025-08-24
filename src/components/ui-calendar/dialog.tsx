@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { XIcon } from 'lucide-react';
+import { X } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
@@ -63,11 +63,8 @@ function DialogContent({
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="group focus-visible:border-ring focus-visible:ring-ring/50 absolute top-3 right-3 flex size-7 items-center justify-center rounded transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:pointer-events-none">
-          <XIcon
-            size={16}
-            className="opacity-60 transition-opacity group-hover:opacity-100"
-          />
+        <DialogPrimitive.Close className="absolute top-4 right-4 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:text-accent-foreground h-10 text-white hover:bg-white/20 p-2">
+          <X className="h-6 w-6" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
@@ -80,7 +77,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="alert-dialog-header"
       className={cn(
-        'flex flex-col gap-1 text-center sm:text-left px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600',
+        'flex flex-col gap-1 text-center sm:text-left px-6 py-6 bg-gradient-to-r from-indigo-600 to-purple-600',
         className
       )}
       {...props}

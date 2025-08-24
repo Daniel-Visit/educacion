@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { Upload, Download, Info, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ErrorState, ModalHeader, SuccessState } from '@/components/resultados';
+import ModalHeader from '@/components/ui/modal-header';
+import { ErrorState, SuccessState } from '@/components/resultados';
 
 // Interfaces para tipar los datos del CSV
 interface CSVRowData {

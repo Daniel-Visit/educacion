@@ -1,7 +1,14 @@
 import React from 'react';
-import { ChevronsUpDown, Check } from 'lucide-react';
-import { Listbox } from '@headlessui/react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Asignatura, Nivel } from '@/types/matrices';
+import PrimaryButton from '@/components/ui/PrimaryButton';
+import SecondaryButton from '@/components/ui/SecondaryButton';
 
 interface MatrizBasicFormProps {
   matrizName: string;
@@ -19,6 +26,9 @@ interface MatrizBasicFormProps {
   className?: string;
   onNext?: () => void;
   canProceed?: boolean;
+  // Nuevas props para modo edición
+  mode?: 'create' | 'edit';
+  onCancel?: () => void;
 }
 
 export default function MatrizBasicForm({
@@ -37,7 +47,11 @@ export default function MatrizBasicForm({
   className = '',
   onNext,
   canProceed = false,
+  mode = 'create',
+  onCancel,
 }: MatrizBasicFormProps) {
+  const isEditMode = mode === 'edit';
+
   const renderSelectField = (
     label: string,
     value: number | null,
@@ -52,66 +66,49 @@ export default function MatrizBasicForm({
         <label className="block text-sm font-medium text-gray-700 mb-2">
           {label}
         </label>
-        <Listbox value={value} onChange={onChange} disabled={isReadOnly}>
-          <div className="relative min-h-[42px]">
-            <Listbox.Button className="relative w-full cursor-default rounded-xl bg-white py-2 pl-3 pr-8 text-left border border-gray-300 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50 disabled:cursor-not-allowed">
-              <span className="block truncate">
-                {value
-                  ? safeOptions.find(option => option.id === value)?.nombre ||
-                    'Seleccionar...'
-                  : 'Seleccionar...'}
-              </span>
-              <span className="absolute inset-y-0 right-0 flex items-center pr-2">
-                <ChevronsUpDown className="h-5 w-5 text-gray-400" />
-              </span>
-            </Listbox.Button>
-            {!isReadOnly && (
-              <Listbox.Options className="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-xl py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                <Listbox.Option
-                  value={null}
-                  className={({ active }) =>
-                    `relative cursor-default select-none py-2 pl-3 pr-9 ${
-                      active ? 'bg-indigo-100 text-indigo-900' : 'text-gray-900'
-                    }`
-                  }
-                >
-                  Seleccionar...
-                </Listbox.Option>
-                {safeOptions.map(option => (
-                  <Listbox.Option
-                    key={option.id}
-                    value={option.id}
-                    className={({ active }) =>
-                      `relative cursor-default select-none py-2 pl-3 pr-9 ${
-                        active
-                          ? 'bg-indigo-100 text-indigo-900'
-                          : 'text-gray-900'
-                      }`
-                    }
-                  >
-                    {({ selected }) => (
-                      <>
-                        <span
-                          className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}
-                        >
-                          {option.nombre}
-                        </span>
-                        {selected && (
-                          <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600">
-                            <Check className="h-5 w-5" />
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </Listbox.Option>
-                ))}
-              </Listbox.Options>
-            )}
-          </div>
-        </Listbox>
+        <Select
+          value={value?.toString() || 'none'}
+          onValueChange={(newValue: string) =>
+            onChange(newValue === 'none' ? null : parseInt(newValue))
+          }
+          disabled={isReadOnly}
+        >
+          <SelectTrigger className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+            <SelectValue placeholder="Seleccionar..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">Seleccionar...</SelectItem>
+            {safeOptions.map(option => (
+              <SelectItem key={option.id} value={option.id.toString()}>
+                {option.nombre}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         {errors[errorKey] && (
           <p className="mt-1 text-sm text-red-600">{errors[errorKey]}</p>
         )}
+      </div>
+    );
+  };
+
+  const renderReadOnlyField = (
+    label: string,
+    value: number | null,
+    options: { id: number; nombre: string }[]
+  ) => {
+    const displayValue = value
+      ? options.find(option => option.id === value)?.nombre
+      : 'Cargando...';
+
+    return (
+      <div className="mb-6 flex-1">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          {label}
+        </label>
+        <div className="w-full px-4 py-2 border rounded-md text-base bg-gray-50 border-gray-300 text-gray-600">
+          {displayValue}
+        </div>
       </div>
     );
   };
@@ -128,7 +125,7 @@ export default function MatrizBasicForm({
             value={matrizName}
             onChange={e => onMatrizNameChange(e.target.value)}
             disabled={isReadOnly}
-            className="w-full px-4 py-2 border rounded-xl text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent border-gray-300 disabled:bg-gray-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-2 border rounded-md text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent border-gray-300 disabled:bg-gray-50 disabled:cursor-not-allowed"
             placeholder="Ingresa el nombre de la matriz"
           />
           {errors.nombre && (
@@ -144,7 +141,7 @@ export default function MatrizBasicForm({
             value={totalPreguntas}
             onChange={e => onTotalPreguntasChange(Number(e.target.value))}
             disabled={isReadOnly}
-            className="w-full px-4 py-2 border rounded-xl text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent border-gray-300 disabled:bg-gray-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-2 border rounded-md text-base focus:ring-2 focus:ring-indigo-500 focus:border-transparent border-gray-300 disabled:bg-gray-50 disabled:cursor-not-allowed"
             placeholder="0"
             min={0}
           />
@@ -152,33 +149,50 @@ export default function MatrizBasicForm({
       </div>
 
       <div className="flex flex-col md:flex-row gap-6">
-        {renderSelectField(
-          'Asignatura',
-          selectedAsignatura,
-          onAsignaturaChange,
-          asignaturas,
-          'asignatura'
-        )}
-        {renderSelectField(
-          'Nivel',
-          selectedNivel,
-          onNivelChange,
-          niveles,
-          'nivel'
+        {isEditMode ? (
+          // En modo edición: campos de solo lectura
+          <>
+            {renderReadOnlyField('Asignatura', selectedAsignatura, asignaturas)}
+            {renderReadOnlyField('Nivel', selectedNivel, niveles)}
+          </>
+        ) : (
+          // En modo creación: selects editables
+          <>
+            {renderSelectField(
+              'Asignatura',
+              selectedAsignatura,
+              onAsignaturaChange,
+              asignaturas,
+              'asignatura'
+            )}
+            {renderSelectField(
+              'Nivel',
+              selectedNivel,
+              onNivelChange,
+              niveles,
+              'nivel'
+            )}
+          </>
         )}
       </div>
 
-      {onNext && (
-        <div className="flex justify-end gap-4 mt-4">
-          <button
+      {/* Botones de navegación */}
+      <div className="flex justify-end gap-4 mt-4">
+        {isEditMode && onCancel && (
+          <SecondaryButton variant="large" onClick={onCancel}>
+            Cancelar
+          </SecondaryButton>
+        )}
+        {onNext && (
+          <PrimaryButton
+            variant="large"
             onClick={onNext}
             disabled={!canProceed}
-            className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Siguiente
-          </button>
-        </div>
-      )}
+          </PrimaryButton>
+        )}
+      </div>
     </div>
   );
 }

@@ -153,9 +153,9 @@ export default function HorariosList() {
               <Calendar className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Horarios Docentes</h1>
+              <h1 className="text-2xl font-bold">Configuración de Horarios</h1>
               <p className="text-indigo-100 text-sm">
-                Gestiona los horarios docentes para la planificación anual
+                Gestiona los horarios de cursos para la planificación anual
               </p>
             </div>
           </div>

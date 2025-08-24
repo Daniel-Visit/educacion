@@ -9,7 +9,13 @@ import {
   CheckCircle2,
   TrendingUp,
 } from 'lucide-react';
-import GlobalDropdown from '@/components/ui/GlobalDropdown';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import CargarResultadosModal from '@/components/correccion/CargarResultadosModal';
 import LoadingState from '@/components/ui/LoadingState';
 import ResultadosDataTable from '@/components/correccion/ResultadosDataTable';
@@ -53,6 +59,10 @@ export default function CorreccionEvaluacionesPage() {
   };
 
   const handleEvaluacionChange = (evaluacionId: string) => {
+    if (evaluacionId === 'none') {
+      setEvaluacionSeleccionada(null);
+      return;
+    }
     const evaluacion = evaluaciones.find(e => e.id.toString() === evaluacionId);
     setEvaluacionSeleccionada(evaluacion || null);
   };
@@ -170,23 +180,27 @@ export default function CorreccionEvaluacionesPage() {
             <label className="text-sm font-semibold text-gray-700 mb-2 block">
               Evaluación Completa
             </label>
-            <GlobalDropdown
-              value={evaluacionSeleccionada?.id.toString() || ''}
-              onChange={handleEvaluacionChange}
-              options={[
-                {
-                  value: '',
-                  label:
-                    'Selecciona una evaluación completa para cargar resultados',
-                },
-                ...evaluaciones.map(evaluacion => ({
-                  value: evaluacion.id.toString(),
-                  label: `${evaluacion.titulo} - ${evaluacion.matrizNombre} (${evaluacion.preguntasCount} preguntas)`,
-                })),
-              ]}
-              placeholder="Selecciona una evaluación completa para cargar resultados"
-              className="h-12"
-            />
+            <Select
+              value={evaluacionSeleccionada?.id.toString() || 'none'}
+              onValueChange={handleEvaluacionChange}
+            >
+              <SelectTrigger className="h-12 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                <SelectValue placeholder="Selecciona una evaluación completa para cargar resultados" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">
+                  Selecciona una evaluación completa para cargar resultados
+                </SelectItem>
+                {evaluaciones.map(evaluacion => (
+                  <SelectItem
+                    key={evaluacion.id}
+                    value={evaluacion.id.toString()}
+                  >
+                    {`${evaluacion.titulo} - ${evaluacion.matrizNombre} (${evaluacion.preguntasCount} preguntas)`}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {evaluacionSeleccionada && (

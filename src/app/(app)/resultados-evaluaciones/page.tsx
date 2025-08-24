@@ -12,7 +12,13 @@ import {
   ChevronDown,
   ChevronRight,
 } from 'lucide-react';
-import GlobalDropdown from '@/components/ui/GlobalDropdown';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import LoadingState from '@/components/ui/LoadingState';
 import { ResultadosHeader } from '@/components/resultados';
 import {
@@ -200,25 +206,26 @@ export default function ResultadosEvaluacionesPage() {
             <label className="text-sm font-semibold text-gray-700 mb-2 block">
               Nivel de Exigencia
             </label>
-            <GlobalDropdown
-              value={nivelExigencia}
-              onChange={setNivelExigencia}
-              options={[
-                { value: '10', label: '10% - Muy Baja' },
-                { value: '20', label: '20% - Baja' },
-                { value: '30', label: '30% - Moderadamente Baja' },
-                { value: '40', label: '40% - Moderada' },
-                { value: '50', label: '50% - Moderadamente Alta' },
-                { value: '55', label: '55% - Alta' },
-                { value: '60', label: '60% - Muy Alta' },
-                { value: '70', label: '70% - Extremadamente Alta' },
-                { value: '80', label: '80% - Muy Exigente' },
-                { value: '90', label: '90% - Extremadamente Exigente' },
-                { value: '100', label: '100% - Máxima Exigencia' },
-              ]}
-              placeholder="Selecciona nivel de exigencia"
-              className="h-10"
-            />
+            <Select value={nivelExigencia} onValueChange={setNivelExigencia}>
+              <SelectTrigger className="h-10 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                <SelectValue placeholder="Selecciona nivel de exigencia" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="10">10% - Muy Baja</SelectItem>
+                <SelectItem value="20">20% - Baja</SelectItem>
+                <SelectItem value="30">30% - Moderadamente Baja</SelectItem>
+                <SelectItem value="40">40% - Moderada</SelectItem>
+                <SelectItem value="50">50% - Moderadamente Alta</SelectItem>
+                <SelectItem value="55">55% - Alta</SelectItem>
+                <SelectItem value="60">60% - Muy Alta</SelectItem>
+                <SelectItem value="70">70% - Extremadamente Alta</SelectItem>
+                <SelectItem value="80">80% - Muy Exigente</SelectItem>
+                <SelectItem value="90">
+                  90% - Extremadamente Exigente
+                </SelectItem>
+                <SelectItem value="100">100% - Máxima Exigencia</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="text-sm text-gray-600">
             <p>
@@ -255,21 +262,31 @@ export default function ResultadosEvaluacionesPage() {
                 <label className="text-sm font-semibold text-gray-700 mb-2 block">
                   Evaluación
                 </label>
-                <GlobalDropdown
-                  value={evaluacionSeleccionada?.toString() || ''}
-                  onChange={value =>
-                    setEvaluacionSeleccionada(value ? parseInt(value) : null)
+                <Select
+                  value={evaluacionSeleccionada?.toString() || 'none'}
+                  onValueChange={(value: string) =>
+                    setEvaluacionSeleccionada(
+                      value === 'none' ? null : parseInt(value)
+                    )
                   }
-                  options={[
-                    { value: '', label: 'Selecciona una evaluación' },
-                    ...evaluaciones.map(evaluacion => ({
-                      value: evaluacion.id.toString(),
-                      label: evaluacion.titulo,
-                    })),
-                  ]}
-                  placeholder="Selecciona una evaluación"
-                  className="h-12"
-                />
+                >
+                  <SelectTrigger className="h-12 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                    <SelectValue placeholder="Selecciona una evaluación" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">
+                      Selecciona una evaluación
+                    </SelectItem>
+                    {evaluaciones.map(evaluacion => (
+                      <SelectItem
+                        key={evaluacion.id}
+                        value={evaluacion.id.toString()}
+                      >
+                        {evaluacion.titulo}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
@@ -296,26 +313,36 @@ export default function ResultadosEvaluacionesPage() {
                   <label className="text-sm font-semibold text-gray-700 mb-2 block">
                     Resultado a Visualizar
                   </label>
-                  <GlobalDropdown
-                    value={resultadoSeleccionado?.toString() || ''}
-                    onChange={value =>
-                      setResultadoSeleccionado(value ? parseInt(value) : null)
+                  <Select
+                    value={resultadoSeleccionado?.toString() || 'none'}
+                    onValueChange={(value: string) =>
+                      setResultadoSeleccionado(
+                        value === 'none' ? null : parseInt(value)
+                      )
                     }
-                    options={[
-                      { value: '', label: 'Selecciona un resultado' },
-                      ...resultados
+                  >
+                    <SelectTrigger className="h-12 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                      <SelectValue placeholder="Selecciona un resultado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">
+                        Selecciona un resultado
+                      </SelectItem>
+                      {resultados
                         .filter(
                           resultado =>
                             resultado.evaluacionId === evaluacionSeleccionada
                         )
-                        .map(resultado => ({
-                          value: resultado.id.toString(),
-                          label: `${resultado.evaluacion.titulo} - ${resultado.evaluacion.matrizNombre} (${resultado.totalAlumnos} alumnos, ${new Date(resultado.fechaCarga).toLocaleDateString()})`,
-                        })),
-                    ]}
-                    placeholder="Selecciona un resultado"
-                    className="h-12"
-                  />
+                        .map(resultado => (
+                          <SelectItem
+                            key={resultado.id}
+                            value={resultado.id.toString()}
+                          >
+                            {`${resultado.evaluacion.titulo} - ${resultado.evaluacion.matrizNombre} (${resultado.totalAlumnos} alumnos, ${new Date(resultado.fechaCarga).toLocaleDateString()})`}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>

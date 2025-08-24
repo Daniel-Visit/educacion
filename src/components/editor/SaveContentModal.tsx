@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { X, Save, FileText, BookOpen } from 'lucide-react';
 import { useContentSave, SavedContent } from '@/hooks/use-content-save';
+import { Button } from '@/components/ui/button';
 import { Editor } from '@tiptap/react';
 
 interface SaveContentModalProps {
@@ -122,12 +123,13 @@ export default function SaveContentModal({
             </div>
 
             {/* Botón de cerrar */}
-            <button
+            <Button
+              variant="ghost"
               onClick={onClose}
-              className="text-white/80 hover:text-white hover:bg-white/20 rounded-full p-2 transition-colors"
+              className="text-white hover:bg-white/20 p-2"
             >
               <X className="h-6 w-6" />
-            </button>
+            </Button>
           </div>
         </div>
 

@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToastContext } from '@/components/providers/ToastProvider';
+import { Avatar } from '@/components/ui/Avatar';
 import { Loader2, Shield, User, GraduationCap, X } from 'lucide-react';
 
 interface ChangeRoleModalProps {
@@ -20,6 +21,7 @@ interface ChangeRoleModalProps {
     name: string | null;
     email: string | null;
     role: string;
+    image?: string | null;
   } | null;
   onSuccess: () => void;
 }
@@ -157,12 +159,13 @@ export default function ChangeRoleModal({
                 </p>
               </div>
             </div>
-            <button
+            <Button
+              variant="ghost"
               onClick={handleClose}
-              className="text-white/80 hover:text-white hover:bg-white/20 rounded-full p-2 transition-colors"
+              className="text-white hover:bg-white/20 p-2"
             >
-              <X className="w-6 h-6" />
-            </button>
+              <X className="h-6 w-6" />
+            </Button>
           </div>
         </div>
 
@@ -171,13 +174,7 @@ export default function ChangeRoleModal({
           {/* Información del usuario */}
           <div className="bg-gray-50 rounded-lg p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-xl flex items-center justify-center">
-                <span className="text-sm font-bold text-white">
-                  {user.name?.charAt(0)?.toUpperCase() ||
-                    user.email?.charAt(0)?.toUpperCase() ||
-                    'U'}
-                </span>
-              </div>
+              <Avatar user={user} size="md" />
               <div>
                 <h3 className="font-semibold text-gray-900">
                   {user.name || 'Sin nombre'}

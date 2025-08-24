@@ -183,16 +183,17 @@ export default function InviteUsersModal({
                     Invitar Usuarios
                   </h2>
                   <p className="text-indigo-100 text-sm">
-                    Envía invitaciones a nuevos usuarios de la plataforma
+                    Envía invitaciones a nuevos usuarios
                   </p>
                 </div>
               </div>
-              <button
+              <Button
+                variant="ghost"
                 onClick={handleClose}
-                className="text-white/80 hover:text-white hover:bg-white/20 rounded-full p-2 transition-colors"
+                className="text-white hover:bg-white/20 p-2"
               >
-                <X className="w-6 w-6" />
-              </button>
+                <X className="h-6 w-6" />
+              </Button>
             </div>
           </div>
 

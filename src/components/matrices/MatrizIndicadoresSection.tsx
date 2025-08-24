@@ -1,6 +1,7 @@
 import { Target, BookOpen, Zap, Plus, X } from 'lucide-react';
 import { getGradient } from '@/utils/matrices';
 import SecondaryButton from '@/components/ui/SecondaryButton';
+import PrimaryButton from '@/components/ui/PrimaryButton';
 
 interface OA {
   id: number;
@@ -363,13 +364,14 @@ export default function MatrizIndicadoresSection({
       {/* Resumen de preguntas */}
       <div className="flex justify-end gap-4 mt-8">
         <SecondaryButton onClick={onBack}>Atrás</SecondaryButton>
-        <button
+        <PrimaryButton
+          variant="large"
           onClick={onCreateMatriz}
           disabled={!isStep3Valid || loading}
           className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Creando...' : 'Continuar'}
-        </button>
+          {loading ? 'Creando...' : 'Finalizar'}
+        </PrimaryButton>
       </div>
 
       <div className="flex justify-end items-center mb-2">
@@ -378,8 +380,7 @@ export default function MatrizIndicadoresSection({
             isStep3Valid ? 'text-green-500' : 'text-gray-500'
           }`}
         >
-          Total preguntas: {totalPreguntasContenido + totalPreguntasHabilidad} /{' '}
-          {totalPreguntas}
+          Total preguntas: {totalPreguntasContenido} / {totalPreguntas}
         </span>
       </div>
 

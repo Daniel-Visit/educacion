@@ -15,6 +15,7 @@ import {
   Sparkles,
   X,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Metodologia {
   id: number;
@@ -112,18 +113,18 @@ export default function ModalIA({ open, onClose }: ModalIAProps) {
                 <h2 className="text-xl font-bold text-white">
                   Generar Clase con IA
                 </h2>
-                <p className="text-indigo-100 text-sm mt-2">
+                <p className="text-indigo-100 text-sm mt-0">
                   Planificación de Clase
                 </p>
               </div>
             </div>
-            <button
+            <Button
+              variant="ghost"
               onClick={onClose}
-              aria-label="Cerrar"
-              className="text-white/80 hover:text-white hover:bg-white/20 rounded-full p-2 transition-colors"
+              className="text-white hover:bg-white/20 p-2"
             >
               <X className="h-6 w-6" />
-            </button>
+            </Button>
           </div>
         </div>
 
