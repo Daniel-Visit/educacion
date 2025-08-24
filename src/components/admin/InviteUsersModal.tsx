@@ -31,6 +31,13 @@ interface Role {
   description?: string;
 }
 
+interface ExistingUser {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+}
+
 export default function InviteUsersModal({
   isOpen,
   onClose,
@@ -91,6 +98,49 @@ export default function InviteUsersModal({
         message: 'Por favor ingresa emails válidos',
       });
       return;
+    }
+
+    // Verificar emails duplicados
+    const uniqueEmails = [...new Set(validEmails)];
+    if (uniqueEmails.length !== validEmails.length) {
+      setAlert({
+        type: 'error',
+        message:
+          'Hay emails duplicados. Por favor elimina los duplicados antes de continuar.',
+      });
+      return;
+    }
+
+    // Verificar usuarios existentes antes de enviar
+    try {
+      const checkResponse = await fetch('/api/admin/users/check-existing', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          emails: validEmails,
+        }),
+      });
+
+      if (checkResponse.ok) {
+        const checkData = await checkResponse.json();
+        const existingUsers = checkData.existingUsers || [];
+
+        if (existingUsers.length > 0) {
+          const existingEmails = existingUsers
+            .map((user: ExistingUser) => user.email)
+            .join(', ');
+          setAlert({
+            type: 'error',
+            message: `Los siguientes usuarios ya existen en la plataforma: ${existingEmails}.`,
+          });
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Error verificando usuarios existentes:', error);
+      // Si falla la verificación, continuar con el proceso normal
     }
 
     // Validar que haya un rol seleccionado

@@ -1,16 +1,16 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { Calendar, Edit3, Trash2, Clock, Layers, Plus } from 'lucide-react';
 import {
-  Calendar,
-  Edit3,
-  Trash2,
-  Clock,
-  Layers,
-  Plus,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from '@/components/ui/pagination';
 import LoadingState from '@/components/ui/LoadingState';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 
@@ -389,53 +389,54 @@ export default function PlanificacionesList() {
               </div>
             ))}
           </div>
-          {/* Paginación */}
-          <div className="flex justify-center mt-8">
-            <nav
-              className="inline-flex items-center gap-4 select-none"
-              aria-label="Pagination"
-            >
-              <button
-                className="flex items-center gap-1 text-[1.7rem] text-gray-800 font-normal px-2 py-1 rounded-md hover:bg-gray-50 transition disabled:opacity-40"
-                onClick={() => setPagina(p => Math.max(1, p - 1))}
-                disabled={pagina === 1}
-              >
-                <ChevronLeft size={20} strokeWidth={2.2} />
-              </button>
-              <div className="flex items-center gap-4">
-                {getPagination(pagina, totalPaginas).map((p, idx) =>
-                  p === '...' ? (
-                    <span
-                      key={idx}
-                      className="text-3xl text-gray-700 font-light px-2"
-                    >
-                      •••
-                    </span>
-                  ) : (
-                    <button
-                      key={p}
-                      className={
-                        pagina === p
-                          ? 'flex items-center justify-center text-sm font-medium rounded-xl border-2 border-gray-200 bg-white  shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] px-4 py-2'
-                          : 'flex items-center justify-center text-sm font-normal rounded-xl px-4 py-2 hover:bg-gray-50 transition'
-                      }
-                      onClick={() => setPagina(Number(p))}
-                      aria-current={pagina === p ? 'page' : undefined}
-                    >
-                      {p}
-                    </button>
-                  )
-                )}
-              </div>
-              <button
-                className="flex items-center gap-1 text-[1.7rem] text-gray-800 font-normal px-2 py-1 rounded-md hover:bg-gray-50 transition disabled:opacity-40"
-                onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))}
-                disabled={pagina === totalPaginas}
-              >
-                <ChevronRight size={20} strokeWidth={2.2} />
-              </button>
-            </nav>
-          </div>
+          {/* Paginación con shadcn */}
+          {totalPaginas > 0 && (
+            <div className="flex justify-center mt-8">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={e => {
+                        e.preventDefault();
+                        if (pagina > 1) setPagina(p => Math.max(1, p - 1));
+                      }}
+                    />
+                  </PaginationItem>
+
+                  {getPagination(pagina, totalPaginas).map((p, idx) => (
+                    <PaginationItem key={idx}>
+                      {p === '...' ? (
+                        <PaginationEllipsis />
+                      ) : (
+                        <PaginationLink
+                          href="#"
+                          onClick={e => {
+                            e.preventDefault();
+                            if (typeof p === 'number') setPagina(p);
+                          }}
+                          isActive={pagina === p}
+                        >
+                          {p}
+                        </PaginationLink>
+                      )}
+                    </PaginationItem>
+                  ))}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={e => {
+                        e.preventDefault();
+                        if (pagina < totalPaginas)
+                          setPagina(p => Math.min(totalPaginas, p + 1));
+                      }}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </>
       )}
 

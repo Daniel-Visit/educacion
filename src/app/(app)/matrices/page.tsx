@@ -15,6 +15,15 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from '@/components/ui/pagination';
 import LoadingState from '@/components/ui/LoadingState';
 import { useMatricesList } from '@/hooks/useMatrices';
 import { formatDate, getGradient } from '@/utils/matrices';
@@ -347,57 +356,64 @@ export default function MatricesPage() {
               ))}
             </div>
 
-            {/* Paginación exacta estilo imagen */}
-            <div className="flex justify-center mt-8">
-              <nav
-                className="inline-flex items-center gap-4 select-none"
-                aria-label="Pagination"
-              >
-                <button
-                  className="flex items-center gap-1 text-[1.7rem] text-gray-800 font-normal px-2 py-1 rounded-md hover:bg-gray-50 transition disabled:opacity-40"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  <ChevronLeft size={20} strokeWidth={2.2} />
-                </button>
-                <div className="flex items-center gap-4">
-                  {getPageNumbers().map((page, index) =>
-                    page === '...' ? (
-                      <span
-                        key={index}
-                        className="text-3xl text-gray-700 font-light px-2"
+            {/* Paginación con shadcn */}
+            {totalPages > 0 && (
+              <div className="flex justify-center mt-8">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        href="#"
+                        onClick={e => {
+                          e.preventDefault();
+                          if (currentPage > 1)
+                            handlePageChange(currentPage - 1);
+                        }}
+                        className="gap-0"
                       >
-                        •••
-                      </span>
-                    ) : (
-                      <button
-                        key={page}
-                        className={
-                          currentPage === page
-                            ? 'flex items-center justify-center text-sm font-medium rounded-xl border-2 border-gray-200 bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.04)] px-4 py-2'
-                            : 'flex items-center justify-center text-sm font-normal rounded-xl px-4 py-2 hover:bg-gray-50 transition'
-                        }
-                        onClick={() =>
-                          typeof page === 'number'
-                            ? handlePageChange(page)
-                            : null
-                        }
-                        aria-current={currentPage === page ? 'page' : undefined}
+                        <ChevronLeft className="h-4 w-4" />
+                        <span className="sr-only">Página anterior</span>
+                      </PaginationPrevious>
+                    </PaginationItem>
+
+                    {getPageNumbers().map((page, index) => (
+                      <PaginationItem key={index}>
+                        {page === '...' ? (
+                          <PaginationEllipsis />
+                        ) : (
+                          <PaginationLink
+                            href="#"
+                            onClick={e => {
+                              e.preventDefault();
+                              if (typeof page === 'number')
+                                handlePageChange(page);
+                            }}
+                            isActive={currentPage === page}
+                          >
+                            {page}
+                          </PaginationLink>
+                        )}
+                      </PaginationItem>
+                    ))}
+
+                    <PaginationItem>
+                      <PaginationNext
+                        href="#"
+                        onClick={e => {
+                          e.preventDefault();
+                          if (currentPage < totalPages)
+                            handlePageChange(currentPage + 1);
+                        }}
+                        className="gap-0"
                       >
-                        {page}
-                      </button>
-                    )
-                  )}
-                </div>
-                <button
-                  className="flex items-center gap-1 text-[1.7rem] text-gray-800 font-normal px-2 py-1 rounded-md hover:bg-gray-50 transition disabled:opacity-40"
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  <ChevronRight size={20} strokeWidth={2.2} />
-                </button>
-              </nav>
-            </div>
+                        <ChevronRight className="h-4 w-4" />
+                        <span className="sr-only">Página siguiente</span>
+                      </PaginationNext>
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
           </div>
         )}
       </div>

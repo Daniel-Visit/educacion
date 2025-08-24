@@ -64,98 +64,110 @@ export async function POST(request: NextRequest) {
     let invitedCount = 0;
     const errors: string[] = [];
 
-    // Solo procesar el primer email para evitar rate limits de Resend
-    const email = emails[0];
-    try {
-      // Verificar si el usuario ya existe
-      let user = await prisma.user.findUnique({
-        where: { email: email.trim() },
-      });
+    // Procesar todos los emails con delay para respetar rate limits de Resend
+    for (let i = 0; i < emails.length; i++) {
+      const email = emails[i];
 
-      if (user) {
-        // Si el usuario existe, actualizar su rol y forzar cambio de contraseña
-        await prisma.user.update({
-          where: { id: user.id },
-          data: {
-            role: role.slug,
-            forcePasswordChange: true,
-          },
-        });
-      } else {
-        // Crear nuevo usuario
-        user = await prisma.user.create({
-          data: {
-            email: email.trim(),
-            role: role.slug,
-            password: null, // Sin contraseña inicial
-            forcePasswordChange: true, // Forzar cambio de contraseña
-          },
-        });
+      // Agregar delay de 1 segundo entre emails (excepto el primero)
+      if (i > 0) {
+        console.log(
+          `📧 INVITE - Esperando 1 segundo antes de enviar email ${i + 1}/${emails.length}...`
+        );
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
-      // Crear token de verificación (reutilizando tu sistema existente)
-      const token = crypto.randomUUID();
-      const expires = new Date(Date.now() + 72 * 60 * 60 * 1000); // 72 horas
-
-      await prisma.verificationToken.create({
-        data: {
-          identifier: email.trim(),
-          token,
-          expires,
-        },
-      });
-
-      // Enviar email de invitación
-      const invitationUrl = `${process.env.NEXTAUTH_URL}/auth/set-password?token=${token}`;
-
-      console.log('📧 INVITE - Intentando enviar email a:', email.trim());
-      console.log('📧 INVITE - URL de invitación:', invitationUrl);
-      console.log('📧 INVITE - Rol:', role.name);
-      console.log('📧 INVITE - Instancia de resend:', typeof resend);
       console.log(
-        '📧 INVITE - Método emails.send disponible:',
-        typeof resend.emails?.send
+        `📧 INVITE - Procesando email ${i + 1}/${emails.length}: ${email}`
       );
 
       try {
-        console.log('📧 INVITE - Llamando a resend.emails.send...');
-
-        // Renderizar el componente React Email
-        const emailHtml = await render(
-          InvitationEmail({
-            userEmail: email.trim(),
-            roleName: role.name,
-            invitationUrl: invitationUrl,
-          })
-        );
-
-        const result = await resend.emails.send({
-          from: 'welcome@notifications.goodly.cl',
-          to: [email.trim()],
-          subject: 'Invitación a la plataforma educativa',
-          html: emailHtml,
-          replyTo: 'welcome@notifications.goodly.cl',
+        // Verificar si el usuario ya existe
+        let user = await prisma.user.findUnique({
+          where: { email: email.trim() },
         });
 
-        console.log('✅ INVITE - Email enviado exitosamente:', result);
-      } catch (resendError) {
-        console.error('❌ INVITE - Error enviando email:', resendError);
-        throw resendError;
-      }
+        if (user) {
+          // Si el usuario existe, actualizar su rol y forzar cambio de contraseña
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              role: role.slug,
+              forcePasswordChange: true,
+            },
+          });
+        } else {
+          // Crear nuevo usuario
+          user = await prisma.user.create({
+            data: {
+              email: email.trim(),
+              role: role.slug,
+              password: null, // Sin contraseña inicial
+              forcePasswordChange: true, // Forzar cambio de contraseña
+            },
+          });
+        }
 
-      invitedCount = 1;
-    } catch (error) {
-      console.error(`Error al invitar ${email}:`, error);
-      errors.push(
-        `Error con ${email}: ${error instanceof Error ? error.message : 'Error desconocido'}`
-      );
+        // Crear token de verificación (reutilizando tu sistema existente)
+        const token = crypto.randomUUID();
+        const expires = new Date(Date.now() + 72 * 60 * 60 * 1000); // 72 horas
+
+        await prisma.verificationToken.create({
+          data: {
+            identifier: email.trim(),
+            token,
+            expires,
+          },
+        });
+
+        // Enviar email de invitación
+        const invitationUrl = `${process.env.NEXTAUTH_URL}/auth/set-password?token=${token}`;
+
+        console.log('📧 INVITE - Intentando enviar email a:', email.trim());
+        console.log('📧 INVITE - URL de invitación:', invitationUrl);
+        console.log('📧 INVITE - Rol:', role.name);
+        console.log('📧 INVITE - Instancia de resend:', typeof resend);
+        console.log(
+          '📧 INVITE - Método emails.send disponible:',
+          typeof resend.emails?.send
+        );
+
+        try {
+          console.log('📧 INVITE - Llamando a resend.emails.send...');
+
+          // Renderizar el componente React Email
+          const emailHtml = await render(
+            InvitationEmail({
+              userEmail: email.trim(),
+              roleName: role.name,
+              invitationUrl: invitationUrl,
+            })
+          );
+
+          const result = await resend.emails.send({
+            from: 'welcome@notifications.goodly.cl',
+            to: [email.trim()],
+            subject: 'Invitación a la plataforma educativa',
+            html: emailHtml,
+            replyTo: 'welcome@notifications.goodly.cl',
+          });
+
+          console.log('✅ INVITE - Email enviado exitosamente:', result);
+        } catch (resendError) {
+          console.error('❌ INVITE - Error enviando email:', resendError);
+          throw resendError;
+        }
+
+        invitedCount++;
+      } catch (error) {
+        console.error(`Error al invitar ${email}:`, error);
+        errors.push(
+          `Error con ${email}: ${error instanceof Error ? error.message : 'Error desconocido'}`
+        );
+      }
     }
 
     console.log(
-      '✅ INVITE - Proceso completado. Invitaciones exitosas:',
-      invitedCount,
-      'Errores:',
-      errors.length
+      `✅ INVITE - Proceso completado. Invitaciones exitosas: ${invitedCount}/${emails.length}, Errores: ${errors.length}`
     );
 
     return NextResponse.json({

@@ -8,17 +8,18 @@ export async function POST(request: NextRequest) {
       '🔍 API SET-PASSWORD - Iniciando establecimiento de contraseña'
     );
 
-    const { token, password } = await request.json();
+    const { token, name, password } = await request.json();
 
     console.log('🔍 API SET-PASSWORD - Datos recibidos:', {
       token: token ? 'presente' : 'ausente',
+      name: name ? 'presente' : 'ausente',
       password: password ? 'presente' : 'ausente',
     });
 
-    if (!token || !password) {
-      console.log('❌ API SET-PASSWORD - Token o contraseña faltantes');
+    if (!token || !name || !password) {
+      console.log('❌ API SET-PASSWORD - Token, nombre o contraseña faltantes');
       return NextResponse.json(
-        { error: 'Token y contraseña son requeridos' },
+        { error: 'Token, nombre y contraseña son requeridos' },
         { status: 400 }
       );
     }
@@ -77,10 +78,11 @@ export async function POST(request: NextRequest) {
     // Hash de la nueva contraseña
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Actualizar usuario: establecer contraseña y marcar que ya no necesita cambiar
+    // Actualizar usuario: establecer nombre, contraseña y marcar que ya no necesita cambiar
     await prisma.user.update({
       where: { id: user.id },
       data: {
+        name: name,
         password: hashedPassword,
         forcePasswordChange: false, // Ya no necesita cambiar contraseña
       },

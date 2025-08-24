@@ -2,8 +2,20 @@ import { NextResponse } from 'next/server';
 import { auth } from '../../../../../auth';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+
+    // Validar parámetros
+    if (page < 1 || limit < 1 || limit > 100) {
+      return NextResponse.json(
+        { error: 'Parámetros de paginación inválidos' },
+        { status: 400 }
+      );
+    }
+
     // Verificar autenticación
     const session = await auth();
     if (!session?.user) {
@@ -32,7 +44,12 @@ export async function GET() {
       return NextResponse.json({ error: 'Acceso denegado' }, { status: 403 });
     }
 
-    // Obtener usuarios con sus cuentas y última sesión
+    // Obtener total de usuarios para paginación
+    const totalUsers = await prisma.user.count();
+    const totalPages = Math.ceil(totalUsers / limit);
+    const offset = (page - 1) * limit;
+
+    // Obtener usuarios con paginación
     const users = await prisma.user.findMany({
       include: {
         accounts: {
@@ -45,9 +62,17 @@ export async function GET() {
         },
       },
       orderBy: { createdAt: 'desc' },
+      skip: offset,
+      take: limit,
     });
 
-    return NextResponse.json({ users });
+    return NextResponse.json({
+      users,
+      total: totalUsers,
+      totalPages,
+      currentPage: page,
+      limit,
+    });
   } catch (error) {
     console.error('Error al obtener usuarios:', error);
     return NextResponse.json(

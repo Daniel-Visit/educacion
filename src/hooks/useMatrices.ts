@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   OA,
   Eje,
@@ -211,7 +211,7 @@ export const useMatricesList = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, []); // Sin dependencias para evitar loop infinito
 
   const deleteMatriz = useCallback(async (id: number) => {
     setDeletingId(id);
@@ -232,9 +232,12 @@ export const useMatricesList = () => {
     }
   }, []);
 
+  const fetchMatricesRef = useRef(fetchMatrices);
+  fetchMatricesRef.current = fetchMatrices;
+
   useEffect(() => {
-    fetchMatrices();
-  }, [fetchMatrices]);
+    fetchMatricesRef.current();
+  }, []); // Sin dependencias para evitar loop infinito
 
   return {
     matrices,

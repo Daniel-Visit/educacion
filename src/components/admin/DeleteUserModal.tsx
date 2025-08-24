@@ -15,6 +15,8 @@ interface DeleteUserModalProps {
     role: string;
     image?: string | null;
   } | null;
+  selectedUsers?: Set<string>;
+  isMultipleDelete?: boolean;
   onSuccess: () => void;
   onError: (error: string) => void;
 }
@@ -23,33 +25,62 @@ export default function DeleteUserModal({
   isOpen,
   onClose,
   user,
+  selectedUsers,
+  isMultipleDelete,
   onSuccess,
   onError,
 }: DeleteUserModalProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleDelete = async () => {
-    if (!user) return;
+    if (isMultipleDelete && selectedUsers) {
+      // Eliminación múltiple
+      setIsLoading(true);
+      try {
+        const response = await fetch('/api/admin/users/delete-multiple', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userIds: Array.from(selectedUsers),
+          }),
+        });
 
-    setIsLoading(true);
-
-    try {
-      const response = await fetch(`/api/admin/users/${user.id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        onSuccess();
-        onClose();
-      } else {
-        const error = await response.json();
-        throw new Error(error.message || 'Error al eliminar usuario');
+        if (response.ok) {
+          onSuccess();
+          onClose();
+        } else {
+          const error = await response.json();
+          throw new Error(error.message || 'Error al eliminar usuarios');
+        }
+      } catch (error) {
+        console.error('Error al eliminar usuarios:', error);
+        onError(error instanceof Error ? error.message : 'Error desconocido');
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Error al eliminar usuario:', error);
-      onError(error instanceof Error ? error.message : 'Error desconocido');
-    } finally {
-      setIsLoading(false);
+    } else if (user) {
+      // Eliminación individual
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/admin/users/${user.id}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          onSuccess();
+          onClose();
+        } else {
+          const error = await response.json();
+          throw new Error(error.message || 'Error al eliminar usuario');
+        }
+      } catch (error) {
+        console.error('Error al eliminar usuario:', error);
+        onError(error instanceof Error ? error.message : 'Error desconocido');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -59,7 +90,7 @@ export default function DeleteUserModal({
     }
   };
 
-  if (!isOpen || !user) return null;
+  if (!isOpen || (!user && !isMultipleDelete)) return null;
 
   return (
     <>
@@ -74,7 +105,9 @@ export default function DeleteUserModal({
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-white">
-                    Eliminar Usuario
+                    {isMultipleDelete
+                      ? 'Eliminar Usuarios'
+                      : 'Eliminar Usuario'}
                   </h2>
                   <p className="text-red-100 text-sm">
                     Esta acción no se puede deshacer
@@ -93,18 +126,39 @@ export default function DeleteUserModal({
 
           {/* Contenido del modal */}
           <div className="p-6 space-y-6">
-            {/* Información del usuario */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="flex items-center gap-3">
-                <Avatar user={user} size="md" />
-                <div>
-                  <h3 className="font-semibold text-gray-900">
-                    {user.name || 'Sin nombre'}
-                  </h3>
-                  <p className="text-sm text-gray-500">{user.email}</p>
+            {/* Información del usuario (solo para eliminación individual) */}
+            {!isMultipleDelete && user && (
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <Avatar user={user} size="md" />
+                  <div>
+                    <h3 className="font-semibold text-gray-900">
+                      {user.name || 'Sin nombre'}
+                    </h3>
+                    <p className="text-sm text-gray-500">{user.email}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* Información para eliminación múltiple */}
+            {isMultipleDelete && selectedUsers && (
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <div className="bg-red-100 p-3 rounded-full">
+                    <Trash2 className="h-6 w-6 text-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">
+                      Eliminar {selectedUsers.size} usuarios
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      Se eliminarán {selectedUsers.size} usuarios seleccionados
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Advertencia */}
             <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -112,8 +166,17 @@ export default function DeleteUserModal({
               <div className="text-sm text-red-700">
                 <p className="font-medium">Esta acción no se puede deshacer.</p>
                 <p className="mt-1">
-                  Se eliminará permanentemente el usuario{' '}
-                  <strong>{user.name || user.email}</strong>.
+                  {isMultipleDelete ? (
+                    <>
+                      Se eliminarán permanentemente{' '}
+                      <strong>{selectedUsers?.size} usuarios</strong>.
+                    </>
+                  ) : (
+                    <>
+                      Se eliminará permanentemente el usuario{' '}
+                      <strong>{user?.name || user?.email}</strong>.
+                    </>
+                  )}
                 </p>
               </div>
             </div>

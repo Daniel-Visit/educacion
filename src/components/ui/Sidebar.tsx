@@ -347,7 +347,7 @@ function SidebarContent({ userRole, user }: { userRole: string; user?: User }) {
           <div className="mt-2">
             <Link
               href="/admin/users"
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all font-semibold text-base text-left focus:outline-none ${pathname === '/admin/users' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg' : 'text-indigo-900 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50'}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 mb-4 rounded-2xl transition-all font-semibold text-base text-left focus:outline-none ${pathname === '/admin/users' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md' : 'text-indigo-900 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50'}`}
             >
               <Users
                 className={
@@ -393,7 +393,7 @@ function SidebarContent({ userRole, user }: { userRole: string; user?: User }) {
               await signOut({ callbackUrl: '/auth/login' });
             }
           }}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all font-semibold text-base text-left focus:outline-none text-indigo-900 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50"
+          className="w-full flex items-center gap-3 px-4 py-2 rounded-2xl transition-all font-semibold text-base text-left focus:outline-none text-indigo-900 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50"
         >
           <CircleMinus className="text-indigo-500" size={22} />
           <span>Cerrar sesión</span>

@@ -20,6 +20,10 @@ import { z } from 'zod';
 // Schema de validación para establecer contraseña
 const setPasswordSchema = z
   .object({
+    name: z
+      .string()
+      .min(2, 'El nombre debe tener al menos 2 caracteres')
+      .max(50, 'El nombre no puede exceder 50 caracteres'),
     password: z
       .string()
       .min(8, 'La contraseña debe tener al menos 8 caracteres')
@@ -47,6 +51,7 @@ export default function SetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setSetPasswordForm] = useState<SetPasswordForm>({
+    name: '',
     password: '',
     confirmPassword: '',
   });
@@ -109,6 +114,7 @@ export default function SetPasswordPage() {
         },
         body: JSON.stringify({
           token,
+          name: formData.name,
           password: formData.password,
         }),
       });
@@ -246,6 +252,27 @@ export default function SetPasswordPage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="name"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Nombre
+                </Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Ingresa tu nombre"
+                  value={formData.name}
+                  onChange={handleInputChange('name')}
+                  className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                  required
+                />
+                {errors.name && (
+                  <p className="text-xs text-red-500 mt-1">{errors.name}</p>
+                )}
+              </div>
+
               <div className="space-y-2">
                 <Label
                   htmlFor="password"

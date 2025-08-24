@@ -4,6 +4,15 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import {
   UserPlus,
   Search,
@@ -13,6 +22,8 @@ import {
   Settings,
   Trash2,
   GitCompare,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import {
   CheckCircleIcon,
@@ -64,13 +75,16 @@ export default function UsersManagement() {
   const [isChangeRoleModalOpen, setIsChangeRoleModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
   const [alert, setAlert] = useState<{
     type: 'error' | 'success';
     message: string;
   } | null>(null);
 
-  const { users, isLoading, refetch } = useUsers();
+  const { users, isLoading, refetch, totalPages, hasNextPage, hasPrevPage } =
+    useUsers(currentPage, 10);
 
   const handleChangeRole = (user: User) => {
     setSelectedUser(user);
@@ -97,6 +111,48 @@ export default function UsersManagement() {
       type: 'error',
       message: error,
     });
+  };
+
+  // Funciones para selección múltiple
+  const handleSelectAll = () => {
+    if (selectedUsers.size === filteredUsers.length) {
+      setSelectedUsers(new Set());
+    } else {
+      setSelectedUsers(new Set(filteredUsers.map(user => user.id)));
+    }
+  };
+
+  const handleSelectUser = (userId: string) => {
+    const newSelected = new Set(selectedUsers);
+    if (newSelected.has(userId)) {
+      newSelected.delete(userId);
+    } else {
+      newSelected.add(userId);
+    }
+    setSelectedUsers(newSelected);
+  };
+
+  const handleDeleteMultiple = () => {
+    if (selectedUsers.size === 0) return;
+
+    // Abrir modal de confirmación para eliminación múltiple
+    setIsDeleteModalOpen(true);
+    setSelectedUser(null); // Indicar que es eliminación múltiple
+  };
+
+  const handleDeleteMultipleSuccess = () => {
+    setIsDeleteModalOpen(false);
+    setSelectedUsers(new Set()); // Limpiar selección
+    refetch();
+    setAlert({
+      type: 'success',
+      message: `${selectedUsers.size} usuarios han sido eliminados correctamente`,
+    });
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setSelectedUsers(new Set()); // Limpiar selección al cambiar página
   };
 
   const handleInviteSuccess = () => {
@@ -211,46 +267,103 @@ export default function UsersManagement() {
             />
           </div>
 
-          <Button
-            onClick={() => setIsInviteModalOpen(true)}
-            className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 shadow-lg"
-          >
-            <UserPlus className="h-4 w-4 mr-2" />
-            Invitar Usuarios
-          </Button>
+          <div className="flex gap-2 items-center min-h-[52px]">
+            {selectedUsers.size > 0 && (
+              <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
+                <div className="flex items-center gap-2 text-white">
+                  <div className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-medium">
+                    {selectedUsers.size} seleccionados
+                  </span>
+                </div>
+                <div className="flex gap-1">
+                  <button
+                    onClick={handleDeleteMultiple}
+                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-100 bg-red-500/20 hover:bg-red-500/30 rounded-md border border-red-400/30 hover:border-red-400/50 transition-all duration-200"
+                    title="Eliminar seleccionados"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                    Eliminar
+                  </button>
+                  <button
+                    onClick={() => setSelectedUsers(new Set())}
+                    className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-gray-200 bg-white/10 hover:bg-white/20 rounded-md border border-white/20 hover:border-white/30 transition-all duration-200"
+                    title="Cancelar selección"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            )}
+            <Button
+              onClick={() => setIsInviteModalOpen(true)}
+              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 shadow-lg"
+            >
+              <UserPlus className="h-4 w-4 mr-2" />
+              Invitar Usuarios
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Tabla de usuarios con estilo mejorado */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
         <table className="w-full">
+          <colgroup>
+            <col className="w-12" />
+            <col className="w-auto" />
+            <col className="w-24" />
+            <col className="w-24" />
+            <col className="w-32" />
+            <col className="w-28" />
+          </colgroup>
           <thead className="bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-200">
             <tr>
+              <th className="px-3 py-4 text-center">
+                <div className="flex items-center justify-center">
+                  <div className="relative">
+                    <Checkbox
+                      checked={
+                        selectedUsers.size === filteredUsers.length &&
+                        filteredUsers.length > 0
+                      }
+                      onCheckedChange={handleSelectAll}
+                    />
+                    {selectedUsers.size > 0 && (
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-indigo-600 rounded-full flex items-center justify-center">
+                        <span className="text-[8px] text-white font-bold">
+                          {selectedUsers.size}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-indigo-600" />
                   Usuario
                 </div>
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">
-                <div className="flex items-center gap-2">
+              <th className="px-4 py-4 text-center text-xs font-semibold text-indigo-800 uppercase tracking-wider">
+                <div className="flex items-center justify-center gap-1">
                   <GitCompare className="h-4 w-4 text-indigo-600" />
                   Rol
                 </div>
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">
-                <div className="flex items-center gap-2">
+              <th className="px-4 py-4 text-center text-xs font-semibold text-indigo-800 uppercase tracking-wider">
+                <div className="flex items-center justify-center gap-1">
                   <Activity className="h-4 w-4 text-indigo-600" />
                   Estado
                 </div>
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">
-                <div className="flex items-center gap-2">
+              <th className="px-4 py-4 text-center text-xs font-semibold text-indigo-800 uppercase tracking-wider">
+                <div className="flex items-center justify-center gap-1">
                   <Clock className="h-4 w-4 text-indigo-600" />
                   Último acceso
                 </div>
               </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-indigo-800 uppercase tracking-wider">
+              <th className="px-4 py-4 text-center text-xs font-semibold text-indigo-800 uppercase tracking-wider">
                 Acciones
               </th>
             </tr>
@@ -259,25 +372,41 @@ export default function UsersManagement() {
             {filteredUsers.map(user => (
               <tr
                 key={user.id}
-                className="hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-colors duration-150"
+                className="hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-200"
               >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center space-x-3">
+                <td className="px-3 py-3 whitespace-nowrap">
+                  <div className="flex items-center justify-center">
+                    <Checkbox
+                      checked={selectedUsers.has(user.id)}
+                      onCheckedChange={() => handleSelectUser(user.id)}
+                    />
+                  </div>
+                </td>
+                <td className="px-4 py-3 whitespace-nowrap">
+                  <div className="flex items-center space-x-2 max-w-full">
                     <div className="flex-shrink-0">
                       <Avatar user={user} size="sm" />
                     </div>
-                    <div>
-                      <div className="font-semibold text-gray-900 text-sm">
+                    <div className="min-w-0 flex-1 overflow-hidden">
+                      <div
+                        className="font-semibold text-gray-900 text-sm truncate max-w-full"
+                        title={user.name || 'Sin nombre'}
+                      >
                         {user.name || 'Sin nombre'}
                       </div>
-                      <div className="text-xs text-gray-500">{user.email}</div>
+                      <div
+                        className="text-xs text-gray-500 truncate max-w-full"
+                        title={user.email || ''}
+                      >
+                        {user.email}
+                      </div>
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
+                <td className="px-4 py-3 whitespace-nowrap text-center">
                   <Badge
                     variant="outline"
-                    className={`${
+                    className={`text-xs ${
                       user.role === 'admin'
                         ? 'bg-sky-50 text-sky-700 border-sky-200'
                         : user.role === 'profesor'
@@ -288,13 +417,13 @@ export default function UsersManagement() {
                     {user.role}
                   </Badge>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
+                <td className="px-4 py-3 whitespace-nowrap text-center">
                   {getStatusBadge(user)}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
-                  {getLastActive(user)}
+                <td className="px-4 py-3 whitespace-nowrap text-center text-xs text-gray-500">
+                  <div className="truncate">{getLastActive(user)}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td className="px-4 py-3 whitespace-nowrap text-center">
                   <div className="flex gap-2 justify-end">
                     <button
                       onClick={() => handleChangeRole(user)}
@@ -318,6 +447,62 @@ export default function UsersManagement() {
         </table>
       </div>
 
+      {/* Paginación */}
+      {totalPages > 0 && (
+        <div className="mt-6 flex justify-center">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={e => {
+                    e.preventDefault();
+                    if (hasPrevPage) handlePageChange(currentPage - 1);
+                  }}
+                  className={
+                    !hasPrevPage ? 'pointer-events-none opacity-50' : ''
+                  }
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  <span className="sr-only">Anterior</span>
+                </PaginationPrevious>
+              </PaginationItem>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    href="#"
+                    onClick={e => {
+                      e.preventDefault();
+                      handlePageChange(page);
+                    }}
+                    isActive={currentPage === page}
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={e => {
+                    e.preventDefault();
+                    if (hasNextPage) handlePageChange(currentPage + 1);
+                  }}
+                  className={
+                    !hasNextPage ? 'pointer-events-none opacity-50' : ''
+                  }
+                >
+                  <ChevronRight className="h-4 w-4" />
+                  <span className="sr-only">Siguiente</span>
+                </PaginationNext>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
+
       {/* Modales */}
       <InviteUsersModal
         isOpen={isInviteModalOpen}
@@ -339,7 +524,13 @@ export default function UsersManagement() {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         user={selectedUser}
-        onSuccess={handleDeleteSuccess}
+        selectedUsers={selectedUsers}
+        isMultipleDelete={selectedUsers.size > 0}
+        onSuccess={
+          selectedUsers.size > 0
+            ? handleDeleteMultipleSuccess
+            : handleDeleteSuccess
+        }
         onError={handleDeleteError}
       />
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface User {
   id: string;
@@ -37,23 +37,29 @@ interface UserActivity {
   lastSeen: string;
 }
 
-export function useUsers() {
+export function useUsers(page: number = 1, limit: number = 10) {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Obtener usuarios
-      const usersResponse = await fetch('/api/admin/users');
+      // Obtener usuarios con paginación
+      const usersResponse = await fetch(
+        `/api/admin/users?page=${page}&limit=${limit}`
+      );
       if (!usersResponse.ok) {
         throw new Error('Error al obtener usuarios');
       }
 
       const usersData = await usersResponse.json();
+      setTotalUsers(usersData.total || 0);
+      setTotalPages(usersData.totalPages || 0);
 
       // Obtener actividad desde Redis
       const activityResponse = await fetch('/api/admin/users/activity');
@@ -81,11 +87,11 @@ export function useUsers() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [page, limit]);
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
   const refetch = () => {
     fetchUsers();
@@ -96,5 +102,10 @@ export function useUsers() {
     isLoading,
     error,
     refetch,
+    totalUsers,
+    totalPages,
+    currentPage: page,
+    hasNextPage: page < totalPages,
+    hasPrevPage: page > 1,
   };
 }
