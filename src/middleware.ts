@@ -38,6 +38,7 @@ export async function middleware(request: NextRequest) {
     '/auth/login',
     '/auth/forgot-password',
     '/auth/reset-password',
+    '/auth/set-password',
     '/auth/change-password',
     '/403',
     '/500',
