@@ -588,59 +588,7 @@ export default function UsersManagement() {
         onError={handleDeleteError}
       />
 
-      {/* Alertas inline */}
-      {alert && (
-        <div
-          className={`rounded-md p-3 ${
-            alert.type === 'error'
-              ? 'bg-red-50 dark:bg-red-500/15 dark:outline dark:outline-red-500/25'
-              : 'bg-green-50 dark:bg-green-500/10 dark:outline dark:outline-green-500/20'
-          }`}
-        >
-          <div className="flex items-center">
-            <div className="shrink-0">
-              {alert.type === 'error' ? (
-                <XCircleIcon
-                  aria-hidden="true"
-                  className="size-5 text-red-400"
-                />
-              ) : (
-                <CheckCircleIcon
-                  aria-hidden="true"
-                  className="size-5 text-green-400"
-                />
-              )}
-            </div>
-            <div className="ml-3 flex-1">
-              <span
-                className={`text-sm ${
-                  alert.type === 'error'
-                    ? 'text-red-800 dark:text-red-200'
-                    : 'text-green-800 dark:text-green-300'
-                }`}
-              >
-                {alert.message}
-              </span>
-            </div>
-            <div className="ml-auto">
-              <div className="-mx-1.5 -my-1.5">
-                <button
-                  type="button"
-                  onClick={() => setAlert(null)}
-                  className={`inline-flex rounded-md p-1.5 hover:bg-opacity-80 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden ${
-                    alert.type === 'error'
-                      ? 'bg-red-50 text-red-500 hover:bg-red-100 focus-visible:ring-red-600 focus-visible:ring-offset-red-50 dark:bg-transparent dark:text-red-400 dark:hover:bg-red-500/10 dark:focus-visible:ring-red-500 dark:focus-visible:ring-offset-1 dark:focus-visible:ring-offset-red-900'
-                      : 'bg-green-50 text-green-500 hover:bg-green-100 focus-visible:ring-green-600 focus-visible:ring-offset-green-50 dark:bg-transparent dark:text-green-400 dark:hover:bg-green-500/10 dark:focus-visible:ring-green-500 dark:focus-visible:ring-offset-1 dark:focus-visible:ring-offset-green-900'
-                  }`}
-                >
-                  <span className="sr-only">Cerrar</span>
-                  <XMarkIcon aria-hidden="true" className="size-5" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Alertas inline duplicadas eliminadas: se mantiene solo la superior */}
     </div>
   );
 }
