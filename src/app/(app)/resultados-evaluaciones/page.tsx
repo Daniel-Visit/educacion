@@ -178,7 +178,7 @@ export default function ResultadosEvaluacionesPage() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <ResultadosHeader
-        title="Resultados de Evaluaciones"
+        title="Informe de Resultados"
         subtitle="Visualiza y analiza los resultados guardados"
         icon={<BarChart3 className="h-6 w-6 text-white" />}
         totalCount={resultados.length}
@@ -574,7 +574,7 @@ export default function ResultadosEvaluacionesPage() {
                         className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold text-sm flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200"
                       >
                         <BarChart3 className="h-4 w-4" />
-                        Ver Gráficos
+                        Ver Informe
                       </button>
                       <button
                         onClick={() => handleDescargarCSV(resultado)}

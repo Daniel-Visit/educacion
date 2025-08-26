@@ -576,8 +576,10 @@ export default function CrearHorarioModal({
         {/* Header bonito con gradiente indigo-morado - FIXED */}
         {/* Header del modal */}
         <ModalHeader
-          title={modoEdicion ? 'Editar Horario' : 'Crear Nuevo Horario'}
-          subtitle="Configura tu horario docente para la planificación anual"
+          title={
+            modoEdicion ? 'Editar Configuración' : 'Crear Nueva Configuración'
+          }
+          subtitle="Configura la información necesaria para la planificación anual"
           icon={<Calendar className="h-6 w-6 text-white" />}
           onClose={onClose}
           gradient="from-indigo-600 to-purple-600"
@@ -590,14 +592,14 @@ export default function CrearHorarioModal({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nombre del Horario *
+                  Nombre de la Configuración *
                 </label>
                 <input
                   type="text"
                   className="w-full rounded-lg border px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
                   value={nombre}
                   onChange={e => setNombre(e.target.value)}
-                  placeholder="Ej: Horario Lenguaje 2do Básico"
+                  placeholder="Ej: Configuración Lenguaje 2do Básico"
                 />
               </div>
               <div>
@@ -851,7 +853,7 @@ export default function CrearHorarioModal({
               className="min-w-[160px] flex items-center justify-center text-sm font-semibold"
             >
               <Save className="w-5 h-5 mr-2" />{' '}
-              {modoEdicion ? 'Guardar Cambios' : 'Crear Horario'}
+              {modoEdicion ? 'Guardar Cambios' : 'Crear Configuración'}
             </PrimaryButton>
           </div>
         </div>

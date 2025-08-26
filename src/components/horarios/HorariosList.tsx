@@ -111,7 +111,7 @@ export default function HorariosList() {
   if (isLoading) {
     return (
       <div className="container mx-auto">
-        <LoadingState message="Cargando horarios..." />
+        <LoadingState message="Cargando configuraciones..." />
       </div>
     );
   }
@@ -153,9 +153,11 @@ export default function HorariosList() {
               <Calendar className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Configuración de Horarios</h1>
+              <h1 className="text-2xl font-bold">
+                Configuración de Planificaciones
+              </h1>
               <p className="text-indigo-100 text-sm">
-                Gestiona los horarios de cursos para la planificación anual
+                Gestiona las configuraciones para la planificación anual
               </p>
             </div>
           </div>
@@ -164,7 +166,7 @@ export default function HorariosList() {
             className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
           >
             <Calendar className="w-4 h-4" />
-            Nuevo Horario
+            Nueva Configuración
           </button>
         </div>
 
@@ -174,7 +176,7 @@ export default function HorariosList() {
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-indigo-200" />
               <div>
-                <p className="text-indigo-200 text-xs">Total Horarios</p>
+                <p className="text-indigo-200 text-xs">Configuraciones</p>
                 <p className="text-lg font-bold">{horarios.length}</p>
               </div>
             </div>

@@ -36,7 +36,7 @@ const navigation = [
     href: '/planificacion-anual',
     icon: Calendar,
     submenu: [
-      { name: 'Horarios', href: '/horarios' },
+      { name: 'Configuración', href: '/horarios' },
       { name: 'Planificación Anual', href: '/planificacion-anual' },
       { name: 'Planificaciones', href: '/planificacion-anual/listado' },
     ],
@@ -65,7 +65,7 @@ const navigation = [
     href: '/resultados-evaluaciones',
     icon: CheckCircle2,
     submenu: [
-      { name: 'Ver Resultados', href: '/resultados-evaluaciones' },
+      { name: 'Informe de Resultados', href: '/resultados-evaluaciones' },
       { name: 'Cargar Resultados', href: '/correccion-evaluaciones' },
     ],
   },
