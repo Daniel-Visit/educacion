@@ -12,7 +12,7 @@ import {
   PaginationEllipsis,
 } from '@/components/ui/pagination';
 import LoadingState from '@/components/ui/LoadingState';
-import PrimaryButton from '@/components/ui/PrimaryButton';
+import { Button } from '@/components/ui/button';
 
 // Definir tipos para las planificaciones
 type Asignacion = {
@@ -240,12 +240,13 @@ export default function PlanificacionesList() {
           <p className="text-base text-gray-500 mb-6 text-center">
             Crea tu primera planificación anual para comenzar
           </p>
-          <PrimaryButton
+          <Button
+            variant="gradient"
+            size="gradient"
             onClick={() => router.push('/planificacion-anual')}
-            className="text-sm px-6 py-2"
           >
             Nueva Planificación
-          </PrimaryButton>
+          </Button>
         </div>
       ) : (
         <>

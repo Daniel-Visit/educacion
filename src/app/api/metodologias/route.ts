@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from '@/lib/db';
 
 export async function GET() {
   try {
-    const metodologias = await prisma.metodologia.findMany({
+    const metodologias = await db.metodologia.findMany({
       orderBy: { nombre_metodologia: 'asc' },
     });
     return NextResponse.json(metodologias);

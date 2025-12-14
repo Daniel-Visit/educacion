@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 export async function GET() {
   try {
-    const resultados = await prisma.resultadoEvaluacion.findMany({
+    const resultados = await db.resultadoEvaluacion.findMany({
       include: {
         evaluacion: {
           include: {

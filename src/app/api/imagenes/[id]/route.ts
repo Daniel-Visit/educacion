@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
@@ -13,7 +13,7 @@ export async function GET(
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
-    const imagen = await prisma.imagen.findUnique({
+    const imagen = await db.imagen.findUnique({
       where: { id: idNum },
     });
 
@@ -53,7 +53,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
-    await prisma.imagen.delete({
+    await db.imagen.delete({
       where: { id: idNum },
     });
 

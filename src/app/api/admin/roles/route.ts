@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '../../../../../auth';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 export async function GET() {
   try {
@@ -11,7 +11,7 @@ export async function GET() {
     }
 
     // Resolver usuario real desde BD y validar rol admin
-    const currentUser = await prisma.user.findFirst({
+    const currentUser = await db.user.findFirst({
       where: {
         OR: [
           ...(session.user.id ? [{ id: session.user.id }] : []),
@@ -33,7 +33,7 @@ export async function GET() {
     }
 
     // Obtener roles activos
-    const roles = await prisma.role.findMany({
+    const roles = await db.role.findMany({
       where: {
         isActive: true,
       },

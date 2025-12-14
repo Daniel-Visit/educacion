@@ -1,12 +1,10 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from '@/lib/db';
 
 export async function GET() {
   try {
     // Obtener todas las asignaciones de la planificación 2
-    const asignaciones = await prisma.asignacionOA.findMany({
+    const asignaciones = await db.asignacionOA.findMany({
       where: {
         planificacionId: 2,
       },

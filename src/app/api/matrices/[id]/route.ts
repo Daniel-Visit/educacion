@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { db } from '@/lib/db';
 
 // Interfaces para reemplazar tipos 'any'
 interface IndicadorInput {
@@ -11,8 +11,6 @@ interface OAInput {
   oaId: number;
   indicadores: IndicadorInput[];
 }
-
-const prisma = new PrismaClient();
 
 export async function GET(
   request: NextRequest,
@@ -26,7 +24,7 @@ export async function GET(
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
-    const matriz = await prisma.matrizEspecificacion.findUnique({
+    const matriz = await db.matrizEspecificacion.findUnique({
       where: { id: matrizId },
       include: {
         oas: {
@@ -49,17 +47,17 @@ export async function GET(
     // Obtener los OAs relacionados manualmente
     const oasWithDetails = await Promise.all(
       matriz.oas.map(async matrizOA => {
-        const oa = await prisma.oa.findUnique({
+        const oa = await db.oa.findUnique({
           where: { id: matrizOA.oaId },
         });
 
         let nivel = null;
         let asignatura = null;
         if (oa) {
-          nivel = await prisma.nivel.findUnique({
+          nivel = await db.nivel.findUnique({
             where: { id: oa.nivel_id },
           });
-          asignatura = await prisma.asignatura.findUnique({
+          asignatura = await db.asignatura.findUnique({
             where: { id: oa.asignatura_id },
           });
         }
@@ -117,21 +115,21 @@ export async function PUT(
     }
 
     // 1. Buscar todos los MatrizOA de la matriz
-    const matrizOAs = await prisma.matrizOA.findMany({ where: { matrizId } });
+    const matrizOAs = await db.matrizOA.findMany({ where: { matrizId } });
     const matrizOAIds = matrizOAs.map(oa => oa.id);
 
     // 2. Eliminar todos los Indicadores de esos MatrizOA
     if (matrizOAIds.length > 0) {
-      await prisma.indicador.deleteMany({
+      await db.indicador.deleteMany({
         where: { matrizOAId: { in: matrizOAIds } },
       });
     }
 
     // 3. Eliminar los MatrizOA
-    await prisma.matrizOA.deleteMany({ where: { matrizId } });
+    await db.matrizOA.deleteMany({ where: { matrizId } });
 
     // 4. Actualizar matriz y crear nuevos OAs
-    const matriz = await prisma.matrizEspecificacion.update({
+    const matriz = await db.matrizEspecificacion.update({
       where: { id: matrizId },
       data: {
         nombre,
@@ -184,21 +182,21 @@ export async function DELETE(
     }
 
     // 1. Buscar todos los MatrizOA de la matriz
-    const matrizOAs = await prisma.matrizOA.findMany({ where: { matrizId } });
+    const matrizOAs = await db.matrizOA.findMany({ where: { matrizId } });
     const matrizOAIds = matrizOAs.map(oa => oa.id);
 
     // 2. Eliminar todos los Indicadores de esos MatrizOA
     if (matrizOAIds.length > 0) {
-      await prisma.indicador.deleteMany({
+      await db.indicador.deleteMany({
         where: { matrizOAId: { in: matrizOAIds } },
       });
     }
 
     // 3. Eliminar los MatrizOA
-    await prisma.matrizOA.deleteMany({ where: { matrizId } });
+    await db.matrizOA.deleteMany({ where: { matrizId } });
 
     // 4. Eliminar la MatrizEspecificacion
-    await prisma.matrizEspecificacion.delete({ where: { id: matrizId } });
+    await db.matrizEspecificacion.delete({ where: { id: matrizId } });
 
     return NextResponse.json({ message: 'Matriz eliminada correctamente' });
   } catch (error) {

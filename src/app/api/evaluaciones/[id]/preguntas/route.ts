@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
@@ -17,7 +17,7 @@ export async function GET(
     }
 
     // Obtener las preguntas de la evaluación ordenadas por número
-    const preguntas = await prisma.pregunta.findMany({
+    const preguntas = await db.pregunta.findMany({
       where: { evaluacionId },
       select: {
         id: true,

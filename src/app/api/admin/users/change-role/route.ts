@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '../../../../../../auth';
-import { prisma } from '@/lib/prisma';
-import { incrementUserVersion } from '@/lib/auth-redis';
+import { db } from '@/lib/db';
 
 export async function PUT(request: NextRequest) {
   try {
@@ -20,7 +19,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Rol inválido' }, { status: 400 });
     }
 
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await db.user.findUnique({
       where: { id: userId },
       select: { id: true, role: true },
     });
@@ -39,7 +38,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await db.user.update({
       where: { id: userId },
       data: { role: newRole },
       select: {
@@ -50,17 +49,6 @@ export async function PUT(request: NextRequest) {
         updatedAt: true,
       },
     });
-
-    // Incrementar versión del usuario para invalidar tokens activos
-    try {
-      const newVersion = await incrementUserVersion(userId);
-      console.log(
-        `🔄 Versión de usuario incrementada a ${newVersion} para invalidar tokens`
-      );
-    } catch (redisError) {
-      console.error('❌ Error incrementando versión de usuario:', redisError);
-      // No fallar la operación si Redis falla
-    }
 
     return NextResponse.json({
       message: 'Rol actualizado correctamente',

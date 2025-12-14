@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { db } from '@/lib/db';
 
 // Interfaces para reemplazar tipos 'any'
 interface AsignacionInput {
@@ -7,11 +7,9 @@ interface AsignacionInput {
   cantidadClases: number;
 }
 
-const prisma = new PrismaClient();
-
 export async function GET() {
   try {
-    const planificaciones = await prisma.planificacionAnual.findMany({
+    const planificaciones = await db.planificacionAnual.findMany({
       include: {
         horario: {
           include: {
@@ -55,7 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar que el horario existe
-    const horario = await prisma.horario.findUnique({
+    const horario = await db.horario.findUnique({
       where: { id: parseInt(horarioId) },
     });
 
@@ -67,7 +65,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear la planificación
-    const planificacion = await prisma.planificacionAnual.create({
+    const planificacion = await db.planificacionAnual.create({
       data: {
         nombre,
         horarioId: parseInt(horarioId),
@@ -103,7 +101,7 @@ export async function POST(request: NextRequest) {
     ) {
       console.log('DEBUG: Asignaciones recibidas:', asignaciones);
 
-      await prisma.asignacionOA.createMany({
+      await db.asignacionOA.createMany({
         data: asignaciones.map((asignacion: AsignacionInput) => ({
           planificacionId: planificacion.id,
           oaId: asignacion.oaId,
@@ -115,7 +113,7 @@ export async function POST(request: NextRequest) {
 
       // Recargar la planificación con las asignaciones
       const planificacionConAsignaciones =
-        await prisma.planificacionAnual.findUnique({
+        await db.planificacionAnual.findUnique({
           where: { id: planificacion.id },
           include: {
             horario: {

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
@@ -18,7 +16,7 @@ export async function GET(
       );
     }
 
-    const planificacion = await prisma.planificacionAnual.findUnique({
+    const planificacion = await db.planificacionAnual.findUnique({
       where: { id: planificacionId },
       include: {
         horario: {
@@ -78,7 +76,7 @@ export async function PUT(
     const { nombre, asignaciones } = body;
 
     // Verificar que la planificación existe
-    const planificacionExistente = await prisma.planificacionAnual.findUnique({
+    const planificacionExistente = await db.planificacionAnual.findUnique({
       where: { id: planificacionId },
     });
 
@@ -90,7 +88,7 @@ export async function PUT(
     }
 
     // Actualizar la planificación
-    const planificacionActualizada = await prisma.planificacionAnual.update({
+    const planificacionActualizada = await db.planificacionAnual.update({
       where: { id: planificacionId },
       data: {
         nombre,
@@ -121,13 +119,13 @@ export async function PUT(
     // Si se proporcionan asignaciones, actualizarlas
     if (asignaciones && Array.isArray(asignaciones)) {
       // Eliminar asignaciones existentes
-      await prisma.asignacionOA.deleteMany({
+      await db.asignacionOA.deleteMany({
         where: { planificacionId },
       });
 
       // Crear nuevas asignaciones
       if (asignaciones.length > 0) {
-        await prisma.asignacionOA.createMany({
+        await db.asignacionOA.createMany({
           data: asignaciones.map(
             (asignacion: { oaId: number; cantidadClases: number }) => ({
               planificacionId: planificacionId,
@@ -165,7 +163,7 @@ export async function DELETE(
     }
 
     // Verificar que la planificación existe
-    const planificacionExistente = await prisma.planificacionAnual.findUnique({
+    const planificacionExistente = await db.planificacionAnual.findUnique({
       where: { id: planificacionId },
     });
 
@@ -177,12 +175,12 @@ export async function DELETE(
     }
 
     // Eliminar las asignaciones primero
-    await prisma.asignacionOA.deleteMany({
+    await db.asignacionOA.deleteMany({
       where: { planificacionId: planificacionId },
     });
 
     // Luego eliminar la planificación
-    await prisma.planificacionAnual.delete({
+    await db.planificacionAnual.delete({
       where: { id: planificacionId },
     });
 

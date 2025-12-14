@@ -1,11 +1,8 @@
 'use client';
 import { useState, useRef } from 'react';
 
-import PrimaryButton from '@/components/ui/PrimaryButton';
-import SecondaryButton from '@/components/ui/SecondaryButton';
-import { CloudUpload } from 'lucide-react';
+import { CloudUpload, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
 
 interface ImportarCSVModalProps {
   isOpen: boolean;
@@ -190,17 +187,24 @@ export default function ImportarCSVModal({
 
         {/* Footer */}
         <div className="flex justify-end gap-3 p-6 pt-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
-          <SecondaryButton onClick={handleClose} disabled={loading}>
+          <Button
+            variant="outlineGray"
+            size="outlineGray"
+            onClick={handleClose}
+            disabled={loading}
+          >
             Cancelar
-          </SecondaryButton>
-          <PrimaryButton
+          </Button>
+          <Button
+            variant="gradient"
+            size="gradient"
             onClick={handleImport}
             disabled={!file || preview.length === 0 || loading}
             className="flex items-center gap-2"
           >
             <CloudUpload className="w-4 h-4" />
             {loading ? 'Importando...' : 'Importar Planificación'}
-          </PrimaryButton>
+          </Button>
         </div>
       </div>
     </div>

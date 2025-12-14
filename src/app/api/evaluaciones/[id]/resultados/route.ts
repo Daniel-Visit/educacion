@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
@@ -17,7 +17,7 @@ export async function GET(
     }
 
     // Obtener todos los resultados de la evaluación
-    const resultados = await prisma.resultadoEvaluacion.findMany({
+    const resultados = await db.resultadoEvaluacion.findMany({
       where: { evaluacionId },
       include: {
         resultados: {
@@ -102,7 +102,7 @@ export async function DELETE(
     console.log('Eliminando resultado ID:', resultadoId);
 
     // Eliminar en orden: respuestas -> resultados de alumnos -> archivo de resultados
-    await prisma.respuestaAlumno.deleteMany({
+    await db.respuestaAlumno.deleteMany({
       where: {
         resultadoAlumno: {
           resultadoEvaluacionId: resultadoId,
@@ -110,11 +110,11 @@ export async function DELETE(
       },
     });
 
-    await prisma.resultadoAlumno.deleteMany({
+    await db.resultadoAlumno.deleteMany({
       where: { resultadoEvaluacionId: resultadoId },
     });
 
-    await prisma.resultadoEvaluacion.delete({
+    await db.resultadoEvaluacion.delete({
       where: { id: resultadoId },
     });
 

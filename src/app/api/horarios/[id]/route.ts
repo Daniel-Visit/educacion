@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 // GET /api/horarios/[id] - Obtener horario por ID
 export async function GET(
@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const id = parseInt((await params).id);
-    const horario = await prisma.horario.findUnique({
+    const horario = await db.horario.findUnique({
       where: { id },
       include: {
         asignatura: true,
@@ -67,7 +67,7 @@ export async function PUT(
     } = body;
 
     // Verificar si el horario existe
-    const horarioExistente = await prisma.horario.findUnique({
+    const horarioExistente = await db.horario.findUnique({
       where: { id },
     });
 
@@ -103,7 +103,7 @@ export async function PUT(
     }
 
     // Validar que el docente existe
-    const docente = await prisma.profesor.findUnique({
+    const docente = await db.profesor.findUnique({
       where: { id: parseInt(docenteId) },
     });
 
@@ -115,7 +115,7 @@ export async function PUT(
     }
 
     // Validar que la asignatura existe
-    const asignatura = await prisma.asignatura.findUnique({
+    const asignatura = await db.asignatura.findUnique({
       where: { id: parseInt(asignaturaId) },
     });
 
@@ -127,7 +127,7 @@ export async function PUT(
     }
 
     // Validar que el nivel existe
-    const nivel = await prisma.nivel.findUnique({
+    const nivel = await db.nivel.findUnique({
       where: { id: parseInt(nivelId) },
     });
 
@@ -139,7 +139,7 @@ export async function PUT(
     }
 
     // Actualizar horario con módulos en una transacción
-    const horario = await prisma.$transaction(
+    const horario = await db.$transaction(
       async tx => {
         // Actualizar el horario
         await tx.horario.update({
@@ -257,7 +257,7 @@ export async function DELETE(
   try {
     const id = parseInt((await params).id);
     // Verificar si el horario existe
-    const horario = await prisma.horario.findUnique({
+    const horario = await db.horario.findUnique({
       where: { id },
     });
 
@@ -269,7 +269,7 @@ export async function DELETE(
     }
 
     // Eliminar horario y sus módulos en una transacción
-    await prisma.$transaction(
+    await db.$transaction(
       async tx => {
         // Eliminar profesores de módulos
         await tx.moduloHorarioProfesor.deleteMany({

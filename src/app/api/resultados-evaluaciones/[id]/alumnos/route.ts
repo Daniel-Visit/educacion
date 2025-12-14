@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
@@ -17,7 +17,7 @@ export async function GET(
     }
 
     // Obtener los resultados individuales de los alumnos para este archivo de resultados
-    const resultadosAlumnos = await prisma.resultadoAlumno.findMany({
+    const resultadosAlumnos = await db.resultadoAlumno.findMany({
       where: { resultadoEvaluacionId },
       include: {
         alumno: true,

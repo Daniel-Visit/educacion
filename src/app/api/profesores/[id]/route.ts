@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 // Interfaces para tipar los datos de actualización
 interface ProfesorUpdateData {
@@ -63,7 +63,7 @@ export async function GET(
         }
       : {};
 
-    const profesor = await prisma.profesor.findUnique({
+    const profesor = await db.profesor.findUnique({
       where: { id: parseInt(params.id) },
       include: includeOptions,
     });
@@ -106,7 +106,7 @@ export async function PUT(
     }
 
     // Verificar si el profesor existe
-    const profesorExistente = await prisma.profesor.findUnique({
+    const profesorExistente = await db.profesor.findUnique({
       where: { id: parseInt(params.id) },
     });
 
@@ -118,7 +118,7 @@ export async function PUT(
     }
 
     // Verificar si el RUT ya existe en otro profesor
-    const rutExistente = await prisma.profesor.findFirst({
+    const rutExistente = await db.profesor.findFirst({
       where: {
         rut,
         id: { not: parseInt(params.id) },
@@ -143,7 +143,7 @@ export async function PUT(
     // Actualizar asignaturas si se proporcionan
     if (asignaturas && Array.isArray(asignaturas)) {
       // Eliminar asignaturas existentes
-      await prisma.profesorAsignatura.deleteMany({
+      await db.profesorAsignatura.deleteMany({
         where: { profesorId: parseInt(params.id) },
       });
 
@@ -160,7 +160,7 @@ export async function PUT(
     // Actualizar niveles si se proporcionan
     if (niveles && Array.isArray(niveles)) {
       // Eliminar asignaturas existentes
-      await prisma.profesorNivel.deleteMany({
+      await db.profesorNivel.deleteMany({
         where: { profesorId: parseInt(params.id) },
       });
 
@@ -174,7 +174,7 @@ export async function PUT(
       }
     }
 
-    const profesor = await prisma.profesor.update({
+    const profesor = await db.profesor.update({
       where: { id: parseInt(params.id) },
       data,
       include: {
@@ -214,7 +214,7 @@ export async function PATCH(
     const { rut, nombre, email, telefono, asignaturas, niveles } = body;
 
     // Verificar si el profesor existe
-    const profesorExistente = await prisma.profesor.findUnique({
+    const profesorExistente = await db.profesor.findUnique({
       where: { id: parseInt(params.id) },
     });
 
@@ -230,7 +230,7 @@ export async function PATCH(
 
     if (rut !== undefined) {
       // Verificar si el RUT ya existe en otro profesor
-      const rutExistente = await prisma.profesor.findFirst({
+      const rutExistente = await db.profesor.findFirst({
         where: {
           rut,
           id: { not: parseInt(params.id) },
@@ -252,7 +252,7 @@ export async function PATCH(
 
     // Actualizar asignaturas si se proporcionan
     if (asignaturas && Array.isArray(asignaturas)) {
-      await prisma.profesorAsignatura.deleteMany({
+      await db.profesorAsignatura.deleteMany({
         where: { profesorId: parseInt(params.id) },
       });
 
@@ -267,7 +267,7 @@ export async function PATCH(
 
     // Actualizar niveles si se proporcionan
     if (niveles && Array.isArray(niveles)) {
-      await prisma.profesorNivel.deleteMany({
+      await db.profesorNivel.deleteMany({
         where: { profesorId: parseInt(params.id) },
       });
 
@@ -280,7 +280,7 @@ export async function PATCH(
       }
     }
 
-    const profesor = await prisma.profesor.update({
+    const profesor = await db.profesor.update({
       where: { id: parseInt(params.id) },
       data,
       include: {
@@ -317,7 +317,7 @@ export async function DELETE(
 ) {
   try {
     // Verificar si el profesor existe
-    const profesor = await prisma.profesor.findUnique({
+    const profesor = await db.profesor.findUnique({
       where: { id: parseInt(params.id) },
       include: {
         horario: true,
@@ -355,7 +355,7 @@ export async function DELETE(
     }
 
     // Eliminar el profesor (las relaciones se eliminan automáticamente por CASCADE)
-    await prisma.profesor.delete({
+    await db.profesor.delete({
       where: { id: parseInt(params.id) },
     });
 

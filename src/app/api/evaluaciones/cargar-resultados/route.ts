@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 interface AlumnoData {
   rut: string;
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar que la evaluación existe
-    const evaluacion = await prisma.evaluacion.findUnique({
+    const evaluacion = await db.evaluacion.findUnique({
       where: { id: evaluacionId },
       include: {
         archivo: true,
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear o actualizar alumnos y resultados en la base de datos
-    const resultadoEvaluacion = await prisma.resultadoEvaluacion.create({
+    const resultadoEvaluacion = await db.resultadoEvaluacion.create({
       data: {
         nombre: `Resultados ${evaluacion.archivo.titulo} - ${new Date().toLocaleDateString()}`,
         evaluacionId,
@@ -127,12 +127,12 @@ export async function POST(request: NextRequest) {
 
     for (const [rut, alumnoData] of alumnosMap) {
       // Crear o encontrar el alumno
-      let alumno = await prisma.alumno.findUnique({
+      let alumno = await db.alumno.findUnique({
         where: { rut },
       });
 
       if (!alumno) {
-        alumno = await prisma.alumno.create({
+        alumno = await db.alumno.create({
           data: {
             rut: alumnoData.rut,
             nombre: alumnoData.nombre,
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
       const nota = (porcentaje / 100) * 7.0; // Escala 1-7
 
       // Crear resultado del alumno
-      const resultadoAlumno = await prisma.resultadoAlumno.create({
+      const resultadoAlumno = await db.resultadoAlumno.create({
         data: {
           resultadoEvaluacionId: resultadoEvaluacion.id,
           alumnoId: alumno.id,
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
       // Crear respuestas individuales
       const respuestas = respuestasMap.get(rut) || [];
       for (const respuesta of respuestas) {
-        await prisma.respuestaAlumno.create({
+        await db.respuestaAlumno.create({
           data: {
             resultadoAlumnoId: resultadoAlumno.id,
             preguntaId: respuesta.preguntaId,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '../../../../../../auth';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 import resend from '@/lib/resend';
 import { InvitationEmail } from '@/components/emails/InvitationEmail';
 import { render } from '@react-email/components';
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Resolver usuario real desde BD y validar rol admin
-    const currentUser = await prisma.user.findFirst({
+    const currentUser = await db.user.findFirst({
       where: {
         OR: [
           ...(session.user.id ? [{ id: session.user.id }] : []),
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar que el rol existe
-    const role = await prisma.role.findUnique({
+    const role = await db.role.findUnique({
       where: { id: roleId },
     });
 
@@ -82,41 +82,44 @@ export async function POST(request: NextRequest) {
 
       try {
         // Verificar si el usuario ya existe
-        let user = await prisma.user.findUnique({
+        let user = await db.user.findUnique({
           where: { email: email.trim() },
         });
 
-        if (user) {
-          // Si el usuario existe, actualizar su rol y forzar cambio de contraseña
-          await prisma.user.update({
-            where: { id: user.id },
-            data: {
-              role: role.slug,
-              forcePasswordChange: true,
-            },
-          });
-        } else {
-          // Crear nuevo usuario
-          user = await prisma.user.create({
-            data: {
-              email: email.trim(),
-              role: role.slug,
-              password: null, // Sin contraseña inicial
-              forcePasswordChange: true, // Forzar cambio de contraseña
-            },
-          });
-        }
-
-        // Crear token de verificación (reutilizando tu sistema existente)
+        // Use transaction to ensure user + token are created atomically
         const token = crypto.randomUUID();
         const expires = new Date(Date.now() + 72 * 60 * 60 * 1000); // 72 horas
 
-        await prisma.verificationToken.create({
-          data: {
-            identifier: email.trim(),
-            token,
-            expires,
-          },
+        await db.transaction(async tx => {
+          if (user) {
+            // Si el usuario existe, actualizar su rol y forzar cambio de contraseña
+            await tx.user.update({
+              where: { id: user.id },
+              data: {
+                role: role.slug,
+                forcePasswordChange: true,
+              },
+            });
+          } else {
+            // Crear nuevo usuario
+            user = await tx.user.create({
+              data: {
+                email: email.trim(),
+                role: role.slug,
+                password: null, // Sin contraseña inicial
+                forcePasswordChange: true, // Forzar cambio de contraseña
+              },
+            });
+          }
+
+          // Crear token de verificación (reutilizando tu sistema existente)
+          await tx.verificationToken.create({
+            data: {
+              identifier: email.trim(),
+              token,
+              expires,
+            },
+          });
         });
 
         // Enviar email de invitación

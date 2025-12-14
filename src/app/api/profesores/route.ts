@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 // Interfaz para los datos de creación del profesor
 interface ProfesorCreateData {
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
         }
       : {};
 
-    const profesores = await prisma.profesor.findMany({
+    const profesores = await db.profesor.findMany({
       include: includeOptions,
       orderBy: {
         createdAt: 'desc',
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar si el RUT ya existe
-    const profesorExistente = await prisma.profesor.findUnique({
+    const profesorExistente = await db.profesor.findUnique({
       where: { rut },
     });
 
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    const profesor = await prisma.profesor.create({
+    const profesor = await db.profesor.create({
       data,
       include: {
         asignaturas: {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '../../../../../../auth';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 export async function DELETE(
   request: NextRequest,
@@ -14,7 +14,7 @@ export async function DELETE(
     }
 
     // Resolver usuario real desde BD y validar rol admin
-    const currentUser = await prisma.user.findFirst({
+    const currentUser = await db.user.findFirst({
       where: {
         OR: [
           ...(session.user.id ? [{ id: session.user.id }] : []),
@@ -36,7 +36,7 @@ export async function DELETE(
     }
 
     // Verificar que el usuario a eliminar existe
-    const userToDelete = await prisma.user.findUnique({
+    const userToDelete = await db.user.findUnique({
       where: { id: params.id },
       select: { id: true, email: true, role: true },
     });
@@ -57,7 +57,7 @@ export async function DELETE(
     }
 
     // Eliminar el usuario (esto también eliminará sus cuentas y sesiones por CASCADE)
-    await prisma.user.delete({
+    await db.user.delete({
       where: { id: params.id },
     });
 

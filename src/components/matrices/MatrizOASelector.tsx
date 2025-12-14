@@ -1,7 +1,6 @@
 import { Listbox } from '@headlessui/react';
 import { Check, ChevronsUpDown, X } from 'lucide-react';
-import SecondaryButton from '@/components/ui/SecondaryButton';
-import PrimaryButton from '@/components/ui/PrimaryButton';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -429,12 +428,17 @@ export default function MatrizOASelector({
 
       {/* Botones de navegación */}
       <div className="flex justify-between gap-4 mt-6">
-        <SecondaryButton variant="large" onClick={onBack}>
+        <Button variant="outlineGray" size="outlineGrayLg" onClick={onBack}>
           Anterior
-        </SecondaryButton>
-        <PrimaryButton variant="large" onClick={onNext} disabled={!canProceed}>
+        </Button>
+        <Button
+          variant="gradient"
+          size="gradientLg"
+          onClick={onNext}
+          disabled={!canProceed}
+        >
           Siguiente
-        </PrimaryButton>
+        </Button>
       </div>
     </div>
   );

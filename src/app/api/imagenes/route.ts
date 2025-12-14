@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 export async function GET() {
   try {
-    const imagenes = await prisma.imagen.findMany({
+    const imagenes = await db.imagen.findMany({
       orderBy: { createdAt: 'desc' },
     });
     return NextResponse.json(imagenes);
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     // Extraer solo la parte base64 pura (sin prefijo)
     const base64Data = data.split(',')[1];
 
-    const imagen = await prisma.imagen.create({
+    const imagen = await db.imagen.create({
       data: {
         nombre,
         tipo,

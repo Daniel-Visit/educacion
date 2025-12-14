@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 // GET /api/horarios - Listar horarios
 export async function GET() {
   try {
-    const horarios = await prisma.horario.findMany({
+    const horarios = await db.horario.findMany({
       include: {
         asignatura: true,
         nivel: true,
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validar que el docente existe
-    const docente = await prisma.profesor.findUnique({
+    const docente = await db.profesor.findUnique({
       where: { id: parseInt(docenteId) },
     });
 
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validar que la asignatura existe
-    const asignatura = await prisma.asignatura.findUnique({
+    const asignatura = await db.asignatura.findUnique({
       where: { id: parseInt(asignaturaId) },
     });
 
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validar que el nivel existe
-    const nivel = await prisma.nivel.findUnique({
+    const nivel = await db.nivel.findUnique({
       where: { id: parseInt(nivelId) },
     });
 
@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear horario con módulos en una transacción
-    const horario = await prisma.$transaction(async tx => {
+    const horario = await db.$transaction(async tx => {
       // Crear el horario
       const nuevoHorario = await tx.horario.create({
         data: {
@@ -245,7 +245,7 @@ async function validarConflictosHorarios(
 
   try {
     // Obtener todos los horarios del profesor
-    const horariosProfesor = await prisma.horario.findMany({
+    const horariosProfesor = await db.horario.findMany({
       where: {
         docenteId,
         ...(horarioExcluirId && { id: { not: horarioExcluirId } }),

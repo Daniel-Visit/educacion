@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '../../../../../auth';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 export async function GET(request: Request) {
   try {
@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     }
 
     // Resolver usuario real desde BD y validar rol admin
-    const currentUser = await prisma.user.findFirst({
+    const currentUser = await db.user.findFirst({
       where: {
         OR: [
           ...(session.user.id ? [{ id: session.user.id }] : []),
@@ -45,12 +45,12 @@ export async function GET(request: Request) {
     }
 
     // Obtener total de usuarios para paginación
-    const totalUsers = await prisma.user.count();
+    const totalUsers = await db.user.count();
     const totalPages = Math.ceil(totalUsers / limit);
     const offset = (page - 1) * limit;
 
     // Obtener usuarios con paginación
-    const users = await prisma.user.findMany({
+    const users = await db.user.findMany({
       include: {
         accounts: {
           select: { provider: true, providerAccountId: true },

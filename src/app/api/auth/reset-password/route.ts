@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Buscar token válido
-    const verificationToken = await prisma.verificationToken.findUnique({
+    const verificationToken = await db.verificationToken.findUnique({
       where: { token },
     });
 
@@ -35,14 +35,14 @@ export async function POST(request: NextRequest) {
     // Verificar que no haya expirado
     if (verificationToken.expires < new Date()) {
       // Eliminar token expirado
-      await prisma.verificationToken.delete({
+      await db.verificationToken.delete({
         where: { token },
       });
       return NextResponse.json({ error: 'Token expirado' }, { status: 400 });
     }
 
     // Buscar usuario
-    const user = await prisma.user.findUnique({
+    const user = await db.user.findUnique({
       where: { email: verificationToken.identifier },
     });
 
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Actualizar contraseña del usuario
-    await prisma.user.update({
+    await db.user.update({
       where: { id: user.id },
       data: {
         password: hashedPassword,
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Eliminar token usado
-    await prisma.verificationToken.delete({
+    await db.verificationToken.delete({
       where: { token },
     });
 

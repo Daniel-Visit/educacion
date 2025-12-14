@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '../../../../../auth';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Buscar usuario
-    const user = await prisma.user.findUnique({
+    const user = await db.user.findUnique({
       where: { email: session.user.email },
     });
 
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     const hashedNewPassword = await bcrypt.hash(newPassword, 12);
 
     // Actualizar contraseña y forcePasswordChange
-    await prisma.user.update({
+    await db.user.update({
       where: { email: session.user.email },
       data: {
         password: hashedNewPassword,

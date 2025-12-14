@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { Calendar, Clock, Trash2, Save } from 'lucide-react';
-import PrimaryButton from '@/components/ui/PrimaryButton';
-import SecondaryButton from '@/components/ui/SecondaryButton';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -839,22 +838,24 @@ export default function CrearHorarioModal({
 
           {/* Footer al final del flujo, siempre visible */}
           <div className="my-4 px-8 bg-white rounded-b-3xl flex justify-end gap-3 shadow-[0_-2px_16px_-8px_rgba(80,80,120,0.06)]">
-            <SecondaryButton
+            <Button
+              variant="outlineGray"
+              size="outlineGraySubtle"
               onClick={onClose}
-              variant="subtle"
-              className="min-w-[120px] flex items-center justify-center text-base font-medium border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
+              className="min-w-[120px] flex items-center justify-center text-base font-medium"
             >
               Cancelar
-            </SecondaryButton>
-            <PrimaryButton
+            </Button>
+            <Button
+              variant="gradient"
+              size="gradientSubtle"
               onClick={handleSubmit}
               disabled={isSubmitting || !isFormValid()}
-              variant="subtle"
-              className="min-w-[160px] flex items-center justify-center text-sm font-semibold"
+              className="min-w-[160px] flex items-center justify-center"
             >
               <Save className="w-5 h-5 mr-2" />{' '}
               {modoEdicion ? 'Guardar Cambios' : 'Crear Configuración'}
-            </PrimaryButton>
+            </Button>
           </div>
         </div>
       </div>

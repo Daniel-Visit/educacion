@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
@@ -15,7 +13,7 @@ export async function GET(
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
-    const archivo = await prisma.archivo.findUnique({
+    const archivo = await db.archivo.findUnique({
       where: { id: idNum },
     });
 
@@ -93,7 +91,7 @@ export async function PUT(
     }
 
     console.log('🔵 [API] Actualizando archivo en base de datos...');
-    const archivo = await prisma.archivo.update({
+    const archivo = await db.archivo.update({
       where: { id: idNum },
       data: {
         titulo,
@@ -128,7 +126,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
-    await prisma.archivo.delete({
+    await db.archivo.delete({
       where: { id: idNum },
     });
 

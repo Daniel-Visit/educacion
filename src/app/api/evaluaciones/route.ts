@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 import { calcularEstadoEvaluacion } from '@/lib/evaluacion-utils';
 import { MatrizEspecificacion } from '@/types/evaluacion';
 
 export async function GET() {
   try {
-    const evaluaciones = await prisma.evaluacion.findMany({
+    const evaluaciones = await db.evaluacion.findMany({
       include: {
         archivo: true,
         matriz: true,
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const evaluacion = await prisma.evaluacion.create({
+    const evaluacion = await db.evaluacion.create({
       data: {
         archivoId,
         matrizId,
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
       }
 
       if (indicadoresToCreate.length > 0) {
-        await prisma.preguntaIndicador.createMany({
+        await db.preguntaIndicador.createMany({
           data: indicadoresToCreate,
         });
       }
@@ -171,13 +171,13 @@ export async function POST(request: NextRequest) {
       } as MatrizEspecificacion,
     });
 
-    await prisma.evaluacion.update({
+    await db.evaluacion.update({
       where: { id: evaluacion.id },
       data: { estado: estadoCalculado },
     });
 
     // Obtener la evaluación final con el estado actualizado
-    const evaluacionFinal = await prisma.evaluacion.findUnique({
+    const evaluacionFinal = await db.evaluacion.findUnique({
       where: { id: evaluacion.id },
       include: {
         preguntas: {

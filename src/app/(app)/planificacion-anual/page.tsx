@@ -11,8 +11,7 @@ import { useHorarios } from '@/hooks/use-horarios';
 import GlobalDropdown from '@/components/ui/GlobalDropdown';
 import { useSearchParams } from 'next/navigation';
 import { CloudUpload, Save, Calendar, FileText } from 'lucide-react';
-import PrimaryButton from '@/components/ui/PrimaryButton';
-import SecondaryButton from '@/components/ui/SecondaryButton';
+import { Button } from '@/components/ui/button';
 import LoadingState from '@/components/ui/LoadingState';
 
 function PlanificacionAnualContent() {
@@ -318,12 +317,22 @@ function PlanificacionAnualContent() {
 
               {/* Botones */}
               <div className="flex gap-3">
-                <SecondaryButton onClick={cancelarSeleccion} className="flex-1">
+                <Button
+                  variant="outlineGray"
+                  size="outlineGray"
+                  onClick={cancelarSeleccion}
+                  className="flex-1"
+                >
                   Cancelar
-                </SecondaryButton>
-                <PrimaryButton onClick={confirmarSeleccion} className="flex-1">
+                </Button>
+                <Button
+                  variant="gradient"
+                  size="gradient"
+                  onClick={confirmarSeleccion}
+                  className="flex-1"
+                >
                   Confirmar
-                </PrimaryButton>
+                </Button>
               </div>
             </div>
           </div>
@@ -438,7 +447,9 @@ function PlanificacionAnualContent() {
               >
                 Cancelar
               </button>
-              <PrimaryButton
+              <Button
+                variant="gradient"
+                size="gradient"
                 onClick={handleGuardarPlanificacion}
                 disabled={!planificacionNombre.trim() || saving}
               >
@@ -447,7 +458,7 @@ function PlanificacionAnualContent() {
                   : planificacionActual
                     ? 'Actualizar'
                     : 'Guardar'}
-              </PrimaryButton>
+              </Button>
             </div>
           </div>
         </div>

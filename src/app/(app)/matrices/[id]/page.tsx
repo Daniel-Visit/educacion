@@ -13,8 +13,7 @@ import {
   Edit,
   Trash2,
 } from 'lucide-react';
-import PrimaryButton from '@/components/ui/PrimaryButton';
-import SecondaryButton from '@/components/ui/SecondaryButton';
+import { Button } from '@/components/ui/button';
 import LoadingState from '@/components/ui/LoadingState';
 import { Dialog } from '@headlessui/react';
 
@@ -134,9 +133,13 @@ export default function VerMatrizPage() {
           <h3 className="text-xl font-semibold text-gray-900 mb-2">
             {error || 'Matriz no encontrada'}
           </h3>
-          <SecondaryButton onClick={() => router.push('/matrices')}>
+          <Button
+            variant="outlineGray"
+            size="outlineGray"
+            onClick={() => router.push('/matrices')}
+          >
             Volver a Matrices
-          </SecondaryButton>
+          </Button>
         </div>
       </div>
     );
@@ -603,10 +606,20 @@ export default function VerMatrizPage() {
               eliminar esta matriz?
             </Dialog.Description>
             <div className="flex gap-4 justify-end">
-              <SecondaryButton onClick={() => setShowDeleteModal(false)}>
+              <Button
+                variant="outlineGray"
+                size="outlineGray"
+                onClick={() => setShowDeleteModal(false)}
+              >
                 Cancelar
-              </SecondaryButton>
-              <PrimaryButton onClick={confirmDelete}>Eliminar</PrimaryButton>
+              </Button>
+              <Button
+                variant="gradient"
+                size="gradient"
+                onClick={confirmDelete}
+              >
+                Eliminar
+              </Button>
             </div>
           </div>
         </div>
@@ -630,9 +643,13 @@ export default function VerMatrizPage() {
                 {alert.message}
               </Dialog.Description>
               <div className="flex gap-4 justify-end">
-                <PrimaryButton onClick={() => setAlert(null)}>
+                <Button
+                  variant="gradient"
+                  size="gradient"
+                  onClick={() => setAlert(null)}
+                >
                   Cerrar
-                </PrimaryButton>
+                </Button>
               </div>
             </div>
           </div>

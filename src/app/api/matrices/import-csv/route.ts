@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 // Interfaces para tipar los datos del CSV
 interface CSVRowData {
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
       ...new Set(matrizData.map(row => row.oa_identificador)),
     ]; // Obtener OAs únicos
 
-    const oas = await prisma.oa.findMany({
+    const oas = await db.oa.findMany({
       where: {
         oas_id: { in: oaIdentificadores },
         asignatura_id: parseInt(asignaturaId),
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
 
     if (oas.length !== oaIdentificadores.length) {
       // Buscar todos los OAs disponibles para esta asignatura/nivel para dar mejor información
-      const todosLosOAs = await prisma.oa.findMany({
+      const todosLosOAs = await db.oa.findMany({
         where: {
           asignatura_id: parseInt(asignaturaId),
           nivel_id: parseInt(nivelId),
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar si hay OAs de habilidad disponibles para esta asignatura/nivel
-    const oasDisponibles = await prisma.oa.findMany({
+    const oasDisponibles = await db.oa.findMany({
       where: {
         asignatura_id: parseInt(asignaturaId),
         nivel_id: parseInt(nivelId),

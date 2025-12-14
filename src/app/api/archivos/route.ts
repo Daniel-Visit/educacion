@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from '@/lib/db';
 
 export async function GET() {
   try {
-    const archivos = await prisma.archivo.findMany({
+    const archivos = await db.archivo.findMany({
       orderBy: {
         updatedAt: 'desc',
       },
@@ -95,7 +93,7 @@ export async function POST(request: NextRequest) {
 
     let archivo;
     try {
-      archivo = await prisma.archivo.create({
+      archivo = await db.archivo.create({
         data: {
           titulo,
           tipo,

@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from '@/lib/db';
 
 export async function GET() {
   try {
-    const oas = await prisma.oa.findMany({
+    const oas = await db.oa.findMany({
       orderBy: [
         { nivel_id: 'asc' },
         { asignatura_id: 'asc' },
@@ -16,10 +14,10 @@ export async function GET() {
     // Obtener los datos de nivel y asignatura manualmente
     const oasWithDetails = await Promise.all(
       oas.map(async oa => {
-        const nivel = await prisma.nivel.findUnique({
+        const nivel = await db.nivel.findUnique({
           where: { id: oa.nivel_id },
         });
-        const asignatura = await prisma.asignatura.findUnique({
+        const asignatura = await db.asignatura.findUnique({
           where: { id: oa.asignatura_id },
         });
 

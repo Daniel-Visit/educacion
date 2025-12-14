@@ -1,7 +1,6 @@
 import { Dialog } from '@headlessui/react';
 import { Save, AlertCircle } from 'lucide-react';
-import PrimaryButton from '@/components/ui/PrimaryButton';
-import SecondaryButton from '@/components/ui/SecondaryButton';
+import { Button } from '@/components/ui/button';
 
 interface SaveModalProps {
   isOpen: boolean;
@@ -69,14 +68,18 @@ export default function SaveModal({
             )}
 
             <div className="flex gap-3 pt-4">
-              <SecondaryButton
+              <Button
+                variant="outlineGray"
+                size="outlineGray"
                 onClick={onClose}
                 disabled={saving}
                 className="flex-1"
               >
                 Cancelar
-              </SecondaryButton>
-              <PrimaryButton
+              </Button>
+              <Button
+                variant="gradient"
+                size="gradient"
                 onClick={onSave}
                 disabled={saving || !titulo.trim()}
                 className="flex-1 flex items-center justify-center gap-2"
@@ -92,7 +95,7 @@ export default function SaveModal({
                     Guardar
                   </>
                 )}
-              </PrimaryButton>
+              </Button>
             </div>
           </div>
         </div>

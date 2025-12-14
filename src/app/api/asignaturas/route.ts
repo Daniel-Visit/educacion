@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 // GET /api/asignaturas - Listar asignaturas
 export async function GET() {
   try {
-    const asignaturas = await prisma.asignatura.findMany({
+    const asignaturas = await db.asignatura.findMany({
       orderBy: {
         nombre: 'asc',
       },
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar si la asignatura ya existe
-    const asignaturaExistente = await prisma.asignatura.findUnique({
+    const asignaturaExistente = await db.asignatura.findUnique({
       where: { nombre },
     });
 
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const asignatura = await prisma.asignatura.create({
+    const asignatura = await db.asignatura.create({
       data: {
         nombre,
       },

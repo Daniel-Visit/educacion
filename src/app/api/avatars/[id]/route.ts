@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from '@/lib/db';
 
 export async function GET(
   request: NextRequest,
@@ -9,7 +7,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const avatar = await prisma.availableAvatar.findUnique({
+    const avatar = await db.availableAvatar.findUnique({
       where: { id },
     });
 
@@ -24,7 +22,5 @@ export async function GET(
       { error: 'Internal server error' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

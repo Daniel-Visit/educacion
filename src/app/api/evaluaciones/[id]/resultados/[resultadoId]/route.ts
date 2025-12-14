@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 // DELETE /api/evaluaciones/[id]/resultados/[resultadoId] - eliminar un archivo de resultados específico
 export async function DELETE(
@@ -16,7 +16,7 @@ export async function DELETE(
     }
 
     // Verificar que el resultado pertenece a la evaluación
-    const resultado = await prisma.resultadoEvaluacion.findFirst({
+    const resultado = await db.resultadoEvaluacion.findFirst({
       where: {
         id: resultadoIdNum,
         evaluacionId: evaluacionId,
@@ -31,7 +31,7 @@ export async function DELETE(
     }
 
     // Eliminar en orden: respuestas -> resultados de alumnos -> archivo de resultados
-    await prisma.respuestaAlumno.deleteMany({
+    await db.respuestaAlumno.deleteMany({
       where: {
         resultadoAlumno: {
           resultadoEvaluacionId: resultadoIdNum,
@@ -39,11 +39,11 @@ export async function DELETE(
       },
     });
 
-    await prisma.resultadoAlumno.deleteMany({
+    await db.resultadoAlumno.deleteMany({
       where: { resultadoEvaluacionId: resultadoIdNum },
     });
 
-    await prisma.resultadoEvaluacion.delete({
+    await db.resultadoEvaluacion.delete({
       where: { id: resultadoIdNum },
     });
 

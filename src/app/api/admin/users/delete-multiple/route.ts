@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '../../../../../../auth';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -13,7 +13,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Resolver usuario real desde BD y validar rol admin
-    const currentUser = await prisma.user.findFirst({
+    const currentUser = await db.user.findFirst({
       where: {
         OR: [
           ...(session.user.id ? [{ id: session.user.id }] : []),
@@ -54,7 +54,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Verificar que todos los usuarios existen
-    const existingUsers = await prisma.user.findMany({
+    const existingUsers = await db.user.findMany({
       where: {
         id: { in: userIds },
       },
@@ -71,7 +71,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Eliminar usuarios en transacción
-    const result = await prisma.$transaction(async tx => {
+    const result = await db.$transaction(async tx => {
       // Eliminar tokens de verificación
       await tx.verificationToken.deleteMany({
         where: {

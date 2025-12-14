@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from '@/lib/db';
 
 interface OAData {
   oaId: number;
@@ -13,7 +11,7 @@ interface OAData {
 
 export async function GET() {
   try {
-    const matrices = await prisma.matrizEspecificacion.findMany({
+    const matrices = await db.matrizEspecificacion.findMany({
       include: {
         oas: {
           include: {
@@ -28,17 +26,17 @@ export async function GET() {
       matrices.map(async matriz => {
         const oasWithDetails = await Promise.all(
           matriz.oas.map(async matrizOA => {
-            const oa = await prisma.oa.findUnique({
+            const oa = await db.oa.findUnique({
               where: { id: matrizOA.oaId },
             });
 
             let nivel = null;
             let asignatura = null;
             if (oa) {
-              nivel = await prisma.nivel.findUnique({
+              nivel = await db.nivel.findUnique({
                 where: { id: oa.nivel_id },
               });
-              asignatura = await prisma.asignatura.findUnique({
+              asignatura = await db.asignatura.findUnique({
                 where: { id: oa.asignatura_id },
               });
             }
@@ -94,7 +92,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const matriz = await prisma.matrizEspecificacion.create({
+    const matriz = await db.matrizEspecificacion.create({
       data: {
         nombre,
         total_preguntas,

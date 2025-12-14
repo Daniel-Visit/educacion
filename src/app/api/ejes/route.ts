@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,7 +26,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Obtener OAs con filtros
-    const oas = await prisma.oa.findMany({
+    const oas = await db.oa.findMany({
       where,
       orderBy: [{ eje_id: 'asc' }, { oas_id: 'asc' }],
     });

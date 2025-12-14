@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from '@/lib/db';
 
 export async function GET() {
   try {
-    const niveles = await prisma.nivel.findMany({
+    const niveles = await db.nivel.findMany({
       orderBy: {
         nombre: 'asc',
       },
@@ -48,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar si ya existe un nivel con ese nombre
-    const existingNivel = await prisma.nivel.findUnique({
+    const existingNivel = await db.nivel.findUnique({
       where: {
         nombre: body.nombre.trim(),
       },
@@ -62,7 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear el nuevo nivel
-    const nuevoNivel = await prisma.nivel.create({
+    const nuevoNivel = await db.nivel.create({
       data: {
         nombre: body.nombre.trim(),
       },

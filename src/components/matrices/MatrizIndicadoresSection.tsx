@@ -1,7 +1,6 @@
 import { Target, BookOpen, Zap, Plus, X } from 'lucide-react';
 import { getGradient } from '@/utils/matrices';
-import SecondaryButton from '@/components/ui/SecondaryButton';
-import PrimaryButton from '@/components/ui/PrimaryButton';
+import { Button } from '@/components/ui/button';
 
 interface OA {
   id: number;
@@ -363,15 +362,17 @@ export default function MatrizIndicadoresSection({
 
       {/* Resumen de preguntas */}
       <div className="flex justify-end gap-4 mt-8">
-        <SecondaryButton onClick={onBack}>Atrás</SecondaryButton>
-        <PrimaryButton
-          variant="large"
+        <Button variant="outlineGray" size="outlineGray" onClick={onBack}>
+          Atrás
+        </Button>
+        <Button
+          variant="gradient"
+          size="gradientLg"
           onClick={onCreateMatriz}
           disabled={!isStep3Valid || loading}
-          className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Creando...' : 'Finalizar'}
-        </PrimaryButton>
+        </Button>
       </div>
 
       <div className="flex justify-end items-center mb-2">

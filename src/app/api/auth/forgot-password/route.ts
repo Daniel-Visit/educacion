@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 import resend from '@/lib/resend';
 import crypto from 'crypto';
 import { render } from '@react-email/render';
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     // Verificar que el usuario existe
     console.log('🔍 FORGOT PASSWORD - Buscando usuario en BD:', email);
-    const user = await prisma.user.findUnique({
+    const user = await db.user.findUnique({
       where: { email },
     });
 
@@ -46,12 +46,12 @@ export async function POST(request: NextRequest) {
     );
 
     // Eliminar tokens anteriores del usuario
-    await prisma.verificationToken.deleteMany({
+    await db.verificationToken.deleteMany({
       where: { identifier: email },
     });
 
     // Crear nuevo token
-    await prisma.verificationToken.create({
+    await db.verificationToken.create({
       data: {
         identifier: email,
         token,

@@ -7,8 +7,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Asignatura, Nivel } from '@/types/matrices';
-import PrimaryButton from '@/components/ui/PrimaryButton';
-import SecondaryButton from '@/components/ui/SecondaryButton';
+import { Button } from '@/components/ui/button';
 
 interface MatrizBasicFormProps {
   matrizName: string;
@@ -179,18 +178,19 @@ export default function MatrizBasicForm({
       {/* Botones de navegación */}
       <div className="flex justify-end gap-4 mt-4">
         {isEditMode && onCancel && (
-          <SecondaryButton variant="large" onClick={onCancel}>
+          <Button variant="outlineGray" size="outlineGrayLg" onClick={onCancel}>
             Cancelar
-          </SecondaryButton>
+          </Button>
         )}
         {onNext && (
-          <PrimaryButton
-            variant="large"
+          <Button
+            variant="gradient"
+            size="gradientLg"
             onClick={onNext}
             disabled={!canProceed}
           >
             Siguiente
-          </PrimaryButton>
+          </Button>
         )}
       </div>
     </div>

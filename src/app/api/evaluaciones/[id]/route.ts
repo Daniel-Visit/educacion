@@ -1,6 +1,6 @@
-// NOTA: Los modelos Prisma se acceden en minúscula y singular: prisma.evaluacion, prisma.pregunta, prisma.alternativa
+// NOTA: Los modelos Prisma se acceden en minúscula y singular: db.evaluacion, db.pregunta, db.alternativa
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 import { calcularEstadoEvaluacion } from '@/lib/evaluacion-utils';
 import { MatrizEspecificacion } from '@/types/evaluacion';
 
@@ -33,7 +33,7 @@ export async function GET(
       return NextResponse.json({ error: 'ID inválido' }, { status: 400 });
     }
 
-    const evaluacion = await prisma.evaluacion.findUnique({
+    const evaluacion = await db.evaluacion.findUnique({
       where: { id },
       include: {
         archivo: true,
@@ -115,7 +115,7 @@ export async function PUT(
 
     // Verificar que la evaluación existe
     console.log('🔍 [API] Buscando evaluación existente con ID:', id);
-    const evaluacionExistente = await prisma.evaluacion.findUnique({
+    const evaluacionExistente = await db.evaluacion.findUnique({
       where: { id },
       include: {
         preguntas: {
@@ -144,7 +144,7 @@ export async function PUT(
       if (contenido) updateData.contenido = contenido;
       if (titulo) updateData.titulo = titulo;
 
-      await prisma.archivo.update({
+      await db.archivo.update({
         where: { id: evaluacionExistente.archivoId },
         data: updateData,
       });
@@ -154,7 +154,7 @@ export async function PUT(
     // Actualizar la matriz si se proporciona
     if (matrizId) {
       console.log('🔍 [API] Actualizando matriz con ID:', matrizId);
-      await prisma.evaluacion.update({
+      await db.evaluacion.update({
         where: { id },
         data: { matrizId: matrizId },
       });
@@ -199,7 +199,7 @@ export async function PUT(
       if (hanCambiado) {
         console.log('🔍 [API] Las preguntas han cambiado, actualizando...');
         // Usar una transacción para asegurar consistencia
-        await prisma.$transaction(async tx => {
+        await db.$transaction(async tx => {
           // Eliminar en orden correcto: RespuestaAlumno → Alternativa → PreguntaIndicador → Pregunta
 
           // 1. Eliminar respuestas de alumnos que referencian las preguntas
@@ -283,7 +283,7 @@ export async function PUT(
 
       // Eliminar indicadores existentes
       console.log('🔍 [API] Eliminando indicadores existentes...');
-      await prisma.preguntaIndicador.deleteMany({
+      await db.preguntaIndicador.deleteMany({
         where: {
           pregunta: {
             evaluacionId: id,
@@ -294,7 +294,7 @@ export async function PUT(
 
       // Obtener las preguntas actuales para mapear números a IDs
       console.log('🔍 [API] Obteniendo preguntas actuales...');
-      const preguntasActuales = await prisma.pregunta.findMany({
+      const preguntasActuales = await db.pregunta.findMany({
         where: { evaluacionId: id },
         select: { id: true, numero: true },
       });
@@ -370,7 +370,7 @@ export async function PUT(
 
       if (indicadoresToCreate.length > 0) {
         console.log('🔍 [API] Creando indicadores en BD...');
-        await prisma.preguntaIndicador.createMany({
+        await db.preguntaIndicador.createMany({
           data: indicadoresToCreate,
         });
         console.log('🔍 [API] Indicadores creados exitosamente');
@@ -385,7 +385,7 @@ export async function PUT(
     console.log('Calculando estado de la evaluación...');
 
     // Obtener la evaluación con todos los datos necesarios para calcular el estado
-    const evaluacionParaEstado = await prisma.evaluacion.findUnique({
+    const evaluacionParaEstado = await db.evaluacion.findUnique({
       where: { id },
       include: {
         matriz: {
@@ -423,7 +423,7 @@ export async function PUT(
         } as MatrizEspecificacion,
       });
 
-      await prisma.evaluacion.update({
+      await db.evaluacion.update({
         where: { id },
         data: { estado: estadoCalculado },
       });
@@ -432,7 +432,7 @@ export async function PUT(
     }
 
     // Obtener la evaluación actualizada
-    const evaluacionActualizada = await prisma.evaluacion.findUnique({
+    const evaluacionActualizada = await db.evaluacion.findUnique({
       where: { id },
       include: {
         archivo: true,
@@ -484,15 +484,15 @@ export async function DELETE(
     }
 
     // Eliminar en orden: alternativas -> preguntas -> evaluación
-    await prisma.alternativa.deleteMany({
+    await db.alternativa.deleteMany({
       where: { pregunta: { evaluacionId: id } },
     });
 
-    await prisma.pregunta.deleteMany({
+    await db.pregunta.deleteMany({
       where: { evaluacionId: id },
     });
 
-    await prisma.evaluacion.delete({
+    await db.evaluacion.delete({
       where: { id },
     });
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '../../../../lib/prisma';
+import { db } from '@/lib/db';
 
 export async function GET() {
   return NextResponse.json(
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     // Verificar que la evaluación existe
     console.log('DEBUG: Buscando evaluación con ID:', evaluacionId);
 
-    const evaluacion = await prisma.evaluacion.findUnique({
+    const evaluacion = await db.evaluacion.findUnique({
       where: { id: evaluacionId },
       include: {
         preguntas: {
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
     console.log('DEBUG: Total de RUTs únicos encontrados:', rutsUnicos.length);
 
     // Buscar todos los alumnos en una sola consulta
-    const alumnos = await prisma.alumno.findMany({
+    const alumnos = await db.alumno.findMany({
       where: {
         rut: {
           in: rutsUnicos,
@@ -234,7 +234,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Crear resultado de evaluación
-    const resultadoEvaluacion = await prisma.resultadoEvaluacion.create({
+    const resultadoEvaluacion = await db.resultadoEvaluacion.create({
       data: {
         nombre: `Resultado ${evaluacion.matriz.nombre} - ${new Date().toLocaleDateString()}`,
         evaluacionId,
@@ -274,7 +274,7 @@ export async function POST(request: NextRequest) {
       const nota = (porcentaje / 100) * 7.0; // Escala de 1-7
 
       // Crear resultado del alumno en transacción separada
-      const resultadoAlumno = await prisma.resultadoAlumno.create({
+      const resultadoAlumno = await db.resultadoAlumno.create({
         data: {
           resultadoEvaluacionId: resultadoEvaluacion.id,
           alumnoId: alumno.id,
@@ -307,7 +307,7 @@ export async function POST(request: NextRequest) {
 
     // Insertar todas las respuestas en un solo lote
     if (todasLasRespuestas.length > 0) {
-      await prisma.respuestaAlumno.createMany({
+      await db.respuestaAlumno.createMany({
         data: todasLasRespuestas,
       });
     }
