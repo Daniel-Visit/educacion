@@ -17,7 +17,9 @@
     "prepare": "husky",
     "db": "./scripts/prisma-safe.sh",
     "db:generate": "./scripts/prisma-safe.sh generate",
-    "db:studio": "./scripts/prisma-safe.sh studio"
+    "db:studio": "./scripts/prisma-safe.sh studio",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
@@ -50,6 +52,7 @@
     "@radix-ui/react-select": "^2.2.5",
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "@react-email/components": "^0.4.0",
     "@remixicon/react": "^4.6.0",
     "@supabase/supabase-js": "^2.53.0",
@@ -105,6 +108,7 @@
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.57.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",

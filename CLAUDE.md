@@ -6,6 +6,8 @@
 npm run dev          # Development server (port 3000)
 npm run build        # Production build
 npm run lint         # ESLint
+npm run test:e2e     # Playwright E2E tests
+npm run test:e2e:ui  # Playwright E2E tests with UI
 npx prisma generate  # Regenerate Prisma client after schema changes
 npx prisma studio    # Database GUI
 ```

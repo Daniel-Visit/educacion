@@ -1,6 +1,7 @@
 'use client';
 
 import LoadingState from '@/components/ui/LoadingState';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { Play, Edit3, Trash2, Calendar, Users, FileText } from 'lucide-react';
 import {
   Pagination,
@@ -98,15 +99,6 @@ export default function HorariosList() {
     loadHorarios();
   }, [loadHorarios]);
 
-  // Log de depuración
-  if (typeof window !== 'undefined') {
-    if (!horarios || horarios.length === 0) {
-      console.warn('No se encontraron horarios para mostrar');
-    } else {
-      console.log('Horarios recibidos:', horarios);
-    }
-  }
-
   // Mostrar loading state mientras se cargan los datos
   if (isLoading) {
     return (
@@ -143,76 +135,35 @@ export default function HorariosList() {
     }
   };
 
+  const totalProfesores = new Set(
+    horarios.map(h => h.profesor?.id).filter(Boolean)
+  ).size;
+  const totalAsignaturas = new Set(
+    horarios.map(h => h.asignatura?.id).filter(Boolean)
+  ).size;
+
   return (
     <>
-      {/* Header compacto */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white shadow-lg mb-6 mt-0">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-4">
-            <div className="bg-white/20 p-2 rounded-lg">
-              <Calendar className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">
-                Configuración de Planificaciones
-              </h1>
-              <p className="text-indigo-100 text-sm">
-                Gestiona las configuraciones para la planificación anual
-              </p>
-            </div>
-          </div>
+      <PageHeader
+        icon={Calendar}
+        title="Configuración de Planificaciones"
+        subtitle="Gestiona las configuraciones para la planificación anual"
+        stats={[
+          { label: 'Config.', value: horarios.length, icon: Calendar },
+          { label: 'Profesores', value: totalProfesores, icon: Users },
+          { label: 'Asignaturas', value: totalAsignaturas, icon: FileText },
+        ]}
+        actions={
           <button
+            data-testid="header-action-create"
             onClick={() => setModalOpen(true)}
             className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
           >
             <Calendar className="w-4 h-4" />
             Nueva Configuración
           </button>
-        </div>
-
-        {/* Stats compactas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-indigo-200" />
-              <div>
-                <p className="text-indigo-200 text-xs">Configuraciones</p>
-                <p className="text-lg font-bold">{horarios.length}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-indigo-200" />
-              <div>
-                <p className="text-indigo-200 text-xs">Profesores</p>
-                <p className="text-lg font-bold">
-                  {
-                    new Set(horarios.map(h => h.profesor?.id).filter(Boolean))
-                      .size
-                  }
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-indigo-200" />
-              <div>
-                <p className="text-indigo-200 text-xs">Asignaturas</p>
-                <p className="text-lg font-bold">
-                  {
-                    new Set(horarios.map(h => h.asignatura?.id).filter(Boolean))
-                      .size
-                  }
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        }
+      />
       <CrearHorarioModal
         isOpen={modalOpen || !!horarioEditando}
         onClose={() => {

@@ -9,7 +9,6 @@ import {
   Edit,
   Eye,
   BarChart3,
-  Calendar,
   Target,
   Users,
   ChevronLeft,
@@ -27,6 +26,7 @@ import {
 import LoadingState from '@/components/ui/LoadingState';
 import { useMatricesList } from '@/hooks/useMatrices';
 import { formatDate, getGradient } from '@/utils/matrices';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 export default function MatricesPage() {
   const router = useRouter();
@@ -135,86 +135,34 @@ export default function MatricesPage() {
       </div>
     );
   }
+  const totalPreguntas = matrices.reduce(
+    (sum, m) => sum + m.total_preguntas,
+    0
+  );
+  const totalOAs = matrices.reduce((sum, m) => sum + (m.oas?.length || 0), 0);
+
   return (
     <>
-      {/* Header moderno */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white shadow-lg mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-4">
-            <div className="bg-white/20 p-2 rounded-lg">
-              <BarChart3 className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-white mb-1">
-                Matrices de Especificación
-              </h1>
-              <p className="text-indigo-100 text-sm">
-                Gestiona las matrices de especificación para evaluaciones
-              </p>
-            </div>
-          </div>
-
-          {/* Botones de acción */}
+      <PageHeader
+        icon={BarChart3}
+        title="Matrices de Especificación"
+        subtitle="Gestiona las matrices de especificación para evaluaciones"
+        stats={[
+          { label: 'Matrices', value: matrices.length, icon: FileText },
+          { label: 'Preguntas', value: totalPreguntas, icon: Target },
+          { label: 'OAs', value: totalOAs, icon: Users },
+        ]}
+        actions={
           <button
+            data-testid="header-action-create"
             onClick={handleCreateMatriz}
             className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
           >
             <Plus className="w-4 h-4" />
             Nueva Matriz
           </button>
-        </div>
-
-        {/* Stats y información */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-indigo-200" />
-              <div>
-                <p className="text-indigo-200 text-xs">Total Matrices</p>
-                <p className="text-lg font-bold">{matrices.length}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <Target className="h-4 w-4 text-indigo-200" />
-              <div>
-                <p className="text-indigo-200 text-xs">Total Preguntas</p>
-                <p className="text-lg font-bold">
-                  {matrices.reduce((sum, m) => sum + m.total_preguntas, 0)}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-indigo-200" />
-              <div>
-                <p className="text-indigo-200 text-xs">Total OAs</p>
-                <p className="text-lg font-bold">
-                  {matrices.reduce((sum, m) => sum + (m.oas?.length || 0), 0)}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-indigo-200" />
-              <div>
-                <p className="text-indigo-200 text-xs">Última Creada</p>
-                <p className="text-lg font-bold">
-                  {matrices.length > 0
-                    ? formatDate(matrices[0].createdAt || '')
-                    : '-'}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* Contenido principal */}
       <div className="space-y-6">

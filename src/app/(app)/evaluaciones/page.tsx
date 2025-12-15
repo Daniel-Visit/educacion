@@ -8,7 +8,6 @@ import {
   FileText,
   CheckCircle2,
   BarChart3,
-  Calendar,
   Target,
 } from 'lucide-react';
 import {
@@ -26,6 +25,7 @@ import { useRouter } from 'next/navigation';
 import { Dialog } from '@headlessui/react';
 import type { EstadoEvaluacion as EstadoEvaluacionType } from '@/lib/evaluacion-utils';
 import LoadingState from '@/components/ui/LoadingState';
+import { PageHeader } from '@/components/ui/PageHeader';
 interface Evaluacion {
   id: number;
   titulo: string;
@@ -191,89 +191,36 @@ export default function EvaluacionesPage() {
     );
   }
 
+  const totalPreguntas = evaluaciones.reduce(
+    (sum, e) => sum + (e.preguntasCount || 0),
+    0
+  );
+  const matricesUnicas = new Set(
+    evaluaciones.map(e => e.matrizNombre).filter(Boolean)
+  ).size;
+
   return (
     <>
-      {/* Header compacto */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 text-white shadow-lg mb-6 mt-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-4">
-            <div className="bg-white/20 p-2 rounded-lg">
-              <CheckCircle2 className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">Evaluaciones</h1>
-              <p className="text-indigo-100 text-sm">
-                Gestiona las evaluaciones creadas en la plataforma
-              </p>
-            </div>
-          </div>
+      <PageHeader
+        icon={CheckCircle2}
+        title="Evaluaciones"
+        subtitle="Gestiona las evaluaciones creadas en la plataforma"
+        stats={[
+          { label: 'Total', value: evaluaciones.length, icon: FileText },
+          { label: 'Preguntas', value: totalPreguntas, icon: Target },
+          { label: 'Matrices', value: matricesUnicas, icon: BarChart3 },
+        ]}
+        actions={
           <button
+            data-testid="header-action-create"
             onClick={() => router.push('/evaluaciones/crear')}
             className="bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all duration-200 backdrop-blur-sm"
           >
             <Plus className="w-4 h-4" />
             Nueva Evaluación
           </button>
-        </div>
-
-        {/* Stats compactas */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-indigo-200" />
-              <div>
-                <p className="text-indigo-200 text-xs">Total Evaluaciones</p>
-                <p className="text-lg font-bold">{evaluaciones.length}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <Target className="h-4 w-4 text-indigo-200" />
-              <div>
-                <p className="text-indigo-200 text-xs">Total Preguntas</p>
-                <p className="text-lg font-bold">
-                  {evaluaciones.reduce(
-                    (sum, e) => sum + (e.preguntasCount || 0),
-                    0
-                  )}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4 text-indigo-200" />
-              <div>
-                <p className="text-indigo-200 text-xs">Matrices Únicas</p>
-                <p className="text-lg font-bold">
-                  {
-                    new Set(
-                      evaluaciones.map(e => e.matrizNombre).filter(Boolean)
-                    ).size
-                  }
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/10 rounded-lg p-3">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-indigo-200" />
-              <div>
-                <p className="text-indigo-200 text-xs">Última Creada</p>
-                <p className="text-lg font-bold">
-                  {evaluaciones.length > 0
-                    ? formatDate(evaluaciones[0].createdAt)
-                    : '-'}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* Contenido principal */}
       <div className="space-y-6">

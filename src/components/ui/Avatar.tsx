@@ -18,20 +18,7 @@ export function Avatar({ user, size = 'md', className = '' }: AvatarProps) {
   const [avatarId, setAvatarId] = useState<string | undefined>();
   const [colorId, setColorId] = useState<string | undefined>();
 
-  const { avatarData, colorData, isLoading, error } = useAvatarData(
-    avatarId,
-    colorId
-  );
-
-  // Logs de debug
-  console.log('🔍 DEBUG Avatar - User recibido:', user);
-  console.log('🔍 DEBUG Avatar - user.image:', user?.image);
-  console.log('🔍 DEBUG Avatar - avatarId:', avatarId);
-  console.log('🔍 DEBUG Avatar - colorId:', colorId);
-  console.log('🔍 DEBUG Avatar - avatarData:', avatarData);
-  console.log('🔍 DEBUG Avatar - colorData:', colorData);
-  console.log('🔍 DEBUG Avatar - isLoading:', isLoading);
-  console.log('🔍 DEBUG Avatar - error:', error);
+  const { avatarData, colorData, isLoading } = useAvatarData(avatarId, colorId);
 
   // Tamaños del avatar
   const sizeClasses = {
@@ -104,10 +91,7 @@ export function Avatar({ user, size = 'md', className = '' }: AvatarProps) {
     );
   }
 
-  // Si hay error, mostrar iniciales
-  if (error) {
-    console.warn('Avatar error, falling back to initials:', error);
-  }
+  // Si hay error, mostrar iniciales (silently fall back)
 
   // Fallback a iniciales
   return (
