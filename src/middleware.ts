@@ -49,13 +49,27 @@ export async function middleware(request: NextRequest) {
 
   try {
     // Get JWT token
+    const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
+    console.log('[Middleware] Path:', pathname);
+    console.log('[Middleware] AUTH_SECRET exists:', !!process.env.AUTH_SECRET);
+    console.log(
+      '[Middleware] NEXTAUTH_SECRET exists:',
+      !!process.env.NEXTAUTH_SECRET
+    );
+
     const token = (await getToken({
       req: request,
-      secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+      secret,
     })) as ExtendedToken | null;
+
+    console.log('[Middleware] Token result:', token ? 'valid' : 'null');
+    if (token) {
+      console.log('[Middleware] Token email:', token.email);
+    }
 
     // No token = redirect to login
     if (!token) {
+      console.log('[Middleware] Redirecting to login - no valid token');
       const url = request.nextUrl.clone();
       url.pathname = '/auth/login';
       return NextResponse.redirect(url);
