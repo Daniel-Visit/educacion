@@ -60,6 +60,7 @@ export async function middleware(request: NextRequest) {
     const token = (await getToken({
       req: request,
       secret,
+      cookieName: '__Secure-authjs.session-token',
     })) as ExtendedToken | null;
 
     console.log('[Middleware] Token result:', token ? 'valid' : 'null');
