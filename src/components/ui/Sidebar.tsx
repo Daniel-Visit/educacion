@@ -162,10 +162,7 @@ function SidebarContent({ userRole, user }: { userRole: string; user?: User }) {
             {!isCollapsed && (
               <div>
                 <div className="text-2xl font-extrabold text-indigo-900">
-                  EdK
-                </div>
-                <div className="text-sm text-purple-500 font-medium">
-                  Soluciones IA en educación
+                  Goodly
                 </div>
               </div>
             )}
